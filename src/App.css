@@ -1,0 +1,240 @@
+@import url('https://fonts.googleapis.com/css?family=IBM+Plex+Sans');
+
+* {
+  box-sizing: border-box;
+}
+
+body {
+  background: #eee;
+  font-family: IBM Plex Sans;
+  font-size: 1.3rem;
+}
+
+h1 {
+  font-size: 3rem;
+  font-weight: normal;
+}
+
+table {
+  border: 1px solid black;
+  border-spacing: 0; 
+  empty-cells: show;
+}
+
+td, th {
+  padding: 0.2em 0.5em;
+  border-right: 1px solid #ddd;
+  border-bottom: 1px solid #bbb;
+  vertical-align: top;
+}
+
+.marker {
+	transform: translate(-50%, -100%);
+	display: inline-block;
+	height: 40px;
+}
+
+#lat, #lon {
+	width: 5em;
+}
+
+.hidden {
+	display: none;
+}
+
+#root {
+  max-width: 1200px;
+  margin: auto;
+  background: white;
+  border: 1px solid #aaa;
+}
+
+.MuiInputBase-root {
+  width: 5em;
+}
+
+table.coverCrop {
+  width: 100%;
+}
+
+table.coverCrop table {
+  width: 50%;
+}
+
+table.coverCrop td:nth-child(1) {
+  width: 10em;
+}
+
+nav {
+  display: flex;
+  position: sticky;
+  top: 0;
+  background: white;
+}
+
+nav button {
+  flex-grow: 1;
+  flex-basis: 0;
+  font-weight: bold;
+  padding: 0.5em;
+  background: transparent;
+  border: none;
+  font-size: 1.2rem;
+  white-space: nowrap;
+  font-style: normal;
+  font-weight: 600;
+  color: gray;
+}
+
+nav button:hover {
+  background: #eee;
+}
+
+nav button.selected {
+  color: #385E1B;
+}
+
+.output button {
+  font-size: 90%;
+  width: 14em;
+  padding: 0.5em;
+}
+
+.output button.selected {
+  background: #8EB644;
+}
+
+nav button:first-of-type {
+  margin-left: 15rem;
+}
+
+#Main {
+  padding: 1rem 3rem;
+  position: relative;
+}
+
+.fullwidth {
+  margin-top: 1em;
+  position: absolute;
+  left: 0;
+  width: 100%;
+}
+
+nav img {
+  height: 2rem;
+}
+
+div.center {
+  text-align: center;
+}
+
+.home button, .about button, .bn button, button.bn {
+  background: #6B9333;
+  box-shadow: 0px 2px 2px rgba(160, 160, 160, 0.3);
+  border-radius: 2rem;
+  color: white;
+  font-size: 1rem;
+  margin-right: 3em;
+  font-weight: bold;
+  padding: 1em 2em;
+}
+
+.home button, .about button {
+  width: 12rem;
+}
+
+img {
+  max-width: 100%;
+}
+
+div.bn {
+  margin-top: 1em;
+  text-align: center;
+}
+
+.inputs {
+  color: #4F6B14;
+  font-size: 110%;
+}
+
+.MuiInputBase-root {
+  min-width: 12em;
+}
+
+.MuiSlider-root {
+  max-width: 20em;
+  vertical-align: bottom;
+  color: #4F6B14 !important;  /* Yeah, I know */
+  position: relative;  
+  top: 12px;  /* align with Input */
+}
+
+.slider * {
+  vertical-align: bottom;
+}
+
+.loading {
+  font-size: 2rem;
+  font-weight: bold;
+  text-align: center;
+  margin: 3rem;
+  height: 70vh;
+}
+
+.loading span {
+  display: inline-block;
+  height: 2rem;
+  width: 2rem;
+  border-radius: 50%;
+  margin: 0 1rem;
+}
+
+.loading span:nth-of-type(1) {background: #DCE8C5;}
+.loading span:nth-of-type(2) {background: #AFCB7C;}
+.loading span:nth-of-type(3) {background: #6B9333;}
+
+input[name="residue"] {
+  zoom: 1.5;
+}
+
+.percent > div {
+  display: inline-block;
+  padding: 0.5em 0;
+  text-align: center;
+}
+
+#Output2 .underscore {
+  border-bottom: 1px solid #4F6B14;
+  width: 200px;
+}
+
+.tiny {
+  font-size: 70%;
+  position: relative;
+  top: 1.5em;
+  color: silver;
+}
+
+.noborder {
+  border: none;
+  width: 100%
+}
+
+.MuiListSubheader-root {
+  background: #246 !important;
+  color: #eca !important;
+  font-style: italic;
+  border-top: 1px solid #aaa;
+  border-bottom: 1px solid #aaa;
+  line-height: 1.5em !important;
+}
+
+.warning {
+  background: yellow;
+  font-size: 80%;
+}
+
+.residueChemistry td:nth-child(2) {
+  text-align: right;
+}
+
