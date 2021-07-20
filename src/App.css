@@ -1,5 +1,7 @@
 @import url('https://fonts.googleapis.com/css?family=IBM+Plex+Sans');
 
+@import url('https://fonts.googleapis.com/icon?family=Material+Icons');
+
 * {
   box-sizing: border-box;
 }
@@ -11,7 +13,7 @@ body {
 }
 
 h1 {
-  font-size: 3rem;
+  font-size: 2rem;
   font-weight: normal;
 }
 
@@ -208,6 +210,14 @@ input[name="residue"] {
   width: 200px;
 }
 
+#Output2 {
+  font-size: 70%;
+}
+
+#Output2 td:nth-child(1) {
+  width: 40%;
+}
+
 .tiny {
   font-size: 70%;
   position: relative;
@@ -234,7 +244,32 @@ input[name="residue"] {
   font-size: 80%;
 }
 
-.residueChemistry td:nth-child(2) {
+.coverCropSummary {
+  width: 10px;
+  white-space: nowrap;
+}
+
+.coverCropSummary, .coverCropSummary * {
+  border: none;
+}
+
+.coverCropSummary td:nth-child(2) {
   text-align: right;
 }
 
+.coverCropSummary td:nth-child(n + 2) {
+  padding: 0.1em;
+}
+
+.MuiSlider-rail, .MuiSlider-track {
+  height: 5px !important;
+}
+
+.help {
+  position: fixed;
+  background: #eef;
+  padding: 0.5em;
+  border-radius: 5px;
+  box-shadow: 5px 5px 15px 5px #000;
+  font-size: 70%;
+}

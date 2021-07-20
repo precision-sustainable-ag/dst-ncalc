@@ -3,7 +3,7 @@ const Home = ({setScreen}) => (
     <p>Welcome to the</p>
     <h1>Cover Crop N Availability Calculator</h1>
 
-    <p>This calculator aids farmers with decision support regarding residue persistence, as well as the amount and timing of nitrogen availability from cover crops.</p>
+    <p>This calculator aids farmers with decision support regarding cover crop residue persistence, as well as the amount and timing of nitrogen availability.</p>
 
     <div>
       <button onClick={() => setScreen('About'   )}>ABOUT</button>
@@ -11,7 +11,6 @@ const Home = ({setScreen}) => (
     </div>
 
     <img className="crops fullwidth" src="8-crops 1.png" alt="" />
-
   </div>
 ) // Home
 

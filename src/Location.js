@@ -2,13 +2,9 @@ import GoogleMaps from './GoogleMaps';
 
 import GoogleMapReact from 'google-map-react';
 
-import React from 'react';
-
 import {
   Input,
 } from '@material-ui/core';
-
-import 'react-datepicker/dist/react-datepicker.css';
 
 const Map = ({sets, parms}) => {
   const mapChange = (e) => {

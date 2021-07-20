@@ -1,15 +1,16 @@
 import DatePicker from 'react-datepicker';
+
 import 'react-datepicker/dist/react-datepicker.css';
 
 import {
-  MenuItem,
-  Select,
   TextField
 } from '@material-ui/core';
 
 import Autocomplete from '@material-ui/lab/Autocomplete';
 
 import Myslider from './slider';
+
+import Icon from '@material-ui/core/Icon';
 
 const maxBiomass = {
   'Alfalfa, Dormant': 5800,
@@ -61,7 +62,7 @@ const maxBiomass = {
   'Wheat, Winter': 9400,
 };
 
-const Species = ({sets, parms}) => {
+const CoverCrops = ({sets, parms}) => {
   const species = {
     Brassica:   ['Brassica, Forage', 'Mustard', 'Radish, Forage', 'Radish, Oilseed', 'Rape, Oilseed, Spring', 'Rape, Oilseed, Winter', 'Rapeseed, Forage', 'Turnip, Forage', 'Turnip, Purple Top'],
     Broadleaf:  ['Buckwheat', 'Phacelia', 'Sunflower'],
@@ -72,7 +73,7 @@ const Species = ({sets, parms}) => {
   return (
     <Autocomplete
       multiple
-      value={parms.species || []}
+      value={parms.coverCrop || []}
       groupBy={
         (option) => species.Brassica.includes(option)  ? 'Brassica' :
                     species.Broadleaf.includes(option) ? 'Broadleaf' :
@@ -86,7 +87,7 @@ const Species = ({sets, parms}) => {
         ...species.Brassica,
         ...species.Broadleaf,
       ]}
-      onChange={(event, newValue) => sets.species(newValue)}
+      onChange={(event, newValue) => sets.coverCrop(newValue)}
       renderInput={(params) => (
         <TextField
           {...params}
@@ -97,40 +98,31 @@ const Species = ({sets, parms}) => {
       )}      
     />    
   );
-} // Species
+} // CoverCrops
 
-const Crops = ({sets, parms}) => {
+const CashCrops = ({sets, parms}) => {
   const crops = [
     'Alfalfa-Establishment',
     'Alfalfa-Maintenance',
     'Annual Flowers',
-    'Annual Flowers (commercial)',
     'Annual Lespedeza',
-    'Apples - Home Garden',
-    'Apples (bearing)',
-    'Apples (non-bearing)',
-    'Arrowleaf Clover (Apache, Yuchi, Amclo, Mechee)',
+    'Apples',
+    'Arrowleaf Clover',
     'Asparagus',
     'Athletic Field',
     'Azaleas',
-    'Azaleas (commercial)',
     'Bahia Grass Pasture',
-    'Basil (and other herbs not listed)',
+    'Basil',
     'Beets',
     'Bentgrass Golf Greens',
     'Bermuda Golf Greens (Overseeded)',
-    'Blackberries - Home Garden',
-    'Blackberries (commercial)',
-    'Blueberries-Home Garden',
-    'Blueberries-Rabbiteye (commercial)',
-    'Blueberries-Southern Highbush in Pinebark Beds',
-    'Blueberries-Southern Highbush in Soil or Amended Soil',
+    'Blackberries',
+    'Blueberries',
     'Broccoli, fresh market',
     'Brown Top Millet',
-    'Bunch Grapes - Home Garden',
+    'Bunch Grapes',
     'Cabbage, fresh market',
     'Camellias',
-    'Camellias (commercial)',
     'Canola Spring Type',
     'Canola Winter Type',
     'Cantaloupes',
@@ -142,22 +134,15 @@ const Crops = ({sets, parms}) => {
     'Christmas Trees - Cedar',
     'Christmas Trees - Pine and Leyland Cypress',
     'Cilantro',
-    'Citrus - Home Garden',
+    'Citrus',
     'Coastal Bermuda - Hay',
     'Coastal Bermuda Pasture',
     'Collards, fresh market',
     'Common Bermuda Lawn',
     'Common Bermuda Pasture',
     'Cool Season Grass Mixtures',
-    'Corn (for Grain) Dryland',
-    'Corn (for Grain) Irrigated 150 bu/a',
-    'Corn (for Grain) Irrigated 200 bu/a',
-    'Corn (for Grain) Irrigated 250 bu/a',
-    'Corn (for Grain) Irrigated 300 bu/a',
-    'Cotton -  750 lbs yield goal',
-    'Cotton - 1000 lbs yield goal',
-    'Cotton - 1250 lbs yield goal',
-    'Cotton - 1500 lbs yield goal',
+    'Corn',
+    'Cotton',
     'Crimson Clover',
     'Cucumbers',
     'Dallis Grass Pasture',
@@ -182,11 +167,9 @@ const Crops = ({sets, parms}) => {
     'Field Nursery - Evergreens (pre-plant)',
     'Field Nursery - Narrow Leaf Evergreen (production)',
     'Field Nursery - Shrubs (pre-plant)',
-    'Figs - Home Garden',
-    'Figs (commercial)',
+    'Figs',
     'Forage Chicory',
     'General Ornamental Shrubs',
-    'General Ornamental Shrubs (commercial)',
     'Goldenseal',
     'Golf Fairways',
     'Golf Tees',
@@ -196,81 +179,57 @@ const Crops = ({sets, parms}) => {
     'Greenhouse',
     'Greenhouse Tomatoes',
     'Ground Cover',
-    'Ground Cover (commercial)',
-    'Herbs (homeowner)',
+    'Herbs',
     'Home Vegetable Garden',
     'Hybrid Bermuda Lawn',
     'Hybrid Bermudas - Hay',
     'Hybrid Bermudas - Pasture',
     'Hybrid Millets',
-    'Industrial Hemp (for flower production)',
-    'Industrial/Business Lawns - Bermuda',
-    'Industrial/Business Lawns - Centipede Establishment',
-    'Industrial/Business Lawns - Centipede Maintenance',
-    'Industrial/Business Lawns - St. Augustine',
-    'Industrial/Business Lawns - Tall Fescue',
-    'Industrial/Business Lawns - Zoysia',
+    'Industrial Hemp',
     'Irish Potatoes',
     'Irrigated Corn Silage',
     'Kale, fresh market',
     'Kenaf',
     'Kentucky Bluegrass',
-    'Kiwifruit - Home Garden',
+    'Kiwifruit',
     'Lettuce, fresh market',
     'Lima Beans',
     'Lupine',
-    'Muscadine - Home Garden',
+    'Muscadine',
     'Mustard, fresh market',
-    'Nectarines - Home Garden',
-    'Nectarines (bearing)',
-    'Nectarines (non-bearing)',
+    'Nectarines',
     'Okra',
     'Olives',
-    'Onions (green bunching)',
-    'Onions (mature and dry)',
-    'Onions (plantbed)',
+    'Onions',
     'Orchard Grass Pasture',
     'Ornamental Trees',
-    'Ornamental Trees (commercial)',
     'Parsley',
-    'Peaches - Home Garden',
-    'Peaches (bearing)',
-    'Peaches (non-bearing)',
+    'Peaches',
     'Peanuts',
-    'Pears - Home Garden',
-    'Pears (bearing)',
-    'Pears (non-bearing)',
+    'Pears',
     'Pecans',
-    'Pecans (bearing) - Home Garden',
-    'Pecans (young trees) - Home Garden',
+    'Pecans',
     'Pepper (Bell and Pimento)',
     'Pepper Transplants',
     'Perennial Flowers',
-    'Perennial Flowers (commercial)',
     'Perennial Peanuts',
     'Pine Plantation - Establishment',
     'Pine Plantation - Maintenance',
     'Pine Seedling Nursery',
-    'Plums - Home Garden',
-    'Plums (bearing)',
-    'Plums (non-bearing)',
+    'Plums',
     'Pole Beans',
     'Pumpkin',
     'Radishes',
-    'Raspberries - Home Garden',
-    'Raspberries (commercial)',
+    'Raspberries',
     'Rhododendrons',
-    'Rhododendrons (commercial)',
     'Rhubarb',
     'Roadside Turf - Establishment',
     'Roadside Turf - Maintenance',
     'Roses',
-    'Roses (commercial)',
     'Ryegrass for Overseeding Lawns',
     'Seashore Paspalum',
     'Sericea',
     'Shade Trees',
-    'Shade Trees (commercial)',
     'Small Grain - Barley',
     'Small Grain - Oats',
     'Small Grain - Rye for Seed Production or Cover Crop',
@@ -288,16 +247,13 @@ const Crops = ({sets, parms}) => {
     'Soybeans',
     'Spinach, fresh market',
     'Spring Flowering Bulbs',
-    'Spring Flowering Bulbs (commercial)',
     'Squash',
     'St. Augustine Lawn',
     'Staked Tomatoes',
-    'Strawberries - Home Garden',
-    'Strawberries-Plasticulture',
+    'Strawberries',
     'Subterranean Clover',
     'Sugar Cane',
     'Summer Bulbs',
-    'Summer Bulbs (commercial)',
     'Summer Deer Mix (Grass only)',
     'Summer Deer Mix (Legume only)',
     'Summer Deer Mix (Legumes and Grass)',
@@ -328,24 +284,31 @@ const Crops = ({sets, parms}) => {
   ];
 
   return (
-    <Select
-      value={parms.crop || ''}
-      onChange={(event) => event.target.value && sets.crop(event.target.value)}
-    >
-      {crops.map((crop, i) => <MenuItem value={crop} key={i}>{crop}</MenuItem>)}
-    </Select>
-  )
-} // Crops
+    <Autocomplete
+      value={parms.cashCrop || []}
+      options={crops}
+      onChange={(event, newValue) => sets.cashCrop(newValue)}
+      renderInput={(params) => (
+        <TextField
+          {...params}
+          variant="standard"
+          label=""
+          zplaceholder="Cash crop"
+        />
+      )}      
+    />    
+  );
+} // CashCrops
 
 const CoverCrop1 = ({ps, parms, sets, setScreen}) => {
-  const max = parms.species.length ? parms.species.map(s => maxBiomass[s]).sort((a, b) => b - a)[0] : 15000;
+  const max = parms.coverCrop.length ? parms.coverCrop.map(s => maxBiomass[s]).sort((a, b) => b - a)[0] : 15000;
 
   return (
     <>
       <h1>Tell us about your cover crop</h1>
       <div className="inputs">
         <p>Cover Crop Species:</p>
-        <Species
+        <CoverCrops
           ps={ps}
           sets={sets}
           parms={parms}
@@ -353,8 +316,8 @@ const CoverCrop1 = ({ps, parms, sets, setScreen}) => {
 
         <p>Cover Crop Termination Date:</p>
         <DatePicker 
-          selected={parms.coverCropKillDate}
-          onChange={date => sets.coverCropKillDate(date)}
+          selected={parms.killDate}
+          onChange={date => sets.killDate(date)}
         />
 
         <p>Dry Biomass (lbs/acre):</p>
@@ -369,12 +332,18 @@ const CoverCrop1 = ({ps, parms, sets, setScreen}) => {
         
         {parms.biomass > max &&
           <p className="warning">
-            This biomass seems too high{parms.species.length > 1 ? ' for these particular species' : parms.species.length ? ' for this particular species' : ''}.<br/>
+            This biomass seems too high{parms.coverCrop.length > 1 ? ' for these particular species' : parms.coverCrop.length ? ' for this particular species' : ''}.<br/>
             Please make sure the biomass entered is on a dry matter basis.
           </p>
         }
 
-        <p>Water Content (g water/g dry biomass):</p>
+        <p>
+          Cover crop water content at termination (g water/g dry biomass): 
+          <Icon>
+            help
+            Water content data is default.  Please change if you have real data.
+          </Icon>
+        </p>
         <Myslider
           parm={'lwc'}
           min={0}
@@ -382,6 +351,7 @@ const CoverCrop1 = ({ps, parms, sets, setScreen}) => {
           ps={ps}
           parms={parms}
           sets={sets}
+          step={0.1}
         />
       </div>
   
@@ -396,6 +366,7 @@ const CoverCrop1 = ({ps, parms, sets, setScreen}) => {
 const CoverCrop2 = ({ps, parms, sets, setScreen}) => {
   return (
     <>
+      <h1>Tell us about your cover crop quality</h1>
       <div className="inputs">
         <p>Nitrogen (%):</p>
         <Myslider
@@ -405,6 +376,7 @@ const CoverCrop2 = ({ps, parms, sets, setScreen}) => {
           ps={ps}
           parms={parms}
           sets={sets}
+          step={0.1}
         />
 
         <p>Carbohydrates (%):</p>
@@ -415,26 +387,29 @@ const CoverCrop2 = ({ps, parms, sets, setScreen}) => {
           ps={ps}
           parms={parms}
           sets={sets}
+          step={0.1}
         />
 
         <p>Cellulose (%):</p>
         <Myslider
-          parm="cellulose"
+          parm="cell"
           min={20}
           max={70}
           ps={ps}
           parms={parms}
           sets={sets}
+          step={0.1}
         />
 
         <p>Lignin (%):</p>
         <Myslider
-          parm="lignin"
+          parm="lign"
           min={1}
           max={10}
           ps={ps}
           parms={parms}
           sets={sets}
+          step={0.1}
         />
 
         <p><em>Carbohydrates + Cellulose + Lignin should equal 100%</em></p>
@@ -452,8 +427,9 @@ const CoverCrop3 = ({ps, parms, sets, setScreen}) => {
   return (
     <>
       <div className="inputs">
+        <h1>Tell us about your cash crop</h1>
         <p>Cash Crop:</p>
-        <Crops sets={sets} parms={parms} />
+        <CashCrops sets={sets} parms={parms} />
 
         <p>Cash crop planting date:</p>
         <DatePicker 
@@ -461,11 +437,25 @@ const CoverCrop3 = ({ps, parms, sets, setScreen}) => {
           onChange={date => sets.plantingDate(date)}
         />
 
-        <p>Yield Goal (bushels/acre):</p>
+        {parms.cashCrop === 'Corn' &&
+          <>
+            <p>Yield Goal (bushels/acre):</p>
+            <Myslider
+              parm={'yield'}
+              min={0}
+              max={300}
+              ps={ps}
+              parms={parms}
+              sets={sets}
+            />
+          </>
+        }
+
+        <p>What is your target nitrogen fertilizer rate? (lbs/acre):</p>
         <Myslider
-          parm={'yield'}
+          parm={'targetN'}
           min={0}
-          max={1000}
+          max={300}
           ps={ps}
           parms={parms}
           sets={sets}
@@ -474,7 +464,7 @@ const CoverCrop3 = ({ps, parms, sets, setScreen}) => {
   
       <div className="bn">
         <button onClick={() => setScreen('CoverCrop2')}>BACK</button>
-        <button onClick={() => setScreen('Output1')   }>NEXT</button>
+        <button onClick={() => setScreen('Output2')   }>NEXT</button>
       </div>
     </>
   )
