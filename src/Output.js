@@ -8,60 +8,7 @@ import transpile from './Transpiler.js';
 
 import moment from 'moment';
 
-const Output1 = ({parms, sets, setScreen}) => {  // OBSOLETE
-  return (
-    <>
-      <h1>Where is the cover crop residue located?</h1>
-      <p>Select your preferred output, then click "next".</p>
-
-      <div className="inputs">
-        <p>
-          <label>
-            <input
-              type="radio" name="residue" id="residue"
-              value="surface"
-              checked={parms.residue === 'surface'} 
-              onChange={() => sets.residue('surface')}
-            />
-            Soil Surface
-          </label>
-        </p>
-
-        <p>
-          <label>
-            <input
-              type="radio" name="residue" id="residue"
-              value="incorporated"
-              checked={parms.residue === 'incorporated'} 
-              onChange={() => sets.residue('incorporated')}
-            />
-            Incorporated
-          </label>
-        </p>
-
-        <p>
-          <label>
-            <input
-              type="radio" name="residue" id="residue"
-              value="compare"
-              checked={parms.residue === 'compare'} 
-              onChange={() => sets.residue('compare')}
-            />
-            Compare
-          </label>
-        </p>
-      </div>
-
-      <div className="bn">
-        <button onClick={() => setScreen('CoverCrop3')}>BACK</button>
-        <button onClick={() => setScreen('Output2')}>NEXT</button>
-      </div>
-
-    </>
-  )
-} // Output1
-
-const Output2 = ({ps, parms, sets, setScreen}) => {
+const Output = ({ps, parms, sets, setScreen}) => {
   if (!parms.biomass || !parms.N || !parms.carb || !parms.cell || !parms.lign || !parms.lwc || !parms.BD || !parms.InorganicN || !parms.weather.length) {
     return (
       <div className="loading">
@@ -73,15 +20,19 @@ const Output2 = ({ps, parms, sets, setScreen}) => {
       </div>
     );
   }
-
-  const total = parms.carb + parms.cell + parms.lign;
+  // alert('output')
+  const total = +parms.carb + +parms.cell + +parms.lign;
+  const carb = parms.carb * 100 / total;
+  const cell = parms.cell * 100 / total;
+  const lign = parms.lign * 100 / total;
+  const factor = parms.unit === 'lb/ac' ? 1.12085 : 1;
 
   const model = transpile({
-    FOMkg: parms.biomass * 1.12085,
+    FOMkg: parms.biomass * factor,
     FOMpctN: +parms.N,
-    FOMpctCarb: +parms.carb,
-    FOMpctCell: +parms.cell,
-    FOMpctLign: +parms.lign,
+    FOMpctCarb: carb,
+    FOMpctCell: cell,
+    FOMpctLign: lign,
     LitterWaterContent: +parms.lwc,
     BD: +parms.BD,
     INppm: +parms.InorganicN,
@@ -92,6 +43,10 @@ const Output2 = ({ps, parms, sets, setScreen}) => {
     rain: parms.weather.map(d => d.precipitation),
   });
 
+  console.log(model.FOMpctCarb);
+  console.log(model.FOMpctCell);
+  console.log(model.FOMpctLign);
+
   const d1 = new Date(parms.plantingDate);
   let dailyTotal = 0;
   let gdd = 0;
@@ -100,18 +55,20 @@ const Output2 = ({ps, parms, sets, setScreen}) => {
 
   const cornN = parms.cashCrop === 'Corn' && parms.outputN === 1;
   if (cornN) {
+    const f = parms.unit === 'lb/ac' ? 1 : 1.12085;
+
     parms.weather.slice((parms.plantingDate - parms.killDate) / (1000 * 60 * 60)).forEach(d => {
       dailyTotal += d.air_temperature - 8;
-      if (d1.getHours() === 23) {
+      if (d1.getHours() === 0) {
         gdd += (dailyTotal / 24);
         NUptake.push([
           // d1 - (1000 * 60 * 60 * 24),
           +d1,
-          (parms.yield * 1.09) / (1 + Math.exp((-0.00615 * (gdd - 646.19)) ))
+          (parms.yield * 1.09) / (1 + Math.exp((-0.00615 * (gdd - 646.19)))) * f
         ]);
         dailyTotal = 0;
       }
-      d1.setHours(d1.getHours() + 1)
+      d1.setHours(d1.getHours() + 1);
     });
   }
 
@@ -120,13 +77,15 @@ const Output2 = ({ps, parms, sets, setScreen}) => {
   const data = [];
 
   model[parms.outputN === 1 ? 'MinNfromFOM' : 'FOM'].forEach((d, i) => {
-    date.setTime(date.getTime() + (60 * 60 * 1000));
-    const value = +(d / 1.12085).toFixed(2)
-    
-    data.push([+date, +value]);
+    const value = +(d / factor).toFixed(2)
+    if (date.getHours() === 0) {
+      data.push([+date, +value]);
+    }
+    date.setHours(date.getHours() + 1)
   });
 
   const max = parms.outputN === 1 ? (parms.biomass * parms.N) / 100 : Math.max.apply(Math, data.map(d => d[1]));
+  const min = parms.outputN === 1 ? (parms.biomass * parms.N) / 100 : Math.min.apply(Math, data.map(d => d[1]));
 
   const minDate = Math.min.apply(Math, data.map(d => d[0]));
 
@@ -141,67 +100,22 @@ const Output2 = ({ps, parms, sets, setScreen}) => {
 
   const options = {
     chart: {
-      events: {
-        /*
-          Linking the secondary axis to the primary axis causes strange percentages, like 0%, 8%, 15%, 23%, ...
-          This code gives the percentages in multiples of 5, 10, 20, or 25.
-          Maybe there's a better way of doing this.
-        */
-        render: function() {
-          const labels = document.querySelectorAll('.highcharts-yaxis-labels')[1].childNodes;
-          const slope = (labels[labels.length - 1].getAttribute('y') - labels[0].getAttribute('y')) / labels[labels.length - 1].innerHTML;
-          const intercept = +labels[0].getAttribute('y');
-          const minY = +labels[labels.length - 1].getAttribute('y');
-          const maxPercent = labels[labels.length - 1].innerHTML;
-          const delta = maxPercent > 100 ? 25 :
-                        maxPercent >  75 ? 20 :
-                        maxPercent >  50 ? 10 :
-                                           5;
-
-          labels.forEach((label, i) => {
-            const y = i * delta * slope + intercept;
-            
-            if (i * delta > 100 || y < minY) {
-              label.innerHTML = '';
-            } else {
-              label.setAttribute('y', y);
-              label.innerHTML = i * delta + '%';
-            }
-          })
-        }
-      },
-    },
-    credits: {
-      enabled: false
-    },
-    legend: {
-      align: 'right',
-      verticalAlign: 'top',
-      layout: 'vertical'
+      height: 405
     },
     plotOptions: {
       series: {
         animation: false,
-        /*
-          dataLabels: {
-            enabled: true,
-            borderRadius: 5,
-            backgroundColor: 'rgba(252, 255, 197, 0.2)',
-            borderWidth: 1,
-            borderColor: '#aaa',
-            formatter: function() {
-              if (this.y === min || this.y === max) {
-                return Math.round(this.y) + ' lbs/A';
-              }
-            }
-          },
-        */
       }
     },
     tooltip: {
-      formatter: function () {
-        return '<small>' + Highcharts.dateFormat('%b %e, %Y', new Date(this.x)) + '</small><br/>' +
-               '<strong>' + this.series.name + ': ' + this.y.toFixed(0) + ' lbs/A</strong>';
+      shared: true,
+      useHTML: true,
+      formatter: function() {
+        const week = Math.floor((this.x - minDate) / (24 * 3600 * 1000) / 7);
+
+        return this.points.reduce((s, point) => (
+          s + '<strong>' + point.series.name + ': ' + point.y.toFixed(0) + ' ' + parms.unit + '<br/></strong>'
+        ), `<small>${Highcharts.dateFormat('%b %e, %Y', new Date(this.x))}</small><br/>Week ${week}<br/>`);
       }
     },
     title: {
@@ -212,22 +126,22 @@ const Output2 = ({ps, parms, sets, setScreen}) => {
         name: parms.outputN === 1 ? 'N released' : 'Residue Remaining',
         data: data,
         color: '#6B9333',
-        showInLegend: false && cornN,
+        showInLegend: false
       },
       {
         name: 'Corn N uptake',
         data: NUptake,
         lineWidth: 1,
         color: 'orange',
-        showInLegend: false && cornN,
+        showInLegend: false
       }
     ],
     yAxis: [
       {
         title: {
-          text: parms.outputN === 1 && cornN  ? 'Cover Crop N Released (lbs/acre)<br><div style="color: orange; zfont-weight: normal;">Corn N uptake (lbs/acre)</div>' :
-                parms.outputN === 1           ? 'Cover Crop N Released (lbs/acre)' :
-                                                'Residue Remaining (lbs/acre)',
+          text: parms.outputN === 1 && cornN  ? `Cover Crop N Released (${parms.unit})<br><div style="color: orange;">Corn N uptake (${parms.unit})</div>` :
+                parms.outputN === 1           ? `Cover Crop N Released (${parms.unit})` :
+                                                `Residue Remaining (${parms.unit})`,
           style: {
             fontSize: '14px',
             fontWeight: 'bold',
@@ -243,40 +157,60 @@ const Output2 = ({ps, parms, sets, setScreen}) => {
         title: {
           text: parms.outputN === 1 ? 'Cover Crop N Released (%)' : 'Residue Remaining (%)',
           style: {
-            fontSize: '16px',
+            fontSize: '14px',
+            fontWeight: 'bold',
             color: '#6B9333'
           }
         },
         linkedTo: 0,
         gridLineWidth: 0,
         opposite: true,
-        tickInterval: 1,
-        labels: {
-          formatter: function () {
-            const result = Math.round(this.value / (max / 100));
-            return result;
+        tickPositioner: function() {
+          const positions = [];
+          const increment = cornN || parms.outputN === 2 ? 25 : 10;
+
+          for (let tick = 0; tick <= 100; tick += increment) {
+            positions.push(tick * (max / 100));
           }
-        }      
+
+          return positions;
+        },        
+        labels: {
+          formatter: function() {
+            const result = Math.round(this.value / (max / 100));
+            return result + '%';
+          }
+        }
       },
     ],
     xAxis: [
       {
         type: 'datetime',
         title: {
-          text: 'Weeks after termination'
+          text: parms.outputN === 1 ? '<div class="caption">Figure shows the amount of cover crop N released over time following its termination.</div>'
+                                    : '<div class="caption">Figure shows the amount of undecomposed cover crop residue mass remaining over time following its termination.</div>'
         },
-        ztickInterval: 24 * 3600 * 1000 * 14,
-        tickInterval: 24 * 3600 * 1000 * 7,
-        startOnTick: false,
-        endOnTick: false,
-        min: data[0][0],
+        crosshair: {
+          color: 'green',
+          dashStyle: 'dash'
+        },
+        tickPositioner: function() {
+          const positions = [];
+          const increment = 24 * 60 * 60 * 1000 * 28;
+
+          for (let tick = this.dataMin; tick <= this.dataMax; tick += increment) {
+            positions.push(tick);
+          }
+          return positions;
+        },
         labels: {
-          formatter: function () {
+          formatter: function() {
             const weeks = Math.round((this.value - minDate) / (24 * 3600 * 1000) / 7);
-            if (!(weeks % 2)) {
-              return Highcharts.dateFormat('%b %e', new Date(this.value)) + '<br/>' +
-                     Math.round((this.value - minDate) / (24 * 3600 * 1000) / 7) + ' weeks';
-            }
+            return Highcharts.dateFormat('%b %e', new Date(this.value)) + '<br/>' +
+                   weeks + ' weeks';
+          },
+          style: {
+            fontSize: '13px'
           }
         },
         plotLines: [{
@@ -286,12 +220,125 @@ const Output2 = ({ps, parms, sets, setScreen}) => {
           width: 0.4,
           label: {
             useHTML: true,
-            text: '<div style="background: white; transform: rotate(-90deg); position: relative; left: -50px;">Planting date</div>'
+            text: '<div style="background: white; transform: rotate(-90deg); position: relative; left: -50px; font-size: 1.2em;">Planting date</div>'
           }
         }],
       },
     ]
   };
+
+  const NPredict = Math.round(model.MinNfromFOM.slice(-1) / factor);
+  console.log(model.MinNfromFOM);
+  const NGraph = {
+    chart: {
+      type: 'column',
+      height: 350
+    },
+    title: {
+      text: ''
+    },
+    xAxis: {
+      categories: ['Incorporated', 'Surface'],
+      title: {
+        text: '<div class="caption">Figure shows the cash crop recommended N rate after accounting for cover crop N credits.</div>'
+      },
+      labels: {
+        style: {
+          fontSize: '15px'
+        }
+      }
+    },
+    yAxis: {
+      title: {
+        text: ''
+      },
+      stackLabels: {
+        enabled: true,
+      },
+      labels: {
+        enabled: false
+      },
+      endOnTick: false,
+    },
+    legend: {
+      align: 'center',
+      verticalAlign: 'top',
+    },
+    plotOptions: {
+      series: {
+        stacking: 'normal',
+        dataLabels: {
+          enabled: true,
+          format: `{y} ${parms.unit}`,
+          color: 'white',
+          style: {
+            textOutline: 'none',
+            textAlign: 'center',
+            fontSize: '0.9rem'
+          }
+        },
+        animation: false
+      }
+    },
+    series: [
+      {
+        name: 'Recommended N',
+        data: [parms.targetN - NPredict, parms.targetN - NPredict],
+        color: '#C4A484'
+      },
+      {
+        name: 'Cover Crop N credit',
+        data: [+NPredict, +NPredict],
+        color: '#6B9333'
+      },
+    ]
+  } // NGraph
+
+  const residueGraph = {
+    chart: {
+      type: 'column',
+    },
+    title: {
+      text: ''
+    },
+    xAxis: {
+      categories: ['Incorporated', 'Surface'],
+      title: {
+        text: '<div class="caption">Figure shows the amount of cover crop residue mass remaining at the end of first year decomposition period.</div>'
+      }
+    },
+    yAxis: {
+      title: {
+        text: ''
+      },
+    },
+    legend: {
+      align: 'center',
+      verticalAlign: 'top',
+    },
+    plotOptions: {
+      series: {
+        dataLabels: {
+          enabled: true,
+          format: `{y} ${parms.unit}`,
+          color: 'white',
+          style: {
+            textOutline: 'none',
+            textAlign: 'center',
+            fontSize: '0.9rem'
+          }
+        },
+        animation: false
+      }
+    },
+    series: [
+      {
+        name: 'Residue remaining',
+        data: [2000, Math.round(min)],
+        color: '#6B9333'
+      },
+    ]
+  } // residueGraph
 
   const dec = {};
 
@@ -306,84 +353,103 @@ const Output2 = ({ps, parms, sets, setScreen}) => {
                                        5;
   });
 
-  const NPredict = (model.MinNfromFOM.slice(-1)  / 1.12085).toFixed(0);
-  const NPredict14 = (model.MinNfromFOM[14 * 24] / 1.12085).toFixed(0);
-  const NPredict28 = (model.MinNfromFOM[28 * 24] / 1.12085).toFixed(0);
-
 //  const col = ['BD', 'RH', 'Rain', 'Temp', 'FOM', 'FON', 'Carb', 'Cell', 'Lign', '%_lignin', 'a', 'Air_MPa', 'b', 'BD', 'c', 'Carb0', 'CarbK', 'CarbN', 'CellK', 'CellN', 'CNR', 'CNRF', 'ContactFactor', 'Critical_FOM', 'DeCarb', 'DeCell', 'DeLign', 'Depth_in', 'Depth_layer_cm', 'Dew', 'Dminr', 'Evaporation', 'FAC', 'FOMNhum', 'FromAir', 'FromDew', 'FromRain', 'GRCom', 'GRCom1', 'GRCom2', 'GRCom3', 'GRNom', 'GrNom1', 'GRNom2', 'GRNOm3', 'Hum', 'HumMin', 'HumN', 'InitialFOMN_kg/ha', 'INkg', 'INppm', 'k_4', 'k1', 'k3', 'LigninN', 'LignK', 'Litter_MPa_Gradient', 'LitterMPa', 'LitterWaterContent', 'MinFromFOMRate', 'MinFromHumRate', 'MinNfromFOM', 'MinNfromHum', 'NAllocationFactor', 'NetMin', 'NImmobFromFOM', 'NimmobIntoCarbN', 'Noname_1', 'Noname_2', 'PMNhotKCl', 'PrevLitWC', 'PrevRH', 'RainToGetCurrentWC', 'Resistant', 'RHChange', 'RhMin', 'RMTFAC', 'RNAC', 'Sat', 'SOCpct', 'WaterLossFromEvap', 'WCFromRain'].slice(0, 8);
 
+  if (parms.field) {
+    const clone = {...parms};
+    clone.weather = {};
+    localStorage.setItem(parms.field, JSON.stringify(clone));
+  }
+
   return (
-    <div id="Output2">
+    <div id="Output">
       <table style={{width: '100%'}}>
         <tbody>
           <tr>
             <td>
               <p><strong>Cover crop summary</strong></p>
               <div className="inputs">
-                <table className="coverCropSummary" style={{marginTop: '1em'}}>
+                <table 
+                  className="coverCropSummary"
+                  style={{marginTop: '1em', width: '100%'}}
+                >
                   <tbody>
                     <tr>
-                      <td>Dry Biomass</td>
-                      <td>{(+parms.biomass).toFixed(0)}</td>
-                      <td>lbs/A</td>
-                    </tr>
-                    <tr>
-                      <td>Residue N Content</td>
-                      <td>{((parms.biomass * parms.N) / 100).toFixed(0)}</td>
-                      <td>lbs/A</td>
-                    </tr>
-                    <tr>
-                      <th colSpan="3">Residue quality</th>
-                    </tr>
-                    <tr>
-                      <td>Carbohydrates</td>
-                      <td>{(parms.carb || 0).toFixed(0)}</td>
-                      <td>%</td>
-                    </tr>
-                    <tr>
-                      <td>Cellulose</td>
-                      <td>{(parms.cell || 0).toFixed(0)}</td>
-                      <td>%</td>
-                    </tr>
-                    <tr>
-                      <td>Lignin</td>
-                      <td>{(parms.lign || 0).toFixed(0)}</td>
-                      <td>%</td>
+                      <td>
+                        <table>
+                          <tbody>
+                            <tr>
+                              <td>Field name</td>
+                              <td style={{textAlign: 'left'}}>{parms.field}</td>
+                            </tr>
+                            <tr>
+                              <td>Cover Crop Species</td>
+                              <td style={{textAlign: 'left'}}>{parms.coverCrop.join('; ')}</td>
+                            </tr>
+                            <tr>
+                              <td>Termination Date</td>
+                              <td style={{textAlign: 'left'}}>{moment(parms.killDate).format('MMM D, yyyy')}</td>
+                            </tr>
+                            <tr>
+                              <td>Dry Biomass</td>
+                              <td style={{textAlign: 'right'}}>{(+parms.biomass).toFixed(0)} {parms.unit}</td>
+                            </tr>
+                            <tr>
+                              <td>Residue N Content</td>
+                              <td style={{textAlign: 'right'}}>{((parms.biomass * parms.N) / 100).toFixed(0)} {parms.unit}</td>
+                            </tr>
+                          </tbody>
+                        </table>
+                      </td>
+                      <td>
+                        <table style={{border: '1px solid #bbb', height: '100%'}}>
+                          <tbody>
+                            <tr>
+                              <th colSpan="3">Residue quality</th>
+                            </tr>
+                            <tr>
+                              <td>Carbohydrates</td>
+                              <td style={{textAlign: 'right'}}>{carb.toFixed(0)} %</td>
+                            </tr>
+                            <tr>
+                              <td>Cellulose</td>
+                              <td style={{textAlign: 'right'}}>{cell.toFixed(0)} %</td>
+                            </tr>
+                            <tr>
+                              <td>Lignin</td>
+                              <td style={{textAlign: 'right'}}>{lign.toFixed(0)} %</td>
+                            </tr>
+                          </tbody>
+                        </table>
+                      </td>
                     </tr>
                   </tbody>
                 </table>
+
                 <hr/>
-                <p>Your cover crop <strong>{parms.coverCrop.join('; ')}</strong> was terminated on <strong>{moment(parms.killDate).format('MMM D, yyyy')}</strong>.</p>
-                <p>The cover crop is predicted to release {NPredict} lbs of N per acre from the aboveground biomass over three months. This is a N {NPredict >= 0 ? 'credit' : 'debit'}.</p>
-                <p>The cover crop is predicted to release:</p>
-                <ul>
-                  <li>{NPredict14} lbs of N per acre in the first two weeks after termination.</li>
-                  <li>{NPredict28} lbs of N per acre in the first four weeks after termination.</li>
-                </ul>
-                <p>Your target nitrogen fertilizer rate was {parms.targetN} lbs N/ac.</p>
-                <p>Your recommended N after crediting nitrogen from the cover crop is {parms.targetN - NPredict} lbs N/ac.</p>
                 <div className="percent" style={{display: 'none', width: '500px', color: '#eee'}}>
-                  <div style={{width: (parms.carb / total) * 100 - 1 + '%', background: '#385E1B'}}>
-                    {(parms.carb || 0).toFixed(0)}
+                  <div style={{width: (carb / total) * 100 - 1 + '%', background: '#385E1B'}}>
+                    {carb.toFixed(0)}
                   </div>
-                  <div style={{width: (parms.cell / total) * 100 - 1 + '%', background: '#8EB644'}}>
-                    {(parms.cell || 0).toFixed(0)}
+                  <div style={{width: (cell / total) * 100 - 1 + '%', background: '#8EB644'}}>
+                    {cell.toFixed(0)}
                   </div>
-                  <div style={{width: (parms.lign / total) * 100 - 1 + '%', background: '#543608'}}>
-                    {(parms.lign || 0).toFixed(0)}
+                  <div style={{width: (lign / total) * 100 - 1 + '%', background: '#543608'}}>
+                    {lign.toFixed(0)}
                   </div>
 
-                  <div style={{textAlign: 'left', width: (parms.carb / total) * 100 - 1 + '%', color: '#385E1B'}}>
+                  <div style={{textAlign: 'left', width: (carb / total) * 100 - 1 + '%', color: '#385E1B'}}>
                     Carb
                   </div>
-                  <div style={{textAlign: 'left', width: (parms.cell / total) * 100 - 1 + '%', color: '#8EB644'}}>
+                  <div style={{textAlign: 'left', width: (cell / total) * 100 - 1 + '%', color: '#8EB644'}}>
                     Cell
                   </div>
-                  <div style={{textAlign: 'left', width: (parms.lign / total) * 100 - 1 + '%', color: '#543608'}}>
+                  <div style={{textAlign: 'left', width: (lign / total) * 100 - 1 + '%', color: '#543608'}}>
                     Lign
                   </div>
                 </div>
               </div>
+              <HighchartsReact highcharts={Highcharts} options={parms.outputN === 1 ? NGraph : residueGraph} />
             </td>
             <td>
               <div className="output center" style={{marginBottom: '1em'}}>
@@ -401,45 +467,38 @@ const Output2 = ({ps, parms, sets, setScreen}) => {
                   RESIDUE REMAINING
                 </button>
               </div>
-              <HighchartsReact highcharts={Highcharts} options={options} />
-              <p>In addition to the amount of available N released from your cover crop, when it is released is important to guide your N management.</p>
-              <p>This graph will give you an idea about when the N is being released. Days after cover crop termination is on the horizontal axis and amount of available N on the vertical axis. To determine how much available N will be available at a given time, follow a vertical line up from a date to the plotted curve.</p>
-              <p>The steepness of the plotted line indicates how rapidly N is released.</p>
-              <p>This graph may help you decide if you want to adjust your N fertilizer at planting or sidedress.</p>
-            </td>
-          </tr>
-        </tbody>
-      </table>
-      <p>The available N reported above from the cover crop decompositions is considered a N credit if positive or a debit if negative. The amount of N fertilizer recommended may be reduced by a credit or increased by a debit. Here are examples:</p>
-      <table className="example">
-        <tbody>
-          <tr>
-            <th>N Credit Example:</th>
-            <th>N Debit Example:</th>
-          </tr>
-          <tr>
-            <td>
-              Recommended or Target N = 150 lbs N/ac<br/>
-              Predicted Cover Crop N = 50 lbs N/ac<br/>
-              Recommended N after Credit = 150 - 50 = <strong>100</strong> lbs N/ac
-            </td>
-            <td>
-              Recommended or Target N = 150 lbs N/ac<br/>
-              Predicted Cover Crop N = - 20 lbs N/ac<br/>
-              Recommended N after Debit = 150 - (-20) = 150 +20 = <strong>170</strong> lbs N/ac
+              <HighchartsReact highcharts={Highcharts} options={options}/>
+              
+              <div className="inputs" style={{borderTop: '1px solid #bbb', paddingTop: '1em'}}>
+                By
+                &nbsp;
+                <select
+                  {...ps('nweeks')}
+                  onChange={() => 'prevent warning'}
+                >
+                  {
+                    Array(Math.round(parms.weather.length / 24 / 7)).fill().map((_, i) => <option key={i + 1}>{i + 1}</option>)
+                  }
+                </select>
+                &nbsp;
+                week{parms.nweeks > 1 ? 's' : ''} after cash crop planting, 
+                {parms.outputN === 1 ? ' cumulative N released ' : ' undecomposed residue mass remaining '}
+                is:
+                <ul>
+                  <li>{Math.round(data[Math.min(parms.nweeks * 7, data.length - 1)][1])} {parms.unit} for surface residues.</li>
+                  <li>{Math.round(data[Math.min(parms.nweeks * 7, data.length - 1)][1])} {parms.unit} for incorporated residues.</li>
+                </ul>
+              </div>
             </td>
           </tr>
         </tbody>
       </table>
 
       <div className="bn">
-        <button onClick={() => setScreen('CoverCrop3')}>BACK</button>
+        <button onClick={() => setScreen('CashCrop')}>BACK</button>
       </div>
     </div>
   )
-} // Output2
+} // Output
 
-export {
-  Output1,
-  Output2
-}
+export default Output;

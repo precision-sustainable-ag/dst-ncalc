@@ -15,8 +15,9 @@ import Home       from './Home';
 import About      from './About';
 import Location   from './Location';
 import Soil       from './Soil';
-import {CoverCrop1, CoverCrop2, CoverCrop3} from './CoverCrop';
-import {Output1, Output2} from './Output';
+import {CoverCrop1, CoverCrop2} from './CoverCrop';
+import CashCrop   from './CashCrop';
+import Output     from './Output';
 
 const useStyles = makeStyles((theme) => ({
   root: {
@@ -33,9 +34,11 @@ const Help = ({parms}) => {
 
   return (
     parms.help &&
-    <div className="help" style={style}>
-      {parms.help}
-    </div>
+    <div
+      className="help"
+      style={style}
+      dangerouslySetInnerHTML={{ __html: parms.help }}
+    />
   )
 }
 
@@ -49,9 +52,8 @@ const Screens = ({parms}) => {
     Soil,
     CoverCrop1,
     CoverCrop2,
-    CoverCrop3,
-    Output1,
-    Output2
+    CashCrop,
+    Output
   };
 
   /*
@@ -86,7 +88,7 @@ const Screens = ({parms}) => {
       }
     } // test
     
-    if (scr === 'Output2') {
+    if (scr === 'Output') {
       if (demo && !parms.BD) {
         parms.OM = 1.5;
         sets.OM(1.5);
@@ -106,13 +108,13 @@ const Screens = ({parms}) => {
       test('cell', 'CoverCrop2', 'Please enter Cellulose') ||
       test('lign', 'CoverCrop2', 'Please enter Lignin') ||
 
-      test('plantingDate', 'CoverCrop3', 'Please enter Cash Crop Planting Date') ||
+      test('plantingDate', 'CashCrop', 'Please enter Cash Crop Planting Date') ||
 
       test('OM', 'Soil', 'Please enter Organic Matter') ||
       test('BD', 'Soil', 'Please enter Bulk Density') ||
       test('InorganicN', 'Soil', 'Please enter Soil Inorganic N') ||
 
-      setScreen2('Output2');
+      setScreen2('Output');
     } else {
       setScreen2(scr);
     }
@@ -186,16 +188,20 @@ const Screens = ({parms}) => {
     parms.lng,
   ]);
 
-  // can't do useState in a loop unless it's in a component, even if that component is unused
-  const State = (parm, value) => {
-    [parms[parm], sets[parm]] = React.useState(value);
-  }
-
-//    localStorage.setItem(parms.fieldID || 'data', JSON.stringify(parms));
-
-  for (const [parm, value] of Object.entries(parms)) {
-    State(parm, value);
-  }
+  const loadField = (field) => {
+    const inputs = JSON.parse(localStorage[field]);
+    Object.keys(inputs).forEach(key => {
+      try {
+        if (/Date/.test(key)) {
+          sets[key](new Date(inputs[key]));
+        } else {
+          sets[key](inputs[key]);
+        }
+      } catch(e) {
+        console.log(key, e.message);
+      }
+    });
+  } // loadField
 
   const update = (e) => {
     try {
@@ -207,7 +213,7 @@ const Screens = ({parms}) => {
       console.log(JSON.stringify(val));
 
       sets[id](val);
-      // console.log(id, val);
+      console.log(id, val);
 
       // doesn't work with slider, and is a step behind input
       if (/carb|cell/.test(id)) {
@@ -227,6 +233,10 @@ const Screens = ({parms}) => {
     }
   } // changeScreen
 
+  const changeField=(e) => {
+    loadField(e.target.value);
+  } // changeField
+
   return (
     <div
       tabIndex="0"
@@ -240,9 +250,9 @@ const Screens = ({parms}) => {
       }}
 
       onClick={(e) => {
-        if (/^help/.test(e.target.innerText)) {
+        if (/^help/.test(e.target.innerHTML)) {
           sets.help(e.target.innerHTML.slice(4));
-          sets.helpX(e.pageX + 20);
+          sets.helpX(Math.min(e.pageX + 20, window.innerWidth - 400));
           sets.helpY(e.pageY - 20);
         } else {
           sets.help('');
@@ -257,7 +267,22 @@ const Screens = ({parms}) => {
         <button className={/Location/.test(screen)    ? 'selected' : ''} data-scr="Location"   >Location</button>
         <button className={/Soil/.test(screen)        ? 'selected' : ''} data-scr="Soil"       >Soil</button>
         <button className={/CoverCrop/.test(screen)   ? 'selected' : ''} data-scr="CoverCrop1" >Cover Crop</button>
-        <button className={/Output/.test(screen)      ? 'selected' : ''} data-scr="Output2"    >Output</button>
+        <button className={/CashCrop/.test(screen)    ? 'selected' : ''} data-scr="CashCrop"   >Cash Crop</button>
+        <button className={/Output/.test(screen)      ? 'selected' : ''} data-scr="Output"     >Output</button>
+        {
+          Object.keys(localStorage).length ?
+            <select id="Fields"
+              onChange={changeField}
+            >
+              <option></option>
+              {
+                Object.keys(localStorage).sort().map((field, idx) => (
+                  <option key={idx} checked={field === parms.field}>{field}</option>
+                ))
+              }
+            </select>
+            : ''
+        }
       </nav>
       
       <Help parms={parms} />
@@ -275,6 +300,15 @@ const Screens = ({parms}) => {
 const App = () => {
   const classes = useStyles();
 
+  // can't do useState in a loop unless it's in a component, even if that component is unused
+  const State = (parm, value) => {
+    [parms[parm], sets[parm]] = React.useState(value);
+  }
+  
+  for (const [parm, value] of Object.entries(parms)) {
+    State(parm, value);
+  }
+console.log('App')
   return (
     <div className={classes.root}>
       <Screens parms={parms} />
@@ -320,6 +354,9 @@ let parms = {
   help                : '',
   helpX               : 0,
   helpY               : 0,
+  unit                : 'lb/ac',
+  location            : demo ? 'Colorado' : '',
+  nweeks              : 4
 }
 
 if (demo === 'corn') {
@@ -335,13 +372,7 @@ const sets = {};
 
 console.clear();
 
-console.log(JSON.parse(localStorage.getItem('data')));
-
-if (!demo) {
-//  parms = {...parms, ...JSON.parse(localStorage.getItem('data'))}
-//  parms.killDate = new Date(parms.killDate);
-//  parms.plantingDate = new Date(parms.plantingDate);
-}
+// localStorage.clear();
 
 document.title = 'Decomp';
 
