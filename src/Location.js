@@ -21,39 +21,29 @@ const Map = ({sets, parms, ps}) => {
 
   return (
     <>
-      <table className="noborder">
-        <tbody>
-          <tr>
-            <td className="noborder" style={{width: '50%'}}>
-              <GoogleMaps sets={sets} ps={ps} parms={parms} />
-            </td>
-            <td className="noborder">
-              <OutlinedInput
-                className="field"
-                label="Name your Field"
-                notched={true}
-                {...ps('field')}
-                autoComplete="off"
-                style={{width: 'calc(100% - 3em)'}}
-              />
-              <Icon>
-                help
-                <p>
-                  This input is optional.  If you enter a field name, you'll be able to rerun the model on this computer without re-entering your data.
-                </p>
-                <p>
-                  Notes:
-                </p>
-                <ul>
-                  <li>If you have multiple fields, you'll be able to select them from a drop-down menu in the upper-right.</li>
-                  <li>Your information is stored on your computer only.  It will not be uploaded to a server.</li>
-                  <li>If you clear your browser's cache, you'll need to re-enter your data the next time you run the program.</li>
-                </ul>
-              </Icon>
-            </td>
-          </tr>
-        </tbody>
-      </table>
+      <GoogleMaps sets={sets} ps={ps} parms={parms} />
+      <OutlinedInput
+        className="field"
+        label="Name your Field"
+        notched={true}
+        {...ps('field')}
+        autoComplete="off"
+        style={{width: 'calc(50% - 2em)'}}
+      />
+      <Icon>
+        help
+        <p>
+          This input is optional.  If you enter a field name, you'll be able to rerun the model on this computer without re-entering your data.
+        </p>
+        <p>
+          Notes:
+        </p>
+        <ul>
+          <li>If you have multiple fields, you'll be able to select them from a drop-down menu in the upper-right.</li>
+          <li>Your information is stored on your computer only.  It will not be uploaded to a server.</li>
+          <li>If you clear your browser's cache, you'll need to re-enter your data the next time you run the program.</li>
+        </ul>
+      </Icon>
       
       {
         parms.lat && parms.lng &&

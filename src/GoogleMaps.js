@@ -58,7 +58,7 @@ const GoogleMaps = ({parms, sets}) => {
   return (
     <Autocomplete
       id="googlemap"
-      style={{ width: 500 }}
+      style={{ width: '50%' }}
       getOptionLabel={(option) => (typeof option === 'string' ? option : option.description)}
       options={options}
       autoComplete
@@ -91,7 +91,12 @@ const GoogleMaps = ({parms, sets}) => {
       }}
 
       renderInput={(params) => (
-        <TextField {...params} label="Find your Location" variant="outlined" />
+        <TextField
+          {...params}
+          label="Find your Location"
+          variant="outlined" 
+          style={{float: 'left', paddingRight: '1em'}}
+        />
       )}
     />
   );
