@@ -91,7 +91,7 @@ const GoogleMaps = ({parms, sets}) => {
       }}
 
       renderInput={(params) => (
-        <TextField {...params} label="Find your location" variant="outlined" />
+        <TextField {...params} label="Find your Location" variant="outlined" />
       )}
     />
   );

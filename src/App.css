@@ -315,3 +315,9 @@ input::-webkit-inner-spin-button {
 #nweeks {
   width: 4em;
 }
+
+.field legend {
+  visibility: visible !important;
+  color: rgba(0, 0, 0, 0.54);
+  transform: translateY(-5px);
+}
