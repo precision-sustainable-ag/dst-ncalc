@@ -191,23 +191,130 @@ const CashCrops = ({sets, parms}) => {
     'Wildlife Plots - Temporary Winter Grazing',
     'Wine Grapes',
     'Zoysia Lawn'
-];
+  ];
 
-return (
+  const PiedNRate = {
+    'Asparagus' : 55,
+    'Bahia Grass Pasture' : 125,
+    'Basil' : 100,
+    'Beets' : 100,
+    'Broccoli, fresh market' : 165,
+    'Brown Top Millet' : 60,
+    'Cabbage, fresh market' : 165,
+    'Canola Spring Type' : 160,
+    'Canola Winter Type' : 155,
+    'Cantaloupes' : 100,
+    'Carrots' : 100,
+    'Cauliflower, fresh market' : 165,
+    'Chives' : 90,
+    'Cilantro' : 100,
+    'Coastal Bermuda - Hay' : 300,
+    'Coastal Bermuda Pasture' : 200,
+    'Collards, fresh market' : 165,
+    'Common Bermuda Pasture' : 125,
+    'Corn' : 150,
+    'Cotton' : 90,
+    'Cucumbers' : 100,
+    'Dallis Grass Pasture' : 125,
+    'Dove Fields - Brown Top Millet, Proso, Sesame, and Buckwheat' : 60,
+    'Dove Fields - Corn or Grain Sorghum' : 100,
+    'Dove Fields - Peredovic Sunflower' : 80,
+    'Eggplant' : 138,
+    'Endive' : 200,
+    'English Peas' : 62,
+    'Fall Deer - Forage Chicory' : 125,
+    'Fall Deer Mix - Brassicas' : 80,
+    'Fall Deer Mix - Cool Season Grasses with Clover' : 50,
+    'Fescue Hay' : 150,
+    'Fescue Pasture' : 75,
+    'Field Nursery - Broadleaf Evergreen (production)' : 115,
+    'Field Nursery - Deciduous Trees & Shrubs (production)' : 245,
+    'Field Nursery - Deciduous Trees (pre-plant)' : 50,
+    'Field Nursery - Evergreens (pre-plant)' : 50,
+    'Field Nursery - Narrow Leaf Evergreen (production)' : 198,
+    'Field Nursery - Shrubs (pre-plant)' : 50,
+    'Figs (commercial)' : 100,
+    'Forage Chicory' : 180,
+    'Grain Sorghum' : 80,
+    'Hybrid Bermudas - Hay' : 300,
+    'Hybrid Bermudas - Pasture' : 200,
+    'Hybrid Millets' : 210,
+    'Irish Potatoes' : 135,
+    'Kale, fresh market' : 165,
+    'Kenaf' : 175,
+    'Lettuce, fresh market' : 100,
+    'Lima Beans' : 70,
+    'Mustard, fresh market' : 165,
+    'Okra' : 112,
+    'Olives' : 90,
+    'Onions (green bunching)' : 110,
+    'Onions (mature and dry)' : 120,
+    'Onions (plantbed)' : 105,
+    'Orchard Grass Pasture' : 75,
+    'Parsley' : 120,
+    'Pepper (Bell and Pimento)' : 125,
+    'Pepper Transplants' : 50,
+    'Pole Beans' : 105,
+    'Pumpkin' : 100,
+    'Radishes' : 90,
+    'Rhubarb' : 90,
+    'Roadside Turf - Establishment' : 120,
+    'Roadside Turf - Maintenance' : 60,
+    'Small Grain - Barley' : 80,
+    'Small Grain - Oats' : 80,
+    'Small Grain - Rye for Seed Production or Cover Crop' : 50,
+    'Small Grain - Silage' : 140,
+    'Small Grain - Wheat' : 90,
+    'Snap Beans' : 70,
+    'Sod Production Centipede' : 165,
+    'Sod Production Hybrid Bermudas' : 270,
+    'Sod Production St. Augustine' : 240,
+    'Sod Production Tall Fescue' : 112,
+    'Sod Production Zoysia' : 240,
+    'Sorghum Silage' : 150,
+    'Sorghum Sudan Hybrids' : 210,
+    'Southern Peas' : 50,
+    'Spinach, fresh market' : 165,
+    'Squash' : 100,
+    'Staked Tomatoes' : 125,
+    'Sugar Cane' : 80,
+    'Summer Deer Mix (Grass only)' : 60,
+    'Summer Deer Mix (Legumes and Grass)' : 30,
+    'Sunflower' : 80,
+    'Sweet Corn' : 175,
+    'Sweet Potatoes' : 65,
+    'Sweet Sorghum' : 80,
+    'Switchgrass and other native grasses-Biomass and forage' : 62,
+    'Switchgrass and other native grasses-Wildlife' : 62,
+    'Temporary Winter Grazing' : 125,
+    'Tobacco (Average Pebble Soil)' : 50,
+    'Tobacco (Low Moisture and Sandy Soils)' : 60,
+    'Tomato Transplants' : 50,
+    'Truffles' : 40,
+    'Turnips, fresh market' : 165,
+    'Watermelon' : 100,
+    'Wheat - Soybean Rotation' : 90,
+    'Wildlife Plots - Chufa' : 40,
+  }
+
+  return (
     <Autocomplete
-    value={parms.cashCrop || []}
-    options={crops}
-    onChange={(event, newValue) => sets.cashCrop(newValue)}
-    renderInput={(params) => (
-        <TextField
-        {...params}
-        variant="standard"
-        label=""
-        zplaceholder="Cash crop"
-        />
-    )}      
-    />    
-);
+      value={parms.cashCrop || []}
+      options={crops}
+      onChange={(event, newValue) => {
+        sets.targetN(PiedNRate[newValue] || 0);
+        sets.cashCrop(newValue);
+      }}
+      renderInput={(params) => (
+          <TextField
+            {...params}
+            variant="standard"
+            label=""
+            zplaceholder="Cash crop"
+          />
+      )}      
+    />
+  );
 } // CashCrops
 
 const CashCrop = ({ps, parms, sets, setScreen}) => {
@@ -239,6 +346,7 @@ const CashCrop = ({ps, parms, sets, setScreen}) => {
         }
 
         <p>What is your target nitrogen fertilizer rate? ({parms.unit}):</p>
+        <p><em>Please specify the target N rate for your region.</em></p>
         <Myslider
           parm={'targetN'}
           min={0}

@@ -8,6 +8,8 @@ import transpile from './Transpiler.js';
 
 import moment from 'moment';
 
+import { CSVLink } from "react-csv";
+
 const Output = ({ps, parms, sets, setScreen}) => {
   if (!parms.biomass || !parms.N || !parms.carb || !parms.cell || !parms.lign || !parms.lwc || !parms.BD || !parms.InorganicN || !parms.weather.length) {
     return (
@@ -42,10 +44,7 @@ const Output = ({ps, parms, sets, setScreen}) => {
     RH: parms.weather.map(d => d.relative_humidity * 100),
     rain: parms.weather.map(d => d.precipitation),
   });
-
-  console.log(model.FOMpctCarb);
-  console.log(model.FOMpctCell);
-  console.log(model.FOMpctLign);
+  console.log(model);
 
   const d1 = new Date(parms.plantingDate);
   let dailyTotal = 0;
@@ -76,18 +75,26 @@ const Output = ({ps, parms, sets, setScreen}) => {
   
   const data = [];
 
-  model[parms.outputN === 1 ? 'MinNfromFOM' : 'FOM'].forEach((d, i) => {
+  model[parms.outputN === 1 ? 'MinNfromFOM' : 'FOM'].forEach((d, i, a) => {
     const value = +(d / factor).toFixed(2)
     if (date.getHours() === 0) {
-      data.push([+date, +value]);
+      console.log(i / 24, parms.nweeks * 7);
+      data.push({
+        x: +date,
+        y: +value,
+        marker: {
+          enabled: (i / 24 === parms.nweeks * 7) ||
+                   (i === a.length - 1 && parms.nweeks * 7 * 24 >= a.length)
+        }
+      });
     }
     date.setHours(date.getHours() + 1)
   });
 
-  const max = parms.outputN === 1 ? (parms.biomass * parms.N) / 100 : Math.max.apply(Math, data.map(d => d[1]));
-  const min = parms.outputN === 1 ? (parms.biomass * parms.N) / 100 : Math.min.apply(Math, data.map(d => d[1]));
+  const max = parms.outputN === 1 ? (parms.biomass * parms.N) / 100 : Math.max.apply(Math, data.map(d => d.y));
+  const min = parms.outputN === 1 ? (parms.biomass * parms.N) / 100 : Math.min.apply(Math, data.map(d => d.y));
 
-  const minDate = Math.min.apply(Math, data.map(d => d[0]));
+  const minDate = Math.min.apply(Math, data.map(d => d.x));
 
   Highcharts.setOptions({
     chart: {
@@ -126,7 +133,10 @@ const Output = ({ps, parms, sets, setScreen}) => {
         name: parms.outputN === 1 ? 'N released' : 'Residue Remaining',
         data: data,
         color: '#6B9333',
-        showInLegend: false
+        showInLegend: false,
+        zmarker: {
+          symbol: 'url(sun.png)'
+        }
       },
       {
         name: 'Corn N uptake',
@@ -187,8 +197,8 @@ const Output = ({ps, parms, sets, setScreen}) => {
       {
         type: 'datetime',
         title: {
-          text: parms.outputN === 1 ? '<div class="caption">Figure shows the amount of cover crop N released over time following its termination.</div>'
-                                    : '<div class="caption">Figure shows the amount of undecomposed cover crop residue mass remaining over time following its termination.</div>'
+          text: parms.outputN === 1 ? '<div class="caption">Cover crop N released and Corn N uptake over time.</div>'
+                                    : '<div class="caption">Undecomposed cover crop residue mass remaining over time following its termination.</div>'
         },
         crosshair: {
           color: 'green',
@@ -228,7 +238,7 @@ const Output = ({ps, parms, sets, setScreen}) => {
   };
 
   const NPredict = Math.round(model.MinNfromFOM.slice(-1) / factor);
-  console.log(model.MinNfromFOM);
+//  console.log(model.Temp.map(t => t.toFixed(2)));
   const NGraph = {
     chart: {
       type: 'column',
@@ -240,7 +250,7 @@ const Output = ({ps, parms, sets, setScreen}) => {
     xAxis: {
       categories: ['Incorporated', 'Surface'],
       title: {
-        text: '<div class="caption">Figure shows the cash crop recommended N rate after accounting for cover crop N credits.</div>'
+        text: '<div class="caption">Cash crop recommended N rate<br>after accounting for cover crop N credits.</div>'
       },
       labels: {
         style: {
@@ -283,7 +293,7 @@ const Output = ({ps, parms, sets, setScreen}) => {
     series: [
       {
         name: 'Recommended N',
-        data: [parms.targetN - NPredict, parms.targetN - NPredict],
+        data: [Math.max(0, parms.targetN - NPredict), Math.max(0, parms.targetN - NPredict)],
         color: '#C4A484'
       },
       {
@@ -304,7 +314,7 @@ const Output = ({ps, parms, sets, setScreen}) => {
     xAxis: {
       categories: ['Incorporated', 'Surface'],
       title: {
-        text: '<div class="caption">Figure shows the amount of cover crop residue mass remaining at the end of first year decomposition period.</div>'
+        text: `<div class="caption">Cover crop residue mass remaining<br>after ${Math.floor(parms.weather.length / (24 * 7))} weeks past termination.</div>`
       }
     },
     yAxis: {
@@ -318,10 +328,10 @@ const Output = ({ps, parms, sets, setScreen}) => {
     },
     plotOptions: {
       series: {
+        stacking: 'normal',
         dataLabels: {
           enabled: true,
           format: `{y} ${parms.unit}`,
-          color: 'white',
           style: {
             textOutline: 'none',
             textAlign: 'center',
@@ -334,8 +344,8 @@ const Output = ({ps, parms, sets, setScreen}) => {
     series: [
       {
         name: 'Residue remaining',
-        data: [2000, Math.round(min)],
-        color: '#6B9333'
+        data: [Math.round(min * 1.3), Math.round(min)],
+        color: '#6B9333',
       },
     ]
   } // residueGraph
@@ -361,8 +371,19 @@ const Output = ({ps, parms, sets, setScreen}) => {
     localStorage.setItem(parms.field, JSON.stringify(clone));
   }
 
+  const cols = Object.keys(model).sort((a, b) => a.toUpperCase().localeCompare(b.toUpperCase()));
+
+  cols.filter(col => !model[col].length).forEach(col => {
+    model[col] = new Array(model.Rain.length).fill(model[col]);
+  });
+
+  const csv = 'Time,' + cols + '\n' + model.Rain.map((_, i) => i + ',' + cols.map(col => model[col][i])).join('\n');
+//  alert(csv);
+
   return (
     <div id="Output">
+      <CSVLink data={csv} className="download">Download</CSVLink>
+
       <table style={{width: '100%'}}>
         <tbody>
           <tr>
@@ -380,23 +401,23 @@ const Output = ({ps, parms, sets, setScreen}) => {
                           <tbody>
                             <tr>
                               <td>Field name</td>
-                              <td style={{textAlign: 'left'}}>{parms.field}</td>
+                              <td>{parms.field}</td>
                             </tr>
                             <tr>
                               <td>Cover Crop Species</td>
-                              <td style={{textAlign: 'left'}}>{parms.coverCrop.join('; ')}</td>
+                              <td>{parms.coverCrop.map(crop => <div>{crop}</div>)}</td>
                             </tr>
                             <tr>
                               <td>Termination Date</td>
-                              <td style={{textAlign: 'left'}}>{moment(parms.killDate).format('MMM D, yyyy')}</td>
+                              <td>{moment(parms.killDate).format('MMM D, yyyy')}</td>
                             </tr>
                             <tr>
                               <td>Dry Biomass</td>
-                              <td style={{textAlign: 'right'}}>{(+parms.biomass).toFixed(0)} {parms.unit}</td>
+                              <td>{(+parms.biomass).toFixed(0)} {parms.unit}</td>
                             </tr>
                             <tr>
                               <td>Residue N Content</td>
-                              <td style={{textAlign: 'right'}}>{((parms.biomass * parms.N) / 100).toFixed(0)} {parms.unit}</td>
+                              <td>{((parms.biomass * parms.N) / 100).toFixed(0)} {parms.unit}</td>
                             </tr>
                           </tbody>
                         </table>
@@ -481,12 +502,12 @@ const Output = ({ps, parms, sets, setScreen}) => {
                   }
                 </select>
                 &nbsp;
-                week{parms.nweeks > 1 ? 's' : ''} after cash crop planting, 
+                week{parms.nweeks > 1 ? 's' : ''} after cover crop termination, 
                 {parms.outputN === 1 ? ' cumulative N released ' : ' undecomposed residue mass remaining '}
                 is:
                 <ul>
-                  <li>{Math.round(data[Math.min(parms.nweeks * 7, data.length - 1)][1])} {parms.unit} for surface residues.</li>
-                  <li>{Math.round(data[Math.min(parms.nweeks * 7, data.length - 1)][1])} {parms.unit} for incorporated residues.</li>
+                  <li>{Math.round(data[Math.min(parms.nweeks * 7, data.length - 1)].y)} {parms.unit} for surface residues.</li>
+                  <li>{Math.round(data[Math.min(parms.nweeks * 7, data.length - 1)].y)} {parms.unit} for incorporated residues.</li>
                 </ul>
               </div>
             </td>
@@ -496,6 +517,7 @@ const Output = ({ps, parms, sets, setScreen}) => {
 
       <div className="bn">
         <button onClick={() => setScreen('CashCrop')}>BACK</button>
+        <button onClick={() => setScreen('Advanced')}>ADVANCED</button>
       </div>
     </div>
   )

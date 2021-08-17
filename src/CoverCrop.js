@@ -29,7 +29,6 @@ const maxBiomass = {
   'Clover, Crimson': 8200,
   'Clover, Red': 5000,
   'Clover, White': 2000,
-  'Corn': 4000,
   'Cowpea': 8500,
   'Millet, Foxtail': 4100,
   'Millet, Japanese': 3500,
@@ -50,7 +49,6 @@ const maxBiomass = {
   'Ryegrass, Perennial': 6000,
   'Sorghum': 8000,
   'Sorghum-sudangrass': 8000,
-  'Soybeans': 2000,
   'Sudangrass': 10000,
   'Sunflower': 5000,
   'Sunn Hemp': 11600,
@@ -123,7 +121,7 @@ const CoverCrop1 = ({ps, parms, sets, setScreen}) => {
           onChange={date => sets.killDate(date)}
         />
 
-        <div style={{marginTop: '1.2em'}}>
+        <div style={{marginTop: '1.2em', marginBottom: '1.2em'}}>
           Dry Biomass
           <Icon>
             help

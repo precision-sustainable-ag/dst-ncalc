@@ -5,7 +5,6 @@ import GoogleMapReact from 'google-map-react';
 import {
   Input,
   Icon,
-  TextField,
   OutlinedInput,
 } from '@material-ui/core';
 
@@ -22,6 +21,7 @@ const Map = ({sets, parms, ps}) => {
   return (
     <>
       <GoogleMaps sets={sets} ps={ps} parms={parms} />
+
       <OutlinedInput
         className="field"
         label="Name your Field"
@@ -30,7 +30,7 @@ const Map = ({sets, parms, ps}) => {
         autoComplete="off"
         style={{width: 'calc(50% - 2em)'}}
       />
-      <Icon>
+      <Icon className="moveLeft">
         help
         <p>
           This input is optional.  If you enter a field name, you'll be able to rerun the model on this computer without re-entering your data.
