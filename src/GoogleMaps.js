@@ -1,25 +1,12 @@
 import React from 'react';
 import TextField from '@material-ui/core/TextField';
 import Autocomplete from '@material-ui/lab/Autocomplete';
-import LocationOnIcon from '@material-ui/icons/LocationOn';
-import Grid from '@material-ui/core/Grid';
-import Typography from '@material-ui/core/Typography';
-import { makeStyles } from '@material-ui/core/styles';
-import parse from 'autosuggest-highlight/parse';
 import throttle from 'lodash/throttle';
 
 const autocompleteService = { current: null };
 
-const useStyles = makeStyles((theme) => ({
-  icon: {
-    color: theme.palette.text.secondary,
-    marginRight: theme.spacing(2),
-  },
-}));
-
-const GoogleMaps = ({sets}) => {
-  const classes = useStyles();
-  const [value, setValue] = React.useState(null);
+const GoogleMaps = ({parms, sets}) => {
+  const [location, setValue] = React.useState(parms.location, null);
   const [inputValue, setInputValue] = React.useState('');
   const [options, setOptions] = React.useState([]);
 
@@ -37,12 +24,13 @@ const GoogleMaps = ({sets}) => {
     if (!autocompleteService.current && window.google) {
       autocompleteService.current = new window.google.maps.places.AutocompleteService();
     }
+
     if (!autocompleteService.current) {
       return undefined;
     }
 
     if (inputValue === '') {
-      setOptions(value ? [value] : []);
+      setOptions(location ? [location] : []);
       return undefined;
     }
 
@@ -50,8 +38,8 @@ const GoogleMaps = ({sets}) => {
       if (active) {
         let newOptions = [];
 
-        if (value) {
-          newOptions = [value];
+        if (location) {
+          newOptions = [location];
         }
 
         if (results) {
@@ -65,72 +53,52 @@ const GoogleMaps = ({sets}) => {
     return () => {
       active = false;
     };
-  }, [value, inputValue, fetch]);
+  }, [location, inputValue, fetch]);
 
   return (
-    <>
-      <Autocomplete
-        id="googlemap"
-        style={{ width: 500 }}
-        getOptionLabel={(option) => (typeof option === 'string' ? option : option.description)}
-        options={options}
-        autoComplete
-        includeInputInList
-        filterSelectedOptions
-        value={value}
-        // getOptionSelected={(option, value) => option.id === value.id}  // avoids warning, per https://stackoverflow.com/a/65347275/3903374, but prevents re-entry of data
-        onChange={(event, newValue) => {
-          setOptions(newValue ? [newValue, ...options] : options);
-          if (newValue) {
-            setValue(newValue.description);  
-            const geocoder = new window.google.maps.Geocoder();
+    <Autocomplete
+      id="googlemap"
+      style={{ width: '50%' }}
+      getOptionLabel={(option) => (typeof option === 'string' ? option : option.description)}
+      options={options}
+      autoComplete
+      includeInputInList
+      filterSelectedOptions
+      value={location}
+      // getOptionSelected={(option, value) => option.id === value.id}  // avoids warning, per https://stackoverflow.com/a/65347275/3903374, but prevents re-entry of data
+      
+      onChange={(event, newValue) => {
+        setOptions(newValue ? [newValue, ...options] : options);
+        if (newValue) {
+          sets.location(newValue.description);
+          setValue(newValue.description);
+          const geocoder = new window.google.maps.Geocoder();
 
-            geocoder.geocode({
-              address: newValue.description,
-              region: "en-US",
-            }, (results, status) => {
-              if (results[0]) {
-                sets.lat(results[0].geometry.location.lat().toFixed(4));
-                sets.lng(results[0].geometry.location.lng().toFixed(4));
-              }
-            });
+          geocoder.geocode({
+            address: newValue.description,
+            region: 'en-US',
+          }, (results, status) => {
+            if (results[0]) {
+              sets.lat(results[0].geometry.location.lat().toFixed(4));
+              sets.lng(results[0].geometry.location.lng().toFixed(4));
+            }
+          });
+        }
+      }}
 
-          }
-        }}
-        onInputChange={(event, newInputValue) => {
-          setInputValue(newInputValue);
-        }}
-        renderInput={(params) => (
-          <TextField {...params} label="Find your location" variant="outlined" fullWidth />
-        )}
-        renderOption={(option) => {
-          const matches = option.structured_formatting.main_text_matched_substrings;
-          const parts = parse(
-            option.structured_formatting.main_text,
-            matches.map((match) => [match.offset, match.offset + match.length]),
-          );
+      onInputChange={(event, newInputValue) => {
+        setInputValue(newInputValue);
+      }}
 
-          return (
-            <Grid container alignItems="center">
-              <Grid item>
-                <LocationOnIcon className={classes.icon} />
-              </Grid>
-              <Grid item xs>
-                {parts.map((part, index) => (
-                  <span key={index} style={{ fontWeight: part.highlight ? 700 : 400 }}>
-                    {part.text}
-                  </span>
-                ))}
-
-                <Typography variant="body2" color="textSecondary">
-                  {option.structured_formatting.secondary_text}
-                </Typography>
-              </Grid>
-            </Grid>
-          );
-        }}
-      />
-    </>
+      renderInput={(params) => (
+        <TextField
+          {...params}
+          label="Find your Location"
+          variant="outlined" 
+          style={{float: 'left', paddingRight: '1em'}}
+        />
+      )}
+    />
   );
 }
 

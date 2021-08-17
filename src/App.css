@@ -9,12 +9,17 @@
 body {
   background: #eee;
   font-family: IBM Plex Sans;
-  font-size: 1.3rem;
+  font-size: 1.2rem;
 }
 
 h1 {
   font-size: 2rem;
   font-weight: normal;
+}
+
+h2 {
+  font-size: 1.2rem;
+  font-weight: bold;
 }
 
 table {
@@ -78,7 +83,8 @@ nav button {
   flex-grow: 1;
   flex-basis: 0;
   font-weight: bold;
-  padding: 0.5em;
+  padding: 0em 1.2rem;
+  width: 9rem;
   background: transparent;
   border: none;
   font-size: 1.2rem;
@@ -96,18 +102,8 @@ nav button.selected {
   color: #385E1B;
 }
 
-.output button {
-  font-size: 90%;
-  width: 14em;
-  padding: 0.5em;
-}
-
-.output button.selected {
-  background: #8EB644;
-}
-
 nav button:first-of-type {
-  margin-left: 15rem;
+  margin-left: 8rem;
 }
 
 #Main {
@@ -128,6 +124,10 @@ nav img {
 
 div.center {
   text-align: center;
+}
+
+.about {
+  font-size: 1rem;
 }
 
 .home button, .about button, .bn button, button.bn {
@@ -160,7 +160,7 @@ div.bn {
 }
 
 .MuiInputBase-root {
-  min-width: 12em;
+  zmin-width: 12em;
 }
 
 .MuiSlider-root {
@@ -205,16 +205,16 @@ input[name="residue"] {
   text-align: center;
 }
 
-#Output2 .underscore {
+#Output .underscore {
   border-bottom: 1px solid #4F6B14;
   width: 200px;
 }
 
-#Output2 {
+#Output {
   font-size: 70%;
 }
 
-#Output2 td:nth-child(1) {
+#Output td:nth-child(1) {
   width: 40%;
 }
 
@@ -227,7 +227,7 @@ input[name="residue"] {
 
 .noborder {
   border: none;
-  width: 100%
+  width: 100%;
 }
 
 .MuiListSubheader-root {
@@ -253,10 +253,6 @@ input[name="residue"] {
   border: none;
 }
 
-.coverCropSummary td:nth-child(2) {
-  text-align: right;
-}
-
 .coverCropSummary td:nth-child(n + 2) {
   padding: 0.1em;
 }
@@ -267,9 +263,71 @@ input[name="residue"] {
 
 .help {
   position: fixed;
-  background: #eef;
+  background: #a8eEBB;
+  z-index: 1000;
   padding: 0.5em;
   border-radius: 5px;
   box-shadow: 5px 5px 15px 5px #000;
   font-size: 70%;
+}
+
+a {
+  font-weight: bold;
+  color: #385E1B;
+  text-decoration: none;
+}
+
+a:hover {
+  text-decoration: underline;
+}
+
+.MuiIcon-root {
+  zoom: 0.8;
+  opacity: 0.6;
+  cursor: pointer;
+  color: #444;
+}
+
+.caption {
+  font-weight: bold;
+  font-size: 0.9rem;
+}
+
+.highcharts-label.highcharts-stack-labels {
+  display: none;
+}
+
+.output button {
+  font-size: 90%;
+  width: 14em;
+  padding: 0.5em;
+}
+
+.output button.selected {
+  background: #8EB644;
+}
+
+input::-webkit-inner-spin-button {
+  -webkit-appearance: none;
+  margin: 0;
+}
+
+#nweeks {
+  width: 4em;
+}
+
+.field legend {
+  visibility: visible !important;
+  color: rgba(0, 0, 0, 0.54);
+  transform: translateY(-5px);
+}
+
+.moveLeft {
+  transform: translateX(-30px);
+}
+
+.download {
+  position: fixed;
+  top: 5px;
+  right: 5px;
 }

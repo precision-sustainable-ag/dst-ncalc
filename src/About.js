@@ -1,22 +1,51 @@
 const About = ({setScreen}) => (
   <div className="about">
-    <h1>About</h1>
+    <h2>Background:</h2>
+    <p>
+      Cover crops influence nitrogen (N) management to subsequent cash crops.
+      Some of the N taken up or fixed by the cover crops becomes available over the cash crop growing season following termination.
+      Estimating the rate of N release is challenging.
+      The <strong>Cover Crop N Availability Calculator</strong> provides a user-friendly approach to estimate decay of cover crop residues and release of N for offsetting N fertilizer inputs.
+      This tool was developed for farmers and agricultural professionals.
+    </p>
+    <p>
+      The N calculator is adapted from the CERES-N (N subroutine of the Crop Environment REsource Synthesis) sub-model.
+      Data from controlled laboratory experiments and on-farm cover crop decomposition studies across diverse environments were used in its development.
+      Depending on residue placement, the calculator uses soil moisture and soil temperature (for incorporated residues) or residue water potential and air temperature (for surface residues) to adjust decomposition rates.
+    </p>
 
-    <p>Cover crops can provide nitrogen (N) to the following cash crops by scavenging N in the soil or, in the case of legumes, by fixing N from the atmosphere. However, some cover crops can reduce the available N to following cash crops by immobilization. It can be difficult to know how much available N a cover crop will provide or if it will immobilize N. The amount of available N depends on the amount of biomass and the cover crop quality as well as soil temperature and moisture conditions. This calculator was developed to help provide guidance for N management when using cover crops.</p>
-
-    <p>What to Expect from the Nitrogen Calculator:</p>
-    <p>This calculator will predict how much and when nitrogen will be available from aboveground cover crop biomass.</p>
+    <h2>Input data requirements:</h2>
+    <p>
+      Based on field location (latitude and longitude), the calculator automatically imports:
+    </p>
     <ul>
-      <li>If the calculator gives you a <strong>positive number</strong>, this is a <strong>N credit</strong>, which can be subtracted from your target N fertilizer rate.</li>
-      <li>If the calculator gives you a <strong>negative number</strong>, this is a <strong>N debit</strong>, and you should add additional N fertilizer at planting to account for the N immobilized by the cover crop.</li>
+      <li>Local soil properties (organic matter and bulk density) from the NRCS' Soil Survey Geographic database (<a target="_blank" rel="noreferrer" href="https://api.precisionsustainableag.org/ssurgo">SSURGO API</a>),</li>
+      <li>Daily soil moisture and soil temperature from <a target="_blank" rel="noreferrer" href="https://docs.clearag.com/documentation/Soil_Conditions/Soil_Conditions/latest">Iteris</a>, and</li>
+      <li>Hourly weather (air relative humidity, air temperature, and rain) data from a <a target="_blank" rel="noreferrer" href="https://api.precisionsustainableag.org/weather">weather API</a> to estimate surface residue environmental conditions.</li>
     </ul>
-    <p>You will need to have measured cover crop biomass in your field and have an analysis of the cover crop nitrogen, carbohydrates, cellulose and lignin to use this calculator.</p>
-    
+
+    <p>At a minimum, users need to provide:</p>
+    <ul>
+      <li>Field location,</li>
+      <li>Cover crop biomass on a dry weight  basis, </li>
+      <li>Cover crop water content at termination, and </li>
+      <li>Cover crop quality (N, carbohydrate, cellulose, and lignin content).</li>
+    </ul>
+    <p>
+      <strong><em>The N calculator uses real-time weather data and five year historic averages for days where data are not yet available.</em></strong>
+    </p>
+
+    <h2>The N calculator estimates:</h2>
+    <ul>
+      <li>How much N is released from decomposing residues over time,</li>
+      <li>The amount of undecomposed residue remaining over time,</li>
+      <li>Corn N uptake based on yield goal, and</li>
+      <li>N fertilizer recommendations for the subsequent cash crop that accounts for cover crop N credit.</li>
+    </ul>
+
     <div className="center">
       <button onClick={() => setScreen('Location')}>GET STARTED</button>
     </div>
-
-    <img className="fullwidth" src="8-crops 1.png" alt="" />
   </div>
 ) // About
 
