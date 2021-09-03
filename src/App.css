@@ -331,3 +331,8 @@ input::-webkit-inner-spin-button {
   top: 5px;
   right: 5px;
 }
+
+.advanced {
+  zoom: 0.5;
+  display: inline-block;
+}
