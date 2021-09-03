@@ -6,10 +6,6 @@ import HighchartsReact from 'highcharts-react-official';
 
 import transpile from './Transpiler.js';
 
-import moment from 'moment';
-
-import { CSVLink } from "react-csv";
-
 const Advanced = ({ps, parms, sets, setScreen}) => {
   if (!parms.biomass || !parms.N || !parms.carb || !parms.cell || !parms.lign || !parms.lwc || !parms.BD || !parms.InorganicN || !parms.weather.length) {
     return (
@@ -46,31 +42,6 @@ const Advanced = ({ps, parms, sets, setScreen}) => {
   });
   console.log(model);
 
-  const d1 = new Date(parms.plantingDate);
-  let dailyTotal = 0;
-  let gdd = 0;
-  // const NUptake = [[+parms.plantingDate, 0]];
-  const NUptake = [];
-
-  const cornN = parms.cashCrop === 'Corn' && parms.outputN === 1;
-  if (cornN) {
-    const f = parms.unit === 'lb/ac' ? 1 : 1.12085;
-
-    parms.weather.slice((parms.plantingDate - parms.killDate) / (1000 * 60 * 60)).forEach(d => {
-      dailyTotal += d.air_temperature - 8;
-      if (d1.getHours() === 0) {
-        gdd += (dailyTotal / 24);
-        NUptake.push([
-          // d1 - (1000 * 60 * 60 * 24),
-          +d1,
-          (parms.yield * 1.09) / (1 + Math.exp((-0.00615 * (gdd - 646.19)))) * f
-        ]);
-        dailyTotal = 0;
-      }
-      d1.setHours(d1.getHours() + 1);
-    });
-  }
-
   let date = new Date(parms.killDate);
   
   const data = [];
@@ -78,7 +49,6 @@ const Advanced = ({ps, parms, sets, setScreen}) => {
   model[parms.outputN === 1 ? 'MinNfromFOM' : 'FOM'].forEach((d, i, a) => {
     const value = +(d / factor).toFixed(2)
     if (date.getHours() === 0) {
-      console.log(i / 24, parms.nweeks * 7);
       data.push({
         x: +date,
         y: +value,
@@ -91,11 +61,6 @@ const Advanced = ({ps, parms, sets, setScreen}) => {
     date.setHours(date.getHours() + 1)
   });
 
-  const max = parms.outputN === 1 ? (parms.biomass * parms.N) / 100 : Math.max.apply(Math, data.map(d => d.y));
-  const min = parms.outputN === 1 ? (parms.biomass * parms.N) / 100 : Math.min.apply(Math, data.map(d => d.y));
-
-  const minDate = Math.min.apply(Math, data.map(d => d.x));
-
   Highcharts.setOptions({
     chart: {
       animation: false
@@ -104,9 +69,6 @@ const Advanced = ({ps, parms, sets, setScreen}) => {
       numericSymbols: null
     }    
   });
-
-  const NPredict = Math.round(model.MinNfromFOM.slice(-1) / factor);
-//  console.log(model.Temp.map(t => t.toFixed(2)));
 
   const dec = {};
 
@@ -121,8 +83,6 @@ const Advanced = ({ps, parms, sets, setScreen}) => {
                                        5;
   });
 
-//  const col = ['BD', 'RH', 'Rain', 'Temp', 'FOM', 'FON', 'Carb', 'Cell', 'Lign', '%_lignin', 'a', 'Air_MPa', 'b', 'BD', 'c', 'Carb0', 'CarbK', 'CarbN', 'CellK', 'CellN', 'CNR', 'CNRF', 'ContactFactor', 'Critical_FOM', 'DeCarb', 'DeCell', 'DeLign', 'Depth_in', 'Depth_layer_cm', 'Dew', 'Dminr', 'Evaporation', 'FAC', 'FOMNhum', 'FromAir', 'FromDew', 'FromRain', 'GRCom', 'GRCom1', 'GRCom2', 'GRCom3', 'GRNom', 'GrNom1', 'GRNom2', 'GRNOm3', 'Hum', 'HumMin', 'HumN', 'InitialFOMN_kg/ha', 'INkg', 'INppm', 'k_4', 'k1', 'k3', 'LigninN', 'LignK', 'Litter_MPa_Gradient', 'LitterMPa', 'LitterWaterContent', 'MinFromFOMRate', 'MinFromHumRate', 'MinNfromFOM', 'MinNfromHum', 'NAllocationFactor', 'NetMin', 'NImmobFromFOM', 'NimmobIntoCarbN', 'Noname_1', 'Noname_2', 'PMNhotKCl', 'PrevLitWC', 'PrevRH', 'RainToGetCurrentWC', 'Resistant', 'RHChange', 'RhMin', 'RMTFAC', 'RNAC', 'Sat', 'SOCpct', 'WaterLossFromEvap', 'WCFromRain'].slice(0, 8);
-
   if (parms.field) {
     const clone = {...parms};
     clone.weather = {};
@@ -135,31 +95,33 @@ const Advanced = ({ps, parms, sets, setScreen}) => {
     model[col] = new Array(model.Rain.length).fill(model[col]);
   });
 
-  const csv = 'Time,' + cols + '\n' + model.Rain.map((_, i) => i + ',' + cols.map(col => model[col][i])).join('\n');
-//  alert(csv);
-
   const Chart = ({parm}) => {
-    const data = [];
+    const cdata = [];
+    let date = new Date(parms.killDate);
+    const minDate = Math.min.apply(Math, data.map(d => d.x));
+ 
+    try {
+      model[parm].forEach((d, i, a) => {
+        const value = +(d / factor).toFixed(2)
+        if (date.getHours() === 0) {
+          cdata.push({
+            x: +date,
+            y: +value,
+            marker: {
+              enabled: (i / 24 === parms.nweeks * 7) ||
+                      (i === a.length - 1 && parms.nweeks * 7 * 24 >= a.length)
+            }
+          });
+        }
+        date.setHours(date.getHours() + 1)
+      });
+    } catch(ee) {
+      alert(parm);
+    }
 
-    model[parm].forEach((d, i, a) => {
-      const value = +(d / factor).toFixed(2)
-      if (date.getHours() === 0) {
-        console.log(i / 24, parms.nweeks * 7);
-        data.push({
-          x: +date,
-          y: +value,
-          marker: {
-            enabled: (i / 24 === parms.nweeks * 7) ||
-                     (i === a.length - 1 && parms.nweeks * 7 * 24 >= a.length)
-          }
-        });
-      }
-      date.setHours(date.getHours() + 1)
-    });
-  
     const options = {
       chart: {
-        height: 405
+        height: 300,
       },
       plotOptions: {
         series: {
@@ -183,12 +145,9 @@ const Advanced = ({ps, parms, sets, setScreen}) => {
       series: [
         {
           name: parm,
-          data: data,
+          data: cdata,
           color: '#6B9333',
           showInLegend: false,
-          zmarker: {
-            symbol: 'url(sun.png)'
-          }
         }
       ],
       yAxis: [
@@ -205,56 +164,15 @@ const Advanced = ({ps, parms, sets, setScreen}) => {
           endOnTick: false,
           minorTicks: true,
           lineWidth: 3
-        },
-        {
-          title: {
-            text: parms.outputN === 1 ? 'Cover Crop N Released (%)' : 'Residue Remaining (%)',
-            style: {
-              fontSize: '14px',
-              fontWeight: 'bold',
-              color: '#6B9333'
-            }
-          },
-          linkedTo: 0,
-          gridLineWidth: 0,
-          opposite: true,
-          tickPositioner: function() {
-            const positions = [];
-            const increment = cornN || parms.outputN === 2 ? 25 : 10;
-  
-            for (let tick = 0; tick <= 100; tick += increment) {
-              positions.push(tick * (max / 100));
-            }
-  
-            return positions;
-          },        
-          labels: {
-            formatter: function() {
-              const result = Math.round(this.value / (max / 100));
-              return result + '%';
-            }
-          }
-        },
+        }
       ],
       xAxis: [
         {
           type: 'datetime',
-          title: {
-            text: parms.outputN === 1 ? '<div class="caption">Cover crop N released and Corn N uptake over time.</div>'
-                                      : '<div class="caption">Undecomposed cover crop residue mass remaining over time following its termination.</div>'
-          },
+          title: '',
           crosshair: {
             color: 'green',
             dashStyle: 'dash'
-          },
-          tickPositioner: function() {
-            const positions = [];
-            const increment = 24 * 60 * 60 * 1000 * 28;
-  
-            for (let tick = this.dataMin; tick <= this.dataMax; tick += increment) {
-              positions.push(tick);
-            }
-            return positions;
           },
           labels: {
             formatter: function() {
@@ -286,10 +204,12 @@ const Advanced = ({ps, parms, sets, setScreen}) => {
   }
   
   return (
-    <div id="Output">
-      <Chart parm="FOM" />
-      <Chart parm="FON" />
-      <Chart parm="%_lignin" />
+    <div id="Advanced">
+      {
+        ['BD', 'RH', 'Rain', 'Temp', 'FOM', 'FON', 'Carb', 'Cell', 'Lign', '%_lignin', 'a', 'Air_MPa', 'b', 'BD', 'c', 'CarbK', 'CarbN', 'CellK', 'CellN', 'CNR', 'CNRF', 'ContactFactor', 'Critical_FOM', 'DeCarb', 'DeCell', 'DeLign', 'Depth_in', 'Depth_layer_cm', 'Dew', 'Dminr', 'Evaporation', 'FAC', 'FOMNhum', 'FromAir', 'FromDew', 'FromRain', 'GRCom', 'GRCom1', 'GRCom2', 'GRCom3', 'GRNom', 'GrNom1', 'GRNom2', 'GRNOm3', 'Hum', 'HumMin', 'HumN', 'InitialFOMN_kg/ha', 'INkg', 'INppm', 'k_4', 'k1', 'k3', 'LigninN', 'LignK', 'Litter_MPa_Gradient', 'LitterMPa', 'LitterWaterContent', 'MinFromFOMRate', 'MinFromHumRate', 'MinNfromFOM', 'MinNfromHum', 'NAllocationFactor', 'NetMin', 'NImmobFromFOM', 'NimmobIntoCarbN', 'Noname_1', 'Noname_2', 'PMNhotKCl', 'PrevLitWC', 'PrevRH', 'RainToGetCurrentWC', 'Resistant', 'RHChange', 'RhMin', 'RMTFAC', 'RNAC', 'Sat', 'SOCpct', 'WaterLossFromEvap', 'WCFromRain']
+          .slice(0, 80)
+          .map(parm => <div className="advanced"> <Chart parm={parm} /> </div>)
+      }
 
       <div className="bn">
         <button onClick={() => setScreen('Output')}>BACK</button>

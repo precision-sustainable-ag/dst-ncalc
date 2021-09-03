@@ -10,6 +10,8 @@ import Myslider from './slider';
 
 import Autocomplete from '@material-ui/lab/Autocomplete';
 
+import Icon from '@material-ui/core/Icon';
+
 const CashCrops = ({sets, parms}) => {
   const crops = [
     'Alfalfa-Establishment',
@@ -345,8 +347,14 @@ const CashCrop = ({ps, parms, sets, setScreen}) => {
           </>
         }
 
-        <p>What is your target nitrogen fertilizer rate? ({parms.unit}):</p>
-        <p><em>Please specify the target N rate for your region.</em></p>
+        <p>
+          What is your target nitrogen fertilizer rate? ({parms.unit}):
+          <Icon>
+            help
+            Please specify the target N rate for your region.
+          </Icon>
+        </p>
+
         <Myslider
           parm={'targetN'}
           min={0}

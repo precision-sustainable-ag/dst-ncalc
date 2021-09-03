@@ -78,7 +78,6 @@ const Output = ({ps, parms, sets, setScreen}) => {
   model[parms.outputN === 1 ? 'MinNfromFOM' : 'FOM'].forEach((d, i, a) => {
     const value = +(d / factor).toFixed(2)
     if (date.getHours() === 0) {
-      console.log(i / 24, parms.nweeks * 7);
       data.push({
         x: +date,
         y: +value,
@@ -241,20 +240,37 @@ const Output = ({ps, parms, sets, setScreen}) => {
 //  console.log(model.Temp.map(t => t.toFixed(2)));
   const NGraph = {
     chart: {
-      type: 'column',
-      height: 350
+      type: 'bar',
+      height: 350,
+      marginRight: 40,
+      className: parms.outputN === 2 && 'hidden'
     },
     title: {
-      text: ''
+      text: '<div class="caption">Cash crop recommended N rate<br>after accounting for cover crop N credits.</div>',
+      verticalAlign: 'bottom'
     },
+    series: [
+      {
+        name: 'Target N',
+        data: [+parms.targetN, +parms.targetN],
+        color: '#666'
+      },
+      {
+        name: 'Cover Crop N credit',
+        data: [+NPredict, +NPredict],
+        color: '#6B9333'
+      },
+      {
+        name: 'Recommended N',
+        data: [Math.max(0, parms.targetN - NPredict), Math.max(0, parms.targetN - NPredict)],
+        color: 'brown'
+      },
+    ],
     xAxis: {
       categories: ['Incorporated', 'Surface'],
-      title: {
-        text: '<div class="caption">Cash crop recommended N rate<br>after accounting for cover crop N credits.</div>'
-      },
       labels: {
         style: {
-          fontSize: '15px'
+          fontSize: 13
         }
       }
     },
@@ -262,51 +278,40 @@ const Output = ({ps, parms, sets, setScreen}) => {
       title: {
         text: ''
       },
-      stackLabels: {
-        enabled: true,
-      },
       labels: {
         enabled: false
-      },
-      endOnTick: false,
+      }
     },
     legend: {
-      align: 'center',
       verticalAlign: 'top',
+      itemDistance: 10,
+      symbolPadding: 0,
+      labelFormatter: function() {
+        return `<div style="color: ${this.color}; background: white">${this.name}</div>`
+      }
     },
     plotOptions: {
       series: {
-        stacking: 'normal',
+        zstacking: 'normal',
+        pointWidth: 22,
+        zpointPadding: 0.5,
+        zgroupPadding: 0.5,
         dataLabels: {
           enabled: true,
-          format: `{y} ${parms.unit}`,
-          color: 'white',
-          style: {
-            textOutline: 'none',
-            textAlign: 'center',
-            fontSize: '0.9rem'
-          }
+          formatter: function() {
+            return `<div style="color: ${this.color}; background: white">${this.y} ${parms.unit}</div>`
+          },
+          zcolor: 'green',
         },
         animation: false
       }
     },
-    series: [
-      {
-        name: 'Recommended N',
-        data: [Math.max(0, parms.targetN - NPredict), Math.max(0, parms.targetN - NPredict)],
-        color: '#C4A484'
-      },
-      {
-        name: 'Cover Crop N credit',
-        data: [+NPredict, +NPredict],
-        color: '#6B9333'
-      },
-    ]
   } // NGraph
 
   const residueGraph = {
     chart: {
       type: 'column',
+      className: parms.outputN === 1 && 'hidden'
     },
     title: {
       text: ''
@@ -405,7 +410,7 @@ const Output = ({ps, parms, sets, setScreen}) => {
                             </tr>
                             <tr>
                               <td>Cover Crop Species</td>
-                              <td>{parms.coverCrop.map(crop => <div>{crop}</div>)}</td>
+                              <td>{parms.coverCrop.map(crop => <div key={crop}>{crop}</div>)}</td>
                             </tr>
                             <tr>
                               <td>Termination Date</td>
@@ -470,7 +475,8 @@ const Output = ({ps, parms, sets, setScreen}) => {
                   </div>
                 </div>
               </div>
-              <HighchartsReact highcharts={Highcharts} options={parms.outputN === 1 ? NGraph : residueGraph} />
+              <HighchartsReact highcharts={Highcharts} options={NGraph}       className="hidden" />
+              <HighchartsReact highcharts={Highcharts} options={residueGraph} />
             </td>
             <td>
               <div className="output center" style={{marginBottom: '1em'}}>
