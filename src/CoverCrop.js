@@ -186,7 +186,7 @@ const CoverCrop1 = ({ps, parms, sets, setScreen}) => {
   )
 } // CoverCrop1
 
-const CoverCrop2 = ({ps, parms, sets, setScreen}) => {
+const CoverCrop2 = ({ps, parms, sets, setScreen, update}) => {
   return (
     <>
       <h1>Tell us about your Cover Crop Quality</h1>
@@ -207,6 +207,7 @@ const CoverCrop2 = ({ps, parms, sets, setScreen}) => {
           parms={parms}
           sets={sets}
           step={0.1}
+          update={update}
         />
 
         <p>
@@ -225,6 +226,7 @@ const CoverCrop2 = ({ps, parms, sets, setScreen}) => {
           parms={parms}
           sets={sets}
           step={0.1}
+          update={update}
         />
 
         <p>
@@ -243,6 +245,7 @@ const CoverCrop2 = ({ps, parms, sets, setScreen}) => {
           parms={parms}
           sets={sets}
           step={0.1}
+          update={update}
         />
 
         <p>
@@ -261,6 +264,7 @@ const CoverCrop2 = ({ps, parms, sets, setScreen}) => {
           parms={parms}
           sets={sets}
           step={0.1}
+          update={update}
         />
       </div>
   

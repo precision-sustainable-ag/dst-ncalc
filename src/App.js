@@ -1,5 +1,3 @@
-// testing VS Code
-
 import React, {useEffect} from 'react';
 
 import './App.css';
@@ -163,7 +161,8 @@ const Screens = ({parms}) => {
     }
     sets.OM('');
 
-    const src = `https://api.precisionsustainableag.org/ssurgo?lat=${parms.lat}&lon=${parms.lng}&component=major`;
+    // const src = `https://api.precisionsustainableag.org/ssurgo?lat=${parms.lat}&lon=${parms.lng}&component=major`;
+    const src = `https://weather.aesl.ces.uga.edu/ssurgo?lat=${parms.lat}&lon=${parms.lng}&component=major`;
     console.log(src);
     clearTimeout(ssurgoTimer);
     sets.gotSSURGO(false);
@@ -213,22 +212,27 @@ const Screens = ({parms}) => {
     });
   } // loadField
 
-  const update = (e) => {
+  const update = (e, id = e.target.id, val = e.target.value) => {
     try {
-      const id = e.target.id;
       if (/googlemap|mui/.test(id)) {
         return;
       }
-      const val = e.target.value;
+
       console.log(JSON.stringify(val));
 
       sets[id](val);
-      console.log(id, val);
 
-      // doesn't work with slider, and is a step behind input
-      if (/carb|cell/.test(id)) {
-        // sets.lign(100 - (+parms.carb + +parms.cell))
+      if (id === 'cell') {
+        // sets.lign(+(100 - (+parms.carb + +val)).toFixed(1));
+      } else if (id === 'N') {
+        const carb = (24.7 + 10.5 * val).toFixed(0);
+        const cell = (69 - 10.2 * val).toFixed(0);
+        sets.carb(carb);
+        sets.cell(cell);
+        sets.lign(100 - (+carb + +cell));
       }
+
+      console.log(id, val);
     } catch(ee) {
       console.log(e.target.id, ee.message);
     }
@@ -330,7 +334,8 @@ const Screens = ({parms}) => {
         ps: ps,
         sets: sets,
         parms: parms,
-        setScreen: setScreen
+        setScreen: setScreen,
+        update: update
       })}
     </div>
   )
@@ -430,7 +435,7 @@ let PSA = {
     location          : '',
     BD                : 1.7,
     coverCrop         : ['rye grass-crimson clover'],
-    cashCrop          : 'corn',
+    cashCrop          : 'Corn',
     killDate          : new Date('03/19/2020'),
     plantingDate      : new Date(moment('08/17/2020').add(-111, 'days')),
     lwc               : 8.66,
@@ -484,7 +489,7 @@ let PSA = {
     location          : '',
     BD                : 1.7,
     coverCrop         : ['cereal rye'],
-    cashCrop          : 'corn',
+    cashCrop          : 'Corn',
     killDate          : new Date('04/21/2020'),
     plantingDate      : new Date(moment('11/16/2020').add(-111, 'days')),
     lwc               : 3.13,
@@ -502,7 +507,7 @@ let PSA = {
     location          : '',
     BD                : 1.7,
     coverCrop         : ['cereal rye'],
-    cashCrop          : 'corn',
+    cashCrop          : 'Corn',
     killDate          : new Date('03/30/2020'),
     plantingDate      : new Date(moment('09/08/2020').add(-111, 'days')),
     lwc               : 4.15,
@@ -538,7 +543,7 @@ let PSA = {
     location          : '',
     BD                : 1.7,
     coverCrop         : ['rye grass-crimson clover'],
-    cashCrop          : 'corn',
+    cashCrop          : 'Corn',
     killDate          : new Date('03/19/2020'),
     plantingDate      : new Date(moment('08/17/2020').add(-111, 'days')),
     lwc               : 9.84,

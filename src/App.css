@@ -336,3 +336,8 @@ input::-webkit-inner-spin-button {
   zoom: 0.5;
   display: inline-block;
 }
+
+.highcharts-point {
+  zoom: 50 !important;
+  zdisplay: none;
+}
