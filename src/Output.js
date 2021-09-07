@@ -82,6 +82,8 @@ const Output = ({ps, parms, sets, setScreen}) => {
         x: +date,
         y: +value,
         marker: {
+          radius: 5,
+          fillColor: 'blue',
           enabled: (i / 24 === parms.nweeks * 7) ||
                    (i === a.length - 1 && parms.nweeks * 7 * 24 >= a.length)
         }
@@ -196,8 +198,9 @@ const Output = ({ps, parms, sets, setScreen}) => {
       {
         type: 'datetime',
         title: {
-          text: parms.outputN === 1 ? '<div class="caption">Cover crop N released and Corn N uptake over time.</div>'
-                                    : '<div class="caption">Undecomposed cover crop residue mass remaining over time following its termination.</div>'
+          text: parms.outputN === 1 && cornN ? '<div class="caption">Cover crop N released and Corn N uptake over time.</div>' :
+                parms.outputN === 1          ? '<div class="caption">Cover crop N released over time.</div>'
+                                             : '<div class="caption">Undecomposed cover crop residue mass remaining over time following its termination.</div>'
         },
         crosshair: {
           color: 'green',
@@ -242,7 +245,7 @@ const Output = ({ps, parms, sets, setScreen}) => {
     chart: {
       type: 'bar',
       height: 350,
-      marginRight: 40,
+      zmarginRight: 40,
       className: parms.outputN === 2 && 'hidden'
     },
     title: {
@@ -250,11 +253,13 @@ const Output = ({ps, parms, sets, setScreen}) => {
       verticalAlign: 'bottom'
     },
     series: [
+      /*
       {
         name: 'Target N',
         data: [+parms.targetN, +parms.targetN],
         color: '#666'
       },
+      */
       {
         name: 'Cover Crop N credit',
         data: [+NPredict, +NPredict],
@@ -266,40 +271,53 @@ const Output = ({ps, parms, sets, setScreen}) => {
         color: 'brown'
       },
     ],
-    xAxis: {
+    xAxis: [{
       categories: ['Incorporated', 'Surface'],
       labels: {
         style: {
           fontSize: 13
         }
-      }
-    },
-    yAxis: {
+      },
+    }],
+    yAxis: [{
       title: {
         text: ''
       },
       labels: {
         enabled: false
-      }
-    },
+      },
+      plotLines: [{
+        value: parms.targetN,
+        color: 'blue',
+        width: 2,
+        label: {
+          useHTML: true,
+          text: '<div style="background: white; transform: rotate(-90deg); position: relative; left: -40px; font-size: 1em; color: blue">Target N</div>'
+        }
+      }],
+  
+    }],
     legend: {
       verticalAlign: 'top',
-      itemDistance: 10,
+      align: 'right',
+      itemDistance: -260,  // hack to reverse legend items
       symbolPadding: 0,
+      useHTML: true,
       labelFormatter: function() {
-        return `<div style="color: ${this.color}; background: white">${this.name}</div>`
+        return `<div style="color: ${this.color};">${this.name}</div>`
       }
     },
     plotOptions: {
       series: {
-        zstacking: 'normal',
-        pointWidth: 22,
+        stacking: 'normal',
+        zpointWidth: 22,
         zpointPadding: 0.5,
         zgroupPadding: 0.5,
         dataLabels: {
           enabled: true,
+          useHTML: true,
           formatter: function() {
-            return `<div style="color: ${this.color}; background: white">${this.y} ${parms.unit}</div>`
+            return `<div style="color: ${this.color}; background: white; transform: translateY(-35px);">${this.y} ${parms.unit}</div>`
           },
           zcolor: 'green',
         },
