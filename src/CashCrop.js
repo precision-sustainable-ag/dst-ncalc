@@ -327,7 +327,7 @@ const CashCrop = ({ps, parms, sets, setScreen}) => {
         <p>Cash Crop:</p>
         <CashCrops sets={sets} parms={parms} />
 
-        <p>Cash crop planting date:</p>
+        <p>Cash Crop Planting Date:</p>
         <DatePicker 
           selected={parms.plantingDate}
           onChange={date => sets.plantingDate(date)}
@@ -348,7 +348,7 @@ const CashCrop = ({ps, parms, sets, setScreen}) => {
         }
 
         <p>
-          What is your target nitrogen fertilizer rate? ({parms.unit}):
+          What is your Target Nitrogen Fertilizer Rate? ({parms.unit}):
           <Icon>
             help
             Please specify the target N rate for your region.
