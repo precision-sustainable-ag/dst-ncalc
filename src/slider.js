@@ -32,4 +32,3 @@ const Myslider = ({parm, min, max, ps, sets, parms, step=1, update}) => {
 }
 
 export default Myslider;
-

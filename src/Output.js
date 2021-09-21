@@ -83,7 +83,7 @@ const Output = ({ps, parms, sets, setScreen}) => {
         y: +value,
         marker: {
           radius: 5,
-          fillColor: 'blue',
+          fillColor: '#6b9333',
           enabled: (i / 24 === parms.nweeks * 7) ||
                    (i === a.length - 1 && parms.nweeks * 7 * 24 >= a.length)
         }
@@ -246,10 +246,31 @@ const Output = ({ps, parms, sets, setScreen}) => {
       type: 'bar',
       height: 350,
       zmarginRight: 40,
-      className: parms.outputN === 2 && 'hidden'
+      className: parms.outputN === 2 && 'hidden',
+      events: {
+        render: function() {
+          setTimeout(() => {
+            const path = document.querySelector('.highcharts-plot-lines-100 path');
+            console.log(path);
+            let p = path.getAttribute('d');
+            p += ' ' + p;
+            p = p.split(' ');
+            p[2] = 81;
+            p[5] = 135;
+            p[8] = 194;
+            p[11] = 248;
+            path.setAttribute('d', p.join(' '));
+            path.style.display = 'block';
+            // path.setAttribute('d', 'M 371 51 L 371 135 M 371 190 L 371 250');
+          }, 1);
+        }
+      }
     },
     title: {
-      text: '<div class="caption">Cash crop recommended N rate<br>after accounting for cover crop N credits.</div>',
+      text: `<div class="caption">
+               Cash crop recommended N rate<br>after accounting for cover crop N credits.
+             </div>
+            `,
       verticalAlign: 'bottom'
     },
     series: [
@@ -289,13 +310,16 @@ const Output = ({ps, parms, sets, setScreen}) => {
       plotLines: [{
         value: parms.targetN,
         color: 'blue',
+        zdashStyle: 'Dash',
         width: 2,
+        zIndex: 100,
         label: {
           useHTML: true,
-          text: '<div style="background: white; transform: rotate(-90deg); position: relative; left: -40px; font-size: 1em; color: blue">Target N</div>'
+          text: `<div style="background: white; transform: rotate(-90deg); position: relative; left:  57px; top: 6px; font-size: 1em; color: blue; background: transparent;">Target N</div>
+                 <div style="background: white; transform: rotate(-90deg); position: relative; left: 170px; top: -9px; font-size: 1em; color: blue; background: transparent;">Target N</div>
+                `
         }
       }],
-  
     }],
     legend: {
       verticalAlign: 'top',
@@ -317,7 +341,8 @@ const Output = ({ps, parms, sets, setScreen}) => {
           enabled: true,
           useHTML: true,
           formatter: function() {
-            return `<div style="color: ${this.color}; background: white; transform: translateY(-35px);">${this.y} ${parms.unit}</div>`
+            const footnote = this.y === 0 ? '<sup>*</sup>' : '';
+            return `<div style="color: ${this.color}; background: white; transform: translateY(-38px);">${this.y} ${parms.unit}${footnote}</div>`
           },
           zcolor: 'green',
         },
@@ -328,17 +353,15 @@ const Output = ({ps, parms, sets, setScreen}) => {
 
   const residueGraph = {
     chart: {
-      type: 'column',
+      type: 'bar',
       className: parms.outputN === 1 && 'hidden'
     },
     title: {
-      text: ''
+      text: `<div class="caption">Cover crop residue mass remaining<br>after ${Math.floor(parms.weather.length / (24 * 7))} weeks past termination.</div>`,
+      verticalAlign: 'bottom'
     },
     xAxis: {
       categories: ['Incorporated', 'Surface'],
-      title: {
-        text: `<div class="caption">Cover crop residue mass remaining<br>after ${Math.floor(parms.weather.length / (24 * 7))} weeks past termination.</div>`
-      }
     },
     yAxis: {
       title: {
@@ -493,7 +516,8 @@ const Output = ({ps, parms, sets, setScreen}) => {
                   </div>
                 </div>
               </div>
-              <HighchartsReact highcharts={Highcharts} options={NGraph}       className="hidden" />
+              <HighchartsReact highcharts={Highcharts} options={NGraph} className="hidden" />
+              {(parms.targetN < NPredict) && <div class="footnote">* Your cover crop is supplying all of your needs</div>}
               <HighchartsReact highcharts={Highcharts} options={residueGraph} />
             </td>
             <td>

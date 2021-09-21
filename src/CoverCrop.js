@@ -253,7 +253,7 @@ const CoverCrop2 = ({ps, parms, sets, setScreen, update}) => {
         />
         <p/>
         <hr/>
-        {parms.N ? <p style={{color: "gray", fontSize: "15px"}}><em>Data values below are default based on your nitrogen value.  Please change these values if you have the measured data.</em></p> : ''}
+        {parms.N ? <p className="note">Adjust default values below based on lab results.</p> : ''}
         <p>
           Carbohydrates (%)
           <Icon>

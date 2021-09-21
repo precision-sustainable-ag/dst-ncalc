@@ -341,3 +341,19 @@ input::-webkit-inner-spin-button {
   zoom: 50 !important;
   zdisplay: none;
 }
+
+.note {
+  color: #555;
+  font-size: 1.2rem;
+  font-style: italic;
+}
+
+.highcharts-plot-lines-100 path {
+  z-index: 9999 !important;
+  display: none;
+}
+
+.footnote {
+  color: brown;
+  font-weight: bold;
+}

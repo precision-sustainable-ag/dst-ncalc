@@ -5,7 +5,7 @@ import {
 const Soil = ({ps, parms, setScreen}) => (
   <div>
     <h1>Tell us about your Soil</h1>
-    {parms.gotSSURGO ? <p><em>Data values are default based on your location.  Please change these values if you have the measured data.</em></p> : ''}
+    {parms.gotSSURGO ? <p className="note">Adjust default values below based on lab results.</p> : ''}
 
     <div className="inputs">
       <p>Organic Matter (%):</p>
