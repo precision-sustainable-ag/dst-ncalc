@@ -263,7 +263,7 @@ input[name="residue"] {
 
 .help {
   position: fixed;
-  background: #a8eEBB;
+  background: #eee;
   z-index: 1000;
   padding: 0.5em;
   border-radius: 5px;
@@ -335,4 +335,25 @@ input::-webkit-inner-spin-button {
 .advanced {
   zoom: 0.5;
   display: inline-block;
+}
+
+.highcharts-point {
+  zoom: 50 !important;
+  zdisplay: none;
+}
+
+.note {
+  color: #555;
+  font-size: 1.2rem;
+  font-style: italic;
+}
+
+.highcharts-plot-lines-100 path {
+  z-index: 9999 !important;
+  display: none;
+}
+
+.footnote {
+  color: brown;
+  font-weight: bold;
 }

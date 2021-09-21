@@ -125,7 +125,48 @@ const CoverCrop1 = ({ps, parms, sets, setScreen}) => {
           Dry Biomass
           <Icon>
             help
-            lorem ipsum
+            <p>The amount of cover crop biomass on a dry weight basis. For taking a representative biomass sample for your field:</p>
+            <ol>
+              <li>Select multiple small areas that best represent mixture composition and biomass in your field.</li>
+              <li>Collect all aboveground material using sickle/scissor/clipper from specified areas. Use quadrant for broadcasted and aerial-seeded cover crops or a measuring stick for drill-seeded cover crops.</li>
+              <li>Record fresh weight of cover crop subsample in pounds (lb).</li>
+              <li>Repeat step 2-3 for each subsample. Sum up all fresh weights (lb).</li>
+              <li>Record the total number of cover crop subsamples harvested.</li>
+              <li>Record quadrant size (ft<sup>2</sup>) or number and length of drill-lines harvested and drill spacing.</li>
+              <li>Combine all cover crop subsamples together into one sample.</li>
+              <li>Drying:
+                <ul>
+                  <li>
+                    Sun dry method:
+                    <ul>
+                      <li>Spread all cover crops sampled out in a thin layer on a clean trap. </li>
+                      <li>Sun dry cover crops for several days, turning it frequently, until it is crunchy. </li>
+                      <li>Record total dry weight (lb).</li>
+                    </ul>
+                  </li>
+                  <li>
+                    Microwave dry method:
+                    <ul>
+                      <li>Take 3.5 ounces (100 g) of fresh material and spread out in a thin layer in a plate. </li>
+                      <li>Heat at small intervals and reweigh until you reach a constant weight. </li>
+                      <li>Record the final dry weight of subsample and determine moisture content (%) using the following equation.</li>
+                      <li>Back calculate total dry weight (lb) using total fresh weight (lb) and moisture content (%).</li>
+                    </ul>
+                    <table>
+                      <tbody>
+                        <tr><td></td><td>Broadcasted or aerial-seeded</td><td>Drill-seeded</td></tr>
+                        <tr><td>Total area sampled (ft<sup>2</sup>)</td><td>#samples × Quadrant size (ft<sup>2</sup>)</td><td>#samples ×#drill lines × length of drill lines (ft)×drill spacing (ft)</td></tr>
+                        <tr><td>Fresh wet weight (lb/ac)</td><td colSpan="2">(Total fresh weight (lb)  )/(Total area sampled (ft<sup>2</sup>)) × 43,560 ft<sup>2</sup>/ac</td></tr>
+                        <tr><td>Dry weight (lb/ac)</td><td colSpan="2">(Total dry weight (lb)  )/(Total area sampled (ft<sup>2</sup>))× 43,560 ft<sup>2</sup>/ac</td></tr>
+                        <tr><td>Moisture content (%)</td><td colSpan="2">(Total fresh weight (lb)-Total dry weight (lb) )/(Total dry weight (lb))  ×100%</td></tr>
+                      </tbody>
+                    </table>
+                  </li>
+                </ul>
+              </li>
+              <li>Take a representative cover crop subsample and ship it to analytical lab for quality analysis. </li>
+            </ol>
+            <p>For more details on cover crop biomass sampling and taking a representative sub-sample for quality analysis, please refer <a target="_blank" href="https://extension.uga.edu/publications/detail.html?number=C1077">here</a>.</p>
           </Icon>
           :
 
@@ -163,14 +204,15 @@ const CoverCrop1 = ({ps, parms, sets, setScreen}) => {
           Cover Crop Water Content at Termination (g water/g dry biomass)
           <Icon>
             help
-            Water content data is default.  Please change if you have real data.
+            <p>Adjust default values based on your following calculations.</p>
+            <p>Cover Crop Water Content = (Total fresh weight - Total dry weight)/(Total dry weight)</p>
           </Icon>
           :
         </p>
         <Myslider
           parm={'lwc'}
           min={0}
-          max={7}
+          max={10}
           ps={ps}
           parms={parms}
           sets={sets}
@@ -186,7 +228,7 @@ const CoverCrop1 = ({ps, parms, sets, setScreen}) => {
   )
 } // CoverCrop1
 
-const CoverCrop2 = ({ps, parms, sets, setScreen}) => {
+const CoverCrop2 = ({ps, parms, sets, setScreen, update}) => {
   return (
     <>
       <h1>Tell us about your Cover Crop Quality</h1>
@@ -195,7 +237,7 @@ const CoverCrop2 = ({ps, parms, sets, setScreen}) => {
           Nitrogen (%)
           <Icon>
             help
-            lorem ipsum
+            Cover crop nitrogen concentrations based on lab results.
           </Icon>
           :
         </p>
@@ -207,13 +249,18 @@ const CoverCrop2 = ({ps, parms, sets, setScreen}) => {
           parms={parms}
           sets={sets}
           step={0.1}
+          update={update}
         />
-
+        <p/>
+        <hr/>
+        {parms.N ? <p className="note">Adjust default values below based on lab results.</p> : ''}
         <p>
           Carbohydrates (%)
           <Icon>
             help
-            lorem ipsum
+            <p>Non-structural labile carbohydrate concentrations based on lab results. It represents the most readily decomposable C constituents in plant materials.</p>
+            <p>If you have the raw data from near infra-red reflectance spectroscopy (NIRS) analysis, use the following equation:</p>
+            <p>Carbohydrates (%) = % Crude Protein (CP) + % Fat + % non-fibrous carbohydrates (NFC)</p>
           </Icon>
           :
         </p>
@@ -225,13 +272,16 @@ const CoverCrop2 = ({ps, parms, sets, setScreen}) => {
           parms={parms}
           sets={sets}
           step={0.1}
+          update={update}
         />
 
         <p>
           Cellulose (%)
           <Icon>
             help
-            lorem ipsum
+            <p>Structural holo-cellulose (i.e., both cellulose and hemi-cellulose) concentrations based on lab results. It represents the moderately decomposable C constituents in plant materials. </p>
+            <p>If you have the raw data from near infra-red reflectance spectroscopy (NIRS) analysis, use the following equation:</p>
+            <p>Cellulose (%) = % neutral detergent fiber (NDF) – (% Lignin + % Ash)</p>
           </Icon>
           :
         </p>
@@ -243,13 +293,14 @@ const CoverCrop2 = ({ps, parms, sets, setScreen}) => {
           parms={parms}
           sets={sets}
           step={0.1}
+          update={update}
         />
 
         <p>
           Lignin (%)
           <Icon>
             help
-            lorem ipsum
+            <p>Structural lignin concentrations based on lab results. It represents the most recalcitrant C constituents in plant materials.</p>
           </Icon>
           :
         </p>
@@ -261,6 +312,7 @@ const CoverCrop2 = ({ps, parms, sets, setScreen}) => {
           parms={parms}
           sets={sets}
           step={0.1}
+          update={update}
         />
       </div>
   
