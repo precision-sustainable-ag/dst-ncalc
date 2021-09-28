@@ -255,10 +255,10 @@ const Output = ({ps, parms, sets, setScreen}) => {
             let p = path.getAttribute('d');
             p += ' ' + p;
             p = p.split(' ');
-            p[2] = 81;
+            p[2] = 70;
             p[5] = 135;
-            p[8] = 194;
-            p[11] = 248;
+            p[8] = 175;
+            p[11] = 235;
             path.setAttribute('d', p.join(' '));
             path.style.display = 'block';
             // path.setAttribute('d', 'M 371 51 L 371 135 M 371 190 L 371 250');
@@ -284,12 +284,12 @@ const Output = ({ps, parms, sets, setScreen}) => {
       {
         name: 'Cover Crop N credit',
         data: [+NPredict, +NPredict],
-        color: '#6B9333'
+        color: '#008837'
       },
       {
         name: 'Recommended N',
         data: [Math.max(0, parms.targetN - NPredict), Math.max(0, parms.targetN - NPredict)],
-        color: 'brown'
+        color: '#7b3294'
       },
     ],
     xAxis: [{
@@ -305,28 +305,27 @@ const Output = ({ps, parms, sets, setScreen}) => {
         text: ''
       },
       labels: {
-        enabled: false
+        enabled: true
       },
       plotLines: [{
         value: parms.targetN,
         color: 'blue',
         zdashStyle: 'Dash',
-        width: 2,
+        width: 4,
         zIndex: 100,
         label: {
           useHTML: true,
-          text: `<div style="background: white; transform: rotate(-90deg); position: relative; left:  57px; top: 6px; font-size: 1em; color: blue; background: transparent;">Target N</div>
-                 <div style="background: white; transform: rotate(-90deg); position: relative; left: 170px; top: -9px; font-size: 1em; color: blue; background: transparent;">Target N</div>
+          text: `<div style="background: white; transform: rotate(-90deg); position: relative; left:  4.5em; top:  0.6em; font-size: 1em; color: blue; background: transparent;">Target N</div>
+                 <div style="background: white; transform: rotate(-90deg); position: relative; left: 13.0em; top: -0.9em; font-size: 1em; color: blue; background: transparent;">Target N</div>
                 `
         }
       }],
     }],
     legend: {
       verticalAlign: 'top',
-      align: 'right',
-      itemDistance: -260,  // hack to reverse legend items
       symbolPadding: 0,
       useHTML: true,
+      reversed: true,
       labelFormatter: function() {
         return `<div style="color: ${this.color};">${this.name}</div>`
       }
@@ -362,10 +361,17 @@ const Output = ({ps, parms, sets, setScreen}) => {
     },
     xAxis: {
       categories: ['Incorporated', 'Surface'],
+      labels: {
+        enabled: true,
+        step: 1
+      },
     },
     yAxis: {
       title: {
         text: ''
+      },
+      labels: {
+        enabled: true
       },
     },
     legend: {
@@ -479,7 +485,7 @@ const Output = ({ps, parms, sets, setScreen}) => {
                               <td style={{textAlign: 'right'}}>{carb.toFixed(0)} %</td>
                             </tr>
                             <tr>
-                              <td>Cellulose</td>
+                              <td>Holo-cellulose</td>
                               <td style={{textAlign: 'right'}}>{cell.toFixed(0)} %</td>
                             </tr>
                             <tr>
@@ -517,7 +523,7 @@ const Output = ({ps, parms, sets, setScreen}) => {
                 </div>
               </div>
               <HighchartsReact highcharts={Highcharts} options={NGraph} className="hidden" />
-              {(parms.targetN < NPredict) && <div class="footnote">* Your cover crop is supplying all of your needs</div>}
+              {(parms.outputN === 1 && parms.targetN < NPredict) && <div class="footnote">* Your cover crop is supplying all of your needs.</div>}
               <HighchartsReact highcharts={Highcharts} options={residueGraph} />
             </td>
             <td>
