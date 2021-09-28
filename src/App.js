@@ -30,7 +30,10 @@ const useStyles = makeStyles((theme) => ({
 const Help = ({parms}) => {
   const style = {
     left: parms.helpX,
-    top: parms.helpY
+    top: parms.helpY,
+    maxWidth:  `calc(100vw - ${parms.helpX}px - 20px)`,
+    maxHeight: `calc(100vh - ${parms.helpY}px - 20px)`,
+    overflow: 'auto'
   }
 
   return (

@@ -204,7 +204,7 @@ const CoverCrop1 = ({ps, parms, sets, setScreen}) => {
           Cover Crop Water Content at Termination (g water/g dry biomass)
           <Icon>
             help
-            <p>Adjust default values based on your following calculations.</p>
+            <p>Use the following calculation to adjust default values:</p>
             <p>Cover Crop Water Content = (Total fresh weight - Total dry weight)/(Total dry weight)</p>
           </Icon>
           :
@@ -237,7 +237,7 @@ const CoverCrop2 = ({ps, parms, sets, setScreen, update}) => {
           Nitrogen (%)
           <Icon>
             help
-            Cover crop nitrogen concentrations based on lab results.
+            Cover crop nitrogen concentration based on lab results.
           </Icon>
           :
         </p>
@@ -258,9 +258,10 @@ const CoverCrop2 = ({ps, parms, sets, setScreen, update}) => {
           Carbohydrates (%)
           <Icon>
             help
-            <p>Non-structural labile carbohydrate concentrations based on lab results. It represents the most readily decomposable C constituents in plant materials.</p>
+            <p>Non-structural labile carbohydrate concentration based on lab results. This represents the most readily decomposable C constituents in plant materials.</p>
+            <p>The default value is based on the nitrogen concentration.</p>
             <p>If you have the raw data from near infra-red reflectance spectroscopy (NIRS) analysis, use the following equation:</p>
-            <p>Carbohydrates (%) = % Crude Protein (CP) + % Fat + % non-fibrous carbohydrates (NFC)</p>
+            <p>carbohydrates (%) = % crude protein (CP) + % fat + % non-fibrous carbohydrates (NFC)</p>
           </Icon>
           :
         </p>
@@ -276,12 +277,13 @@ const CoverCrop2 = ({ps, parms, sets, setScreen, update}) => {
         />
 
         <p>
-          Cellulose (%)
+          Holo-cellulose (%)
           <Icon>
             help
-            <p>Structural holo-cellulose (i.e., both cellulose and hemi-cellulose) concentrations based on lab results. It represents the moderately decomposable C constituents in plant materials. </p>
+            <p>Structural holo-cellulose (i.e., both cellulose and hemi-cellulose) concentration based on lab results. This represents the moderately decomposable C constituents in plant materials.</p>
+            <p>The default value is based on the nitrogen concentration.</p>
             <p>If you have the raw data from near infra-red reflectance spectroscopy (NIRS) analysis, use the following equation:</p>
-            <p>Cellulose (%) = % neutral detergent fiber (NDF) – (% Lignin + % Ash)</p>
+            <p>cellulose (%) = % neutral detergent fiber (NDF) – (% lignin + % ash)</p>
           </Icon>
           :
         </p>
@@ -300,7 +302,8 @@ const CoverCrop2 = ({ps, parms, sets, setScreen, update}) => {
           Lignin (%)
           <Icon>
             help
-            <p>Structural lignin concentrations based on lab results. It represents the most recalcitrant C constituents in plant materials.</p>
+            <p>Structural lignin concentration based on lab results. This represents the most recalcitrant C constituents in plant materials.</p>
+            <p>The default value is based on the nitrogen concentration.</p>
           </Icon>
           :
         </p>
