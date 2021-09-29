@@ -348,9 +348,8 @@ input::-webkit-inner-spin-button {
   font-style: italic;
 }
 
-.highcharts-plot-lines-100 path {
-  z-index: 9999 !important;
-  display: none;
+.highcharts-plot-lines-4 path {
+  z-index: -1 !important;
 }
 
 .footnote {

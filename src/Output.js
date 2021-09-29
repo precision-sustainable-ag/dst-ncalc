@@ -83,7 +83,7 @@ const Output = ({ps, parms, sets, setScreen}) => {
         y: +value,
         marker: {
           radius: 5,
-          fillColor: '#6b9333',
+          fillColor: '#008837',
           enabled: (i / 24 === parms.nweeks * 7) ||
                    (i === a.length - 1 && parms.nweeks * 7 * 24 >= a.length)
         }
@@ -133,7 +133,7 @@ const Output = ({ps, parms, sets, setScreen}) => {
       {
         name: parms.outputN === 1 ? 'N released' : 'Residue Remaining',
         data: data,
-        color: '#6B9333',
+        color: '#008837',
         showInLegend: false,
         zmarker: {
           symbol: 'url(sun.png)'
@@ -156,7 +156,7 @@ const Output = ({ps, parms, sets, setScreen}) => {
           style: {
             fontSize: '14px',
             fontWeight: 'bold',
-            color: '#6B9333'
+            color: '#008837'
           }
         },
         min: 0,
@@ -170,7 +170,7 @@ const Output = ({ps, parms, sets, setScreen}) => {
           style: {
             fontSize: '14px',
             fontWeight: 'bold',
-            color: '#6B9333'
+            color: '#008837'
           }
         },
         linkedTo: 0,
@@ -203,7 +203,7 @@ const Output = ({ps, parms, sets, setScreen}) => {
                                              : '<div class="caption">Undecomposed cover crop residue mass remaining over time following its termination.</div>'
         },
         crosshair: {
-          color: 'green',
+          color: '#7b3294',
           dashStyle: 'dash'
         },
         tickPositioner: function() {
@@ -227,7 +227,7 @@ const Output = ({ps, parms, sets, setScreen}) => {
         },
         plotLines: [{
           value: new Date(parms.plantingDate),
-          color: 'green',
+          color: '#7b3294',
           dashStyle: 'shortdash',
           width: 0.4,
           label: {
@@ -250,7 +250,7 @@ const Output = ({ps, parms, sets, setScreen}) => {
       events: {
         render: function() {
           setTimeout(() => {
-            const path = document.querySelector('.highcharts-plot-lines-100 path');
+            const path = document.querySelector('.highcharts-plot-lines-4 path');
             console.log(path);
             let p = path.getAttribute('d');
             p += ' ' + p;
@@ -293,10 +293,14 @@ const Output = ({ps, parms, sets, setScreen}) => {
       },
     ],
     xAxis: [{
-      categories: ['Incorporated', 'Surface'],
+      categories: [
+        '<div style="text-align: left">Till&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<br><span style="font-size: 90%">(Incorporated)</span></div>',
+        '<div style="text-align: left">No Till&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<br><span style="font-size: 90%">(Surface)&nbsp;&nbsp;&nbsp;&nbsp;</span></div>',
+      ],
       labels: {
         style: {
-          fontSize: 13
+          fontSize: 13,
+          color: 'black'
         }
       },
     }],
@@ -312,7 +316,7 @@ const Output = ({ps, parms, sets, setScreen}) => {
         color: 'blue',
         zdashStyle: 'Dash',
         width: 4,
-        zIndex: 100,
+        zIndex: 4,
         label: {
           useHTML: true,
           text: `<div style="background: white; transform: rotate(-90deg); position: relative; left:  4.5em; top:  0.6em; font-size: 1em; color: blue; background: transparent;">Target N</div>
@@ -343,7 +347,6 @@ const Output = ({ps, parms, sets, setScreen}) => {
             const footnote = this.y === 0 ? '<sup>*</sup>' : '';
             return `<div style="color: ${this.color}; background: white; transform: translateY(-38px);">${this.y} ${parms.unit}${footnote}</div>`
           },
-          zcolor: 'green',
         },
         animation: false
       }
@@ -397,7 +400,7 @@ const Output = ({ps, parms, sets, setScreen}) => {
       {
         name: 'Residue remaining',
         data: [Math.round(min * 1.3), Math.round(min)],
-        color: '#6B9333',
+        color: '#008837',
       },
     ]
   } // residueGraph
@@ -456,7 +459,7 @@ const Output = ({ps, parms, sets, setScreen}) => {
                               <td>{parms.field}</td>
                             </tr>
                             <tr>
-                              <td>Cover Crop Species</td>
+                              <td>Species</td>
                               <td>{parms.coverCrop.map(crop => <div key={crop}>{crop}</div>)}</td>
                             </tr>
                             <tr>
