@@ -363,10 +363,16 @@ const Output = ({ps, parms, sets, setScreen}) => {
       verticalAlign: 'bottom'
     },
     xAxis: {
-      categories: ['Incorporated', 'Surface'],
+      categories: [
+        '<div style="text-align: left">Till&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<br><span style="font-size: 90%">(Incorporated)</span></div>',
+        '<div style="text-align: left">No Till&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<br><span style="font-size: 90%">(Surface)&nbsp;&nbsp;&nbsp;&nbsp;</span></div>',
+      ],
       labels: {
-        enabled: true,
-        step: 1
+        style: {
+          fontSize: 13,
+          color: 'black',
+          step: 1
+        }
       },
     },
     yAxis: {
