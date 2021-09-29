@@ -283,7 +283,7 @@ const CoverCrop2 = ({ps, parms, sets, setScreen, update}) => {
             <p>Structural holo-cellulose (i.e., both cellulose and hemi-cellulose) concentration based on lab results. This represents the moderately decomposable C constituents in plant materials.</p>
             <p>The default value is based on the nitrogen concentration.</p>
             <p>If you have the raw data from near infra-red reflectance spectroscopy (NIRS) analysis, use the following equation:</p>
-            <p>cellulose (%) = % neutral detergent fiber (NDF) – (% lignin + % ash)</p>
+            <p>holo-cellulose (%) = % neutral detergent fiber (NDF) – (% lignin + % ash)</p>
           </Icon>
           :
         </p>
