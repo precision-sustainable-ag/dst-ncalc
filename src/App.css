@@ -303,8 +303,12 @@ a:hover {
   padding: 0.5em;
 }
 
-.output button.selected {
+.output button.selected, .mockup button.selected {
   background: #8EB644;
+}
+
+.mockup button {
+  padding: 0.5em;
 }
 
 input::-webkit-inner-spin-button {
@@ -355,4 +359,16 @@ input::-webkit-inner-spin-button {
 .footnote {
   color: #7b3294;
   font-weight: bold;
+}
+
+div.mockup1, div.mockup2, div.mockup3, div.mockup4, div.mockup5 {
+  display: none;
+}
+
+.mockup1 .mockup1,
+.mockup2 .mockup2,
+.mockup3 .mockup3,
+.mockup4 .mockup4,
+.mockup5 .mockup5 {
+  display: block;
 }
