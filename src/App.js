@@ -409,7 +409,8 @@ let parms = {
   unit                : 'lb/ac',
   location            : demo ? '' : '',
   nweeks              : 4,
-  firstSSURGO         : true
+  firstSSURGO         : true,
+  mockup              : 1,
 }
 
 let PSA = {
