@@ -372,3 +372,7 @@ div.mockup1, div.mockup2, div.mockup3, div.mockup4, div.mockup5 {
 .mockup5 .mockup5 {
   display: block;
 }
+
+.highcharts-plot-line-label {
+  overflow: visible !important;
+}
