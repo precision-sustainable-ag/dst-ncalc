@@ -1,31 +1,61 @@
+// npm i --no-optional
+// https://github.com/Tjatse/ansi-html/issues/19
+
+// https://itnext.io/fixing-security-vulnerabilities-in-npm-dependencies-in-less-than-3-mins-a53af735261d
+// npm i minimist --save-dev
+// "resolutions": {
+//   "minimist": "^1.2.5"
+// }
+// "scripts": {
+//   "preinstall": "npx npm-force-resolutions"
+// }
+// npm i
+// npm audit fix
+// npm audit
+
+// TODO: Compare *incorporated* Georgia data to Iteris
+// TODO: Inputs
+// TODO: Name your field:  Same as CC-Econ, or vice-versa?
+// TODO: Change NUptake to percentage. "your first mock-up could be having a common secondary y-axis for both corn N uptake and cover crop N released (0-100%). And your second mock-up could be two different labels on secondary y-axis, both going from 0-100%."
+// TODO: Determine Mockup (different colors on Mockup 2?)
+// TODO: Saved PSA fields
+// TODO: Carb, Cell, Lignin graph
+// TODO: Rain, RH, Temp graph
+// TODO: CNRF, ContactFactor, MTRF graph (?)
+// TODO: Make it a backend
+// TODO: Incorporated
+// TODO: num:  iteris moisture - Air Dry
+// TODO: Output:  Mockup:  Center or enlarge left graph
+// TODO: Flexbox Output screen:  Portrait
+// TODO: Use SSURGO to troubleshoot Iteris vs Weather Station
+// TODO: SSURGO: Field capacity and Permanent Wilting Point
+// TODO: wthirdbar_r == DUL, wfifteenbar_r == Air Dry, awc_r
+// TODO: SSURGO Air Dry / 2 === our Air Dry
+// TODO: * 100 for percent
+// TODO: MFac = (Sw - Ad) / (Dul - Ad
+// TODO: Beta testing in January
+
+// DONE: Output: Target N and Planting date:  .highcharts-plot-line-label {overflow: visible !important;}
+
 import React, {useEffect} from 'react';
 
 import './App.css';
 
 import moment from 'moment';
 
-import {makeStyles} from '@material-ui/core';
-
 import 'react-datepicker/dist/react-datepicker.css';
 
 // import './data';
 
 // Screens
-import Home       from './Home';
-import About      from './About';
-import Location   from './Location';
-import Soil       from './Soil';
-import {CoverCrop1, CoverCrop2} from './CoverCrop';
-import CashCrop   from './CashCrop';
-import Output     from './Output';
-import Advanced   from './Advanced';
-
-const useStyles = makeStyles((theme) => ({
-  root: {
-    flexGrow: 1,
-    backgroundColor: theme.palette.background.paper,
-  },
-}));
+import Home       from './components/Home';
+import About      from './components/About';
+import Location   from './components/Location';
+import Soil       from './components/Soil';
+import {CoverCrop1, CoverCrop2} from './components/CoverCrop';
+import CashCrop   from './components/CashCrop';
+import Output     from './components/Output';
+import Advanced   from './components/Advanced';
 
 const Help = ({parms}) => {
   const style = {
@@ -96,9 +126,9 @@ const Screens = ({parms}) => {
     if (/Output|Advanced/.test(scr)) {
       if (demo && !parms.BD) {
         parms.OM = 1.5;
-        sets.OM(1.5);
+        set.OM(1.5);
         parms.BD = 1.6;
-        sets.BD(1.6);
+        set.BD(1.6);
       }
 
       test('lat', 'Location', 'Please enter Latitude and Longitude') ||
@@ -129,9 +159,9 @@ const Screens = ({parms}) => {
       return;
     }
 
-    sets.weather([]);
+    set.weather([]);
 
-    const src = `https://weather.aesl.ces.uga.edu/weather/hourly?lat=${parms.lat}&lon=${parms.lng}&start=${moment(parms.killDate).format('yyyy-MM-DD')}&end=${moment(parms.plantingDate).add(110, 'days').format('yyyy-MM-DD')}&attributes=air_temperature,relative_humidity,precipitation&options=predicted,zGMT`;
+    const src = `https://weather.aesl.ces.uga.edu/weather/hourly?lat=${parms.lat}&lon=${parms.lng}&start=${moment(parms.killDate).format('yyyy-MM-DD')}&end=${moment(parms.plantingDate).add(110, 'days').format('yyyy-MM-DD')}&attributes=air_temperature,relative_humidity,precipitation&options=predicted`;
     console.log(src);
     clearTimeout(weatherTimer);
     weatherTimer = setTimeout(() => {
@@ -141,7 +171,7 @@ const Screens = ({parms}) => {
           if (!(data instanceof Array)) {
             alert(`No data found.\nPlease choose a location within the conterminous United States.`);
           } else {
-            sets.weather(data);
+            set.weather(data);
             console.log('Weather:');
             console.log(data);
           }
@@ -160,21 +190,63 @@ const Screens = ({parms}) => {
     }
 
     if (!parms.firstSSURGO) {
-      sets.BD('');
+      set.BD('');
     }
-    sets.OM('');
+    set.OM('');
 
-    // const src = `https://api.precisionsustainableag.org/ssurgo?lat=${parms.lat}&lon=${parms.lng}&component=major`;
-    const src = `https://weather.aesl.ces.uga.edu/ssurgo?lat=${parms.lat}&lon=${parms.lng}&component=major`;
-    console.log(src);
+    // const ssurgoSrc = `https://api.precisionsustainableag.org/ssurgo?lat=${parms.lat}&lon=${parms.lng}&component=major`;
+    const start = moment(parms.killDate).format('yyyy-MM-DD');
+    const end   = moment(parms.plantingDate).add(110, 'days').add(1, 'hour').format('yyyy-MM-DD');
+    const lwc = parms.lwc || 10;
+    let carb = parms.carb || (24.7 + 10.5 * parms.N);
+    let cell = parms.cell || (69 - 10.2 * parms.N);
+    let lign = parms.lign || (100 - (carb + cell));
+
+    const total = +parms.carb + +parms.cell + +parms.lign;
+    carb = parms.carb * 100 / total;
+    cell = parms.cell * 100 / total;
+    lign = parms.lign * 100 / total;
+    const factor = parms.unit === 'lb/ac' ? 1.12085 : 1;
+    const biomass = parms.biomass * factor;
+    const om = parms.OM;
+    const bd = parms.BD;
+    const In = parms.InorganicN || 10;
+    const pmn = 10;
+    console.log(parms.N, carb, cell, lign, biomass, bd, In);
+    const ssurgoSrc = `https://weather.aesl.ces.uga.edu/ssurgo?lat=${parms.lat}&lon=${parms.lng}&component=major`;
+    const iterisSrc = `https://weather.aesl.ces.uga.edu/ID?type=daily&lat=${parms.lat}&lon=${parms.lng}&start=${start}&end=${end}`;
+    const modelSrc  = `https://weather.aesl.ces.uga.edu/cc-ncalc/both?lat=${parms.lat}&lon=${parms.lng}&start=${start}&end=${end}&n=${parms.N}&biomass=${biomass}&lwc=${lwc}&carb=${carb}&cell=${cell}&lign=${lign}&om=${om}&bd=${bd}&in=${In}&pmn=${pmn}`;
+
+    console.log(ssurgoSrc);
+    console.log(iterisSrc);
+    console.log(modelSrc);
     clearTimeout(ssurgoTimer);
-    sets.gotSSURGO(false);
+    set.gotSSURGO(false);
+    set.gotIteris(false);
+    set.gotModel(false);
+
     ssurgoTimer = setTimeout(() => {
-      fetch(src)
+      fetch(modelSrc)
+        .then(response => response.json())
+        .then(data => {
+          set.model(data);
+          set.gotModel(true);
+          console.log('model');
+          console.log(data);
+        });
+
+        fetch(iterisSrc)
+        .then(response => response.json())
+        .then(data => {
+          set.gotIteris(true);
+          console.log(data);
+        });
+
+      fetch(ssurgoSrc)
         .then(response => response.json())
         .then(data => {
           if (data instanceof Array) {
-            sets.gotSSURGO(true);
+            set.gotSSURGO(true);
             console.log('SSURGO:');
             console.log(data);
             
@@ -187,17 +259,29 @@ const Screens = ({parms}) => {
             console.log(weightedAverage(data, 'dbthirdbar_r'));
 
             if (!parms.firstSSURGO || !parms.BD) {
-              sets.BD(weightedAverage(data, 'dbthirdbar_r'));
+              set.BD(weightedAverage(data, 'dbthirdbar_r'));
             }
-            sets.firstSSURGO(false);
+            set.firstSSURGO(false);
             
-            sets.OM(weightedAverage(data, 'om_r'));
+            set.OM(weightedAverage(data, 'om_r'));
           }
         });
     }, 1000)
   }, [
+    parms,
     parms.lat,
-    parms.lng
+    parms.lng,
+    parms.N,
+    parms.killDate,
+    parms.plantingDate,
+    parms.carb,
+    parms.cell,
+    parms.lign,
+    parms.lwc,
+    // parms.BD,
+    // parms.OM,
+    parms.InorganicN,
+    parms.biomass,
   ]);
 
   const loadField = (field) => {
@@ -205,9 +289,9 @@ const Screens = ({parms}) => {
     Object.keys(inputs).forEach(key => {
       try {
         if (/Date/.test(key)) {
-          sets[key](new Date(inputs[key]));
+          set[key](new Date(inputs[key]));
         } else {
-          sets[key](inputs[key]);
+          set[key](inputs[key]);
         }
       } catch(e) {
         console.log(key, e.message);
@@ -223,16 +307,16 @@ const Screens = ({parms}) => {
 
       console.log(JSON.stringify(val));
 
-      sets[id](val);
+      set[id](val);
 
       if (id === 'cell') {
-        // sets.lign(+(100 - (+parms.carb + +val)).toFixed(1));
+        // set.lign(+(100 - (+parms.carb + +val)).toFixed(1));
       } else if (id === 'N') {
         const carb = (24.7 + 10.5 * val).toFixed(0);
         const cell = (69 - 10.2 * val).toFixed(0);
-        sets.carb(carb);
-        sets.cell(cell);
-        sets.lign(100 - (+carb + +cell));
+        set.carb(carb);
+        set.cell(cell);
+        set.lign(100 - (+carb + +cell));
       }
 
       console.log(id, val);
@@ -258,7 +342,7 @@ const Screens = ({parms}) => {
     
     Object.keys(PSA).forEach(key => {
       try {
-        sets[key](PSA[key]);
+        set[key](PSA[key]);
       } catch(ee) {
 
       }
@@ -274,17 +358,17 @@ const Screens = ({parms}) => {
       
       onKeyDown={(e) => {
         if (e.key === 'Escape') {
-          sets.help('');
+          set.help('');
         }
       }}
 
       onClick={(e) => {
         if (/^help/.test(e.target.innerHTML)) {
-          sets.help(e.target.innerHTML.slice(4));
-          sets.helpX(Math.min(e.pageX + 20, window.innerWidth - 400));
-          sets.helpY(e.pageY - 20);
+          set.help(e.target.innerHTML.slice(4));
+          set.helpX(Math.min(e.pageX + 20, window.innerWidth - 400));
+          set.helpY(e.pageY - 20);
         } else {
-          sets.help('');
+          set.help('');
         }
       }}
 
@@ -292,12 +376,12 @@ const Screens = ({parms}) => {
     >
       <nav onClick={changeScreen}>
         <img src="logo.png" alt="" />
-        <button className={/Home|About/.test(screen)  ? 'selected' : ''} data-scr="Home"       >Home</button>
-        <button className={/Location/.test(screen)    ? 'selected' : ''} data-scr="Location"   >Location</button>
-        <button className={/Soil/.test(screen)        ? 'selected' : ''} data-scr="Soil"       >Soil</button>
-        <button className={/CoverCrop/.test(screen)   ? 'selected' : ''} data-scr="CoverCrop1" >Cover Crop</button>
-        <button className={/CashCrop/.test(screen)    ? 'selected' : ''} data-scr="CashCrop"   >Cash Crop</button>
-        <button className={/Output/.test(screen)      ? 'selected' : ''} data-scr="Output"     >Output</button>
+        <button className={/Home|About/.test(screen)  ? 'selected' : undefined} data-scr="Home"       >Home</button>
+        <button className={/Location/.test(screen)    ? 'selected' : undefined} data-scr="Location"   >Location</button>
+        <button className={/Soil/.test(screen)        ? 'selected' : undefined} data-scr="Soil"       >Soil</button>
+        <button className={/CoverCrop/.test(screen)   ? 'selected' : undefined} data-scr="CoverCrop1" >Cover Crop</button>
+        <button className={/CashCrop/.test(screen)    ? 'selected' : undefined} data-scr="CashCrop"   >Cash Crop</button>
+        <button className={/Output/.test(screen)      ? 'selected' : undefined} data-scr="Output"     >Output</button>
         {
           PSA ? 
             <select id="Fields"
@@ -334,30 +418,28 @@ const Screens = ({parms}) => {
       <Help parms={parms} />
       
       {screens[screen]({
-        ps: ps,
-        sets: sets,
+        props: props,
+        set: set,
         parms: parms,
         setScreen: setScreen,
         update: update
       })}
     </div>
-  )
+  );
 } // Screens
 
 const App = () => {
-  const classes = useStyles();
-
   // can't do useState in a loop unless it's in a component, even if that component is unused
   const State = (parm, value) => {
-    [parms[parm], sets[parm]] = React.useState(value);
+    [parms[parm], set[parm]] = React.useState(value);
   }
   
   for (const [parm, value] of Object.entries(parms)) {
     State(parm, value);
   }
-console.log('App')
+
   return (
-    <div className={classes.root}>
+    <div>
       <Screens parms={parms} />
     </div>
   );
@@ -395,6 +477,7 @@ let parms = {
   mapZoom             : 13,
   mapType             : 'hybrid',
   weather             : {},
+  model               : {},
   OM                  : demo ? 5   : '',
   BD                  : demo ? 1.5 : '',
   yield               : demo ? 150 : 150,
@@ -403,14 +486,17 @@ let parms = {
   residueC            : demo ? 100 : '',
   outputN             : 1,
   gotSSURGO           : false,
+  gotIteris           : false,
+  gotModel           : false,
   help                : '',
   helpX               : 0,
   helpY               : 0,
+  state               : '',
   unit                : 'lb/ac',
   location            : demo ? '' : '',
   nweeks              : 4,
   firstSSURGO         : true,
-  mockup              : 1,
+  mockup              : 2,
 }
 
 let PSA = {
@@ -2927,12 +3013,12 @@ if (examples[demo]) {
   parms = {...parms, ...examples[demo]}
 }
 
-const ps = (s) => ({
+const props = (s) => ({
   id: s,
   value: parms[s]
 });
 
-const sets = {};
+const set = {};
 
 console.clear();
 
