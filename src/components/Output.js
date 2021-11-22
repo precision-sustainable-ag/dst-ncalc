@@ -74,7 +74,7 @@ const Output = ({props, parms, set, setScreen}) => {
       return;
     }
 
-    const start = 70;
+    // const start = 70;
     const stop = 70;
     for (let n = 1; n <= stop; n++) {
       const v1 = Array.isArray(model[key]) ? model[key][n] : model[key];
@@ -331,19 +331,23 @@ const Output = ({props, parms, set, setScreen}) => {
       events: {
         render: function() {
           setTimeout(() => {
-            const path = document.querySelector('.highcharts-plot-lines-4 path');
-            console.log(path);
-            let p = path.getAttribute('d');
-            p += ' ' + p;
-            p = p.split(' ');
-            p[2] = 70;
-            p[5] = 135;
-            p[8] = 175;
-            p[11] = 235;
-            path.setAttribute('d', p.join(' '));
-            path.style.display = 'block';
-            // path.setAttribute('d', 'M 371 51 L 371 135 M 371 190 L 371 250');
-          }, 1);
+            try {
+              const path = document.querySelector('.highcharts-plot-lines-4 path');
+              console.log(path);
+              let p = path.getAttribute('d');
+              p += ' ' + p;
+              p = p.split(' ');
+              p[2] = 70;
+              p[5] = 135;
+              p[8] = 175;
+              p[11] = 235;
+              path.setAttribute('d', p.join(' '));
+              path.style.display = 'block';
+              // path.setAttribute('d', 'M 371 51 L 371 135 M 371 190 L 371 250');
+            } catch(err) {
+              console.log(err);
+            }
+          }, 100);
         }
       }
     },
