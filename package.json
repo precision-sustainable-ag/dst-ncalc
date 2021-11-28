@@ -24,6 +24,7 @@
     "prop-types": "^15.7.2",
     "react-csv": "^2.0.3",
     "react-datepicker": "^3.4.1",
+    "react-number-format": "^4.8.0",
     "react-router-dom": "^5.2.0",
     "react-scripts": "^4.0.3",
     "web-vitals": "^0.2.4"

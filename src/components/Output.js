@@ -4,8 +4,6 @@ import Highcharts from 'highcharts';
 
 import HighchartsReact from 'highcharts-react-official';
 
-import transpile from './Transpiler.js';
-
 import moment from 'moment';
 
 import { CSVLink } from "react-csv";
@@ -30,22 +28,6 @@ const Output = ({props, parms, set, setScreen}) => {
   const lign = parms.lign * 100 / total;
   const factor = parms.unit === 'lb/ac' ? 1.12085 : 1;
 
-  let model = transpile({
-    FOMkg: parms.biomass * factor,
-    FOMpctN: +parms.N,
-    FOMpctCarb: carb,
-    FOMpctCell: cell,
-    FOMpctLign: lign,
-    LitterWaterContent: +parms.lwc,
-    BD: +parms.BD,
-    INppm: +parms.InorganicN,
-    hours: parms.weather.length,
-    stop:  parms.weather.length,
-    temp: parms.weather.map(d => d.air_temperature),
-    RH: parms.weather.map(d => d.relative_humidity * 100),
-    rain: parms.weather.map(d => d.precipitation),
-  });
-
   const modelSurface = {};
   console.log(parms.model);
   parms.model.surface.forEach(data => {
@@ -62,35 +44,9 @@ const Output = ({props, parms, set, setScreen}) => {
       modelIncorporated[key].push(data[key]);
     });
   });
-
-  console.log('_'.repeat(40));
-  console.log(model);
-  console.log(modelSurface);
-  console.log('_'.repeat(40));
-
-  Object.keys(model).forEach(key => {
-    if (!modelSurface[key]) {
-      console.log('Unknown', key);
-      return;
-    }
-
-    // const start = 70;
-    const stop = 70;
-    for (let n = 1; n <= stop; n++) {
-      const v1 = Array.isArray(model[key]) ? model[key][n] : model[key];
-      const v2 = modelSurface[key][n];
-      const pd = ((v1 - v2) / ((v1 + v2) / 2)) * 100;
-
-      if (pd > 150) {
-        console.log(n, key, v1, v2);
-        break;
-      }
-    }
-  });
-  
-  model = {
+ 
+  const model = {
     s: modelSurface,
-    // s: model,
     i: modelIncorporated
   }
 

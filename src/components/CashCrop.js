@@ -6,9 +6,9 @@ import {
   TextField,
 } from '@mui/material';
 
-import Myslider from './slider';
+import Myslider from './Slider';
 
-import Autocomplete from '@mui/material/Autocomplete';
+import {Autocomplete} from './Inputs';
 
 import Icon from '@mui/material/Icon';
 

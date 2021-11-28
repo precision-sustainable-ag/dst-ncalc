@@ -13,6 +13,7 @@
 // npm audit fix
 // npm audit
 
+// TODO: Advanced graphs
 // TODO: Compare *incorporated* Georgia data to Iteris
 // TODO: Inputs
 // TODO: Name your field:  Same as CC-Econ, or vice-versa?
@@ -22,8 +23,6 @@
 // TODO: Carb, Cell, Lignin graph
 // TODO: Rain, RH, Temp graph
 // TODO: CNRF, ContactFactor, MTRF graph (?)
-// TODO: Make it a backend
-// TODO: Incorporated
 // TODO: num:  iteris moisture - Air Dry
 // TODO: Output:  Mockup:  Center or enlarge left graph
 // TODO: Flexbox Output screen:  Portrait
@@ -36,6 +35,8 @@
 // TODO: Beta testing in January
 
 // DONE: Output: Target N and Planting date:  .highcharts-plot-line-label {overflow: visible !important;}
+// DONE: Make it a backend
+// DONE: Incorporated
 
 import React, {useEffect} from 'react';
 
@@ -45,7 +46,7 @@ import moment from 'moment';
 
 import 'react-datepicker/dist/react-datepicker.css';
 
-// import './data';
+import {defaults} from './defaults';
 
 // Screens
 import Home       from './components/Home';
@@ -92,7 +93,7 @@ const Help = ({parms}) => {
   )
 }
 
-const Screens = ({parms}) => {
+const Screens = ({parms, props, set}) => {
   let [screen, setScreen2] = React.useState('Home');
 
   const screens = {
@@ -106,29 +107,6 @@ const Screens = ({parms}) => {
     Output,
     Advanced,
   };
-
-  /*
-    const mean = (data, parm, dec = 2) => {
-      data = data
-              .filter(d => d[parm])
-              .map(d => d[parm]);
-
-      return (data.reduce((a, b) => +a + +b) / data.length).toFixed(dec);
-    } // mean
-  */
-
-  const weightedAverage = (data, parm, dec = 2) => {
-    let totpct = 0;
-
-    data = data
-            .filter(d => d[parm])
-            .map(d => {
-              totpct += +d.comppct_r;
-              return d[parm] * d.comppct_r;
-            });
-
-    return (data.reduce((a, b) => +a + +b) / totpct).toFixed(dec);
-  } // weightedAverage
 
   const setScreen = (scr) => {
     const test = (parm, scr, desc = `Please enter ${parm}`) => {
@@ -171,177 +149,66 @@ const Screens = ({parms}) => {
   } // setScreen
 
   useEffect(() => {
-    const base = new Airtable({apiKey: 'keySO0dHQzGVaSZp2'}).base('appOEj4Ag9MgTTrMg')
-    base('PSA').select({
-      view: 'Grid view'
-    }).eachPage((records, fetchNextPage) => {
-      records.forEach(record => {
-        const site = record.fields;
-        if (site.Hour === 0) {
-          examples[site.ID] = {
-            field             : site.ID,
-            lat               : site.Lat,
-            lng               : site.Lng,
-            location          : '',
-            BD                : site.BD,
-            coverCrop         : [site['Cover Crop']],
-            cashCrop          : site['Cash Crop'],
-            killDate          : new Date(site.Date),
-            lwc               : site.LitterWaterContent,
-            biomass           : Math.round(site.FOM),
-            unit              : 'kg/ha',
-            N                 : +(site.FOMpctN.toFixed(2)),
-            carb              : +(site.Carb.toFixed(2)),
-            cell              : +(site.Cell.toFixed(2)),
-            lign              : +(site.Lign.toFixed(2)),
-            targetN           : 150,
-            category          : site.Category,
-          } 
-        } else {
-          examples[site.ID].plantingDate = new Date(moment(site.Date).add(-111, 'days'));
+    const airtable = (table, callback, wrapup) => {
+      base(table).select({
+        view: 'Grid view'
+      }).eachPage((records, fetchNextPage) => {
+        records.forEach(record => {
+          callback(record.fields);
+        });
+    
+        fetchNextPage();
+      }, function done(err) {
+        if (err) {
+          console.error(err);
+        } else if (wrapup) {
+          wrapup();
         }
       });
-  
-      fetchNextPage();
-    }, function done(err) {
-      if (err) {
-        console.error(err);
-        return;
+    } // airtable
+
+    const base = new Airtable({apiKey: 'keySO0dHQzGVaSZp2'}).base('appOEj4Ag9MgTTrMg');
+
+    airtable('PSA', (site) => {
+      // console.log(site);
+      if (site.Hour === 0) {
+        examples[site.ID] = {
+          field             : site.ID,
+          lat               : site.Lat,
+          lng               : site.Lng,
+          location          : '',
+          BD                : site.BD,
+          coverCrop         : [site['Cover Crop']],
+          cashCrop          : site['Cash Crop'],
+          killDate          : new Date(site.Date),
+          lwc               : site.LitterWaterContent,
+          biomass           : Math.round(site.FOM),
+          unit              : 'kg/ha',
+          N                 : +(site.FOMpctN.toFixed(2)),
+          carb              : +(site.Carb.toFixed(2)),
+          cell              : +(site.Cell.toFixed(2)),
+          lign              : +(site.Lign.toFixed(2)),
+          targetN           : 150,
+          category          : site.Category,
+        } 
       } else {
-        console.log(examples);
+        examples[site.ID].plantingDate = new Date(moment(site.Date).add(-111, 'days'));
       }
     });
+
+    const mb = {};
+    airtable(
+      'CoverCrops',
+      (crop) => {
+//         console.log(crop);
+        mb[crop.Crop] = crop.MaxBiomass;
+      },
+      () => {
+        console.log(mb);
+        set.maxBiomass(mb);
+      }
+    );
   }, []);
-
-  useEffect(() => {
-    if (!parms.lat || !parms.lng || !parms.killDate || !parms.plantingDate) {
-      return;
-    }
-
-    set.weather([]);
-
-    const src = `https://weather.aesl.ces.uga.edu/weather/hourly?lat=${parms.lat}&lon=${parms.lng}&start=${moment(parms.killDate).format('yyyy-MM-DD')}&end=${moment(parms.plantingDate).add(110, 'days').format('yyyy-MM-DD')}&attributes=air_temperature,relative_humidity,precipitation&options=predicted`;
-    console.log(src);
-    clearTimeout(weatherTimer);
-    weatherTimer = setTimeout(() => {
-      fetch(src)
-        .then(response => response.json())
-        .then(data => {
-          if (!(data instanceof Array)) {
-            alert(`No data found.\nPlease choose a location within the conterminous United States.`);
-          } else {
-            set.weather(data);
-            console.log('Weather:');
-            console.log(data);
-          }
-        });
-    }, 1000)
-  }, [
-    parms.lat,
-    parms.lng,
-    parms.plantingDate,
-    parms.killDate,
-  ]);
-
-  useEffect(() => {
-    if (!parms.lat || !parms.lng) {
-      return;
-    }
-
-    if (!parms.firstSSURGO) {
-      set.BD('');
-    }
-    set.OM('');
-
-    // const ssurgoSrc = `https://api.precisionsustainableag.org/ssurgo?lat=${parms.lat}&lon=${parms.lng}&component=major`;
-    const start = moment(parms.killDate).format('yyyy-MM-DD');
-    const end   = moment(parms.plantingDate).add(110, 'days').add(1, 'hour').format('yyyy-MM-DD');
-    const lwc = parms.lwc || 10;
-    let carb = parms.carb || (24.7 + 10.5 * parms.N);
-    let cell = parms.cell || (69 - 10.2 * parms.N);
-    let lign = parms.lign || (100 - (carb + cell));
-
-    const total = +parms.carb + +parms.cell + +parms.lign;
-    carb = parms.carb * 100 / total;
-    cell = parms.cell * 100 / total;
-    lign = parms.lign * 100 / total;
-    const factor = parms.unit === 'lb/ac' ? 1.12085 : 1;
-    const biomass = parms.biomass * factor;
-    const om = parms.OM;
-    const bd = parms.BD;
-    const In = parms.InorganicN || 10;
-    const pmn = 10;
-    console.log(parms.N, carb, cell, lign, biomass, bd, In);
-    const ssurgoSrc = `https://weather.aesl.ces.uga.edu/ssurgo?lat=${parms.lat}&lon=${parms.lng}&component=major`;
-    const iterisSrc = `https://weather.aesl.ces.uga.edu/ID?type=daily&lat=${parms.lat}&lon=${parms.lng}&start=${start}&end=${end}`;
-    const modelSrc  = `https://weather.aesl.ces.uga.edu/cc-ncalc/both?lat=${parms.lat}&lon=${parms.lng}&start=${start}&end=${end}&n=${parms.N}&biomass=${biomass}&lwc=${lwc}&carb=${carb}&cell=${cell}&lign=${lign}&om=${om}&bd=${bd}&in=${In}&pmn=${pmn}`;
-
-    console.log(ssurgoSrc);
-    console.log(iterisSrc);
-    console.log(modelSrc);
-    clearTimeout(ssurgoTimer);
-    set.gotSSURGO(false);
-    set.gotIteris(false);
-    set.gotModel(false);
-
-    ssurgoTimer = setTimeout(() => {
-      fetch(modelSrc)
-        .then(response => response.json())
-        .then(data => {
-          set.model(data);
-          set.gotModel(true);
-          console.log('model');
-          console.log(data);
-        });
-
-        fetch(iterisSrc)
-        .then(response => response.json())
-        .then(data => {
-          set.gotIteris(true);
-          console.log(data);
-        });
-
-      fetch(ssurgoSrc)
-        .then(response => response.json())
-        .then(data => {
-          if (data instanceof Array) {
-            set.gotSSURGO(true);
-            console.log('SSURGO:');
-            console.log(data);
-            
-            data = data.filter(d => d.desgnmaster !== 'O');
-
-            const minhzdept = Math.min.apply(Math, data.map(d => d.hzdept_r));
-            data = data.filter(d => +d.hzdept_r === +minhzdept);
-
-            console.log(JSON.stringify(data.map(d => [d.dbthirdbar_r, d.om_r, d.comppct_r, d.hzdept_r]), null, 2));
-            console.log(weightedAverage(data, 'dbthirdbar_r'));
-
-            if (!parms.firstSSURGO || !parms.BD) {
-              set.BD(weightedAverage(data, 'dbthirdbar_r'));
-            }
-            set.firstSSURGO(false);
-            
-            set.OM(weightedAverage(data, 'om_r'));
-          }
-        });
-    }, 1000)
-  }, [
-    parms,
-    parms.lat,
-    parms.lng,
-    parms.N,
-    parms.killDate,
-    parms.plantingDate,
-    parms.carb,
-    parms.cell,
-    parms.lign,
-    parms.lwc,
-    // parms.BD,
-    // parms.OM,
-    parms.InorganicN,
-    parms.biomass,
-  ]);
 
   const loadField = (field) => {
     const inputs = JSON.parse(localStorage[field]);
@@ -447,6 +314,7 @@ const Screens = ({parms}) => {
               onChange={changePSA}
               value={parms.field}
             >
+              <option></option>
               <optgroup label="PSA">
                 {
                   Object.keys(examples)
@@ -492,18 +360,187 @@ const Screens = ({parms}) => {
 } // Screens
 
 const App = () => {
-  // can't do useState in a loop unless it's in a component, even if that component is unused
-  const State = (parm, value) => {
-    [parms[parm], set[parm]] = React.useState(value);
-  }
+  const runModel = () => {
+    const weightedAverage = (data, parm, dec = 2) => {
+      let totpct = 0;
   
-  for (const [parm, value] of Object.entries(parms)) {
-    State(parm, value);
-  }
+      data = data
+              .filter(d => d[parm])
+              .map(d => {
+                totpct += +d.comppct_r;
+                return d[parm] * d.comppct_r;
+              });
+  
+      return (data.reduce((a, b) => +a + +b) / totpct).toFixed(dec);
+    } // weightedAverage
+  
+    if (!parms.lat || !parms.lng) {
+      return;
+    }
+
+    if (!parms.firstSSURGO) {
+      set.BD('');
+    }
+    set.OM('');
+
+    // const ssurgoSrc = `https://api.precisionsustainableag.org/ssurgo?lat=${parms.lat}&lon=${parms.lng}&component=major`;
+    const start = moment(parms.killDate).format('yyyy-MM-DD');
+    const end   = moment(parms.plantingDate).add(110, 'days').add(1, 'hour').format('yyyy-MM-DD');
+    const lwc = parms.lwc || 10;
+    let carb = parms.carb || (24.7 + 10.5 * parms.N);
+    let cell = parms.cell || (69 - 10.2 * parms.N);
+    let lign = parms.lign || (100 - (carb + cell));
+
+    const total = +parms.carb + +parms.cell + +parms.lign;
+    carb = parms.carb * 100 / total;
+    cell = parms.cell * 100 / total;
+    lign = parms.lign * 100 / total;
+    const factor = parms.unit === 'lb/ac' ? 1.12085 : 1;
+    const biomass = parms.biomass * factor;
+    const om = parms.OM;
+    const bd = parms.BD;
+    const In = parms.InorganicN || 10;
+    const pmn = 10;
+    console.log(parms.N, carb, cell, lign, biomass, bd, In);
+    const ssurgoSrc = `https://weather.aesl.ces.uga.edu/ssurgo?lat=${parms.lat}&lon=${parms.lng}&component=major`;
+    const modelSrc  = `https://weather.aesl.ces.uga.edu/cc-ncalc/both?lat=${parms.lat}&lon=${parms.lng}&start=${start}&end=${end}&n=${parms.N}&biomass=${biomass}&lwc=${lwc}&carb=${carb}&cell=${cell}&lign=${lign}&om=${om}&bd=${bd}&in=${In}&pmn=${pmn}`;
+
+    console.log(ssurgoSrc);
+    console.log(modelSrc);
+    clearTimeout(ssurgoTimer);
+    set.gotSSURGO(false);
+    set.gotModel(false);
+
+    ssurgoTimer = setTimeout(() => {
+      fetch(modelSrc)
+        .then(response => response.json())
+        .then(data => {
+          set.model(data);
+          set.gotModel(true);
+          console.log('model');
+          console.log(data);
+        });
+
+      fetch(ssurgoSrc)
+        .then(response => response.json())
+        .then(data => {
+          if (data instanceof Array) {
+            set.gotSSURGO(true);
+            console.log('SSURGO:');
+            console.log(data);
+            
+            data = data.filter(d => d.desgnmaster !== 'O');
+
+            const minhzdept = Math.min.apply(Math, data.map(d => d.hzdept_r));
+            data = data.filter(d => +d.hzdept_r === +minhzdept);
+
+            console.log(JSON.stringify(data.map(d => [d.dbthirdbar_r, d.om_r, d.comppct_r, d.hzdept_r]), null, 2));
+            console.log(weightedAverage(data, 'dbthirdbar_r'));
+
+            if (!parms.firstSSURGO || !parms.BD) {
+              set.BD(weightedAverage(data, 'dbthirdbar_r'));
+            }
+            set.firstSSURGO(false);
+            
+            set.OM(weightedAverage(data, 'om_r'));
+          }
+        });
+    }, 1000)
+  } // runModel
+
+  const getWeather = () => {
+    if (!parms.lat || !parms.lng || !parms.killDate || !parms.plantingDate) {
+      return;
+    }
+
+    set.weather([]);
+
+    const src = `https://weather.aesl.ces.uga.edu/weather/hourly?lat=${parms.lat}&lon=${parms.lng}&start=${moment(parms.killDate).format('yyyy-MM-DD')}&end=${moment(parms.plantingDate).add(110, 'days').format('yyyy-MM-DD')}&attributes=air_temperature,relative_humidity,precipitation&options=predicted`;
+    console.log(src);
+    clearTimeout(weatherTimer);
+    weatherTimer = setTimeout(() => {
+      fetch(src)
+        .then(response => response.json())
+        .then(data => {
+          if (!(data instanceof Array)) {
+            alert(`No data found.\nPlease choose a location within the conterminous United States.`);
+          } else {
+            set.weather(data);
+            console.log('Weather:');
+            console.log(data);
+          }
+        });
+    }, 1000)
+  } // getWeather
+
+  const change = (parm, value, target, index) => {
+  } // change
+
+  let {parms, set, props} = defaults(
+    change,
+    {
+      field               : demo ? 'My field' : '',
+      targetN             : demo ? '150' : '',
+      coverCrop           : demo ? ['Oats, Black'] : [],
+      killDate            : demo ? new Date('05/08/2021') : '',
+      cashCrop            : demo ? 'Corn' : '',
+      plantingDate        : demo ? new Date('05/20/2021') : '',
+      lat                 : demo ? 32.5714 : 40.7849,
+      lng                 : demo ? -82.0760 : -74.8073,
+      N                   : demo ? 1.52 : '',
+      InorganicN          : demo ? 10   : 10,
+      carb                : demo ? 44.34 : '',
+      cell                : demo ? 50.77 : '',
+      lign                : demo ? 4.88 : '',
+      lwc                 : 4,
+      highOM              : 'No',
+      nutrient            : 'Left on the surface',
+      biomass             : demo ? 5235 : '',
+      mapZoom             : 13,
+      mapType             : 'hybrid',
+      weather             : {},
+      model               : {},
+      OM                  : demo ? 5   : '',
+      BD                  : demo ? 1.5 : '',
+      yield               : demo ? 150 : 150,
+      residue             : 'surface',
+      NContent            : demo ? 1000 : '',
+      residueC            : demo ? 100 : '',
+      outputN             : 1,
+      gotSSURGO           : false,
+      gotModel            : false,
+      help                : '',
+      helpX               : 0,
+      helpY               : 0,
+      state               : '',
+      unit                : 'lb/ac',
+      location            : demo ? '' : '',
+      nweeks              : 4,
+      firstSSURGO         : true,
+      mockup              : 2,
+      species             : {},
+      maxBiomass          : {},
+      effects : {
+        lat           : [getWeather, runModel],
+        lng           : [getWeather, runModel],
+        plantingDate  : [getWeather, runModel],
+        killDate      : [getWeather, runModel],
+        N             : runModel,
+        carb          : runModel,
+        cell          : runModel,
+        lign          : runModel,
+        lwc           : runModel,
+        // BD         : runModel,
+        // OM         : runModel,
+        InorganicN    : runModel,
+        biomass       : runModel,
+      }
+    }
+  );
 
   return (
     <div>
-      <Screens parms={parms} />
+      <Screens parms={parms} props={props} set={set} />
     </div>
   );
 } // App
@@ -519,64 +556,14 @@ if (isPSA && !demo) {
 let weatherTimer;
 let ssurgoTimer;
 
-let parms = {
-  field               : demo ? 'My field' : '',
-  targetN             : demo ? '150' : '',
-  coverCrop           : demo ? ['Oats, Black'] : [],
-  killDate            : demo ? new Date('05/08/2021') : '',
-  cashCrop            : demo ? 'Corn' : '',
-  plantingDate        : demo ? new Date('05/20/2021') : '',
-  lat                 : demo ? 32.5714 : 40.7849,
-  lng                 : demo ? -82.0760 : -74.8073,
-  N                   : demo ? 1.52 : '',
-  InorganicN          : demo ? 10   : 10,
-  carb                : demo ? 44.34 : '',
-  cell                : demo ? 50.77 : '',
-  lign                : demo ? 4.88 : '',
-  lwc                 : 4,
-  highOM              : 'No',
-  nutrient            : 'Left on the surface',
-  biomass             : demo ? 5235 : '',
-  mapZoom             : 13,
-  mapType             : 'hybrid',
-  weather             : {},
-  model               : {},
-  OM                  : demo ? 5   : '',
-  BD                  : demo ? 1.5 : '',
-  yield               : demo ? 150 : 150,
-  residue             : 'surface',
-  NContent            : demo ? 1000 : '',
-  residueC            : demo ? 100 : '',
-  outputN             : 1,
-  gotSSURGO           : false,
-  gotIteris           : false,
-  gotModel           : false,
-  help                : '',
-  helpX               : 0,
-  helpY               : 0,
-  state               : '',
-  unit                : 'lb/ac',
-  location            : demo ? '' : '',
-  nweeks              : 4,
-  firstSSURGO         : true,
-  mockup              : 2,
-}
-
 let examples = {};
 
 if (examples[demo]) {
-  parms = {...parms, ...examples[demo]}
+  // parms = {...parms, ...examples[demo]}
 }
-
-const props = (s) => ({
-  id: s,
-  value: parms[s]
-});
-
-const set = {};
 
 // localStorage.clear();
 
-document.title = 'Decomp';
+document.title = 'CC-NCalc';
 
 export default App;

@@ -3,15 +3,14 @@ import DatePicker from 'react-datepicker';
 import 'react-datepicker/dist/react-datepicker.css';
 
 import {
-  TextField,
   Radio,
   RadioGroup,
   FormControlLabel
 } from '@mui/material';
 
-import Autocomplete from '@mui/material/Autocomplete';
+import {Autocomplete} from './Inputs';
 
-import Myslider from './slider';
+import Myslider from './Slider';
 
 import Icon from '@mui/material/Icon';
 
@@ -63,18 +62,19 @@ const maxBiomass = {
   'Wheat, Winter': 9400,
 };
 
-const CoverCrops = ({set, parms}) => {
+const CoverCrops = ({props, set, parms}) => {
   const species = {
-    Brassica:   ['Brassica, Forage', 'Mustard', 'Radish, Forage', 'Radish, Oilseed', 'Rape, Oilseed, Spring', 'Rape, Oilseed, Winter', 'Rapeseed, Forage', 'Turnip, Forage', 'Turnip, Purple Top'],
-    Broadleaf:  ['Buckwheat', 'Phacelia', 'Sunflower'],
     Grass:      ['Barley, Spring', 'Barley, Winter', 'Cereal Rye, Spring', 'Cereal Rye, Winter', 'Millet, Japanese', 'Millet, Pearl', 'Oats', 'Oats, Black', 'Oats, Spring', 'Ryegrass, Annual', 'Ryegrass, Perennial', 'Sorghum', 'Sorghum-sudangrass', 'Sudangrass', 'Teff', 'Triticale, Spring', 'Triticale, Winter', 'Wheat, Spring', 'Wheat, Winter'],
-    Legume:     ['Alfalfa, Dormant', 'Clover, Alsike', 'Clover, Balansa', 'Clover, Berseem', 'Clover, Crimson', 'Clover, Red', 'Clover, White', 'Cowpea', 'Pea, Spring', 'Pea, Winter', 'Soybeans', 'Sunn Hemp', 'Sweetclover, Yellow', 'Vetch, Hairy']
+    Legume:     ['Alfalfa, Dormant', 'Clover, Alsike', 'Clover, Balansa', 'Clover, Berseem', 'Clover, Crimson', 'Clover, Red', 'Clover, White', 'Cowpea', 'Pea, Spring', 'Pea, Winter', 'Soybeans', 'Sunn Hemp', 'Sweetclover, Yellow', 'Vetch, Hairy'],
+    Brassica:   ['Brassica, Forage', 'Mustard', 'Radish, Forage', 'Radish, Oilseed', 'Rape, Oilseed, Spring', 'Rape, Oilseed, Winter', 'Rapeseed, Forage', 'Turnip, Forage', 'Turnip, Purple Top'],
+    Broadleaf:  ['Buckwheat', 'Phacelia', 'Sunflower']
   };
-  
+
   return (
     <Autocomplete
       multiple
-      value={parms.coverCrop || []}
+      {...props('coverCrop')}
+
       groupBy={
         (option) => species.Brassica.includes(option)  ? 'Brassica' :
                     species.Broadleaf.includes(option) ? 'Broadleaf' :
@@ -88,15 +88,6 @@ const CoverCrops = ({set, parms}) => {
         ...species.Brassica,
         ...species.Broadleaf,
       ]}
-      onChange={(event, newValue) => set.coverCrop(newValue)}
-      renderInput={(params) => (
-        <TextField
-          {...params}
-          variant="standard"
-          label=""
-          placeholder="Cover crop"
-        />
-      )}      
     />    
   );
 } // CoverCrops

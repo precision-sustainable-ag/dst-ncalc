@@ -4,7 +4,6 @@ import Highcharts from 'highcharts';
 
 import HighchartsReact from 'highcharts-react-official';
 
-import transpile from './Transpiler.js';
 
 const Advanced = ({parms, setScreen}) => {
   if (!parms.biomass || !parms.N || !parms.carb || !parms.cell || !parms.lign || !parms.lwc || !parms.BD || !parms.InorganicN || !parms.weather.length) {
@@ -25,7 +24,7 @@ const Advanced = ({parms, setScreen}) => {
   const lign = parms.lign * 100 / total;
   const factor = parms.unit === 'lb/ac' ? 1.12085 : 1;
 
-  const model = transpile({
+  const model = {
     FOMkg: parms.biomass * factor,
     FOMpctN: +parms.N,
     FOMpctCarb: carb,
@@ -39,7 +38,7 @@ const Advanced = ({parms, setScreen}) => {
     temp: parms.weather.map(d => d.air_temperature),
     RH: parms.weather.map(d => d.relative_humidity * 100),
     rain: parms.weather.map(d => d.precipitation),
-  });
+  };
   console.log(model);
 
   let date = new Date(parms.killDate);
