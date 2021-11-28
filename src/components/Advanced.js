@@ -4,61 +4,12 @@ import Highcharts from 'highcharts';
 
 import HighchartsReact from 'highcharts-react-official';
 
-
 const Advanced = ({parms, setScreen}) => {
-  if (!parms.biomass || !parms.N || !parms.carb || !parms.cell || !parms.lign || !parms.lwc || !parms.BD || !parms.InorganicN || !parms.weather.length) {
-    return (
-      <div className="loading">
-        <p>Loading Advanced</p>
-        <p>Please wait</p>
-        <span></span>
-        <span></span>
-        <span></span>
-      </div>
-    );
-  }
-
-  const total = +parms.carb + +parms.cell + +parms.lign;
-  const carb = parms.carb * 100 / total;
-  const cell = parms.cell * 100 / total;
-  const lign = parms.lign * 100 / total;
   const factor = parms.unit === 'lb/ac' ? 1.12085 : 1;
 
-  const model = {
-    FOMkg: parms.biomass * factor,
-    FOMpctN: +parms.N,
-    FOMpctCarb: carb,
-    FOMpctCell: cell,
-    FOMpctLign: lign,
-    LitterWaterContent: +parms.lwc,
-    BD: +parms.BD,
-    INppm: +parms.InorganicN,
-    hours: parms.weather.length,
-    stop:  parms.weather.length,
-    temp: parms.weather.map(d => d.air_temperature),
-    RH: parms.weather.map(d => d.relative_humidity * 100),
-    rain: parms.weather.map(d => d.precipitation),
-  };
-  console.log(model);
+  const model = parms.model;
 
-  let date = new Date(parms.killDate);
-  
-  const data = [];
-
-  model[parms.outputN === 1 ? 'MinNfromFOM' : 'FOM'].forEach((d, i, a) => {
-    const value = +(d / factor).toFixed(2)
-    if (date.getHours() === 0) {
-      data.push({
-        x: +date,
-        y: +value,
-        marker: {
-          enabled: (i / 24 === parms.nweeks * 7) ||
-                   (i === a.length - 1 && parms.nweeks * 7 * 24 >= a.length)
-        }
-      });
-    }
-    date.setHours(date.getHours() + 1)
-  });
+  const minDate = +parms.killDate;
 
   Highcharts.setOptions({
     chart: {
@@ -69,38 +20,12 @@ const Advanced = ({parms, setScreen}) => {
     }    
   });
 
-  const dec = {};
-
-  Object.keys(model).forEach(parm => {
-    const max = isFinite(model[parm][1]) ? Math.max.apply(Math, model[parm].filter(v => isFinite(v))) : model[parm];
-
-    dec[parm] = Math.abs(max) > 100  ? 0 :
-                Math.abs(max) > 10   ? 1 :
-                Math.abs(max) > 0    ? 2 :
-                Math.abs(max) > 0.1  ? 3 :
-                Math.abs(max) > 0.01 ? 4 :
-                                       5;
-  });
-
-  if (parms.field) {
-    const clone = {...parms};
-    clone.weather = {};
-    localStorage.setItem(parms.field, JSON.stringify(clone));
-  }
-
-  const cols = Object.keys(model).sort((a, b) => a.toUpperCase().localeCompare(b.toUpperCase()));
-
-  cols.filter(col => !model[col].length).forEach(col => {
-    model[col] = new Array(model.Rain.length).fill(model[col]);
-  });
-
   const Chart = ({parm}) => {
     const cdata = [];
     let date = new Date(parms.killDate);
-    const minDate = Math.min.apply(Math, data.map(d => d.x));
  
     try {
-      model[parm].forEach((d, i, a) => {
+      model.s[parm].forEach((d, i, a) => {
         const value = +(d / factor).toFixed(2)
         if (date.getHours() === 0) {
           cdata.push({

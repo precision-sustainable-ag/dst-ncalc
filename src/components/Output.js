@@ -21,34 +21,13 @@ const Output = ({props, parms, set, setScreen}) => {
     );
   }
 
-  // alert('output')
   const total = +parms.carb + +parms.cell + +parms.lign;
   const carb = parms.carb * 100 / total;
   const cell = parms.cell * 100 / total;
   const lign = parms.lign * 100 / total;
   const factor = parms.unit === 'lb/ac' ? 1.12085 : 1;
 
-  const modelSurface = {};
-  console.log(parms.model);
-  parms.model.surface.forEach(data => {
-    Object.keys(data).forEach(key => {
-      modelSurface[key] = modelSurface[key] || [];
-      modelSurface[key].push(data[key]);
-    });
-  });
-
-  const modelIncorporated = {};
-  parms.model.incorporated.forEach(data => {
-    Object.keys(data).forEach(key => {
-      modelIncorporated[key] = modelIncorporated[key] || [];
-      modelIncorporated[key].push(data[key]);
-    });
-  });
- 
-  const model = {
-    s: modelSurface,
-    i: modelIncorporated
-  }
+  const model = parms.model;
 
   const d1 = new Date(parms.plantingDate);
   let dailyTotal = 0;
@@ -116,7 +95,7 @@ const Output = ({props, parms, set, setScreen}) => {
   const surfaceMin = parms.outputN === 1 ? (parms.biomass * parms.N) / 100 : Math.min.apply(Math, surfaceData.map(d => d.y));
   const incorporatedMin = parms.outputN === 1 ? (parms.biomass * parms.N) / 100 : Math.min.apply(Math, incorporatedData.map(d => d.y));
 
-  const minDate = Math.min.apply(Math, surfaceData.map(d => d.x));
+  const minDate = +parms.killDate;
 
   Highcharts.setOptions({
     chart: {
@@ -452,21 +431,6 @@ const Output = ({props, parms, set, setScreen}) => {
     ]
   } // residueGraph
 
-  const dec = {};
-
-  Object.keys(model.s).forEach(parm => {
-    const max = isFinite(model.s[parm][1]) ? Math.max.apply(Math, model.s[parm].filter(v => isFinite(v))) : model.s[parm];
-
-    dec[parm] = Math.abs(max) > 100  ? 0 :
-                Math.abs(max) > 10   ? 1 :
-                Math.abs(max) > 0    ? 2 :
-                Math.abs(max) > 0.1  ? 3 :
-                Math.abs(max) > 0.01 ? 4 :
-                                       5;
-  });
-
-//  const col = ['BD', 'RH', 'Rain', 'Temp', 'FOM', 'FON', 'Carb', 'Cell', 'Lign', '%_lignin', 'a', 'Air_MPa', 'b', 'BD', 'c', 'Carb0', 'CarbK', 'CarbN', 'CellK', 'CellN', 'CNR', 'CNRF', 'ContactFactor', 'Critical_FOM', 'DeCarb', 'DeCell', 'DeLign', 'Depth_in', 'Depth_layer_cm', 'Dew', 'Dminr', 'Evaporation', 'FAC', 'FOMNhum', 'FromAir', 'FromDew', 'FromRain', 'GRCom', 'GRCom1', 'GRCom2', 'GRCom3', 'GRNom', 'GrNom1', 'GRNom2', 'GRNOm3', 'Hum', 'HumMin', 'HumN', 'InitialFOMN_kg/ha', 'INkg', 'INppm', 'k_4', 'k1', 'k3', 'LigninN', 'LignK', 'Litter_MPa_Gradient', 'LitterMPa', 'LitterWaterContent', 'MinFromFOMRate', 'MinFromHumRate', 'MinNfromFOM', 'MinNfromHum', 'NAllocationFactor', 'NetMin', 'NImmobFromFOM', 'NimmobIntoCarbN', 'Noname_1', 'Noname_2', 'PMNhotKCl', 'PrevLitWC', 'PrevRH', 'RainToGetCurrentWC', 'Resistant', 'RHChange', 'RhMin', 'RMTFAC', 'RNAC', 'Sat', 'SOCpct', 'WaterLossFromEvap', 'WCFromRain'].slice(0, 8);
-
   if (parms.field) {
     const clone = {...parms};
     delete clone.model;
@@ -477,10 +441,6 @@ const Output = ({props, parms, set, setScreen}) => {
   }
 
   const cols = Object.keys(model.s).sort((a, b) => a.toUpperCase().localeCompare(b.toUpperCase()));
-
-  cols.filter(col => !model.s[col].length).forEach(col => {
-    model.s[col] = new Array(model.s.Rain.length).fill(model.s[col]);
-  });
 
   const csv = 'Time,' + cols + '\n' + model.s.Rain.map((_, i) => i + ',' + cols.map(col => model.s[col][i])).join('\n');
 //  alert(csv);

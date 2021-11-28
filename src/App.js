@@ -415,7 +415,34 @@ const App = () => {
       fetch(modelSrc)
         .then(response => response.json())
         .then(data => {
-          set.model(data);
+          const modelSurface = {};
+          data.surface.forEach(data => {
+            Object.keys(data).forEach(key => {
+              modelSurface[key] = modelSurface[key] || [];
+              modelSurface[key].push(data[key]);
+            });
+          });
+        
+          const modelIncorporated = {};
+          data.incorporated.forEach(data => {
+            Object.keys(data).forEach(key => {
+              modelIncorporated[key] = modelIncorporated[key] || [];
+              modelIncorporated[key].push(data[key]);
+            });
+          });
+         
+          const model = {
+            s: modelSurface,
+            i: modelIncorporated
+          }
+        
+          const cols = Object.keys(model.s).sort((a, b) => a.toUpperCase().localeCompare(b.toUpperCase()));
+
+          cols.filter(col => !model.s[col].length).forEach(col => {
+            model.s[col] = new Array(model.s.Rain.length).fill(model.s[col]);
+          });
+        
+          set.model(model);
           set.gotModel(true);
           console.log('model');
           console.log(data);
