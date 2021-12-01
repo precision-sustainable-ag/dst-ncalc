@@ -14,86 +14,31 @@ import Myslider from './Slider';
 
 import Icon from '@mui/material/Icon';
 
-const maxBiomass = {
-  'Alfalfa, Dormant': 5800,
-  'Barley, Spring': 3000,
-  'Barley, Winter': 5000,
-  'Brassica, Forage': 2000,
-  'Buckwheat': 3500,
-  'Cereal Rye, Spring': 4000,
-  'Cereal Rye, Winter': 11200,
-  'Clover, Alsike': 1200,
-  'Clover, Balansa': 3000,
-  'Clover, Berseem': 3000,
-  'Clover, Crimson': 8200,
-  'Clover, Red': 5000,
-  'Clover, White': 2000,
-  'Cowpea': 8500,
-  'Millet, Foxtail': 4100,
-  'Millet, Japanese': 3500,
-  'Millet, Pearl': 8000,
-  'Mustard': 4000,
-  'Oats': 6000,
-  'Oats, Black': 9600,
-  'Oats, Spring': 4000,
-  'Pea, Spring': 2500,
-  'Pea, Winter': 5600,
-  'Phacelia': 6000,
-  'Radish, Forage': 4000,
-  'Radish, Oilseed': 3000,
-  'Rape, Oilseed, Spring': 2000,
-  'Rape, Oilseed, Winter': 2000,
-  'Rapeseed, Forage': 2500,
-  'Ryegrass, Annual': 9000,
-  'Ryegrass, Perennial': 6000,
-  'Sorghum': 8000,
-  'Sorghum-sudangrass': 8000,
-  'Sudangrass': 10000,
-  'Sunflower': 5000,
-  'Sunn Hemp': 11600,
-  'Sweetclover, Yellow': 5000,
-  'Teff': 5000,
-  'Triticale, Spring': 3000,
-  'Triticale, Winter': 7500,
-  'Turnip, Forage': 3300,
-  'Turnip, Purple Top': 3000,
-  'Vetch, Hairy': 6300,
-  'Wheat, Spring': 5000,
-  'Wheat, Winter': 9400,
-};
-
-const CoverCrops = ({props, set, parms}) => {
-  const species = {
-    Grass:      ['Barley, Spring', 'Barley, Winter', 'Cereal Rye, Spring', 'Cereal Rye, Winter', 'Millet, Japanese', 'Millet, Pearl', 'Oats', 'Oats, Black', 'Oats, Spring', 'Ryegrass, Annual', 'Ryegrass, Perennial', 'Sorghum', 'Sorghum-sudangrass', 'Sudangrass', 'Teff', 'Triticale, Spring', 'Triticale, Winter', 'Wheat, Spring', 'Wheat, Winter'],
-    Legume:     ['Alfalfa, Dormant', 'Clover, Alsike', 'Clover, Balansa', 'Clover, Berseem', 'Clover, Crimson', 'Clover, Red', 'Clover, White', 'Cowpea', 'Pea, Spring', 'Pea, Winter', 'Soybeans', 'Sunn Hemp', 'Sweetclover, Yellow', 'Vetch, Hairy'],
-    Brassica:   ['Brassica, Forage', 'Mustard', 'Radish, Forage', 'Radish, Oilseed', 'Rape, Oilseed, Spring', 'Rape, Oilseed, Winter', 'Rapeseed, Forage', 'Turnip, Forage', 'Turnip, Purple Top'],
-    Broadleaf:  ['Buckwheat', 'Phacelia', 'Sunflower']
-  };
-
+const CoverCrops = ({props, parms}) => {
   return (
     <Autocomplete
       multiple
       {...props('coverCrop')}
 
       groupBy={
-        (option) => species.Brassica.includes(option)  ? 'Brassica' :
-                    species.Broadleaf.includes(option) ? 'Broadleaf' :
-                    species.Grass.includes(option)     ? 'Grass' :
-                    species.Legume.includes(option)    ? 'Legume' :
-                                                         'ERROR'
+        (option) => parms.species.Brassica.includes(option)  ? 'Brassica' :
+                    parms.species.Broadleaf.includes(option) ? 'Broadleaf' :
+                    parms.species.Grass.includes(option)     ? 'Grass' :
+                    parms.species.Legume.includes(option)    ? 'Legume' :
+                                                               'ERROR'
       }
       options={[
-        ...species.Grass,
-        ...species.Legume,
-        ...species.Brassica,
-        ...species.Broadleaf,
+        ...parms.species.Grass,
+        ...parms.species.Legume,
+        ...parms.species.Brassica,
+        ...parms.species.Broadleaf,
       ]}
     />    
   );
 } // CoverCrops
 
 const CoverCrop1 = ({props, parms, set, setScreen}) => {
-  const max = parms.coverCrop.length ? parms.coverCrop.map(s => maxBiomass[s]).sort((a, b) => b - a)[0] : 15000;
+  const max = parms.coverCrop.length ? parms.coverCrop.map(s => parms.maxBiomass[s]).sort((a, b) => b - a)[0] : 15000;
 
   return (
     <>

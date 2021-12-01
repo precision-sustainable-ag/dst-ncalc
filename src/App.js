@@ -197,15 +197,18 @@ const Screens = ({parms, props, set}) => {
     });
 
     const mb = {};
+    const species = {};
+  
     airtable(
       'CoverCrops',
       (crop) => {
-//         console.log(crop);
+        species[crop.Category] = species[crop.Category] || [];
+        species[crop.Category].push(crop.Crop);
         mb[crop.Crop] = crop.MaxBiomass;
       },
       () => {
-        console.log(mb);
         set.maxBiomass(mb);
+        set.species(species);
       }
     );
   }, []);
@@ -412,41 +415,44 @@ const App = () => {
     set.gotModel(false);
 
     ssurgoTimer = setTimeout(() => {
-      fetch(modelSrc)
-        .then(response => response.json())
-        .then(data => {
-          const modelSurface = {};
-          data.surface.forEach(data => {
-            Object.keys(data).forEach(key => {
-              modelSurface[key] = modelSurface[key] || [];
-              modelSurface[key].push(data[key]);
+      if (start !== 'Invalid date' && end !== 'Invalid date') {
+        fetch(modelSrc)
+          .then(response => response.json())
+          .then(data => {
+            console.log(data);
+            const modelSurface = {};
+            data.surface.forEach(data => {
+              Object.keys(data).forEach(key => {
+                modelSurface[key] = modelSurface[key] || [];
+                modelSurface[key].push(data[key]);
+              });
             });
-          });
-        
-          const modelIncorporated = {};
-          data.incorporated.forEach(data => {
-            Object.keys(data).forEach(key => {
-              modelIncorporated[key] = modelIncorporated[key] || [];
-              modelIncorporated[key].push(data[key]);
+          
+            const modelIncorporated = {};
+            data.incorporated.forEach(data => {
+              Object.keys(data).forEach(key => {
+                modelIncorporated[key] = modelIncorporated[key] || [];
+                modelIncorporated[key].push(data[key]);
+              });
             });
-          });
-         
-          const model = {
-            s: modelSurface,
-            i: modelIncorporated
-          }
-        
-          const cols = Object.keys(model.s).sort((a, b) => a.toUpperCase().localeCompare(b.toUpperCase()));
+          
+            const model = {
+              s: modelSurface,
+              i: modelIncorporated
+            }
+          
+            const cols = Object.keys(model.s).sort((a, b) => a.toUpperCase().localeCompare(b.toUpperCase()));
 
-          cols.filter(col => !model.s[col].length).forEach(col => {
-            model.s[col] = new Array(model.s.Rain.length).fill(model.s[col]);
+            cols.filter(col => !model.s[col].length).forEach(col => {
+              model.s[col] = new Array(model.s.Rain.length).fill(model.s[col]);
+            });
+          
+            set.model(model);
+            set.gotModel(true);
+            console.log('model');
+            console.log(data);
           });
-        
-          set.model(model);
-          set.gotModel(true);
-          console.log('model');
-          console.log(data);
-        });
+      }
 
       fetch(ssurgoSrc)
         .then(response => response.json())
@@ -472,7 +478,7 @@ const App = () => {
             set.OM(weightedAverage(data, 'om_r'));
           }
         });
-    }, 1000)
+    }, 1000);
   } // runModel
 
   const getWeather = () => {
@@ -557,8 +563,8 @@ const App = () => {
         cell          : runModel,
         lign          : runModel,
         lwc           : runModel,
-        // BD         : runModel,
-        // OM         : runModel,
+        // BD            : runModel,  // TODO
+        // OM            : runModel,  // TODO
         InorganicN    : runModel,
         biomass       : runModel,
       }

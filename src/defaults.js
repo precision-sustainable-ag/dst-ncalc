@@ -37,7 +37,7 @@ const defaults = (change, p) => {
   const props = (parm) => ({
     id: parm,                                         // allows the parameter to be styled in CSS
     parms: parms,                                     // saves the need to pass parms to each component
-    value: parms[parm] || '',                         // the parameter's curent value
+    value: parms[parm] || '',                         // the parameter's current value
     checked: parms[parm] === 'true',                  // handle checkboxes
     set: set,                                         // the parameter's useState function
     onChange: ({target}, value=target.value, index) => {
@@ -45,11 +45,11 @@ const defaults = (change, p) => {
         value = value.value || value.label || value;  // Autocomplete
       }
 
-      if (Array.isArray(parms[parm])) {
+      if (Array.isArray(parms[parm]) && index) {
         set[parm](arr => {
           arr[index] = value;
           return [...arr];
-        });        
+        });
       } else {
         set[parm](value);
       }
