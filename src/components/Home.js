@@ -1,7 +1,7 @@
 const Home = ({setScreen}) => (
   <div className="home">
     <p>Welcome to the</p>
-    <h1>Cover Crop N Availability Calculator</h1>
+    <h1>Cover Crop Nitrogen Calculator (CC-NCalc)</h1>
 
     <p>This calculator aids farmers with decision support regarding cover crop residue persistence, as well as the amount and timing of nitrogen availability.</p>
 

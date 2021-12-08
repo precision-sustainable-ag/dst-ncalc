@@ -1,5 +1,13 @@
 const About = ({setScreen}) => (
   <div className="about">
+    <h2>The N calculator estimates:</h2>
+    <ul>
+      <li>How much N is released from decomposing residues over time,</li>
+      <li>The amount of undecomposed residue remaining over time,</li>
+      <li>Corn N uptake based on yield goal, and</li>
+      <li>N fertilizer recommendations for the subsequent cash crop that accounts for cover crop N credit.</li>
+    </ul>
+
     <h2>Background:</h2>
     <p>
       Cover crops influence nitrogen (N) management to subsequent cash crops.
@@ -27,21 +35,21 @@ const About = ({setScreen}) => (
     <p>At a minimum, users need to provide:</p>
     <ul>
       <li>Field location,</li>
-      <li>Cover crop biomass on a dry weight  basis, </li>
-      <li>Cover crop water content at termination, and </li>
-      <li>Cover crop quality (N, carbohydrate, cellulose, and lignin content).</li>
+      <li>Cover crop biomass on a dry weight  basis,</li>
+      <li>Cover crop Nitrogen concentration.</li>
     </ul>
+
+    <p>If available, users should also provide:</p>
+    <ul>
+      <li>Cover crop carbohydrate, cellulose, and lignin content.</li>
+      <li>Cover crop water content at termination.</li>
+    </ul>
+    
+    <p>If these parameters are unavailable, the program will provide estimates.</p>
+
     <p>
       <strong><em>The N calculator uses real-time weather data and five year historic averages for days where data are not yet available.</em></strong>
     </p>
-
-    <h2>The N calculator estimates:</h2>
-    <ul>
-      <li>How much N is released from decomposing residues over time,</li>
-      <li>The amount of undecomposed residue remaining over time,</li>
-      <li>Corn N uptake based on yield goal, and</li>
-      <li>N fertilizer recommendations for the subsequent cash crop that accounts for cover crop N credit.</li>
-    </ul>
 
     <div className="center">
       <button onClick={() => setScreen('Location')}>GET STARTED</button>

@@ -9,6 +9,8 @@ import moment from 'moment';
 import { CSVLink } from "react-csv";
 
 const Output = ({props, parms, set, setScreen}) => {
+  const doIncorporated = false;
+
   if (!parms.gotModel || !parms.model || !parms.biomass || !parms.N || !parms.carb || !parms.cell || !parms.lign || !parms.lwc || !parms.BD || !parms.InorganicN || !parms.weather.length) {
     return (
       <div className="loading">
@@ -152,7 +154,8 @@ const Output = ({props, parms, set, setScreen}) => {
         showInLegend: false,
         zmarker: {
           symbol: 'url(sun.png)'
-        }
+        },
+        visible: doIncorporated
       },
       {
         name: 'Corn N uptake',
@@ -261,30 +264,7 @@ const Output = ({props, parms, set, setScreen}) => {
     chart: {
       type: 'bar',
       height: 350,
-      zmarginRight: 40,
       className: parms.outputN === 2 ? 'hidden' : '',
-      events: {
-        render: function() {
-          setTimeout(() => {
-            try {
-              const path = document.querySelector('.highcharts-plot-lines-4 path');
-              console.log(path);
-              let p = path.getAttribute('d');
-              p += ' ' + p;
-              p = p.split(' ');
-              p[2] = 70;
-              p[5] = 135;
-              p[8] = 175;
-              p[11] = 235;
-              path.setAttribute('d', p.join(' '));
-              path.style.display = 'block';
-              // path.setAttribute('d', 'M 371 51 L 371 135 M 371 190 L 371 250');
-            } catch(err) {
-              console.log(err);
-            }
-          }, 100);
-        }
-      }
     },
     title: {
       text: `<div class="caption">
@@ -303,20 +283,27 @@ const Output = ({props, parms, set, setScreen}) => {
       */
       {
         name: 'Cover Crop N credit',
-        data: [+incorporatedNPredict, +surfaceNPredict],
+        data: doIncorporated ? [+incorporatedNPredict, +surfaceNPredict] : [+surfaceNPredict],
         color: '#008837'
       },
       {
         name: 'Recommended N',
-        data: [Math.max(0, parms.targetN - incorporatedNPredict), Math.max(0, parms.targetN - surfaceNPredict)],
-        color: '#7b3294'
+        data: doIncorporated ? [Math.max(0, parms.targetN - incorporatedNPredict), Math.max(0, parms.targetN - surfaceNPredict)] : [Math.max(0, parms.targetN - surfaceNPredict)],
+        color: '#7b3294',
       },
     ],
     xAxis: [{
-      categories: [
-        '<div style="text-align: left">Till&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<br><span style="font-size: 90%">(Incorporated)</span></div>',
-        '<div style="text-align: left">No Till&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<br><span style="font-size: 90%">(Surface)&nbsp;&nbsp;&nbsp;&nbsp;</span></div>',
-      ],
+      categories: 
+        doIncorporated ? 
+          [
+            '<div style="text-align: left">Till&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<br><span style="font-size: 90%">(Incorporated)</span></div>',
+            '<div style="text-align: left">No Till&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<br><span style="font-size: 90%">(Surface)&nbsp;&nbsp;&nbsp;&nbsp;</span></div>',
+          ]
+        :
+          [
+            '<div style="text-align: left">No Till&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<br><span style="font-size: 90%">(Surface)&nbsp;&nbsp;&nbsp;&nbsp;</span></div>',
+          ]
+      ,
       labels: {
         style: {
           fontSize: 13,
@@ -333,15 +320,14 @@ const Output = ({props, parms, set, setScreen}) => {
       },
       plotLines: [{
         value: parms.targetN,
-        color: 'blue',
-        zdashStyle: 'Dash',
-        width: 4,
-        zIndex: 4,
         label: {
           useHTML: true,
-          text: `<div style="background: white; transform: rotate(-90deg); position: relative; left:  4.5em; top:  0.6em; font-size: 1em; color: blue; background: transparent;">Target N</div>
-                 <div style="background: white; transform: rotate(-90deg); position: relative; left: 13.0em; top: -0.9em; font-size: 1em; color: blue; background: transparent;">Target N</div>
-                `
+          text: doIncorporated ? 
+                  `<div class="IncorporatedTargetN">Target N</div>
+                   <div class="SurfaceTargetN">Target N</div>
+                  `                  
+                : 
+                  `<div class="SurfaceOnlyTargetN">Target N</div>`
         }
       }],
     }],
@@ -357,25 +343,23 @@ const Output = ({props, parms, set, setScreen}) => {
     plotOptions: {
       series: {
         stacking: 'normal',
-        zpointWidth: 22,
-        zpointPadding: 0.5,
-        zgroupPadding: 0.5,
         dataLabels: {
           enabled: true,
           useHTML: true,
           formatter: function() {
             const footnote = this.y === 0 ? '<sup>*</sup>' : '';
-            return `<div style="color: ${this.color}; background: white; transform: translateY(-38px);">${this.y} ${parms.unit}${footnote}</div>`
+            return `<div style="color: ${this.color}; background: white; transform: translateY(${doIncorporated ? -38 : -58}px);">${this.y} ${parms.unit}${footnote}</div>`
           },
         },
         animation: false
-      }
+      },
     },
   } // NGraph
 
   const residueGraph = {
     chart: {
       type: 'bar',
+      height: 350,
       className: parms.outputN === 1 ? 'hidden' : ''
     },
     title: {
@@ -383,10 +367,17 @@ const Output = ({props, parms, set, setScreen}) => {
       verticalAlign: 'bottom'
     },
     xAxis: {
-      categories: [
-        '<div style="text-align: left">Till&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<br><span style="font-size: 90%">(Incorporated)</span></div>',
-        '<div style="text-align: left">No Till&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<br><span style="font-size: 90%">(Surface)&nbsp;&nbsp;&nbsp;&nbsp;</span></div>',
-      ],
+      categories: 
+        doIncorporated ?
+          [
+            '<div style="text-align: left">Till&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<br><span style="font-size: 90%">(Incorporated)</span></div>',
+            '<div style="text-align: left">No Till&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<br><span style="font-size: 90%">(Surface)&nbsp;&nbsp;&nbsp;&nbsp;</span></div>',
+          ]
+        :
+        [
+          '<div style="text-align: left">No Till&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<br><span style="font-size: 90%">(Surface)&nbsp;&nbsp;&nbsp;&nbsp;</span></div>',
+        ]
+      ,
       labels: {
         style: {
           fontSize: 13,
@@ -425,7 +416,7 @@ const Output = ({props, parms, set, setScreen}) => {
     series: [
       {
         name: 'Residue remaining',
-        data: [Math.round(incorporatedMin), Math.round(surfaceMin)],
+        data: doIncorporated ? [Math.round(incorporatedMin), Math.round(surfaceMin)] : [Math.round(surfaceMin)],
         color: '#008837',
       },
     ]
