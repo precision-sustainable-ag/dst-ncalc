@@ -11,7 +11,7 @@ const defaults = (change, p) => {
     mapZoom   : 13,
     mapType   : 'hybrid',
     lat       : 40.7849,
-    lng       : -74.8073,
+    lon       : -74.8073,
     location  : '',
     state     : '',
     ...p

@@ -16,9 +16,7 @@
 // TODO: Advanced graphs
 // TODO: Compare *incorporated* Georgia data to Iteris
 // TODO: Inputs
-// TODO: Name your field:  Same as CC-Econ, or vice-versa?
 // TODO: Change NUptake to percentage. "your first mock-up could be having a common secondary y-axis for both corn N uptake and cover crop N released (0-100%). And your second mock-up could be two different labels on secondary y-axis, both going from 0-100%."
-// TODO: Determine Mockup (different colors on Mockup 2?)
 // TODO: Saved PSA fields
 // TODO: Carb, Cell, Lignin graph
 // TODO: Rain, RH, Temp graph
@@ -126,7 +124,7 @@ const Screens = ({parms, props, set}) => {
       }
 
       test('lat', 'Location', 'Please enter Latitude and Longitude') ||
-      test('lng', 'Location', 'Please enter Latitude and Longitude') ||
+      test('lon', 'Location', 'Please enter Latitude and Longitude') ||
 
       test('killDate', 'CoverCrop1', 'Please enter Cover Crop Termination Date') ||
       test('biomass', 'CoverCrop1', 'Please enter Biomass') ||
@@ -175,7 +173,7 @@ const Screens = ({parms, props, set}) => {
         examples[site.ID] = {
           field             : site.ID,
           lat               : site.Lat,
-          lng               : site.Lng,
+          lon               : site.Lon,
           location          : '',
           BD                : site.BD,
           coverCrop         : [site['Cover Crop']],
@@ -377,7 +375,7 @@ const App = () => {
       return (data.reduce((a, b) => +a + +b) / totpct).toFixed(dec);
     } // weightedAverage
   
-    if (!parms.lat || !parms.lng) {
+    if (!parms.lat || !parms.lon) {
       return;
     }
 
@@ -386,7 +384,7 @@ const App = () => {
     }
     set.OM('');
 
-    // const ssurgoSrc = `https://api.precisionsustainableag.org/ssurgo?lat=${parms.lat}&lon=${parms.lng}&component=major`;
+    // const ssurgoSrc = `https://api.precisionsustainableag.org/ssurgo?lat=${parms.lat}&lon=${parms.lon}&component=major`;
     const start = moment(parms.killDate).format('yyyy-MM-DD');
     const end   = moment(parms.plantingDate).add(110, 'days').add(1, 'hour').format('yyyy-MM-DD');
     const lwc = parms.lwc || 10;
@@ -405,8 +403,8 @@ const App = () => {
     const In = parms.InorganicN || 10;
     const pmn = 10;
     console.log(parms.N, carb, cell, lign, biomass, bd, In);
-    const ssurgoSrc = `https://weather.aesl.ces.uga.edu/ssurgo?lat=${parms.lat}&lon=${parms.lng}&component=major`;
-    const modelSrc  = `https://weather.aesl.ces.uga.edu/cc-ncalc/both?lat=${parms.lat}&lon=${parms.lng}&start=${start}&end=${end}&n=${parms.N}&biomass=${biomass}&lwc=${lwc}&carb=${carb}&cell=${cell}&lign=${lign}&om=${om}&bd=${bd}&in=${In}&pmn=${pmn}`;
+    const ssurgoSrc = `https://weather.aesl.ces.uga.edu/ssurgo?lat=${parms.lat}&lon=${parms.lon}&component=major`;
+    const modelSrc  = `https://weather.aesl.ces.uga.edu/cc-ncalc/both?lat=${parms.lat}&lon=${parms.lon}&start=${start}&end=${end}&n=${parms.N}&biomass=${biomass}&lwc=${lwc}&carb=${carb}&cell=${cell}&lign=${lign}&om=${om}&bd=${bd}&in=${In}&pmn=${pmn}`;
 
     console.log(ssurgoSrc);
     console.log(modelSrc);
@@ -482,13 +480,13 @@ const App = () => {
   } // runModel
 
   const getWeather = () => {
-    if (!parms.lat || !parms.lng || !parms.killDate || !parms.plantingDate) {
+    if (!parms.lat || !parms.lon || !parms.killDate || !parms.plantingDate) {
       return;
     }
 
     set.weather([]);
 
-    const src = `https://weather.aesl.ces.uga.edu/weather/hourly?lat=${parms.lat}&lon=${parms.lng}&start=${moment(parms.killDate).format('yyyy-MM-DD')}&end=${moment(parms.plantingDate).add(110, 'days').format('yyyy-MM-DD')}&attributes=air_temperature,relative_humidity,precipitation&options=predicted`;
+    const src = `https://weather.aesl.ces.uga.edu/weather/hourly?lat=${parms.lat}&lon=${parms.lon}&start=${moment(parms.killDate).format('yyyy-MM-DD')}&end=${moment(parms.plantingDate).add(110, 'days').format('yyyy-MM-DD')}&attributes=air_temperature,relative_humidity,precipitation&options=predicted`;
     console.log(src);
     clearTimeout(weatherTimer);
     weatherTimer = setTimeout(() => {
@@ -519,7 +517,7 @@ const App = () => {
       cashCrop            : demo ? 'Corn' : '',
       plantingDate        : demo ? new Date('05/20/2021') : '',
       lat                 : demo ? 32.5714 : 40.7849,
-      lng                 : demo ? -82.0760 : -74.8073,
+      lon                 : demo ? -82.0760 : -74.8073,
       N                   : demo ? 1.52 : '',
       InorganicN          : demo ? 10   : 10,
       carb                : demo ? 44.34 : '',
@@ -555,7 +553,7 @@ const App = () => {
       maxBiomass          : {},
       effects : {
         lat           : [getWeather, runModel],
-        lng           : [getWeather, runModel],
+        lon           : [getWeather, runModel],
         plantingDate  : [getWeather, runModel],
         killDate      : [getWeather, runModel],
         N             : runModel,
