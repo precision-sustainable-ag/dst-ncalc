@@ -57,7 +57,7 @@ td, th {
 }
 
 .MuiInputBase-root {
-  width: 5em;
+  zwidth: 5em;
 }
 
 table.coverCrop {
@@ -77,6 +77,7 @@ nav {
   position: sticky;
   top: 0;
   background: white;
+  z-index: 999;
 }
 
 nav button {
@@ -384,7 +385,7 @@ div.mockup1, div.mockup2, div.mockup3, div.mockup4, div.mockup5 {
 }
 
 .MuiSlider-root {
-  pointer-events: none;
+  zpointer-events: none;
 }
 
 .SurfaceOnlyTargetN {

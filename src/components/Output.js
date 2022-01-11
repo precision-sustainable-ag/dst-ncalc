@@ -11,7 +11,11 @@ import { CSVLink } from "react-csv";
 const Output = ({props, parms, set, setScreen}) => {
   const doIncorporated = false;
 
-  if (!parms.gotModel || !parms.model || !parms.biomass || !parms.N || !parms.carb || !parms.cell || !parms.lign || !parms.lwc || !parms.BD || !parms.InorganicN || !parms.weather.length) {
+  console.log({
+    gotModel: parms.gotModel
+  });
+
+  if (!parms.gotModel || !parms.model || !parms.biomass || !parms.N || !parms.carb || !parms.cell || !parms.lign || !parms.lwc || !parms.BD || !parms.InorganicN) {
     return (
       <div className="loading">
         <p>Loading Output</p>
@@ -22,6 +26,14 @@ const Output = ({props, parms, set, setScreen}) => {
       </div>
     );
   }
+
+  Object.keys(parms.model.s).forEach(key => {
+    if (!/^(Temp|MinNfromFOM|FOM|Date|Rain)$/.test(key)) {
+      // delete parms.model.s[key];
+    }
+  });
+
+  console.log(parms.model.s);
 
   const total = +parms.carb + +parms.cell + +parms.lign;
   const carb = parms.carb * 100 / total;
@@ -41,8 +53,8 @@ const Output = ({props, parms, set, setScreen}) => {
   if (cornN) {
     const f = parms.unit === 'lb/ac' ? 1 : 1.12085;
 
-    parms.weather.slice((parms.plantingDate - parms.killDate) / (1000 * 60 * 60)).forEach(d => {
-      dailyTotal += d.air_temperature - 8;
+    parms.model.s.Temp.slice((parms.plantingDate - parms.killDate) / (1000 * 60 * 60)).forEach(temp => {
+      dailyTotal += temp - 8;
       if (d1.getHours() === 0) {
         gdd += (dailyTotal / 24);
         NUptake.push([
@@ -78,20 +90,23 @@ const Output = ({props, parms, set, setScreen}) => {
 
   date = new Date(parms.killDate);
   const incorporatedData = [];
-  model.i[parms.outputN === 1 ? 'FomCumN' : 'FOM'].forEach((d, i, a) => {
-    const value = +(d / factor).toFixed(2);
-    incorporatedData.push({
-      x: +date,
-      y: +value,
-      marker: {
-        radius: 5,
-        fillColor: '#008837',
-        enabled: (i / 24 === parms.nweeks * 7) ||
-                  (i === a.length - 1 && parms.nweeks * 7 * 24 >= a.length)
-      }
+
+  if (doIncorporated) {
+    model.i[parms.outputN === 1 ? 'FomCumN' : 'FOM'].forEach((d, i, a) => {
+      const value = +(d / factor).toFixed(2);
+      incorporatedData.push({
+        x: +date,
+        y: +value,
+        marker: {
+          radius: 5,
+          fillColor: '#008837',
+          enabled: (i / 24 === parms.nweeks * 7) ||
+                    (i === a.length - 1 && parms.nweeks * 7 * 24 >= a.length)
+        }
+      });
+      date.setDate(date.getDate() + 1);
     });
-    date.setDate(date.getDate() + 1);
-  });
+  }
 
   const max = parms.outputN === 1 ? (parms.biomass * parms.N) / 100 : Math.max.apply(Math, surfaceData.map(d => d.y));
   const surfaceMin = parms.outputN === 1 ? (parms.biomass * parms.N) / 100 : Math.min.apply(Math, surfaceData.map(d => d.y));
@@ -258,8 +273,9 @@ const Output = ({props, parms, set, setScreen}) => {
   };
 
   const surfaceNPredict = Math.round(model.s.MinNfromFOM.slice(-1) / factor);
-  const incorporatedNPredict = Math.round(model.i.FomCumN.slice(-1) / factor);
-//  console.log(model.s.Temp.map(t => t.toFixed(2)));
+  
+  const incorporatedNPredict = doIncorporated && Math.round(model.i.FomCumN.slice(-1) / factor);
+
   const NGraph = {
     chart: {
       type: 'bar',
@@ -363,7 +379,7 @@ const Output = ({props, parms, set, setScreen}) => {
       className: parms.outputN === 1 ? 'hidden' : ''
     },
     title: {
-      text: `<div class="caption">Cover crop residue mass remaining<br>after ${Math.floor(parms.weather.length / (24 * 7))} weeks past termination.</div>`,
+      text: `<div class="caption">Cover crop residue mass remaining<br>after ${Math.floor(parms.model.s.Date.length / (24 * 7))} weeks past termination.</div>`,
       verticalAlign: 'bottom'
     },
     xAxis: {
@@ -425,7 +441,6 @@ const Output = ({props, parms, set, setScreen}) => {
   if (parms.field) {
     const clone = {...parms};
     delete clone.model;
-    delete clone.weather;
 
     console.log(clone);
     localStorage.setItem(parms.field, JSON.stringify(clone));
@@ -766,10 +781,10 @@ const Output = ({props, parms, set, setScreen}) => {
                 &nbsp;
                 <select
                   {...props('nweeks')}
-                  onChange={() => 'prevent warning'}
+                  onChange={(e) => set.nweeks(e.target.value)}
                 >
                   {
-                    Array(Math.round(parms.weather.length / 24 / 7)).fill().map((_, i) => <option key={i + 1}>{i + 1}</option>)
+                    Array(Math.round(parms.model.s.Date.length / 24 / 7)).fill().map((_, i) => <option key={i + 1}>{i + 1}</option>)
                   }
                 </select>
                 &nbsp;
@@ -778,7 +793,11 @@ const Output = ({props, parms, set, setScreen}) => {
                 is:
                 <ul>
                   <li>{Math.round(surfaceData[Math.min(parms.nweeks * 7, surfaceData.length - 1)].y)} {parms.unit} for surface residues.</li>
-                  <li>{Math.round(incorporatedData[Math.min(parms.nweeks * 7, incorporatedData.length - 1)].y)} {parms.unit} for incorporated residues.</li>
+                  {
+                    doIncorporated &&
+                    <li>{Math.round(incorporatedData[Math.min(parms.nweeks * 7, incorporatedData.length - 1)].y)} {parms.unit} for incorporated residues.</li>
+                  }
+                  
                 </ul>
               </div>
             </td>

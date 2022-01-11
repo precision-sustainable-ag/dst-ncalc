@@ -45,7 +45,7 @@ const defaults = (change, p) => {
         value = value.value || value.label || value;  // Autocomplete
       }
 
-      if (Array.isArray(parms[parm]) && index) {
+      if (Array.isArray(parms[parm]) && isFinite(index)) {
         set[parm](arr => {
           arr[index] = value;
           return [...arr];

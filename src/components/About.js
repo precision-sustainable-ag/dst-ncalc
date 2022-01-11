@@ -1,6 +1,6 @@
 const About = ({setScreen}) => (
   <div className="about">
-    <h2>The N calculator estimates:</h2>
+    <h2>The CC-NCalc estimates:</h2>
     <ul>
       <li>How much N is released from decomposing residues over time,</li>
       <li>The amount of undecomposed residue remaining over time,</li>
@@ -35,17 +35,17 @@ const About = ({setScreen}) => (
     <p>At a minimum, users need to provide:</p>
     <ul>
       <li>Field location,</li>
-      <li>Cover crop biomass on a dry weight  basis,</li>
-      <li>Cover crop Nitrogen concentration.</li>
+      <li>Cover crop biomass on a dry weight basis,</li>
+      <li>Cover crop N concentration.</li>
     </ul>
 
     <p>If available, users should also provide:</p>
     <ul>
-      <li>Cover crop carbohydrate, cellulose, and lignin content.</li>
+      <li>Cover crop residue chemistry (i.e., Carbohydrate, Holo-cellulose, and lignin concentrations).</li>
       <li>Cover crop water content at termination.</li>
     </ul>
     
-    <p>If these parameters are unavailable, the program will provide estimates.</p>
+    <p>If these data are unavailable, the program will estimate cover crop residue chemistry based on N concentrations and will use a default value for cover crop water content at termination.</p>
 
     <p>
       <strong><em>The N calculator uses real-time weather data and five year historic averages for days where data are not yet available.</em></strong>

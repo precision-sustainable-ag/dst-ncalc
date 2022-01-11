@@ -123,26 +123,43 @@ const Screens = ({parms, props, set}) => {
         set.BD(1.6);
       }
 
-      test('lat', 'Location', 'Please enter Latitude and Longitude') ||
-      test('lon', 'Location', 'Please enter Latitude and Longitude') ||
+      if (parms.plantingDate < parms.killDate) {
+        alert('Cash crop planting date must be later than the cover crop kill date.');
+        setScreen('CoverCrop1');
+      } else if (parms.plantingDate - parms.killDate > 7776000000) {
+        alert('Cash crop planting date should be within 3 months of the cover crop kill date.');
+        setScreen('CoverCrop1');
+      } else {
+        test('lat', 'Location', 'Please enter Latitude and Longitude') ||
+        test('lon', 'Location', 'Please enter Latitude and Longitude') ||
 
-      test('killDate', 'CoverCrop1', 'Please enter Cover Crop Termination Date') ||
-      test('biomass', 'CoverCrop1', 'Please enter Biomass') ||
-      test('lwc', 'CoverCrop1', 'Please enter Water Content') ||
+        test('killDate', 'CoverCrop1', 'Please enter Cover Crop Termination Date') ||
+        test('biomass', 'CoverCrop1', 'Please enter Biomass') ||
+        test('lwc', 'CoverCrop1', 'Please enter Water Content') ||
 
-      test('N', 'CoverCrop2', 'Please enter Nitrogen') ||
-      test('carb', 'CoverCrop2', 'Please enter Carbohydrates') ||
-      test('cell', 'CoverCrop2', 'Please enter Cellulose') ||
-      test('lign', 'CoverCrop2', 'Please enter Lignin') ||
+        test('N', 'CoverCrop2', 'Please enter Nitrogen') ||
+        test('carb', 'CoverCrop2', 'Please enter Carbohydrates') ||
+        test('cell', 'CoverCrop2', 'Please enter Cellulose') ||
+        test('lign', 'CoverCrop2', 'Please enter Lignin') ||
 
-      test('plantingDate', 'CashCrop', 'Please enter Cash Crop Planting Date') ||
+        test('plantingDate', 'CashCrop', 'Please enter Cash Crop Planting Date') ||
 
-      test('BD', 'Soil', 'Please enter Bulk Density') ||
-      test('InorganicN', 'Soil', 'Please enter Soil Inorganic N') ||
+        test('BD', 'Soil', 'Please enter Bulk Density') ||
+        test('InorganicN', 'Soil', 'Please enter Soil Inorganic N') ||
 
-      setScreen2(scr);
+        setScreen2(scr);
+      }
     } else {
       setScreen2(scr);
+
+      // AutoComplete component doesn't understand autoFocus:
+      let focus = scr === 'CoverCrop1' ? '#coverCrop' :
+                  scr === 'CashCrop'   ? '#cashCrop'  :
+                                         null;
+        
+      if (focus) {
+        setTimeout(() => document.querySelector(focus).focus(), 10);
+      }
     }
   } // setScreen
 
@@ -226,32 +243,6 @@ const Screens = ({parms, props, set}) => {
     });
   } // loadField
 
-  const update = (e, id = e.target.id, val = e.target.value) => {
-    try {
-      if (/googlemap|mui/.test(id)) {
-        return;
-      }
-
-      console.log(JSON.stringify(val));
-
-      set[id](val);
-
-      if (id === 'cell') {
-        // set.lign(+(100 - (+parms.carb + +val)).toFixed(1));
-      } else if (id === 'N') {
-        const carb = (24.7 + 10.5 * val).toFixed(0);
-        const cell = (69 - 10.2 * val).toFixed(0);
-        set.carb(carb);
-        set.cell(cell);
-        set.lign(100 - (+carb + +cell));
-      }
-
-      console.log(id, val);
-    } catch(ee) {
-      console.log(e.target.id, ee.message);
-    }
-  } // update
-
   const changeScreen = (e) => {
     const button = e.target;
 
@@ -281,8 +272,6 @@ const Screens = ({parms, props, set}) => {
     <div
       tabIndex="0"
 
-      onChange={update}
-      
       onKeyDown={(e) => {
         if (e.key === 'Escape') {
           set.help('');
@@ -354,7 +343,6 @@ const Screens = ({parms, props, set}) => {
         set: set,
         parms: parms,
         setScreen: setScreen,
-        update: update
       })}
     </div>
   );
@@ -362,6 +350,11 @@ const Screens = ({parms, props, set}) => {
 
 const App = () => {
   const runModel = () => {
+    clearTimeout(modelTimer);
+    modelTimer = setTimeout(runModel2, 300);
+  } // runModel
+
+  const runModel2 = () => {
     const weightedAverage = (data, parm, dec = 2) => {
       let totpct = 0;
   
@@ -402,107 +395,92 @@ const App = () => {
     const bd = parms.BD;
     const In = parms.InorganicN || 10;
     const pmn = 10;
-    console.log(parms.N, carb, cell, lign, biomass, bd, In);
-    const ssurgoSrc = `https://weather.aesl.ces.uga.edu/ssurgo?lat=${parms.lat}&lon=${parms.lon}&component=major`;
-    const modelSrc  = `https://weather.aesl.ces.uga.edu/cc-ncalc/both?lat=${parms.lat}&lon=${parms.lon}&start=${start}&end=${end}&n=${parms.N}&biomass=${biomass}&lwc=${lwc}&carb=${carb}&cell=${cell}&lign=${lign}&om=${om}&bd=${bd}&in=${In}&pmn=${pmn}`;
 
-    console.log(ssurgoSrc);
-    console.log(modelSrc);
-    clearTimeout(ssurgoTimer);
+    const ssurgoSrc = `https://weather.aesl.ces.uga.edu/ssurgo?lat=${parms.lat}&lon=${parms.lon}&component=major`;
+    // const modelSrc  = `https://weather.aesl.ces.uga.edu/cc-ncalc/both?lat=${parms.lat}&lon=${parms.lon}&start=${start}&end=${end}&n=${parms.N}&biomass=${biomass}&lwc=${lwc}&carb=${carb}&cell=${cell}&lign=${lign}&om=${om}&bd=${bd}&in=${In}&pmn=${pmn}`;
+    const modelSrc  = `https://weather.aesl.ces.uga.edu/cc-ncalc/surface?lat=${parms.lat}&lon=${parms.lon}&start=${start}&end=${end}&n=${parms.N}&biomass=${biomass}&lwc=${lwc}&carb=${carb}&cell=${cell}&lign=${lign}&om=${om}&bd=${bd}&in=${In}&pmn=${pmn}`;
+
     set.gotSSURGO(false);
     set.gotModel(false);
 
-    ssurgoTimer = setTimeout(() => {
-      if (start !== 'Invalid date' && end !== 'Invalid date') {
-        fetch(modelSrc)
-          .then(response => response.json())
-          .then(data => {
-            console.log(data);
-            const modelSurface = {};
-            data.surface.forEach(data => {
-              Object.keys(data).forEach(key => {
-                modelSurface[key] = modelSurface[key] || [];
-                modelSurface[key].push(data[key]);
-              });
-            });
-          
-            const modelIncorporated = {};
-            data.incorporated.forEach(data => {
-              Object.keys(data).forEach(key => {
-                modelIncorporated[key] = modelIncorporated[key] || [];
-                modelIncorporated[key].push(data[key]);
-              });
-            });
-          
-            const model = {
-              s: modelSurface,
-              i: modelIncorporated
-            }
-          
-            const cols = Object.keys(model.s).sort((a, b) => a.toUpperCase().localeCompare(b.toUpperCase()));
-
-            cols.filter(col => !model.s[col].length).forEach(col => {
-              model.s[col] = new Array(model.s.Rain.length).fill(model.s[col]);
-            });
-          
-            set.model(model);
-            set.gotModel(true);
-            console.log('model');
-            console.log(data);
-          });
-      }
-
-      fetch(ssurgoSrc)
+    if (start !== 'Invalid date' && end !== 'Invalid date' && end > start) {
+      console.log(modelSrc);
+  
+      fetch(modelSrc)
         .then(response => response.json())
         .then(data => {
-          if (data instanceof Array) {
-            set.gotSSURGO(true);
-            console.log('SSURGO:');
-            console.log(data);
-            
-            data = data.filter(d => d.desgnmaster !== 'O');
-
-            const minhzdept = Math.min.apply(Math, data.map(d => d.hzdept_r));
-            data = data.filter(d => +d.hzdept_r === +minhzdept);
-
-            console.log(JSON.stringify(data.map(d => [d.dbthirdbar_r, d.om_r, d.comppct_r, d.hzdept_r]), null, 2));
-            console.log(weightedAverage(data, 'dbthirdbar_r'));
-
-            if (!parms.firstSSURGO || !parms.BD) {
-              set.BD(weightedAverage(data, 'dbthirdbar_r'));
-            }
-            set.firstSSURGO(false);
-            
-            set.OM(weightedAverage(data, 'om_r'));
+          console.log(data);
+          const modelSurface = {};
+          data.surface.forEach(data => {
+            Object.keys(data).forEach(key => {
+              modelSurface[key] = modelSurface[key] || [];
+              modelSurface[key].push(data[key]);
+            });
+          });
+        
+          const modelIncorporated = {};
+          /*
+          data.incorporated.forEach(data => {
+            Object.keys(data).forEach(key => {
+              modelIncorporated[key] = modelIncorporated[key] || [];
+              modelIncorporated[key].push(data[key]);
+            });
+          });
+          */
+        
+          const model = {
+            s: modelSurface,
+            i: modelIncorporated
           }
-        });
-    }, 1000);
-  } // runModel
+        
+          const cols = Object.keys(model.s).sort((a, b) => a.toUpperCase().localeCompare(b.toUpperCase()));
 
-  const getWeather = () => {
-    if (!parms.lat || !parms.lon || !parms.killDate || !parms.plantingDate) {
-      return;
+          cols.filter(col => !model.s[col].length).forEach(col => {
+            model.s[col] = new Array(model.s.Rain.length).fill(model.s[col]);
+          });
+        
+          set.model(model);
+          set.gotModel(true);
+          console.log('model');
+          console.log(data);
+        });
     }
 
-    set.weather([]);
+    console.log(ssurgoSrc);
+    fetch(ssurgoSrc)
+      .then(response => response.json())
+      .then(data => {
+        if (data instanceof Array) {
+          set.gotSSURGO(true);
+          console.log('SSURGO:');
+          console.log(data);
+          
+          data = data.filter(d => d.desgnmaster !== 'O');
 
-    const src = `https://weather.aesl.ces.uga.edu/weather/hourly?lat=${parms.lat}&lon=${parms.lon}&start=${moment(parms.killDate).format('yyyy-MM-DD')}&end=${moment(parms.plantingDate).add(110, 'days').format('yyyy-MM-DD')}&attributes=air_temperature,relative_humidity,precipitation&options=predicted`;
-    console.log(src);
-    clearTimeout(weatherTimer);
-    weatherTimer = setTimeout(() => {
-      fetch(src)
-        .then(response => response.json())
-        .then(data => {
-          if (!(data instanceof Array)) {
-            alert(`No data found.\nPlease choose a location within the conterminous United States.`);
-          } else {
-            set.weather(data);
-            console.log('Weather:');
-            console.log(data);
+          const minhzdept = Math.min.apply(Math, data.map(d => d.hzdept_r));
+          data = data.filter(d => +d.hzdept_r === +minhzdept);
+
+          console.log(JSON.stringify(data.map(d => [d.dbthirdbar_r, d.om_r, d.comppct_r, d.hzdept_r]), null, 2));
+          console.log(weightedAverage(data, 'dbthirdbar_r'));
+
+          if (!parms.firstSSURGO || !parms.BD) {
+            set.BD(weightedAverage(data, 'dbthirdbar_r'));
           }
-        });
-    }, 1000)
-  } // getWeather
+          set.firstSSURGO(false);
+          
+          set.OM(weightedAverage(data, 'om_r'));
+        }
+      }
+    );
+  } // runModel2
+
+  const NDefaults = () => {
+    const carb = Math.min(100, Math.max(0, (24.7 + 10.5 * parms.N))).toFixed(0);
+    const cell = Math.min(100, Math.max(0, (69 - 10.2 * parms.N))).toFixed(0);
+    set.carb(carb);
+    set.cell(cell);
+    set.lign(100 - (+carb + +cell));
+  } // NDefaults
 
   const change = (parm, value, target, index) => {
   } // change
@@ -511,7 +489,7 @@ const App = () => {
     change,
     {
       field               : demo ? 'My field' : '',
-      targetN             : demo ? '150' : '',
+      targetN             : demo ? '150' : '150',
       coverCrop           : demo ? ['Oats, Black'] : [],
       killDate            : demo ? new Date('05/08/2021') : '',
       cashCrop            : demo ? 'Corn' : '',
@@ -529,7 +507,6 @@ const App = () => {
       biomass             : demo ? 5235 : '',
       mapZoom             : 13,
       mapType             : 'hybrid',
-      weather             : {},
       model               : {},
       OM                  : demo ? 5   : '',
       BD                  : demo ? 1.5 : '',
@@ -552,10 +529,10 @@ const App = () => {
       species             : {},
       maxBiomass          : {},
       effects : {
-        lat           : [getWeather, runModel],
-        lon           : [getWeather, runModel],
-        plantingDate  : [getWeather, runModel],
-        killDate      : [getWeather, runModel],
+        lat           : runModel,
+        lon           : runModel,
+        plantingDate  : runModel,
+        killDate      : runModel,
         N             : runModel,
         carb          : runModel,
         cell          : runModel,
@@ -563,8 +540,9 @@ const App = () => {
         lwc           : runModel,
         // BD            : runModel,  // TODO
         // OM            : runModel,  // TODO
-        InorganicN    : runModel,
+        // InorganicN    : runModel,  // TODO
         biomass       : runModel,
+        N             : NDefaults,
       }
     }
   );
@@ -584,10 +562,9 @@ if (isPSA && !demo) {
   demo = 'AMD';
 }
 
-let weatherTimer;
-let ssurgoTimer;
-
 let examples = {};
+
+let modelTimer;
 
 if (examples[demo]) {
   // parms = {...parms, ...examples[demo]}

@@ -1,14 +1,10 @@
-import DatePicker from 'react-datepicker';
-
-import 'react-datepicker/dist/react-datepicker.css';
-
 import {
   Radio,
   RadioGroup,
   FormControlLabel
 } from '@mui/material';
 
-import {Autocomplete} from './Inputs';
+import {Autocomplete, Input} from './Inputs';
 
 import Myslider from './Slider';
 
@@ -18,6 +14,7 @@ const CoverCrops = ({props, parms}) => {
   return (
     <Autocomplete
       multiple
+
       {...props('coverCrop')}
 
       groupBy={
@@ -27,13 +24,16 @@ const CoverCrops = ({props, parms}) => {
                     parms.species.Legume.includes(option)    ? 'Legume' :
                                                                'ERROR'
       }
+
       options={[
         ...parms.species.Grass,
         ...parms.species.Legume,
         ...parms.species.Brassica,
         ...parms.species.Broadleaf,
       ]}
-    />    
+
+      placeholder="Select one or more cover crops"
+    />
   );
 } // CoverCrops
 
@@ -47,63 +47,19 @@ const CoverCrop1 = ({props, parms, set, setScreen}) => {
         <p>Cover Crop Species:</p>
         <CoverCrops
           props={props}
-          set={set}
           parms={parms}
         />
 
         <p>Cover Crop Termination Date:</p>
-        <DatePicker 
-          selected={parms.killDate}
-          onChange={date => set.killDate(date)}
-        />
+        <Input type="date" {...props('killDate')} />
 
         <p/>
         <div>
           Dry Biomass
           <Icon>
             help
-            <p>The amount of cover crop biomass on a dry weight basis. For taking a representative biomass sample for your field:</p>
-            <ol>
-              <li>Select multiple small areas that best represent mixture composition and biomass in your field.</li>
-              <li>Collect all aboveground material using sickle/scissor/clipper from specified areas. Use quadrant for broadcasted and aerial-seeded cover crops or a measuring stick for drill-seeded cover crops.</li>
-              <li>Record fresh weight of cover crop subsample in pounds (lb).</li>
-              <li>Repeat step 2-3 for each subsample. Sum up all fresh weights (lb).</li>
-              <li>Record the total number of cover crop subsamples harvested.</li>
-              <li>Record quadrant size (ft<sup>2</sup>) or number and length of drill-lines harvested and drill spacing.</li>
-              <li>Combine all cover crop subsamples together into one sample.</li>
-              <li>Drying:
-                <ul>
-                  <li>
-                    Sun dry method:
-                    <ul>
-                      <li>Spread all cover crops sampled out in a thin layer on a clean trap. </li>
-                      <li>Sun dry cover crops for several days, turning it frequently, until it is crunchy. </li>
-                      <li>Record total dry weight (lb).</li>
-                    </ul>
-                  </li>
-                  <li>
-                    Microwave dry method:
-                    <ul>
-                      <li>Take 3.5 ounces (100 g) of fresh material and spread out in a thin layer in a plate. </li>
-                      <li>Heat at small intervals and reweigh until you reach a constant weight. </li>
-                      <li>Record the final dry weight of subsample and determine moisture content (%) using the following equation.</li>
-                      <li>Back calculate total dry weight (lb) using total fresh weight (lb) and moisture content (%).</li>
-                    </ul>
-                    <table>
-                      <tbody>
-                        <tr><td></td><td>Broadcasted or aerial-seeded</td><td>Drill-seeded</td></tr>
-                        <tr><td>Total area sampled (ft<sup>2</sup>)</td><td>#samples × Quadrant size (ft<sup>2</sup>)</td><td>#samples ×#drill lines × length of drill lines (ft)×drill spacing (ft)</td></tr>
-                        <tr><td>Fresh wet weight (lb/ac)</td><td colSpan="2">(Total fresh weight (lb)  )/(Total area sampled (ft<sup>2</sup>)) × 43,560 ft<sup>2</sup>/ac</td></tr>
-                        <tr><td>Dry weight (lb/ac)</td><td colSpan="2">(Total dry weight (lb)  )/(Total area sampled (ft<sup>2</sup>))× 43,560 ft<sup>2</sup>/ac</td></tr>
-                        <tr><td>Moisture content (%)</td><td colSpan="2">(Total fresh weight (lb)-Total dry weight (lb) )/(Total dry weight (lb))  ×100%</td></tr>
-                      </tbody>
-                    </table>
-                  </li>
-                </ul>
-              </li>
-              <li>Take a representative cover crop subsample and ship it to analytical lab for quality analysis. </li>
-            </ol>
-            <p>For more details on cover crop biomass sampling and taking a representative sub-sample for quality analysis, please refer <a target="_blank" rel="noreferrer" href="https://extension.uga.edu/publications/detail.html?number=C1077">here</a>.</p>
+            <p>The amount of cover crop biomass on a dry weight basis.</p>
+            <p>For details on cover crop biomass sampling and taking a representative sub-sample for quality analysis, please refer to <a tabIndex="-1" target="_blank" rel="noreferrer" href="https://extension.uga.edu/publications/detail.html?number=C1077">here</a>.</p>
           </Icon>
           :
 
@@ -111,16 +67,18 @@ const CoverCrop1 = ({props, parms, set, setScreen}) => {
             <FormControlLabel
               value="lb/ac"
               control={<Radio id="unit" checked={parms.unit === 'lb/ac'}/>}
+              onChange={() => set.unit('lb/ac')}
               label="lb/ac"
             />
             <FormControlLabel
               value="kg/ha"
               control={<Radio id="unit" checked={parms.unit === 'kg/ha'} />}
+              onChange={() => set.unit('kg/ha')}
               label="kg/ha"
             />
           </RadioGroup>
         </div>
-        <p/>
+
         <Myslider
           parm={'biomass'}
           min={0}
@@ -137,7 +95,7 @@ const CoverCrop1 = ({props, parms, set, setScreen}) => {
           </p>
         }
 
-        <div style={{margin: "2rem 0"}}>
+        <div style={{marginTop: "2rem"}}>
           Cover Crop Water Content at Termination (g water/g dry biomass)
           <Icon>
             help
@@ -179,6 +137,7 @@ const CoverCrop2 = ({props, parms, set, setScreen, update}) => {
           :
         </p>
         <Myslider
+          autoFocus
           parm={'N'}
           min={0}
           max={6}

@@ -1,20 +1,26 @@
-import {
-  Input,
-} from '@mui/material';
+import {Input} from './Inputs';
 
 const Soil = ({props, parms, setScreen}) => (
   <div>
     <h1>Tell us about your Soil</h1>
-    {parms.gotSSURGO ? <p className="note">Adjust default values below based on lab results.</p> : ''}
+    {parms.gotSSURGO ? 
+      <p className="note">
+        The data below was pulled from the national soil database based on the location entered on the previous screen.<br/>
+        You can adjust them if you have lab results.
+      </p> :
+      ''
+    }
 
     <div className="inputs">
-      <p>Organic Matter (%):</p>
-      <Input {...props('OM')} />
+      Organic Matter (%):<br/>
+      <Input type="number" {...props('OM')} autoFocus />
+      <br/><br/>
 
-      <p>Bulk Density (g/cm<sup>3</sup>):</p>
+      Bulk Density (g/cm<sup>3</sup>):<br/>
       <Input {...props('BD')} />
 
-      <p>Soil Inorganic N (ppm):</p>
+      <br/><br/>
+      Soil Inorganic N (ppm):<br/>
       <Input {...props('InorganicN')} />
     </div>
 

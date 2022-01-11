@@ -8,7 +8,7 @@ const Location = ({props, set, parms, setScreen}) => (
       You can then zoom in and click to pinpoint it on the map.
     </p>
     
-    <Map set={set} parms={parms} props={props} field />
+    <Map set={set} parms={parms} props={props} field autoFocus />
     
     <div className="bn">
       <button onClick={() => setScreen('Home')}>BACK</button>

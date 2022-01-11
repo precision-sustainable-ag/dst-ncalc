@@ -1,18 +1,10 @@
-import DatePicker from 'react-datepicker';
-
-import 'react-datepicker/dist/react-datepicker.css';
-
-import {
-  TextField,
-} from '@mui/material';
-
 import Myslider from './Slider';
 
-import {Autocomplete} from './Inputs';
+import {Autocomplete, Input} from './Inputs';
 
 import Icon from '@mui/material/Icon';
 
-const CashCrops = ({set, parms}) => {
+const CashCrops = ({props}) => {
   const crops = [
     'Alfalfa-Establishment',
     'Alfalfa-Maintenance',
@@ -119,7 +111,6 @@ const CashCrops = ({set, parms}) => {
     'Peaches',
     'Peanuts',
     'Pears',
-    'Pecans',
     'Pecans',
     'Pepper (Bell and Pimento)',
     'Pepper Transplants',
@@ -301,20 +292,16 @@ const CashCrops = ({set, parms}) => {
 
   return (
     <Autocomplete
-      value={parms.cashCrop || []}
+      {...props('cashCrop')}
+
       options={crops}
-      onChange={(event, newValue) => {
-        set.targetN(PiedNRate[newValue] || 0);
-        set.cashCrop(newValue);
-      }}
-      renderInput={(params) => (
-          <TextField
-            {...params}
-            variant="standard"
-            label=""
-            zplaceholder="Cash crop"
-          />
-      )}      
+
+      // onChange={(event, newValue) => {
+      //   set.targetN(PiedNRate[newValue] || 0);
+      //   set.cashCrop(newValue);
+      // }}
+
+      placeholder="Select a cash crop"
     />
   );
 } // CashCrops
@@ -325,13 +312,10 @@ const CashCrop = ({props, parms, set, setScreen}) => {
       <div className="inputs">
         <h1>Tell us about your Cash Crop</h1>
         <p>Cash Crop:</p>
-        <CashCrops set={set} parms={parms} />
+        <CashCrops props={props} />
 
         <p>Cash Crop Planting Date:</p>
-        <DatePicker 
-          selected={parms.plantingDate}
-          onChange={date => set.plantingDate(date)}
-        />
+        <Input type="date" {...props('plantingDate')} />
 
         {parms.cashCrop === 'Corn' &&
           <>

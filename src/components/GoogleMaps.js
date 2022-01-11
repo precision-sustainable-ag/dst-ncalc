@@ -65,7 +65,6 @@ const GoogleMaps = ({props, parms, set, autoFocus=false, field=false}) => {
         autoComplete
         includeInputInList
         filterSelectedOptions
-        autoFocus={autoFocus}  // not working
 
         // getOptionSelected={(option, value) => option.id === value.id}  // avoids warning, per https://stackoverflow.com/a/65347275/3903374, but prevents re-entry of data
         
@@ -104,6 +103,7 @@ const GoogleMaps = ({props, parms, set, autoFocus=false, field=false}) => {
           <>
             <TextField
               {...params}
+              autoFocus={autoFocus}
               label="Find your Location"
               variant="outlined" 
               style={{width: field ? '50%' : '100%', float: field ? 'left' : ''}}
@@ -140,22 +140,22 @@ const GoogleMaps = ({props, parms, set, autoFocus=false, field=false}) => {
         </>
       }
 
-      <div>
+      <div tabIndex="-1">
         <small>
           If you know your exact coordinates, you can enter them here:
           &nbsp;
           Latitude:&nbsp;
-          <Input {...props('lat')} inputProps={{ tabIndex: -1 }} style={{width: '6em', fontSize: 14}} />
+          <Input type="number" {...props('lat')} style={{width: '6em', fontSize: 14}} />
           &nbsp;&nbsp;&nbsp;
           Longitude:&nbsp;
-          <Input {...props('lon')} inputProps={{ tabIndex: -1 }} style={{width: '6em', fontSize: 14}}/>
+          <Input type="number" {...props('lon')} style={{width: '6em', fontSize: 14}}/>
         </small>
       </div>
     </>
   );
 }
 
-const Map = ({set, parms, props, field=false}) => {
+const Map = ({set, parms, props, field=false, autoFocus}) => {
   const mapChange = (e) => {
     set.lat(+e.lat.toFixed(4));
     set.lon(+e.lng.toFixed(4));
@@ -193,7 +193,7 @@ const Map = ({set, parms, props, field=false}) => {
 
   return (
     <>
-      <GoogleMaps set={set} props={props} parms={parms} field={field} />
+      <GoogleMaps set={set} props={props} parms={parms} field={field} autoFocus={autoFocus}/>
 
       {
         parms.lat && parms.lon &&
