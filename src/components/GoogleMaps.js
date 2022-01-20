@@ -140,16 +140,27 @@ const GoogleMaps = ({props, parms, set, autoFocus=false, field=false}) => {
         </>
       }
 
+      <p/>
       <div tabIndex="-1">
-        <small>
-          If you know your exact coordinates, you can enter them here:
-          &nbsp;
-          Latitude:&nbsp;
-          <Input type="number" {...props('lat')} style={{width: '6em', fontSize: 14}} />
-          &nbsp;&nbsp;&nbsp;
-          Longitude:&nbsp;
-          <Input type="number" {...props('lon')} style={{width: '6em', fontSize: 14}}/>
-        </small>
+        If you know your exact coordinates, you can enter them here:
+        &nbsp;
+        <OutlinedInput
+          className="field"
+          label="Latitude"
+          notched={true}
+          {...props('lat')}
+          autoComplete="off"
+          style={{width: '8em'}}
+          type="number"
+        />
+        <OutlinedInput
+          className="field"
+          label="Longitude"
+          notched={true}
+          {...props('lon')}
+          autoComplete="off"
+          style={{width: '8em'}}
+        />
       </div>
     </>
   );

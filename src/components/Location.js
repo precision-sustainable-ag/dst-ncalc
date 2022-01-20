@@ -4,7 +4,7 @@ const Location = ({props, set, parms, setScreen}) => (
   <>
     <h1>Where is your field located?</h1>
     <p>
-      Enter your address or zip code to determine your field's location.<br/>
+      Enter your field's address.
       You can then zoom in and click to pinpoint it on the map.
     </p>
     

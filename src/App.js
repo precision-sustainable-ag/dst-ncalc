@@ -275,6 +275,7 @@ const Screens = ({parms, props, set}) => {
       onKeyDown={(e) => {
         if (e.key === 'Escape') {
           set.help('');
+          set.privacy(false);
         }
       }}
 
@@ -410,6 +411,9 @@ const App = () => {
         .then(response => response.json())
         .then(data => {
           console.log(data);
+          if (!data.surface) {
+            return;
+          }
           const modelSurface = {};
           data.surface.forEach(data => {
             Object.keys(data).forEach(key => {
@@ -528,6 +532,7 @@ const App = () => {
       mockup              : 2,
       species             : {},
       maxBiomass          : {},
+      privacy             : false,
       effects : {
         lat           : runModel,
         lon           : runModel,
@@ -572,6 +577,6 @@ if (examples[demo]) {
 
 // localStorage.clear();
 
-document.title = 'CC-NCalc';
+document.title = 'CC-NCALC';
 
 export default App;

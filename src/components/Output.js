@@ -452,7 +452,7 @@ const Output = ({props, parms, set, setScreen}) => {
 //  alert(csv);
 
   return (
-    <div id="Output" className="mockup">
+    <div id="Output" zclassName="mockup">
       <CSVLink data={csv} className="download">Download</CSVLink>
       { /*
       Mockup: &nbsp;
