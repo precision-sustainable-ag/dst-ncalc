@@ -6,7 +6,8 @@ const Myslider = ({parm, min, max, props, set, parms, step=1, autoFocus}) => {
       <Input
         {...props(parm)}
         autoComplete="off"
-        autoFocus={autoFocus}        
+        autoFocus={autoFocus}
+        style={{width: '5em'}}
       />
       &nbsp;&nbsp;&nbsp;&nbsp;
       <span className="tiny">{min}</span>

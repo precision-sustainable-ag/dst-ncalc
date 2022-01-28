@@ -1,7 +1,9 @@
 import {Input} from './Inputs';
 import Icon from '@mui/material/Icon';
 
-const Soil = ({props, parms, setScreen}) => (
+import Myslider from './Slider';
+
+const Soil = ({props, parms, setScreen, set}) => (
   <div>
     <h1>Tell us about your Soil</h1>
     {parms.gotSSURGO ? 
@@ -24,7 +26,15 @@ const Soil = ({props, parms, setScreen}) => (
         <p>Soil organic matter in the surface (0-10cm) soil</p>
       </Icon>
       <br/>
-      <Input type="number" {...props('OM')} autoFocus />
+      <Myslider
+        parm={'OM'}
+        min={0.1}
+        max={5}
+        step={0.1}
+        props={props}
+        parms={parms}
+        set={set}
+      />
 
       <br/><br/>
 
@@ -34,7 +44,15 @@ const Soil = ({props, parms, setScreen}) => (
         <p>Soil bulk density in the surface (0-10cm) soil</p>
       </Icon>
       <br/>
-      <Input {...props('BD')} />
+      <Myslider
+        parm={'BD'}
+        min={0.8}
+        max={1.8}
+        step={0.1}
+        props={props}
+        parms={parms}
+        set={set}
+      />
 
       <br/><br/>
       Soil Inorganic N (ppm or mg/kg):
@@ -43,7 +61,14 @@ const Soil = ({props, parms, setScreen}) => (
         <p>Soil inorganic nitrogen in the surface (0-10cm) soil</p>
       </Icon>
       <br/>
-      <Input {...props('InorganicN')} />
+      <Myslider
+        parm={'InorganicN'}
+        min={0}
+        max={25}
+        props={props}
+        parms={parms}
+        set={set}
+      />
     </div>
 
     <div className="bn">

@@ -150,7 +150,11 @@ const Output = ({props, parms, set, setScreen}) => {
       }
     },
     title: {
-      text: ''
+      text: parms.mockup === 2 ? (
+              parms.outputN === 1 && cornN ? '<div class="caption">Cover crop N released and Corn N uptake over time.</div>' :
+              parms.outputN === 1          ? '<div class="caption">Cover crop N released over time.</div>'
+                                            : '<div class="caption">Undecomposed cover crop residue mass remaining over time following its termination.</div>'
+            ) : ''
     },
     series: [
       {
@@ -231,9 +235,11 @@ const Output = ({props, parms, set, setScreen}) => {
       {
         type: 'datetime',
         title: {
-          text: parms.outputN === 1 && cornN ? '<div class="caption">Cover crop N released and Corn N uptake over time.</div>' :
-                parms.outputN === 1          ? '<div class="caption">Cover crop N released over time.</div>'
-                                             : '<div class="caption">Undecomposed cover crop residue mass remaining over time following its termination.</div>'
+          text: parms.mockup === 1 ? (
+                  parms.outputN === 1 && cornN ? '<div class="caption">Cover crop N released and Corn N uptake over time.</div>' :
+                  parms.outputN === 1          ? '<div class="caption">Cover crop N released over time.</div>'
+                                              : '<div class="caption">Undecomposed cover crop residue mass remaining over time following its termination.</div>'
+                ) : ''
         },
         crosshair: {
           color: '#7b3294',
@@ -452,9 +458,9 @@ const Output = ({props, parms, set, setScreen}) => {
 //  alert(csv);
 
   return (
-    <div id="Output" zclassName="mockup">
+    <div id="Output" className="mockup">
       <CSVLink data={csv} className="download">Download</CSVLink>
-      { /*
+
       Mockup: &nbsp;
       <button
        className={parms.mockup === 1 ? 'selected' : ''}
@@ -468,115 +474,12 @@ const Output = ({props, parms, set, setScreen}) => {
       >
         2
       </button>
-      <button
-       className={parms.mockup === 3 ? 'selected' : ''}
-       onClick={() => set.mockup(3)}
-      >
-        3
-      </button>
-      <button
-       className={parms.mockup === 4 ? 'selected' : ''}
-       onClick={() => set.mockup(4)}
-      >
-        4
-      </button>
-      <button
-       className={parms.mockup === 5 ? 'selected' : ''}
-       onClick={() => set.mockup(5)}
-      >
-        5
-      </button>
-      */}
+
       <table style={{width: '100%'}}>
         <tbody>
           <tr>
-            <td className={'mockup' + parms.mockup} >
-              <div className="mockup1" >
-                <p><strong>Cover crop summary</strong></p>
-                <div className="inputs">
-                  <table 
-                    className="coverCropSummary"
-                    style={{width: '100%'}}
-                  >
-                    <tbody>
-                      <tr>
-                        <td>
-                          <table>
-                            <tbody>
-                              <tr>
-                                <td>Field name</td>
-                                <td>{parms.field}</td>
-                              </tr>
-                              <tr>
-                                <td>Species</td>
-                                <td>{parms.coverCrop.map(crop => <div key={crop}>{crop}</div>)}</td>
-                              </tr>
-                              <tr>
-                                <td>Termination Date</td>
-                                <td>{moment(parms.killDate).format('MMM D, yyyy')}</td>
-                              </tr>
-                              <tr>
-                                <td>Dry Biomass</td>
-                                <td>{(+parms.biomass).toFixed(0)} {parms.unit}</td>
-                              </tr>
-                              <tr>
-                                <td>Residue N Content</td>
-                                <td>{((parms.biomass * parms.N) / 100).toFixed(0)} {parms.unit}</td>
-                              </tr>
-                            </tbody>
-                          </table>
-                        </td>
-                        <td>
-                          <table style={{border: '1px solid #bbb', height: '100%'}}>
-                            <tbody>
-                              <tr>
-                                <th colSpan="3">Residue quality</th>
-                              </tr>
-                              <tr>
-                                <td>Carbohydrates</td>
-                                <td style={{textAlign: 'right'}}>{carb.toFixed(0)} %</td>
-                              </tr>
-                              <tr>
-                                <td>Holo-cellulose</td>
-                                <td style={{textAlign: 'right'}}>{cell.toFixed(0)} %</td>
-                              </tr>
-                              <tr>
-                                <td>Lignin</td>
-                                <td style={{textAlign: 'right'}}>{lign.toFixed(0)} %</td>
-                              </tr>
-                            </tbody>
-                          </table>
-                        </td>
-                      </tr>
-                    </tbody>
-                  </table>
-
-                  <hr/>
-                  <div className="percent" style={{display: 'none', width: '500px', color: '#eee'}}>
-                    <div style={{width: (carb / total) * 100 - 1 + '%', background: '#385E1B'}}>
-                      {carb.toFixed(0)}
-                    </div>
-                    <div style={{width: (cell / total) * 100 - 1 + '%', background: '#8EB644'}}>
-                      {cell.toFixed(0)}
-                    </div>
-                    <div style={{width: (lign / total) * 100 - 1 + '%', background: '#543608'}}>
-                      {lign.toFixed(0)}
-                    </div>
-
-                    <div style={{textAlign: 'left', width: (carb / total) * 100 - 1 + '%', color: '#385E1B'}}>
-                      Carb
-                    </div>
-                    <div style={{textAlign: 'left', width: (cell / total) * 100 - 1 + '%', color: '#8EB644'}}>
-                      Cell
-                    </div>
-                    <div style={{textAlign: 'left', width: (lign / total) * 100 - 1 + '%', color: '#543608'}}>
-                      Lign
-                    </div>
-                  </div>
-                </div>
-              </div>
-
-              <div className="mockup2" >
+            <td>
+              <div>
                 <div className="inputs">
                   <table 
                     className="coverCropSummary"
@@ -610,144 +513,6 @@ const Output = ({props, parms, set, setScreen}) => {
                           <u>Lignin</u><br/>
                           (<strong>{lign.toFixed(0)} %</strong>)
                         </td>
-                      </tr>
-                    </tbody>
-                  </table>
-                </div>
-              </div>
-
-              <div className="mockup3" >
-                <div className="inputs">
-                  <table 
-                    className="coverCropSummary"
-                    style={{width: '100%', borderBottom: '1px solid #888'}}
-                  >
-                    <tbody>
-                      <tr>
-                        <td>Field name</td>
-                        <td colSpan="2">
-                          <strong>{parms.field}</strong>
-                        </td>
-                      </tr>
-
-                      <tr>
-                        <td>Species</td>
-                        <td colSpan="2">
-                          <strong>{parms.coverCrop.map(crop => <div key={crop}>{crop}</div>)}</strong>
-                        </td>
-                      </tr>
-
-                      <tr>
-                        <td>Termination Date</td>
-                        <td><strong>{moment(parms.killDate).format('MMM D, yyyy')}</strong></td>
-                        <td style={{paddingLeft: '0.5em'}}>Carbohydrates</td>
-                        <td><strong>{carb.toFixed(0)} %</strong></td>
-                      </tr>
-
-                      <tr>
-                        <td>Dry Biomass</td>
-                        <td><strong>{(+parms.biomass).toFixed(0)} {parms.unit}</strong></td>
-                        <td style={{paddingLeft: '0.5em'}}>Holo-cellulose</td>
-                        <td><strong>{cell.toFixed(0)} %</strong></td>
-                      </tr>
-                          
-                      <tr>
-                        <td>Residue N Content</td>
-                        <td><strong>{((parms.biomass * parms.N) / 100).toFixed(0)} {parms.unit}</strong></td>
-                        <td style={{paddingLeft: '0.5em'}}>Lignin</td>
-                        <td><strong>{lign.toFixed(0)} %</strong></td>
-                      </tr>
-                    </tbody>
-                  </table>
-                </div>
-              </div>
-
-              <div className="mockup4" >
-                <div className="inputs">
-                  <table 
-                    className="coverCropSummary"
-                    style={{width: '100%', borderBottom: '1px solid #888'}}
-                  >
-                    <tbody>
-                      <tr>
-                        <td>Field name</td>
-                        <td colSpan="2">
-                          <strong>{parms.field}</strong>
-                        </td>
-                      </tr>
-
-                      <tr>
-                        <td>Species</td>
-                        <td colSpan="2">
-                          <strong>{parms.coverCrop.map(crop => <div key={crop}>{crop}</div>)}</strong>
-                        </td>
-                      </tr>
-
-                      <tr>
-                        <td>Termination Date</td>
-                        <td><strong>{moment(parms.killDate).format('MMM D, yyyy')}</strong></td>
-                        <td style={{borderLeft: '1px solid #ccc', paddingLeft: '0.5em'}}>Carbohydrates</td>
-                        <td><strong>{carb.toFixed(0)} %</strong></td>
-                      </tr>
-
-                      <tr>
-                        <td>Dry Biomass</td>
-                        <td><strong>{(+parms.biomass).toFixed(0)} {parms.unit}</strong></td>
-                        <td style={{borderLeft: '1px solid #ccc', paddingLeft: '0.5em'}}>Holo-cellulose</td>
-                        <td><strong>{cell.toFixed(0)} %</strong></td>
-                      </tr>
-                          
-                      <tr>
-                        <td>Residue N Content</td>
-                        <td><strong>{((parms.biomass * parms.N) / 100).toFixed(0)} {parms.unit}</strong></td>
-                        <td style={{borderLeft: '1px solid #ccc', paddingLeft: '0.5em'}}>Lignin</td>
-                        <td><strong>{lign.toFixed(0)} %</strong></td>
-                      </tr>
-                    </tbody>
-                  </table>
-                </div>
-              </div>
-
-              <div className="mockup5" >
-                <div className="inputs">
-                  <table 
-                    className="coverCropSummary"
-                    style={{width: '100%', borderBottom: '1px solid #888'}}
-                  >
-                    <tbody>
-                      <tr>
-                        <td>Field name</td>
-                        <td colSpan="2">
-                          <strong>{parms.field}</strong>
-                        </td>
-                      </tr>
-
-                      <tr>
-                        <td>Species</td>
-                        <td colSpan="2">
-                          <strong>{parms.coverCrop.map(crop => <div key={crop}>{crop}</div>)}</strong>
-                        </td>
-                      </tr>
-
-                      <tr>
-                        <td>Termination Date</td>
-                        <td><strong>{moment(parms.killDate).format('MMM D, yyyy')}</strong></td>
-                        <td style={{borderTop: '1px solid #ccc', borderLeft: '1px solid #ccc', paddingLeft: '0.5em'}}>Carbohydrates</td>
-                        <td style={{borderTop: '1px solid #ccc'}}><strong>{carb.toFixed(0)} %</strong></td>
-                      </tr>
-
-                      <tr>
-                        <td>Dry Biomass</td>
-                        <td><strong>{(+parms.biomass).toFixed(0)} {parms.unit}</strong></td>
-                        <td style={{borderLeft: '1px solid #ccc', paddingLeft: '0.5em'}}>Holo-cellulose</td>
-                        <td><strong>{cell.toFixed(0)} %</strong></td>
-                      </tr>
-                          
-                      <tr>
-                        <td>Residue N Content</td>
-                        <td><strong>{((parms.biomass * parms.N) / 100).toFixed(0)} {parms.unit}</strong></td>
-                        <td style={{borderLeft: '1px solid #ccc', paddingLeft: '0.5em'}}>Lignin</td>
-                        <td><strong>{lign.toFixed(0)} %</strong></td>
                       </tr>
                     </tbody>
                   </table>

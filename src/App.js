@@ -529,7 +529,7 @@ const App = () => {
       location            : demo ? '' : '',
       nweeks              : 4,
       firstSSURGO         : true,
-      mockup              : 2,
+      mockup              : 1,
       species             : {},
       maxBiomass          : {},
       privacy             : false,
