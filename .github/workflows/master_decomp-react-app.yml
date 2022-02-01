@@ -23,8 +23,6 @@ jobs:
 
       - name: npm install, build, and test
         run: |
-          npm i react-scripts
-          npm install -g create-react-app@latest
           CI=false npm run build --if-present
 
       - name: Upload artifact for deployment job
