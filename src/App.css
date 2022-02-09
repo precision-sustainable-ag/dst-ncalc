@@ -81,7 +81,7 @@ nav {
   z-index: 999;
 }
 
-nav button {
+nav > :not(img):not(select) {
   flex-grow: 1;
   flex-basis: 0;
   font-weight: bold;
@@ -96,16 +96,20 @@ nav button {
   color: gray;
 }
 
-nav button:hover {
+nav > :not(img):not(select):hover {
   background: #eee;
 }
 
-nav button.selected {
+nav > .selected {
   color: #385E1B;
 }
 
-nav button:first-of-type {
+nav > :not(img):not(select):first-of-type {
   margin-left: 8rem;
+}
+
+nav img {
+  height: 2rem;
 }
 
 #Main {
@@ -118,10 +122,6 @@ nav button:first-of-type {
   position: absolute;
   left: 0;
   width: 100%;
-}
-
-nav img {
-  height: 2rem;
 }
 
 div.center {
@@ -174,10 +174,6 @@ div.bn {
   color: #4F6B14 !important;  /* Yeah, I know */
   position: relative;  
   top: 12px;  /* align with Input */
-}
-
-.slider * {
-  vertical-align: bottom;
 }
 
 .loading {
@@ -470,4 +466,28 @@ div.mockup1, div.mockup2, div.mockup3, div.mockup4, div.mockup5 {
 .close {
   float: right;
   cursor: pointer;
+}
+
+#CCQuality {
+  display: none;
+  position: absolute;
+  z-index: 999;
+  top: 2rem;
+  left: 52%;
+}
+
+button[data-scr=CoverCrop1]:hover ~ #CCQuality,
+#CCQuality:hover {
+  display: inline-block;
+}
+
+.slider * {
+  vertical-align: bottom;
+}
+
+.zslider2 {
+  position: absolute;
+  left: 3rem;
+  width: 20em;
+  ztop: 3em;
 }

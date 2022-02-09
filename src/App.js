@@ -185,7 +185,7 @@ const Screens = ({parms, props, set}) => {
     const base = new Airtable({apiKey: 'keySO0dHQzGVaSZp2'}).base('appOEj4Ag9MgTTrMg');
 
     airtable('PSA', (site) => {
-      // console.log(site);
+      localStorage.removeItem(site.ID);
       if (site.Hour === 0) {
         examples[site.ID] = {
           field             : site.ID,
@@ -297,6 +297,7 @@ const Screens = ({parms, props, set}) => {
         <button className={/Location/.test(screen)    ? 'selected' : undefined} data-scr="Location"   >Location</button>
         <button className={/Soil/.test(screen)        ? 'selected' : undefined} data-scr="Soil"       >Soil</button>
         <button className={/CoverCrop/.test(screen)   ? 'selected' : undefined} data-scr="CoverCrop1" >Cover Crop</button>
+        {/*  <button id="CCQuality" data-scr="CoverCrop2">Quality</button> */}
         <button className={/CashCrop/.test(screen)    ? 'selected' : undefined} data-scr="CashCrop"   >Cash Crop</button>
         <button className={/Output/.test(screen)      ? 'selected' : undefined} data-scr="Output"     >Output</button>
         {
@@ -479,36 +480,48 @@ const App = () => {
   } // runModel2
 
   const NDefaults = () => {
-    const carb = Math.min(100, Math.max(0, (24.7 + 10.5 * parms.N))).toFixed(0);
-    const cell = Math.min(100, Math.max(0, (69 - 10.2 * parms.N))).toFixed(0);
-    set.carb(carb);
-    set.cell(cell);
-    set.lign(100 - (+carb + +cell));
+    if (!parms.edited) {
+      const carb = Math.min(100, Math.max(0, (24.7 + 10.5 * parms.N))).toFixed(0);
+      const cell = Math.min(100, Math.max(0, (69 - 10.2 * parms.N))).toFixed(0);
+      set.carb(carb);
+      set.cell(cell);
+      set.lign(100 - (+carb + +cell));
+    }
   } // NDefaults
 
   const change = (parm, value, target, index) => {
   } // change
 
+  const query = (parm, def) => {
+    if (parm === 'covercrop' && params.get('covercrop')) {
+      return params.get(parm).split(',');
+    } else if (/date/.test(parm) && params.get(parm)) {
+      return moment(params.get(parm));
+    } else {
+      return params.get(parm) || def;
+    }
+  } // query
+
   let {parms, set, props} = defaults(
     change,
     {
-      field               : demo ? 'My field' : '',
+      field               : demo ? 'My field' : query('field', ''),
       targetN             : demo ? '150' : '150',
-      coverCrop           : demo ? ['Oats, Black'] : [],
-      killDate            : demo ? new Date('05/08/2021') : '',
+      coverCrop           : demo ? ['Oats, Black'] : query('covercrop', []),
+      killDate            : demo ? new Date('05/08/2021') : query('date1', ''),
       cashCrop            : demo ? 'Corn' : '',
-      plantingDate        : demo ? new Date('05/20/2021') : '',
-      lat                 : demo ? 32.5714 : 40.7849,
-      lon                 : demo ? -82.0760 : -74.8073,
-      N                   : demo ? 1.52 : '',
+      plantingDate        : demo ? new Date('05/20/2021') : query('date2', ''),
+      lat                 : demo ? 32.5714 : query('lat', 40.7849),
+      lon                 : demo ? -82.0760 : query('lon', -74.8073),
+      N                   : demo ? 1.52 : query('N', ''),
       InorganicN          : demo ? 10   : 10,
-      carb                : demo ? 44.34 : '',
-      cell                : demo ? 50.77 : '',
-      lign                : demo ? 4.88 : '',
+      carb                : demo ? 44.34 : query('carb', ''),
+      cell                : demo ? 50.77 : query('cell', ''),
+      lign                : demo ? 4.88 : query('lign', ''),
       lwc                 : 4,
       highOM              : 'No',
       nutrient            : 'Left on the surface',
-      biomass             : demo ? 5235 : '',
+      biomass             : demo ? 5235 : query('biomass', ''),
       mapZoom             : 13,
       mapType             : 'hybrid',
       model               : {},
@@ -533,6 +546,7 @@ const App = () => {
       species             : {},
       maxBiomass          : {},
       privacy             : false,
+      edited              : query('carb', false),
       effects : {
         lat           : runModel,
         lon           : runModel,
@@ -563,6 +577,15 @@ const params = new URLSearchParams(window.location.search);
 let demo = params.get('site');
 const isPSA = params.get('PSA');
 
+if (params.get('fy')) {
+  setTimeout(() => {
+    document.querySelector('button[data-scr=Output]').click();
+    setTimeout(() => {
+      window.close();
+    }, 2000);
+  }, 5000);
+}
+
 if (isPSA && !demo) {
   demo = 'AMD';
 }
@@ -576,6 +599,8 @@ if (examples[demo]) {
 }
 
 // localStorage.clear();
+
+localStorage.removeItem('AMD');
 
 document.title = 'CC-NCALC';
 

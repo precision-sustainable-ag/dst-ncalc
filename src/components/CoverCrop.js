@@ -172,6 +172,7 @@ const CoverCrop2 = ({props, parms, set, setScreen, update}) => {
           set={set}
           step={0.1}
           update={update}
+          onInput={() => set.edited(true)}
         />
 
         <p/>
@@ -196,6 +197,7 @@ const CoverCrop2 = ({props, parms, set, setScreen, update}) => {
           set={set}
           step={0.1}
           update={update}
+          onInput={() => set.edited(true)}
         />
 
         <p/>
@@ -218,6 +220,7 @@ const CoverCrop2 = ({props, parms, set, setScreen, update}) => {
           set={set}
           step={0.1}
           update={update}
+          onInput={() => set.edited(true)}
         />
       </div>
   

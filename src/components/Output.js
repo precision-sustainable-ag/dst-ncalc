@@ -8,6 +8,8 @@ import moment from 'moment';
 
 import { CSVLink } from "react-csv";
 
+const params = new URLSearchParams(window.location.search);
+
 const Output = ({props, parms, set, setScreen}) => {
   const doIncorporated = false;
 
@@ -71,8 +73,21 @@ const Output = ({props, parms, set, setScreen}) => {
   let date = new Date(parms.killDate);
   const surfaceData = [];
 
+  let m2;
+  let m4;
+  let mf;
+
   model.s[parms.outputN === 1 ? 'MinNfromFOM' : 'FOM'].forEach((d, i, a) => {
     const value = +(d / factor).toFixed(2);
+    
+    if (i === 24 * 2 * 7) {
+      m2 = value;
+    } else if (i === 24 * 4 * 7) {
+      m4 = value;
+    } else if (i === 24 * 13 * 7) {
+      mf = value;
+    }
+
     if (date.getHours() === 0) {
       surfaceData.push({
         x: +date,
@@ -113,6 +128,14 @@ const Output = ({props, parms, set, setScreen}) => {
   const incorporatedMin = parms.outputN === 1 ? (parms.biomass * parms.N) / 100 : Math.min.apply(Math, incorporatedData.map(d => d.y));
 
   const minDate = +parms.killDate;
+
+  let labModel = '';
+
+  if (params.get('fy')) {
+    const src = `http://aesl.ces.uga.edu/mineralization/client/surface/?fy=${params.get('fy')}&lab=${params.get('lab')}&modeled2=${m2}&modeled4=${m4}&modeled=${mf}`;
+
+    labModel = <iframe title="N/A" style={{display: 'none'}} src={src}/>
+  }
 
   Highcharts.setOptions({
     chart: {
@@ -293,7 +316,7 @@ const Output = ({props, parms, set, setScreen}) => {
                Cash crop recommended N rate<br>after accounting for cover crop N credits.
              </div>
             `,
-      verticalAlign: 'bottom'
+      verticalAlign: parms.mockup === 1 ? 'bottom' : 'top'
     },
     series: [
       /*
@@ -457,8 +480,35 @@ const Output = ({props, parms, set, setScreen}) => {
   const csv = 'Time,' + cols + '\n' + model.s.Rain.map((_, i) => i + ',' + cols.map(col => model.s[col][i])).join('\n');
 //  alert(csv);
 
+  const summary = 
+    <div className="inputs" style={{borderTop: parms.mockup === 1 ? '1px solid #bbb' : 'none', paddingTop: parms.mockup === 1 ? '1em' : 'none'}}>
+      By
+      &nbsp;
+      <select
+        {...props('nweeks')}
+        onChange={(e) => set.nweeks(e.target.value)}
+      >
+        {
+          Array(Math.round(parms.model.s.Date.length / 24 / 7)).fill().map((_, i) => <option key={i + 1}>{i + 1}</option>)
+        }
+      </select>
+      &nbsp;
+      week{parms.nweeks > 1 ? 's' : ''} after cover crop termination, 
+      {parms.outputN === 1 ? ' cumulative N released ' : ' undecomposed residue mass remaining '}
+      is:
+      <ul>
+        <li><strong>{Math.round(surfaceData[Math.min(parms.nweeks * 7, surfaceData.length - 1)].y)}</strong> {parms.unit} for surface residues.</li>
+        {
+          doIncorporated &&
+          <li>{Math.round(incorporatedData[Math.min(parms.nweeks * 7, incorporatedData.length - 1)].y)} {parms.unit} for incorporated residues.</li>
+        }
+        
+      </ul>
+    </div>
+
   return (
     <div id="Output" className="mockup">
+      {labModel}
       <CSVLink data={csv} className="download">Download</CSVLink>
 
       Mockup: &nbsp;
@@ -539,32 +589,12 @@ const Output = ({props, parms, set, setScreen}) => {
                   RESIDUE REMAINING
                 </button>
               </div>
+              
+              {parms.mockup === 2 && summary}
+
               <HighchartsReact highcharts={Highcharts} options={options}/>
               
-              <div className="inputs" style={{borderTop: '1px solid #bbb', paddingTop: '1em'}}>
-                By
-                &nbsp;
-                <select
-                  {...props('nweeks')}
-                  onChange={(e) => set.nweeks(e.target.value)}
-                >
-                  {
-                    Array(Math.round(parms.model.s.Date.length / 24 / 7)).fill().map((_, i) => <option key={i + 1}>{i + 1}</option>)
-                  }
-                </select>
-                &nbsp;
-                week{parms.nweeks > 1 ? 's' : ''} after cover crop termination, 
-                {parms.outputN === 1 ? ' cumulative N released ' : ' undecomposed residue mass remaining '}
-                is:
-                <ul>
-                  <li>{Math.round(surfaceData[Math.min(parms.nweeks * 7, surfaceData.length - 1)].y)} {parms.unit} for surface residues.</li>
-                  {
-                    doIncorporated &&
-                    <li>{Math.round(incorporatedData[Math.min(parms.nweeks * 7, incorporatedData.length - 1)].y)} {parms.unit} for incorporated residues.</li>
-                  }
-                  
-                </ul>
-              </div>
+              {parms.mockup === 1 && summary}
             </td>
           </tr>
         </tbody>
