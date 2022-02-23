@@ -56,6 +56,7 @@ import CashCrop   from './components/CashCrop';
 import Output     from './components/Output';
 import Feedback   from './components/Feedback';
 import Advanced   from './components/Advanced';
+import { Button } from '@mui/material';
 
 const Airtable = require('airtable');
 
@@ -303,7 +304,7 @@ const Screens = ({parms, props, set}) => {
         {/*  <button id="CCQuality" data-scr="CoverCrop2">Quality</button> */}
         <button className={/CashCrop/.test(screen)    ? 'selected' : undefined} data-scr="CashCrop"   >Cash Crop</button>
         <button className={/Output/.test(screen)      ? 'selected' : undefined} data-scr="Output"     >Output</button>
-        <button className={/Feedback/.test(screen)    ? 'selected' : undefined} data-scr="Feedback"   >Feedback</button>
+        <Button className={/Feedback/.test(screen)    ? 'selected' : undefined} data-scr="Feedback" variant="outlined" color="primary" >Feedback</Button>
         {
           isPSA ? 
             <select id="Fields"
@@ -512,9 +513,9 @@ const App = () => {
   let {parms, set, props} = defaults(
     change,
     {
-      name                : 'Rick',
-      email               : 'rickhitchcock@gmail.com',
-      feedback            : 'this is a test',
+      name                : '',
+      email               : '',
+      feedback            : '',
       field               : demo ? 'My field' : query('field', ''),
       targetN             : demo ? '150' : '150',
       coverCrop           : demo ? ['Oats, Black'] : query('covercrop', []),
