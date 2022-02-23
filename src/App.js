@@ -54,6 +54,7 @@ import Soil       from './components/Soil';
 import {CoverCrop1, CoverCrop2} from './components/CoverCrop';
 import CashCrop   from './components/CashCrop';
 import Output     from './components/Output';
+import Feedback   from './components/Feedback';
 import Advanced   from './components/Advanced';
 
 const Airtable = require('airtable');
@@ -103,6 +104,7 @@ const Screens = ({parms, props, set}) => {
     CoverCrop2,
     CashCrop,
     Output,
+    Feedback,
     Advanced,
   };
 
@@ -155,6 +157,7 @@ const Screens = ({parms, props, set}) => {
       // AutoComplete component doesn't understand autoFocus:
       let focus = scr === 'CoverCrop1' ? '#coverCrop' :
                   scr === 'CashCrop'   ? '#cashCrop'  :
+                  scr === 'Feedback'   ? '#Feedback'  :
                                          null;
         
       if (focus) {
@@ -300,6 +303,7 @@ const Screens = ({parms, props, set}) => {
         {/*  <button id="CCQuality" data-scr="CoverCrop2">Quality</button> */}
         <button className={/CashCrop/.test(screen)    ? 'selected' : undefined} data-scr="CashCrop"   >Cash Crop</button>
         <button className={/Output/.test(screen)      ? 'selected' : undefined} data-scr="Output"     >Output</button>
+        <button className={/Feedback/.test(screen)    ? 'selected' : undefined} data-scr="Feedback"   >Feedback</button>
         {
           isPSA ? 
             <select id="Fields"
@@ -508,6 +512,9 @@ const App = () => {
   let {parms, set, props} = defaults(
     change,
     {
+      name                : 'Rick',
+      email               : 'rickhitchcock@gmail.com',
+      feedback            : 'this is a test',
       field               : demo ? 'My field' : query('field', ''),
       targetN             : demo ? '150' : '150',
       coverCrop           : demo ? ['Oats, Black'] : query('covercrop', []),
@@ -555,7 +562,7 @@ const App = () => {
         lon           : runModel,
         plantingDate  : runModel,
         killDate      : runModel,
-        N             : runModel,
+        N             : [NDefaults, runModel],
         carb          : runModel,
         cell          : runModel,
         lign          : runModel,
@@ -564,7 +571,6 @@ const App = () => {
         // OM            : runModel,  // TODO
         // InorganicN    : runModel,  // TODO
         biomass       : runModel,
-        N             : NDefaults,
       }
     }
   );
