@@ -2,7 +2,20 @@ import {Input} from './Inputs';
 import { Button } from '@mui/material';
 
 const Feedback = ({set, parms, props}) => {
-  const submit = () => {
+  const submit = (e) => {
+    if (!parms.feedback.trim()) {
+      alert('Please enter Feedback before submitting.');
+      return
+    } else if (!parms.name.trim()) {
+      alert('Please enter Name before submitting.');
+      return;
+    } else if (!parms.email.trim()) {
+      alert('Please enter Email before submitting.');
+      return;
+    }
+
+    e.target.disabled = true;
+
     fetch(
       'https://weather.aesl.ces.uga.edu/cc-ncalc/feedback',
       {
@@ -21,6 +34,7 @@ ${parms.feedback}
       })
       .then(response => response.json())
       .then(data => {
+        e.target.disabled = false;
         alert(`
           Thank you for the feedback!
           We will contact you if we have any updates or questions.
@@ -30,7 +44,7 @@ ${parms.feedback}
   } // submit
 
   return (
-    <div class="feedback">
+    <div className="feedback">
       <h2>CC-NCALC Feedback</h2>
       <br/>
 
@@ -59,7 +73,7 @@ ${parms.feedback}
         <div>
           <Button
             variant="contained"
-            onClick={() => submit()}
+            onClick={(e) => submit(e)}
           >
             Submit
           </Button>
