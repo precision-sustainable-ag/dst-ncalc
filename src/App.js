@@ -54,7 +54,9 @@ import Soil       from './components/Soil';
 import {CoverCrop1, CoverCrop2} from './components/CoverCrop';
 import CashCrop   from './components/CashCrop';
 import Output     from './components/Output';
+import Feedback   from './components/Feedback';
 import Advanced   from './components/Advanced';
+import { Button } from '@mui/material';
 
 const Airtable = require('airtable');
 
@@ -103,6 +105,7 @@ const Screens = ({parms, props, set}) => {
     CoverCrop2,
     CashCrop,
     Output,
+    Feedback,
     Advanced,
   };
 
@@ -155,6 +158,7 @@ const Screens = ({parms, props, set}) => {
       // AutoComplete component doesn't understand autoFocus:
       let focus = scr === 'CoverCrop1' ? '#coverCrop' :
                   scr === 'CashCrop'   ? '#cashCrop'  :
+                  scr === 'Feedback'   ? '#Feedback'  :
                                          null;
         
       if (focus) {
@@ -300,6 +304,7 @@ const Screens = ({parms, props, set}) => {
         {/*  <button id="CCQuality" data-scr="CoverCrop2">Quality</button> */}
         <button className={/CashCrop/.test(screen)    ? 'selected' : undefined} data-scr="CashCrop"   >Cash Crop</button>
         <button className={/Output/.test(screen)      ? 'selected' : undefined} data-scr="Output"     >Output</button>
+        <Button className={/Feedback/.test(screen)    ? 'selected' : undefined} data-scr="Feedback" variant="outlined" color="primary" >Feedback</Button>
         {
           isPSA ? 
             <select id="Fields"
@@ -398,9 +403,12 @@ const App = () => {
     const In = parms.InorganicN || 10;
     const pmn = 10;
 
-    const ssurgoSrc = `https://weather.aesl.ces.uga.edu/ssurgo?lat=${parms.lat}&lon=${parms.lon}&component=major`;
+    const ssurgoSrc = params.get('dev') ? `https://weather.aesl.ces.uga.edu/ssurgo?lat=${parms.lat}&lon=${parms.lon}&component=major` :
+                                          `https://api.precisionsustainableag.org/ssurgo?lat=${parms.lat}&lon=${parms.lon}&component=major`
+
     // const modelSrc  = `https://weather.aesl.ces.uga.edu/cc-ncalc/both?lat=${parms.lat}&lon=${parms.lon}&start=${start}&end=${end}&n=${parms.N}&biomass=${biomass}&lwc=${lwc}&carb=${carb}&cell=${cell}&lign=${lign}&om=${om}&bd=${bd}&in=${In}&pmn=${pmn}`;
-    const modelSrc  = `https://weather.aesl.ces.uga.edu/cc-ncalc/surface?lat=${parms.lat}&lon=${parms.lon}&start=${start}&end=${end}&n=${parms.N}&biomass=${biomass}&lwc=${lwc}&carb=${carb}&cell=${cell}&lign=${lign}&om=${om}&bd=${bd}&in=${In}&pmn=${pmn}`;
+    const modelSrc  = params.get('dev') ? `https://weather.aesl.ces.uga.edu/cc-ncalc/surface?lat=${parms.lat}&lon=${parms.lon}&start=${start}&end=${end}&n=${parms.N}&biomass=${biomass}&lwc=${lwc}&carb=${carb}&cell=${cell}&lign=${lign}&om=${om}&bd=${bd}&in=${In}&pmn=${pmn}` :
+                                          `https://api.precisionsustainableag.org/cc-ncalc/surface?lat=${parms.lat}&lon=${parms.lon}&start=${start}&end=${end}&n=${parms.N}&biomass=${biomass}&lwc=${lwc}&carb=${carb}&cell=${cell}&lign=${lign}&om=${om}&bd=${bd}&in=${In}&pmn=${pmn}`
 
     set.gotSSURGO(false);
     set.gotModel(false);
@@ -505,6 +513,9 @@ const App = () => {
   let {parms, set, props} = defaults(
     change,
     {
+      name                : '',
+      email               : '',
+      feedback            : '',
       field               : demo ? 'My field' : query('field', ''),
       targetN             : demo ? '150' : '150',
       coverCrop           : demo ? ['Oats, Black'] : query('covercrop', []),
@@ -552,7 +563,7 @@ const App = () => {
         lon           : runModel,
         plantingDate  : runModel,
         killDate      : runModel,
-        N             : runModel,
+        N             : [NDefaults, runModel],
         carb          : runModel,
         cell          : runModel,
         lign          : runModel,
@@ -561,7 +572,6 @@ const App = () => {
         // OM            : runModel,  // TODO
         // InorganicN    : runModel,  // TODO
         biomass       : runModel,
-        N             : NDefaults,
       }
     }
   );
