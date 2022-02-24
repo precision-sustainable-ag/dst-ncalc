@@ -533,3 +533,10 @@ button[data-scr=Feedback] {
   right: calc(-3rem + 2px);
   top: calc(-2rem + 2px);
 }
+
+[contenteditable=true]:empty:before{
+  content: attr(placeholder);
+  pointer-events: none;
+  font-style: italic;
+  display: block; /* For Firefox */
+}
