@@ -21,6 +21,10 @@ ${parms.feedback}
       })
       .then(response => response.json())
       .then(data => {
+        alert(`
+          Thank you for the feedback!
+          We will contact you if we have any updates or questions.
+        `);
         console.log(JSON.stringify(data, null, 2));
       });
   } // submit
