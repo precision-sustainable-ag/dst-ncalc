@@ -233,18 +233,41 @@ const Screens = ({parms, props, set}) => {
   }, []);
 
   const loadField = (field) => {
-    const inputs = JSON.parse(localStorage[field]);
-    Object.keys(inputs).forEach(key => {
-      try {
-        if (/Date/.test(key)) {
-          set[key](new Date(inputs[key]));
-        } else {
-          set[key](inputs[key]);
+    if (field === 'Example run') {
+      setScreen('Location');
+      set.lat(32.865389);
+      set.lon(-82.258361);
+      set.location('Example');
+      set.field('Example run');
+      set.OM(0.75);
+      set.BD(1.62);
+      set.InorganicN(10);
+      set.coverCrop(['Oats, Black']);
+      set.killDate(new Date('04/27/2020'));
+      set.plantingDate(new Date('07/04/2020'));
+      set.biomass(1357);
+      set.lwc(4.15);
+      set.N(1.52);
+      set.carb(41);
+      set.cell(53);
+      set.lign(6);
+      set.cashCrop('Corn');
+      set.yield(150);
+      set.targetN(150);
+    } else {
+      const inputs = JSON.parse(localStorage[field]);
+      Object.keys(inputs).forEach(key => {
+        try {
+          if (/Date/.test(key)) {
+            set[key](new Date(inputs[key]));
+          } else {
+            set[key](inputs[key]);
+          }
+        } catch(e) {
+          console.log(key, e.message);
         }
-      } catch(e) {
-        console.log(key, e.message);
-      }
-    });
+      });
+    }
   } // loadField
 
   const changeScreen = (e) => {
@@ -256,7 +279,15 @@ const Screens = ({parms, props, set}) => {
   } // changeScreen
 
   const changeField=(e) => {
-    loadField(e.target.value);
+    const field = e.target.value;
+    if (field === 'Clear previous runs') {
+      if (window.confirm('Clear all previous runs?')) {
+        localStorage.clear();
+        setScreen('Home');
+      }
+    } else {
+      loadField(field);
+    }
   } // changeField
 
   const changePSA=(e) => {
@@ -304,7 +335,7 @@ const Screens = ({parms, props, set}) => {
         {/*  <button id="CCQuality" data-scr="CoverCrop2">Quality</button> */}
         <button className={/CashCrop/.test(screen)    ? 'selected' : undefined} data-scr="CashCrop"   >Cash Crop</button>
         <button className={/Output/.test(screen)      ? 'selected' : undefined} data-scr="Output"     >Output</button>
-        <Button className={/Feedback/.test(screen)    ? 'selected' : undefined} data-scr="Feedback" variant="outlined" color="primary" >Feedback</Button>
+        <Button className="feedback" data-scr="Feedback" variant="outlined" color="primary" >Feedback</Button>
         {
           isPSA ? 
             <select id="Fields"
@@ -328,11 +359,21 @@ const Screens = ({parms, props, set}) => {
               </optgroup>
             </select>
           :
-          Object.keys(localStorage).length ?
+          true || Object.keys(localStorage).length ?
             <select id="Fields"
               onChange={changeField}
+              value={parms.field}
             >
               <option></option>
+              <option>Example run</option>
+              {
+                Object.keys(localStorage).length && (
+                  <>
+                    <option>Clear previous runs</option>
+                    <option disabled>____________________</option>
+                  </>
+                )
+              }
               {
                 Object.keys(localStorage).sort().map((field, idx) => (
                   <option key={idx} checked={field === parms.field}>{field}</option>
@@ -612,11 +653,5 @@ let modelTimer;
 if (examples[demo]) {
   // parms = {...parms, ...examples[demo]}
 }
-
-// localStorage.clear();
-
-localStorage.removeItem('AMD');
-
-document.title = 'CC-NCALC';
 
 export default App;
