@@ -29,11 +29,32 @@ Name: ${parms.name}
 Email: ${parms.email}
 Feedback:
 ${parms.feedback}
+__________________________________
+field        : ${parms.field}
+targetN      : ${parms.targetN}
+coverCrop    : ${parms.coverCrop}
+killDate     : ${parms.killDate}
+cashCrop     : ${parms.cashCrop}
+plantingDate : ${parms.plantingDate}
+lat          : ${parms.lat}
+lon          : ${parms.lon}
+N            : ${parms.N}
+InorganicN   : ${parms.InorganicN}
+carb         : ${parms.carb}
+cell         : ${parms.cell}
+lign         : ${parms.lign}
+lwc          : ${parms.lwc}
+biomass      : ${parms.biomass}
+OM           : ${parms.OM}
+BD           : ${parms.BD}
+yield        : ${parms.yield}
+__________________________________
           `
         }),
       })
       .then(response => response.json())
       .then(data => {
+        console.log(data);
         e.target.disabled = false;
         alert(`
           Thank you for the feedback!
@@ -51,6 +72,12 @@ ${parms.feedback}
       <p>
         Explain your feedback as thoroughly as you can.<br/>
         Your feedback will help us improve the CC-NCALC experience.
+        <br/><br/>
+      </p>
+
+      <p>
+        Note that your inputs will be sent to us along with your feedback, in order to help us troubleshoot.
+        Please delete any personal information that you do not wish to share with us.
         <span style={{display: 'none'}}>You can attach a screenshot of your feedback below.</span>
       </p>
 
