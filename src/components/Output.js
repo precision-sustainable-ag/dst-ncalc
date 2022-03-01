@@ -468,7 +468,7 @@ const Output = ({props, parms, set, setScreen}) => {
   } // residueGraph
 
   if (parms.field) {
-    if (parms.field !== 'Example run') {
+    if (!/Example: Grass|Example: Legume/.test(parms.field)) {
       const clone = {...parms};
       delete clone.model;
 
