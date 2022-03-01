@@ -233,27 +233,48 @@ const Screens = ({parms, props, set}) => {
   }, []);
 
   const loadField = (field) => {
-    if (field === 'Example run') {
+    if (field === 'Example: Grass') {
       setScreen('Location');
       set.lat(32.865389);
       set.lon(-82.258361);
       set.location('Example');
-      set.field('Example run');
+      set.field('Example: Grass');
       set.OM(0.75);
       set.BD(1.62);
       set.InorganicN(10);
-      set.coverCrop(['Oats, Black']);
-      set.killDate(new Date('04/27/2020'));
-      set.plantingDate(new Date('07/04/2020'));
-      set.biomass(1357);
+      set.coverCrop(['Rye']);
+      set.killDate(new Date('03/21/2019'));
+      set.plantingDate(new Date('04/01/2019'));
+      set.biomass(1060);
       set.lwc(4.15);
-      set.N(1.52);
-      set.carb(41);
-      set.cell(53);
-      set.lign(6);
+      set.N(16.87 / 6.25);
+      set.carb(47.2);
+      set.cell(49.12);
+      set.lign(3.68);
       set.cashCrop('Corn');
       set.yield(150);
       set.targetN(150);
+    } else if (field === 'Example: Legume') {
+      setScreen('Location');
+      set.lat(32.865389);
+      set.lon(-82.258361);
+      set.location('Example');
+      set.field('Example: Legume');
+      set.OM(0.75);
+      set.BD(1.62);
+      set.InorganicN(10);
+      set.coverCrop(['Clover, Crimson']);
+      set.killDate(new Date('04/27/2019'));
+      set.plantingDate(new Date('05/15/2019'));
+      set.biomass(3400);
+      set.lwc(4.15);
+      set.N(18.92 / 6.25);
+      set.carb(55.04);
+      set.cell(40.43);
+      set.lign(4.53);
+      set.cashCrop('Corn');
+      set.yield(150);
+      set.targetN(100);
     } else {
       const inputs = JSON.parse(localStorage[field]);
       Object.keys(inputs).forEach(key => {
@@ -365,7 +386,8 @@ const Screens = ({parms, props, set}) => {
               value={parms.field}
             >
               <option></option>
-              <option>Example run</option>
+              <option>Example: Grass</option>
+              <option>Example: Legume</option>
               {
                 Object.keys(localStorage).length && (
                   <>
