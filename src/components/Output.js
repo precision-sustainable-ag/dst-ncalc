@@ -468,11 +468,13 @@ const Output = ({props, parms, set, setScreen}) => {
   } // residueGraph
 
   if (parms.field) {
-    const clone = {...parms};
-    delete clone.model;
+    if (parms.field !== 'Example run') {
+      const clone = {...parms};
+      delete clone.model;
 
-    console.log(clone);
-    localStorage.setItem(parms.field, JSON.stringify(clone));
+      console.log(parms);
+      localStorage.setItem(parms.field, JSON.stringify(clone));
+    }
   }
 
   const cols = Object.keys(model.s).sort((a, b) => a.toUpperCase().localeCompare(b.toUpperCase()));
@@ -507,104 +509,105 @@ const Output = ({props, parms, set, setScreen}) => {
     </div>
 
   return (
-    <div id="Output" className="mockup">
-      {labModel}
-      <CSVLink data={csv} className="download">Download</CSVLink>
+    <>
+      <div id="Output" className="mockup">
+        {labModel}
+        <CSVLink data={csv} className="download">Download</CSVLink>
 
-      Mockup: &nbsp;
-      <button
-       className={parms.mockup === 1 ? 'selected' : ''}
-       onClick={() => set.mockup(1)}
-      >
-        1
-      </button>
-      <button
-       className={parms.mockup === 2 ? 'selected' : ''}
-       onClick={() => set.mockup(2)}
-      >
-        2
-      </button>
+        Mockup: &nbsp;
+        <button
+        className={parms.mockup === 1 ? 'selected' : ''}
+        onClick={() => set.mockup(1)}
+        >
+          1
+        </button>
+        <button
+        className={parms.mockup === 2 ? 'selected' : ''}
+        onClick={() => set.mockup(2)}
+        >
+          2
+        </button>
 
-      <table style={{width: '100%'}}>
-        <tbody>
-          <tr>
-            <td>
-              <div>
-                <div className="inputs">
-                  <table 
-                    className="coverCropSummary"
-                    style={{width: '100%', textAlign: 'center', borderBottom: '1px solid #888'}}
-                  >
-                    <tbody>
-                      <tr>
-                        <td>
-                          <u>Field name</u><br/>
-                          (<strong>{parms.field}</strong>)
-                          <p></p>
-                          <u>Species</u><br/>
-                          (<strong>{parms.coverCrop.map((crop, i, a) => <span key={crop}>{crop}{i < a.length - 1 ? <br/> : ''}</span>)}</strong>)
-                          <p></p>
-                          <u>Termination Date</u><br/>
-                          (<strong>{moment(parms.killDate).format('MMM D, yyyy')}</strong>)
-                          <p></p>
-                          <u>Dry Biomass</u><br/>
-                          (<strong>{(+parms.biomass).toFixed(0)} {parms.unit}</strong>)
-                        </td>
-                        <td>
-                          <u>Residue N Content</u><br/>
-                          (<strong>{((parms.biomass * parms.N) / 100).toFixed(0)} {parms.unit}</strong>)
-                          <p></p>
-                          <u>Carbohydrates</u><br/>
-                          (<strong>{carb.toFixed(0)} %</strong>)
-                          <p></p>
-                          <u>Holo-cellulose</u><br/>
-                          (<strong>{cell.toFixed(0)} %</strong>)
-                          <p></p>
-                          <u>Lignin</u><br/>
-                          (<strong>{lign.toFixed(0)} %</strong>)
-                        </td>
-                      </tr>
-                    </tbody>
-                  </table>
+        <table style={{width: '100%'}}>
+          <tbody>
+            <tr>
+              <td>
+                <div>
+                  <div className="inputs">
+                    <table 
+                      className="coverCropSummary"
+                      style={{width: '100%', textAlign: 'center', borderBottom: '1px solid #888'}}
+                    >
+                      <tbody>
+                        <tr>
+                          <td>
+                            <u>Field name</u><br/>
+                            (<strong>{parms.field}</strong>)
+                            <p></p>
+                            <u>Species</u><br/>
+                            (<strong>{parms.coverCrop.map((crop, i, a) => <span key={crop}>{crop}{i < a.length - 1 ? <br/> : ''}</span>)}</strong>)
+                            <p></p>
+                            <u>Termination Date</u><br/>
+                            (<strong>{moment(parms.killDate).format('MMM D, yyyy')}</strong>)
+                            <p></p>
+                            <u>Dry Biomass</u><br/>
+                            (<strong>{(+parms.biomass).toFixed(0)} {parms.unit}</strong>)
+                          </td>
+                          <td>
+                            <u>Residue N Content</u><br/>
+                            (<strong>{((parms.biomass * parms.N) / 100).toFixed(0)} {parms.unit}</strong>)
+                            <p></p>
+                            <u>Carbohydrates</u><br/>
+                            (<strong>{carb.toFixed(0)} %</strong>)
+                            <p></p>
+                            <u>Holo-cellulose</u><br/>
+                            (<strong>{cell.toFixed(0)} %</strong>)
+                            <p></p>
+                            <u>Lignin</u><br/>
+                            (<strong>{lign.toFixed(0)} %</strong>)
+                          </td>
+                        </tr>
+                      </tbody>
+                    </table>
+                  </div>
                 </div>
-              </div>
 
-              <HighchartsReact highcharts={Highcharts} options={NGraph} className="hidden" />
-              {(parms.outputN === 1 && parms.targetN < surfaceNPredict) && <div class="footnote">* Your cover crop is supplying all of your needs.</div>}
-              <HighchartsReact highcharts={Highcharts} options={residueGraph} />
-            </td>
-            <td>
-              <div className="output center" style={{marginBottom: '1em'}}>
-                <button
-                  className={parms.outputN === 1 ? 'selected' : ''}
-                  onClick={() => set.outputN(1)}
-                >
-                  N RELEASED
-                </button>
+                <HighchartsReact highcharts={Highcharts} options={NGraph} className="hidden" />
+                {(parms.outputN === 1 && parms.targetN < surfaceNPredict) && <div class="footnote">* Your cover crop is supplying all of your needs.</div>}
+                <HighchartsReact highcharts={Highcharts} options={residueGraph} />
+              </td>
+              <td>
+                <div className="output center" style={{marginBottom: '1em'}}>
+                  <button
+                    className={parms.outputN === 1 ? 'selected' : ''}
+                    onClick={() => set.outputN(1)}
+                  >
+                    N RELEASED
+                  </button>
+                  
+                  <button
+                    className={parms.outputN === 2 ? 'selected' : ''}
+                    onClick={() => set.outputN(2)}
+                  >
+                    RESIDUE REMAINING
+                  </button>
+                </div>
                 
-                <button
-                  className={parms.outputN === 2 ? 'selected' : ''}
-                  onClick={() => set.outputN(2)}
-                >
-                  RESIDUE REMAINING
-                </button>
-              </div>
-              
-              {parms.mockup === 2 && summary}
+                {parms.mockup === 2 && summary}
 
-              <HighchartsReact highcharts={Highcharts} options={options}/>
-              
-              {parms.mockup === 1 && summary}
-            </td>
-          </tr>
-        </tbody>
-      </table>
-
+                <HighchartsReact highcharts={Highcharts} options={options}/>
+                
+                {parms.mockup === 1 && summary}
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
       <div className="bn">
         <button onClick={() => setScreen('CashCrop')}>BACK</button>
         <button onClick={() => setScreen('Advanced')}>ADVANCED</button>
       </div>
-    </div>
+    </>
   )
 } // Output
 

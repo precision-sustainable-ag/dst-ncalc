@@ -309,8 +309,8 @@ const CashCrops = ({props}) => {
 const CashCrop = ({props, parms, set, setScreen}) => {
   return (
     <>
+      <h1>Tell us about your Cash Crop</h1>
       <div className="inputs">
-        <h1>Tell us about your Cash Crop</h1>
         <p>Cash Crop:</p>
         <CashCrops props={props} />
 
