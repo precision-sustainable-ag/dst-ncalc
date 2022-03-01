@@ -351,6 +351,11 @@ const Screens = ({parms, props, set}) => {
         parms: parms,
         setScreen: setScreen,
       })}
+      <footer>
+        <a href="https://precisionsustainableag.org/">
+          <img alt="logo" src="PSALogo.png"/>
+        </a>
+      </footer>
     </div>
   );
 } // Screens
