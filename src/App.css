@@ -339,11 +339,6 @@ input::-webkit-inner-spin-button {
   right: 5px;
 }
 
-.advanced {
-  zoom: 0.5;
-  display: inline-block;
-}
-
 .highcharts-point {
   zoom: 50 !important;
   zdisplay: none;
@@ -559,4 +554,35 @@ footer img {
 
 #Fields {
   width: 10em;
+}
+
+#Advanced {
+  margin-bottom: 5rem;
+  background: #eee;
+  text-align: center;
+  padding: 1rem;
+}
+
+.advanced {
+  zoom: 0.5;
+  display: inline-block;
+  margin: 0.5rem;
+  border: 1px solid #aaa;
+  position: relative;
+}
+
+.zoom {
+  position: absolute;
+  right: 0.3rem;
+  top: 0.3rem;
+  z-index: 1;
+  zoom: 2;
+}
+
+.zoomed {
+  position: fixed;
+  top: 10rem;
+  bottom: 10rem;
+  left: 10rem;
+  right: 10rem;
 }

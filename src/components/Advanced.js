@@ -4,6 +4,14 @@ import Highcharts from 'highcharts';
 
 import HighchartsReact from 'highcharts-react-official';
 
+import ZoomInIcon from '@mui/icons-material/ZoomIn';
+
+const zoomIn = (e) => {
+  const div = e.target.closest('.parent');
+  div.classList.toggle('advanced');
+  div.classList.toggle('zoomed');
+} // zoomIn
+
 const Advanced = ({parms, setScreen}) => {
   const factor = parms.unit === 'lb/ac' ? 1.12085 : 1;
 
@@ -125,16 +133,18 @@ const Advanced = ({parms, setScreen}) => {
     };
 
     return (
-      <HighchartsReact highcharts={Highcharts} options={options}/>
+      <div className="advanced parent">
+        <HighchartsReact highcharts={Highcharts} options={options}/>
+      </div>
     )
   }
   
   return (
     <div id="Advanced">
       {
-        ['RH', 'Rain', 'Temp', 'FOM', 'FON', 'Carb', 'Cell', 'Lign', '%_lignin', 'a', 'Air_MPa', 'b', 'CarbK', 'CarbN', 'CellK', 'CellN', 'CNR', 'CNRF', 'ContactFactor', 'Critical_FOM', 'DeCarb', 'DeCell', 'DeLign', 'Depth_layer_cm', 'Dew', 'Dminr', 'Evaporation', 'FAC', 'FOMNhum', 'FromAir', 'FromDew', 'FromRain', 'GRCom', 'GRCom1', 'GRCom2', 'GRCom3', 'GRNom', 'GrNom1', 'GRNom2', 'GRNOm3', 'Hum', 'HumMin', 'HumN', 'InitialFOMN_kg/ha', 'INkg', 'INppm', 'k_4', 'k1', 'k3', 'LigninN', 'LignK', 'Litter_MPa_Gradient', 'LitterMPa', 'LitterWaterContent', 'MinFromFOMRate', 'MinFromHumRate', 'MinNfromFOM', 'MinNfromHum', 'NAllocationFactor', 'NetMin', 'NImmobFromFOM', 'NimmobIntoCarbN', 'Noname_1', 'Noname_2', 'PMNhotKCl', 'PrevLitWC', 'PrevRH', 'RainToGetCurrentWC', 'Resistant', 'RHChange', 'RhMin', 'RMTFAC', 'RNAC', 'Sat', 'SOCpct', 'WaterLossFromEvap', 'WCFromRain']
+        ['RH', 'Rain', 'Temp', 'FOM', 'FON', 'Carb', 'Cell', 'Lign', '%_lignin', 'a', 'CarbK', 'CarbN', 'CellN', 'CNR', 'Dew', 'Evaporation', 'FOMNhum', 'FromAir', 'FromRain', 'GRCom', 'GRCom1', 'GRCom2', 'GRCom3', 'GRNom', 'GrNom1', 'GRNom2', 'HumMin', 'INkg', 'k_4', 'LigninN', 'Litter_MPa_Gradient', 'LitterMPa', 'LitterWaterContent', 'MinFromFOMRate', 'MinFromHumRate', 'MinNfromFOM', 'MinNfromHum', 'NetMin', 'NImmobFromFOM', 'PrevLitWC', 'PrevRH', 'RainToGetCurrentWC', 'Resistant', 'RHChange', 'RhMin', 'RMTFAC', 'WaterLossFromEvap', 'WCFromRain']
           .slice(0, 80)
-          .map(parm => <div className="advanced"> <Chart parm={parm} /> </div>)
+          .map(parm => <Chart parm={parm} />)
       }
 
       <div className="bn">
