@@ -235,6 +235,7 @@ const Screens = ({parms, props, set}) => {
   const loadField = (field) => {
     if (field === 'Example: Grass') {
       setScreen('Location');
+      set.edited(true);
       set.lat(32.865389);
       set.lon(-82.258361);
       set.location('Example');
@@ -245,17 +246,18 @@ const Screens = ({parms, props, set}) => {
       set.coverCrop(['Rye']);
       set.killDate(new Date('03/21/2019'));
       set.plantingDate(new Date('04/01/2019'));
-      set.biomass(1060);
-      set.lwc(4.15);
-      set.N(16.87 / 6.25);
-      set.carb(47.2);
-      set.cell(49.12);
-      set.lign(3.68);
+      set.biomass(5000);
+      set.lwc(1.486);
+      set.N(0.6);
+      set.carb(33.45);
+      set.cell(57.81);
+      set.lign(8.74);
       set.cashCrop('Corn');
       set.yield(150);
       set.targetN(150);
     } else if (field === 'Example: Legume') {
       setScreen('Location');
+      set.edited(true);
       set.lat(32.865389);
       set.lon(-82.258361);
       set.location('Example');
@@ -266,12 +268,12 @@ const Screens = ({parms, props, set}) => {
       set.coverCrop(['Clover, Crimson']);
       set.killDate(new Date('04/27/2019'));
       set.plantingDate(new Date('05/15/2019'));
-      set.biomass(3400);
-      set.lwc(4.15);
-      set.N(18.92 / 6.25);
-      set.carb(55.04);
-      set.cell(40.43);
-      set.lign(4.53);
+      set.biomass(3500);
+      set.lwc(7.4);
+      set.N(3.5);
+      set.carb(56.18);
+      set.cell(36.74);
+      set.lign(7.08);
       set.cashCrop('Corn');
       set.yield(150);
       set.targetN(100);

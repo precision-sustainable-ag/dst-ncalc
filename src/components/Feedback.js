@@ -25,12 +25,12 @@ const Feedback = ({set, parms, props}) => {
         },
         body: JSON.stringify({
           feedback: `
-Name: ${parms.name}
-Email: ${parms.email}
+Name: ${parms.name.replace(/"/g, '')}
+Email: ${parms.email.replace(/"/g, '')}
 Feedback:
-${parms.feedback}
+${parms.feedback.replace(/"/g, '')}
 __________________________________
-field        : ${parms.field}
+field        : ${parms.field.replace(/"/g, '')}
 targetN      : ${parms.targetN}
 coverCrop    : ${parms.coverCrop}
 killDate     : ${parms.killDate}
