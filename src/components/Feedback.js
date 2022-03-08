@@ -70,8 +70,8 @@ __________________________________
       <br/>
 
       <p>
-        Explain your feedback as thoroughly as you can.<br/>
-        Your feedback will help us improve the CC-NCALC experience.
+        Please provide any comments or suggestions that will help us improve the tool.<br/>
+        Include any difficulties you may have encountered while running the program.
         <br/><br/>
       </p>
 
@@ -84,6 +84,7 @@ __________________________________
       <div
         id="Feedback"
         contentEditable
+        placeholder="Enter comments here"
         dangerouslySetInnerHTML={{ __html: parms.feedback }}
         onBlur={(e) => set.feedback(e.currentTarget.innerText.replace(/[\n\r]/g, '<br>'))}
       />
