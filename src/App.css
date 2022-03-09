@@ -79,6 +79,13 @@ nav {
   top: 0;
   background: white;
   z-index: 999;
+  height: 3rem;
+  vertical-align: bottom;
+}
+
+nav select {
+  height: 1.2rem;
+  vertical-align: bottom;
 }
 
 nav > :not(img):not(select) {
@@ -105,7 +112,7 @@ nav > .selected {
 }
 
 nav > :not(select):first-of-type {
-  margin-left: 60px;
+  margin-left: 85px;
 }
 
 nav img {
@@ -119,7 +126,7 @@ nav img {
 }
 
 .fullwidth {
-  margin-top: 1em;
+  margin-top: 3rem;
   position: absolute;
   left: 0;
   width: 100%;
@@ -435,7 +442,7 @@ div.mockup1, div.mockup2, div.mockup3, div.mockup4, div.mockup5 {
 #Privacy {
   position: absolute;
   right: 0;
-  top: 4.5rem;
+  top: 5.5rem;
   padding: 0.5rem;
   font-size: 0.8rem;
   width: auto;
@@ -555,6 +562,7 @@ footer img {
 
 #Fields {
   width: 10em;
+  margin-top: 1rem;
 }
 
 #Advanced {
@@ -590,8 +598,8 @@ footer img {
 
 #PSALogo {
   position: absolute;
-  top: 0.3rem;
-  left: 0.3rem;
+  top: 0.8rem;
+  left: 0.8rem;
   z-index: 100000;
-  zheight: 100%;
+  transform: scale(1.1);
 }
