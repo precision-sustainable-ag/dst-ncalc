@@ -573,7 +573,7 @@ footer img {
 }
 
 .advanced {
-  zoom: 0.5;
+  ztransform: scale(0.5);
   display: inline-block;
   margin: 0.5rem;
   border: 1px solid #aaa;

@@ -76,6 +76,7 @@ const Output = ({props, parms, set, setScreen}) => {
   let m2;
   let m4;
   let mf;
+  const dates = [];
 
   model.s[parms.outputN === 1 ? 'MinNfromFOM' : 'FOM'].forEach((d, i, a) => {
     const value = +(d / factor).toFixed(2);
@@ -87,6 +88,8 @@ const Output = ({props, parms, set, setScreen}) => {
     } else if (i === 24 * 13 * 7) {
       mf = value;
     }
+
+    dates.push(moment(date).format('YYYY-MM-DD HH:mm'));
 
     if (date.getHours() === 0) {
       surfaceData.push({
@@ -477,10 +480,12 @@ const Output = ({props, parms, set, setScreen}) => {
     }
   }
 
-  const cols = Object.keys(model.s).sort((a, b) => a.toUpperCase().localeCompare(b.toUpperCase()));
+  // const cols = Object.keys(model.s).sort((a, b) => a.toUpperCase().localeCompare(b.toUpperCase())).slice(0, 10);
 
-  const csv = 'Time,' + cols + '\n' + model.s.Rain.map((_, i) => i + ',' + cols.map(col => model.s[col][i])).join('\n');
-//  alert(csv);
+  const cols = ['FOM', 'Carb', 'Cell', 'Lign', 'FON', 'CarbN', 'CellN', 'LigninN', 'RMTFAC', 'CNRF', 'ContactFactor', 'Rain', 'Temp', 'RH', 'Air_MPa', 'LitterMPa'];
+
+  // const csv = 'Date,' + cols + '\n' + model.s.Rain.map((_, i) => i + ',' + cols.map(col => model.s[col][i])).join('\n');
+  const csv = 'Date,' + cols + '\n' + dates.map((date, i) => date + ',' + cols.map(col => model.s[col][i])).join('\n');
 
   const summary = 
     <div className="inputs" style={{borderTop: parms.mockup === 1 ? '1px solid #bbb' : 'none', paddingTop: parms.mockup === 1 ? '1em' : 'none'}}>
