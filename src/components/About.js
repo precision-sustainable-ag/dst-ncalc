@@ -54,6 +54,10 @@ const About = ({setScreen}) => (
     <div className="center">
       <button onClick={() => setScreen('Location')}>GET STARTED</button>
     </div>
+
+    <p style={{fontSize: "90%"}}>
+      <em>For more information about <strong>Precision Sustainable Agriculture</strong> projects, please visit <a href="https://precisionsustainableag.org/">https://precisionsustainableag.org/</a>.</em>
+    </p>
   </div>
 ) // About
 

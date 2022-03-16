@@ -349,8 +349,9 @@ const Screens = ({parms, props, set}) => {
 
       id="Main"
     >
+      <img alt="logo" src="PSALogo.png" id="PSALogo"/>
+
       <nav onClick={changeScreen}>
-        <img src="logo.png" alt="" />
         <button className={/Home|About/.test(screen)  ? 'selected' : undefined} data-scr="Home"       >Home</button>
         <button className={/Location/.test(screen)    ? 'selected' : undefined} data-scr="Location"   >Location</button>
         <button className={/Soil/.test(screen)        ? 'selected' : undefined} data-scr="Soil"       >Soil</button>
@@ -416,11 +417,6 @@ const Screens = ({parms, props, set}) => {
         parms: parms,
         setScreen: setScreen,
       })}
-      <footer>
-        <a href="https://precisionsustainableag.org/">
-          <img alt="logo" src="PSALogo.png"/>
-        </a>
-      </footer>
     </div>
   );
 } // Screens
@@ -623,7 +619,7 @@ const App = () => {
       location            : demo ? '' : '',
       nweeks              : 4,
       firstSSURGO         : true,
-      mockup              : 1,
+      mockup              : 2,
       species             : {},
       maxBiomass          : {},
       privacy             : false,

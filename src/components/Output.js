@@ -76,6 +76,7 @@ const Output = ({props, parms, set, setScreen}) => {
   let m2;
   let m4;
   let mf;
+  const dates = [];
 
   model.s[parms.outputN === 1 ? 'MinNfromFOM' : 'FOM'].forEach((d, i, a) => {
     const value = +(d / factor).toFixed(2);
@@ -87,6 +88,8 @@ const Output = ({props, parms, set, setScreen}) => {
     } else if (i === 24 * 13 * 7) {
       mf = value;
     }
+
+    dates.push(moment(date).format('YYYY-MM-DD HH:mm'));
 
     if (date.getHours() === 0) {
       surfaceData.push({
@@ -176,7 +179,7 @@ const Output = ({props, parms, set, setScreen}) => {
       text: parms.mockup === 2 ? (
               parms.outputN === 1 && cornN ? '<div class="caption">Cover crop N released and Corn N uptake over time.</div>' :
               parms.outputN === 1          ? '<div class="caption">Cover crop N released over time.</div>'
-                                            : '<div class="caption">Undecomposed cover crop residue mass remaining over time following its termination.</div>'
+                                            : '<div class="caption">Undecomposed cover crop residue mass<br/>remaining over time following its termination.</div>'
             ) : ''
     },
     series: [
@@ -409,7 +412,7 @@ const Output = ({props, parms, set, setScreen}) => {
     },
     title: {
       text: `<div class="caption">Cover crop residue mass remaining<br>after ${Math.floor(parms.model.s.Date.length / (24 * 7))} weeks past termination.</div>`,
-      verticalAlign: 'bottom'
+      verticalAlign: parms.mockup === 1 ? 'bottom' : 'top'
     },
     xAxis: {
       categories: 
@@ -477,10 +480,12 @@ const Output = ({props, parms, set, setScreen}) => {
     }
   }
 
-  const cols = Object.keys(model.s).sort((a, b) => a.toUpperCase().localeCompare(b.toUpperCase()));
+  // const cols = Object.keys(model.s).sort((a, b) => a.toUpperCase().localeCompare(b.toUpperCase())).slice(0, 10);
 
-  const csv = 'Time,' + cols + '\n' + model.s.Rain.map((_, i) => i + ',' + cols.map(col => model.s[col][i])).join('\n');
-//  alert(csv);
+  const cols = ['FOM', 'Carb', 'Cell', 'Lign', 'FON', 'CarbN', 'CellN', 'LigninN', 'RMTFAC', 'CNRF', 'ContactFactor', 'Rain', 'Temp', 'RH', 'Air_MPa', 'LitterMPa'];
+
+  // const csv = 'Date,' + cols + '\n' + model.s.Rain.map((_, i) => i + ',' + cols.map(col => model.s[col][i])).join('\n');
+  const csv = 'Date,' + cols + '\n' + dates.map((date, i) => date + ',' + cols.map(col => model.s[col][i])).join('\n');
 
   const summary = 
     <div className="inputs" style={{borderTop: parms.mockup === 1 ? '1px solid #bbb' : 'none', paddingTop: parms.mockup === 1 ? '1em' : 'none'}}>
@@ -514,19 +519,21 @@ const Output = ({props, parms, set, setScreen}) => {
         {labModel}
         <CSVLink data={csv} className="download">Download</CSVLink>
 
-        Mockup: &nbsp;
-        <button
-        className={parms.mockup === 1 ? 'selected' : ''}
-        onClick={() => set.mockup(1)}
-        >
-          1
-        </button>
-        <button
-        className={parms.mockup === 2 ? 'selected' : ''}
-        onClick={() => set.mockup(2)}
-        >
-          2
-        </button>
+        <div style={{display: 'none'}}>
+          Mockup: &nbsp;
+          <button
+          className={parms.mockup === 1 ? 'selected' : ''}
+          onClick={() => set.mockup(1)}
+          >
+            1
+          </button>
+          <button
+          className={parms.mockup === 2 ? 'selected' : ''}
+          onClick={() => set.mockup(2)}
+          >
+            2
+          </button>
+        </div>
 
         <table style={{width: '100%'}}>
           <tbody>
@@ -606,6 +613,7 @@ const Output = ({props, parms, set, setScreen}) => {
       <div className="bn">
         <button onClick={() => setScreen('CashCrop')}>BACK</button>
         <button onClick={() => setScreen('Advanced')}>ADVANCED</button>
+        <button onClick={() => setScreen('Feedback')}>FEEDBACK</button>
       </div>
     </>
   )
