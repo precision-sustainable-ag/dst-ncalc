@@ -326,6 +326,12 @@ const Screens = ({parms, props, set}) => {
     // window.location = `?PSA=true&demo=${e.target.value}`;
   } // changePSA
 
+  useEffect(() => {
+    if (params.get('dev')) {
+      loadField('Example: Grass');
+    }
+  }, []);
+
   return (
     <div
       tabIndex="0"
@@ -359,6 +365,11 @@ const Screens = ({parms, props, set}) => {
         {/*  <button id="CCQuality" data-scr="CoverCrop2">Quality</button> */}
         <button className={/CashCrop/.test(screen)    ? 'selected' : undefined} data-scr="CashCrop"   >Cash Crop</button>
         <button className={/Output/.test(screen)      ? 'selected' : undefined} data-scr="Output"     >Output</button>
+        {
+          params.get('dev') && 
+          <button className={/Advanced/.test(screen)    ? 'selected' : undefined} data-scr="Advanced"   >Advanced</button>
+        }
+        
         <Button className="feedback" data-scr="Feedback" variant="outlined" color="primary" >Feedback</Button>
         {
           isPSA ? 

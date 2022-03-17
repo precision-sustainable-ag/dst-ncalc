@@ -88,7 +88,7 @@ const CoverCrop1 = ({props, parms, set, setScreen}) => {
           set={set}
         />
         
-        {parms.biomass > max &&
+        {+parms.biomass > +max &&
           <p className="warning">
             This biomass seems too high{parms.coverCrop.length > 1 ? ' for these particular species' : parms.coverCrop.length ? ' for this particular species' : ''}.<br/>
             Please make sure the biomass entered is on a dry matter basis.

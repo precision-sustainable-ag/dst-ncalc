@@ -14,6 +14,18 @@ const zoomIn = (e) => {
 
 const Advanced = ({parms, setScreen}) => {
   // const factor = parms.unit === 'lb/ac' ? 1.12085 : 1;
+  if (!parms.gotModel || !parms.model || !parms.biomass || !parms.N || !parms.carb || !parms.cell || !parms.lign || !parms.lwc || !parms.BD || !parms.InorganicN) {
+    return (
+      <div className="loading">
+        <p>Loading Output</p>
+        <p>Please wait</p>
+        <span></span>
+        <span></span>
+        <span></span>
+      </div>
+    );
+  }
+
   const factor = 1;
 
   const model = parms.model;
@@ -31,10 +43,10 @@ const Advanced = ({parms, setScreen}) => {
 
   const Chart = ({parm}) => {
     let date;
-    const stacked = Array.isArray(parm);
+    const stacked = /Carb/.test(parm); // Array.isArray(parm);
     const series = [];
-    const colors = ['#6b9333', 'brown', 'blue'];
-
+    const colors = ['#6b9333', 'blue', 'brown'];
+// alert(`<div style={{color: ${colors[0]}}}>Rainfall (mm)</div><div style={{color: ${colors[1]}}}}>Air temperature (&deg;C)</div>`);
     [parm].flat().forEach((parm, i) => {
       const cdata = [];
       date = new Date(parms.killDate);
@@ -65,10 +77,27 @@ const Advanced = ({parms, setScreen}) => {
         date.setHours(date.getHours() + 1)
       });
       series.push({
-        name: parm,
+        name: {
+          Carb: 'Carbohydrates',
+          Cell: 'Holo-cellulose',
+          Lign: 'Lignin',
+          CarbN: 'Carbohydrates',
+          CellN: 'Holo-cellulose',
+          LigninN: 'Lignin',
+          Rain: 'Rainfall',
+          Temp: 'Air temperature',
+          RH: 'Relative humidity',
+          CNRF: 'C:N ratio factor',
+          RMTFAC: 'Water potential gradient',
+          ContactFactor: 'Residue contact factor',
+          LitterMPa: 'Litter water potential',
+          Air_MPa: 'Air pressure',
+        }[parm] || parm,
+        ztype: 'spline',
+        yAxis: /(RH)/.test(parm) ? 1 : 0,
         data: cdata,
         color: colors[i],
-        showInLegend: false,
+        showInLegend: true || /(Carb|Cell|Lign|Rain|Temp|RH|CNRF|RMTFAC|ContactFactor)/.test(parm),
       });
     })
 
@@ -95,7 +124,7 @@ const Advanced = ({parms, setScreen}) => {
       tooltip: {
         shared: true,
         useHTML: true,
-        formatter: function() {
+        zformatter: function() {
           const week = Math.floor((this.x - minDate) / (24 * 3600 * 1000) / 7);
   
           return this.points.reduce((s, point) => (
@@ -105,21 +134,18 @@ const Advanced = ({parms, setScreen}) => {
       },
       title: {
         text: {
-          RH      : 'Relative Humidity',
-          Rain    : 'Rainfall',
-          Temp    : 'Air Temperature',
-          FOM     : 'Fresh Organic Matter',
-          FON     : 'Fresh Organic Nitrogen',
-          'Carb,Cell,Lign' : `Carbohydrates, <span style="color: ${colors[1]}">Cellulose</span>, <span style="color: ${colors[2]}">Lignin</span>`,
-          'CarbN,CellN,LigninN' : `Carbohydrates, <span style="color: ${colors[1]}">Cellulose</span>, <span style="color: ${colors[2]}">Lignin</span>`,
-        }[parm] || parm,
+          'Carb,Cell,Lign'      : 'Fresh Organic Matter',
+          'CarbN,CellN,LigninN' : 'Fresh Organic Nitrogen',
+          'zRain,Temp,RH'  : 'Weather',
+          'zRMTFAC,CNRF,ContactFactor' : ' ',
+        }[parm],
         style: {
           color: colors[0],
           padding: 0,
           margin: 0
         }
       },
-      subtitle: {
+      zsubtitle: {
         text: {
           RH      : ``,
           Rain    : `mm`,
@@ -136,22 +162,6 @@ const Advanced = ({parms, setScreen}) => {
         }
       },
       series: series,
-      yAxis: [
-        {
-          title: {
-            text: '',
-            style: {
-              fontSize: '14px',
-              fontWeight: 'bold',
-              color: '#6B9333'
-            }
-          },
-          zmin: 0,
-          endOnTick: false,
-          minorTicks: true,
-          lineWidth: 3
-        }
-      ],
       xAxis: [
         {
           type: 'datetime',
@@ -183,7 +193,41 @@ const Advanced = ({parms, setScreen}) => {
           }],
           */
         },
-      ]
+      ],
+      yAxis: [
+        {
+          title: {
+            text: /Rain/.test(parm) ? `<div style="color: ${colors[0]}">Rainfall (mm)</div><br><div style="color: ${colors[1]}">Air temperature (&deg;C)</div>` : 
+                  /Carb/.test(parm) ? 'kg/ha' :
+                  /LitterMPa|Air_MPa/.test(parm) ? 'MPa' :
+                  '',
+            style: {
+              fontWeight: 'bold'
+            }
+          },
+          zmin: 0,
+          endOnTick: false,
+          minorTicks: true,
+          lineWidth: 3,
+        },
+        { // Secondary yAxis
+          gridLineWidth: 0,
+          title: {
+            text: /RH/.test(parm) ? 'Relative humidity (%)' : '',
+            style: {
+              color: colors[2],
+              fontWeight: 'bold',
+            }
+          },
+          zlabels: {
+            format: '{value} mm',
+            style: {
+              color: Highcharts.getOptions().colors[0]
+            }
+          },
+          opposite: true
+        }
+      ],
     };
 
     return (
@@ -195,33 +239,29 @@ const Advanced = ({parms, setScreen}) => {
   
   return (
     <div id="Advanced">
-      <h2>Residue mass related variables</h2>
-      {
-        ['FOM', ['Carb', 'Cell', 'Lign']]
-          .map(parm => <Chart parm={parm} />)
-      }
+      <div style={{display: 'inline-block'}}>
+        <h3>Residue mass related variables</h3>
+        <Chart parm={['Carb', 'Cell', 'Lign']} />
+      </div>
 
-      <h2>Residue N related variables</h2>
-      {
-        ['FON', ['CarbN', 'CellN', 'LigninN']]
-          .map(parm => <Chart parm={parm} />)
-      }
+      <div style={{display: 'inline-block'}}>
+        <h3>Residue N related variables</h3>
+        <Chart parm={['CarbN', 'CellN', 'LigninN']} />
+      </div>
 
-      <h2>Adjustment factors</h2>
-      {
-        ['RMTFAC', 'CNRF', 'ContactFactor']
-          .map(parm => <Chart parm={parm} />)
-      }
+      <div style={{display: 'inline-block'}}>
+        <h3>Decay rate adjustment factors</h3>
+        <Chart parm={['RMTFAC', 'CNRF', 'ContactFactor']} />
+      </div>
 
-      <h2>Weather Information</h2>
-      {
-        ['Rain', 'Temp', 'RH', 'Air_MPa']
-          .map(parm => <Chart parm={parm} />)
-      }
+      <div style={{display: 'inline-block'}}>
+        <h3>Residue environment</h3>
+        <Chart parm={['LitterMPa']} />
+      </div>
 
-      <h2>Residue environment</h2>
+      <h3>Weather information</h3>
       {
-        ['LitterMPa']
+        [['Rain', 'Temp', 'RH'], 'Air_MPa']
           .map(parm => <Chart parm={parm} />)
       }
 
