@@ -564,6 +564,12 @@ const App = () => {
     );
   } // runModel2
 
+  const setLWC = () => {
+    if (+parms.biomass && +parms.freshBiomass) {
+      set.lwc(+((parms.freshBiomass - parms.biomass) / parms.biomass).toFixed(2));
+    }
+  } // setLWC
+
   const NDefaults = () => {
     if (!parms.edited) {
       const carb = Math.min(100, Math.max(0, (24.7 + 10.5 * parms.N))).toFixed(0);
@@ -609,6 +615,7 @@ const App = () => {
       lwc                 : 4,
       highOM              : 'No',
       nutrient            : 'Left on the surface',
+      freshBiomass        : '',
       biomass             : demo ? 5235 : query('biomass', ''),
       mapZoom             : 13,
       mapType             : 'hybrid',
@@ -648,7 +655,8 @@ const App = () => {
         // BD            : runModel,  // TODO
         // OM            : runModel,  // TODO
         // InorganicN    : runModel,  // TODO
-        biomass       : runModel,
+        biomass       : [setLWC, runModel],
+        freshBiomass  : [setLWC, runModel],
       }
     }
   );

@@ -38,7 +38,8 @@ const CoverCrops = ({props, parms}) => {
 } // CoverCrops
 
 const CoverCrop1 = ({props, parms, set, setScreen}) => {
-  const max = parms.coverCrop.length ? parms.coverCrop.map(s => parms.maxBiomass[s]).sort((a, b) => b - a)[0] : 15000;
+  const max = parms.coverCrop.length ? parms.coverCrop.map(s => parms.maxBiomass[s]).sort((a, b) => b - a)[0] || 15000 : 15000;
+  const freshMax = max * 4 || 30000;
 
   return (
     <>
@@ -92,6 +93,32 @@ const CoverCrop1 = ({props, parms, set, setScreen}) => {
           <p className="warning">
             This biomass seems too high{parms.coverCrop.length > 1 ? ' for these particular species' : parms.coverCrop.length ? ' for this particular species' : ''}.<br/>
             Please make sure the biomass entered is on a dry matter basis.
+          </p>
+        }
+
+        <br/>
+        <div>
+          Fresh Biomass
+          <Icon>
+            help
+            <p>The amount of cover crop biomass on a wet weight basis.</p>
+            <p>For details on cover crop biomass sampling and taking a representative sub-sample for quality analysis, please refer to <a tabIndex="-1" target="_blank" rel="noreferrer" href="https://extension.uga.edu/publications/detail.html?number=C1077">here</a>.</p>
+          </Icon>
+        </div>
+
+        <Myslider
+          parm={'freshBiomass'}
+          min={0}
+          max={freshMax}
+          props={props}
+          parms={parms}
+          set={set}
+        />
+        
+        {+parms.freshBiomass > +freshMax &&
+          <p className="warning">
+            This biomass seems too high{parms.coverCrop.length > 1 ? ' for these particular species' : parms.coverCrop.length ? ' for this particular species' : ''}.<br/>
+            Please make sure the biomass entered is on a fresh matter basis.
           </p>
         }
 

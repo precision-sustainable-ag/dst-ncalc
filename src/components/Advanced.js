@@ -41,6 +41,8 @@ const Advanced = ({parms, setScreen}) => {
     }    
   });
 
+  const hourly = false;
+
   const Chart = ({parm}) => {
     let date;
     const stacked = /Carb/.test(parm); // Array.isArray(parm);
@@ -50,10 +52,11 @@ const Advanced = ({parms, setScreen}) => {
     [parm].flat().forEach((parm, i) => {
       const cdata = [];
       date = new Date(parms.killDate);
+      let total = 0;
       model.s[parm].forEach((d, i) => {
-        const value = +(d / factor).toFixed(2)
-  
-        if (date.getHours() === 0) {
+        const value = +(d / factor).toFixed(2);
+        total += +value;
+        if (hourly || date.getHours() === 23) {
           if (stacked) {
             cdata.push({
               x: +date,
@@ -66,13 +69,14 @@ const Advanced = ({parms, setScreen}) => {
           } else {
             cdata.push({
               x: +date,
-              y: +value,
+              y: hourly ? +value : parm === 'Rain' ? total : total / 24,
               // marker: {
               //   enabled: (i / 24 === parms.nweeks * 7) ||
               //           (i === a.length - 1 && parms.nweeks * 7 * 24 >= a.length)
               // }
             });
           }
+          total = 0;
         }
         date.setHours(date.getHours() + 1)
       });
@@ -88,12 +92,14 @@ const Advanced = ({parms, setScreen}) => {
           Temp: 'Air temperature',
           RH: 'Relative humidity',
           CNRF: 'C:N ratio factor',
-          RMTFAC: 'Water potential gradient',
+          RMTFAC: 'Residue moisture-temperature reduction factor',
           ContactFactor: 'Residue contact factor',
           LitterMPa: 'Litter water potential',
-          Air_MPa: 'Air pressure',
+          Air_MPa: 'Air water potential',
         }[parm] || parm,
-        ztype: 'spline',
+        type: stacked         ? 'area' : 
+              parm === 'Rain' ? 'column' : 
+                                'line',
         yAxis: /(RH)/.test(parm) ? 1 : 0,
         data: cdata,
         color: colors[i],
@@ -103,13 +109,13 @@ const Advanced = ({parms, setScreen}) => {
 
     const options = {
       chart: {
-        type: stacked ? 'area' : 'line',
         height: 300,
         width: 500,
       },
       plotOptions: {
         series: {
           animation: false,
+          turboThreshold: 100000
         },
         area: {
           stacking: 'normal',
