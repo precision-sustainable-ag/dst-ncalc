@@ -126,8 +126,8 @@ const Screens = ({parms, props, set}) => {
         set.BD(1.6);
       }
 
-      if (parms.plantingDate < parms.killDate) {
-        alert('Cash crop planting date must be later than the cover crop kill date.');
+      if (parms.killDate - parms.plantingDate > 1814400000) {
+        alert('Cash crop planting date must be no earlier than 3 weeks before the cover crop kill date.');
         setScreen('CoverCrop1');
       } else if (parms.plantingDate - parms.killDate > 7776000000) {
         alert('Cash crop planting date should be within 3 months of the cover crop kill date.');
@@ -492,7 +492,6 @@ const App = () => {
 
     if (start !== 'Invalid date' && end !== 'Invalid date' && end > start) {
       console.log(modelSrc);
-  
       fetch(modelSrc)
         .then(response => response.json())
         .then(data => {

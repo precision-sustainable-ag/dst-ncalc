@@ -205,7 +205,6 @@ const Map = ({set, parms, props, field=false, autoFocus}) => {
   return (
     <>
       <GoogleMaps set={set} props={props} parms={parms} field={field} autoFocus={autoFocus}/>
-
       {
         parms.lat && parms.lon &&
         <div style={{ height: '400px', width: '100%' }} id="GoogleMap">
