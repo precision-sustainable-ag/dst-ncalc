@@ -484,11 +484,15 @@ const App = () => {
                                           `https://api.precisionsustainableag.org/ssurgo?lat=${parms.lat}&lon=${parms.lon}&component=major`
 
     // const modelSrc  = `https://weather.aesl.ces.uga.edu/cc-ncalc/both?lat=${parms.lat}&lon=${parms.lon}&start=${start}&end=${end}&n=${parms.N}&biomass=${biomass}&lwc=${lwc}&carb=${carb}&cell=${cell}&lign=${lign}&om=${om}&bd=${bd}&in=${In}&pmn=${pmn}`;
-    const modelSrc  = params.get('dev') ? `https://weather.aesl.ces.uga.edu/cc-ncalc/surface?lat=${parms.lat}&lon=${parms.lon}&start=${start}&end=${end}&n=${parms.N}&biomass=${biomass}&lwc=${lwc}&carb=${carb}&cell=${cell}&lign=${lign}&om=${om}&bd=${bd}&in=${In}&pmn=${pmn}` :
-                                          `https://api.precisionsustainableag.org/cc-ncalc/surface?lat=${parms.lat}&lon=${parms.lon}&start=${start}&end=${end}&n=${parms.N}&biomass=${biomass}&lwc=${lwc}&carb=${carb}&cell=${cell}&lign=${lign}&om=${om}&bd=${bd}&in=${In}&pmn=${pmn}`
+    const modelSrc = params.get('dev') ? `https://weather.aesl.ces.uga.edu/cc-ncalc/surface?lat=${parms.lat}&lon=${parms.lon}&start=${start}&end=${end}&n=${parms.N}&biomass=${biomass}&lwc=${lwc}&carb=${carb}&cell=${cell}&lign=${lign}&om=${om}&bd=${bd}&in=${In}&pmn=${pmn}` :
+                                         `https://api.precisionsustainableag.org/cc-ncalc/surface?lat=${parms.lat}&lon=${parms.lon}&start=${start}&end=${end}&n=${parms.N}&biomass=${biomass}&lwc=${lwc}&carb=${carb}&cell=${cell}&lign=${lign}&om=${om}&bd=${bd}&in=${In}&pmn=${pmn}`
 
+    const cornNSrc =  params.get('dev') ? `https://weather.aesl.ces.uga.edu/weather/hourly?lat=${parms.lat}&lon=${parms.lon}&start=${moment(parms.plantingDate).format('yyyy-MM-DD')}&end=${end}&attributes=air_temperature` :
+                                          `https://api.precisionsustainableag.org/weather/hourly?lat=${parms.lat}&lon=${parms.lon}&start=${moment(parms.plantingDate).format('yyyy-MM-DD')}&end=${end}&attributes=air_temperature`;
+    
     set.gotSSURGO(false);
     set.gotModel(false);
+    set.cornN(false);
 
     if (start !== 'Invalid date' && end !== 'Invalid date' && end > start) {
       console.log(modelSrc);
@@ -534,6 +538,18 @@ const App = () => {
           console.log(data);
         });
     }
+
+    fetch(cornNSrc)
+      .then(response => response.json())
+      .then(data => {
+        if (data instanceof Array) {
+          set.cornN(data);
+
+          console.log('CornN:');
+          console.log(data);
+        }
+      }
+    );
 
     console.log(ssurgoSrc);
     fetch(ssurgoSrc)
@@ -628,6 +644,7 @@ const App = () => {
       outputN             : 1,
       gotSSURGO           : false,
       gotModel            : false,
+      cornN               : false,
       help                : '',
       helpX               : 0,
       helpY               : 0,

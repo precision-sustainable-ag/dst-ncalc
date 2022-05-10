@@ -14,10 +14,11 @@ const Output = ({props, parms, set, setScreen}) => {
   const doIncorporated = false;
 
   console.log({
-    gotModel: parms.gotModel
+    gotModel: parms.gotModel,
+    cornN: parms.cornN
   });
 
-  if (!parms.gotModel || !parms.model || !parms.biomass || !parms.N || !parms.carb || !parms.cell || !parms.lign || !parms.lwc || !parms.BD || !parms.InorganicN) {
+  if (!parms.gotModel || !parms.cornN || !parms.model || !parms.biomass || !parms.N || !parms.carb || !parms.cell || !parms.lign || !parms.lwc || !parms.BD || !parms.InorganicN) {
     return (
       <div className="loading">
         <p>Loading Output</p>
@@ -55,6 +56,23 @@ const Output = ({props, parms, set, setScreen}) => {
   if (cornN) {
     const f = parms.unit === 'lb/ac' ? 1 : 1.12085;
 
+    parms.cornN.forEach(rec => {
+      const temp = rec.air_temperature;
+
+      dailyTotal += temp - 8;
+      if (d1.getHours() === 0) {
+        gdd += (dailyTotal / 24);
+        NUptake.push([
+          // d1 - (1000 * 60 * 60 * 24),
+          +d1,
+          (parms.yield * 1.09) / (1 + Math.exp((-0.00615 * (gdd - 646.19)))) * f
+        ]);
+        dailyTotal = 0;
+      }
+      d1.setHours(d1.getHours() + 1);
+    });
+
+    /*
     parms.model.s.Temp.slice((parms.plantingDate - parms.killDate) / (1000 * 60 * 60)).forEach(temp => {
       dailyTotal += temp - 8;
       if (d1.getHours() === 0) {
@@ -68,6 +86,7 @@ const Output = ({props, parms, set, setScreen}) => {
       }
       d1.setHours(d1.getHours() + 1);
     });
+    */
   }
 
   let date = new Date(parms.killDate);
