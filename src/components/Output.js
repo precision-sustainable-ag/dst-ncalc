@@ -6,7 +6,7 @@ import HighchartsReact from 'highcharts-react-official';
 
 import moment from 'moment';
 
-import { CSVLink } from "react-csv";
+import {CSVLink} from "react-csv";
 
 const params = new URLSearchParams(window.location.search);
 
@@ -18,16 +18,43 @@ const Output = ({props, parms, set, setScreen}) => {
     cornN: parms.cornN
   });
 
+  if (parms.errorModel || parms.errorCorn) {
+    const errors = [];
+    if (parms.errorModel) {
+      errors.push(`Couldn't run Model.  Make sure your location is in the continental United States.`)
+    }
+    if (parms.errorCorn) {
+      errors.push(`Couldn't run corn uptake curve.`)
+    }
+    return (
+      <>
+        <p>
+          Errors:
+        </p>
+        <ul>
+          {errors.map(k => <li>{k}</li>)}
+        </ul>
+        <p>
+          Please review your inputs and try again.
+        </p>
+      </>
+    )
+  }
+
   if (!parms.gotModel || !parms.cornN || !parms.model || !parms.biomass || !parms.N || !parms.carb || !parms.cell || !parms.lign || !parms.lwc || !parms.BD || !parms.InorganicN) {
     return (
-      <div className="loading">
-        <p>Loading Output</p>
-        <p>Please wait</p>
-        <span></span>
-        <span></span>
-        <span></span>
-      </div>
-    );
+      <>
+        <div className="loading">
+          <p>Loading Output</p>
+          <p>Please wait</p>
+        </div>
+        <ul>
+          <li>Model: {parms.errorModel}</li>
+          <li>SSURGO: {parms.errorSSURGO}</li>
+          <li>Corn uptake curve: {parms.errorCorn}</li>
+        </ul>
+      </>
+  );
   }
 
   Object.keys(parms.model.s).forEach(key => {

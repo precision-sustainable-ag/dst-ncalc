@@ -490,9 +490,14 @@ const App = () => {
     const cornNSrc =  params.get('dev') ? `https://weather.aesl.ces.uga.edu/weather/hourly?lat=${parms.lat}&lon=${parms.lon}&start=${moment(parms.plantingDate).format('yyyy-MM-DD')}&end=${end}&attributes=air_temperature` :
                                           `https://api.precisionsustainableag.org/weather/hourly?lat=${parms.lat}&lon=${parms.lon}&start=${moment(parms.plantingDate).format('yyyy-MM-DD')}&end=${end}&attributes=air_temperature`;
     
-    set.gotSSURGO(false);
     set.gotModel(false);
+    set.errorModel(false);
+
+    set.gotSSURGO(false);
+    set.errorSSURGO(false);
+
     set.cornN(false);
+    set.errorCorn(false);
 
     if (start !== 'Invalid date' && end !== 'Invalid date' && end > start) {
       console.log(modelSrc);
@@ -500,9 +505,11 @@ const App = () => {
         .then(response => response.json())
         .then(data => {
           console.log(data);
-          if (!data.surface) {
+          if (data.name === 'error' || !data.surface) {
+            set.errorModel(true);
             return;
           }
+
           const modelSurface = {};
           data.surface.forEach(data => {
             Object.keys(data).forEach(key => {
@@ -536,6 +543,9 @@ const App = () => {
           set.gotModel(true);
           console.log('model');
           console.log(data);
+        })
+        .catch((error) => {
+          alert(JSON.stringify(error));
         });
     }
 
@@ -543,22 +553,29 @@ const App = () => {
       .then(response => response.json())
       .then(data => {
         if (data instanceof Array) {
-          set.cornN(data);
-
           console.log('CornN:');
           console.log(data);
+
+          set.cornN(data);
+        } else {
+          set.errorCorn(true);
         }
-      }
-    );
+      })
+      .catch((error) => {
+        alert(JSON.stringify(error));
+      });
 
     console.log(ssurgoSrc);
     fetch(ssurgoSrc)
       .then(response => response.json())
       .then(data => {
-        if (data instanceof Array) {
-          set.gotSSURGO(true);
+        if (data.ERROR) {
+          set.errorSSURGO(true);
+        } else if (data instanceof Array) {
           console.log('SSURGO:');
           console.log(data);
+
+          set.gotSSURGO(true);
           
           data = data.filter(d => d.desgnmaster !== 'O');
 
@@ -575,8 +592,10 @@ const App = () => {
           
           set.OM(weightedAverage(data, 'om_r'));
         }
-      }
-    );
+      })
+      .catch((error) => {
+        alert(JSON.stringify(error));
+      });
   } // runModel2
 
   const setLWC = () => {
@@ -657,6 +676,9 @@ const App = () => {
       species             : {},
       maxBiomass          : {},
       privacy             : false,
+      errorModel          : false,
+      errorSSURGO         : false,
+      errorCorn           : false,
       edited              : query('carb', false),
       effects : {
         lat           : runModel,
