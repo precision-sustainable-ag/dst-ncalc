@@ -47,11 +47,14 @@ const Output = ({props, parms, set, setScreen}) => {
         <div className="loading">
           <p>Loading Output</p>
           <p>Please wait</p>
+          <span></span>
+          <span></span>
+          <span></span>
         </div>
         <ul>
-          <li>Model: {parms.errorModel}</li>
-          <li>SSURGO: {parms.errorSSURGO}</li>
-          <li>Corn uptake curve: {parms.errorCorn}</li>
+          <li>Model: {parms.errorModel.toString()}</li>
+          <li>SSURGO: {parms.errorSSURGO.toString()}</li>
+          <li>Corn uptake curve: {parms.errorCorn.toString()}</li>
         </ul>
       </>
   );
