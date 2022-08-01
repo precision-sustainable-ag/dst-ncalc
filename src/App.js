@@ -126,8 +126,8 @@ const Screens = ({parms, props, set}) => {
         set.BD(1.6);
       }
 
-      if (parms.plantingDate < parms.killDate) {
-        alert('Cash crop planting date must be later than the cover crop kill date.');
+      if (parms.killDate - parms.plantingDate > 1814400000) {
+        alert('Cash crop planting date must be no earlier than 3 weeks before the cover crop kill date.');
         setScreen('CoverCrop1');
       } else if (parms.plantingDate - parms.killDate > 7776000000) {
         alert('Cash crop planting date should be within 3 months of the cover crop kill date.');
@@ -326,6 +326,12 @@ const Screens = ({parms, props, set}) => {
     // window.location = `?PSA=true&demo=${e.target.value}`;
   } // changePSA
 
+  useEffect(() => {
+    if (params.get('dev')) {
+      loadField('Example: Grass');
+    }
+  }, []);
+
   return (
     <div
       tabIndex="0"
@@ -359,6 +365,11 @@ const Screens = ({parms, props, set}) => {
         {/*  <button id="CCQuality" data-scr="CoverCrop2">Quality</button> */}
         <button className={/CashCrop/.test(screen)    ? 'selected' : undefined} data-scr="CashCrop"   >Cash Crop</button>
         <button className={/Output/.test(screen)      ? 'selected' : undefined} data-scr="Output"     >Output</button>
+        {
+          params.get('dev') && 
+          <button className={/Advanced/.test(screen)    ? 'selected' : undefined} data-scr="Advanced"   >Advanced</button>
+        }
+        
         <Button className="feedback" data-scr="Feedback" variant="outlined" color="primary" >Feedback</Button>
         {
           isPSA ? 
@@ -473,22 +484,32 @@ const App = () => {
                                           `https://api.precisionsustainableag.org/ssurgo?lat=${parms.lat}&lon=${parms.lon}&component=major`
 
     // const modelSrc  = `https://weather.aesl.ces.uga.edu/cc-ncalc/both?lat=${parms.lat}&lon=${parms.lon}&start=${start}&end=${end}&n=${parms.N}&biomass=${biomass}&lwc=${lwc}&carb=${carb}&cell=${cell}&lign=${lign}&om=${om}&bd=${bd}&in=${In}&pmn=${pmn}`;
-    const modelSrc  = params.get('dev') ? `https://weather.aesl.ces.uga.edu/cc-ncalc/surface?lat=${parms.lat}&lon=${parms.lon}&start=${start}&end=${end}&n=${parms.N}&biomass=${biomass}&lwc=${lwc}&carb=${carb}&cell=${cell}&lign=${lign}&om=${om}&bd=${bd}&in=${In}&pmn=${pmn}` :
-                                          `https://api.precisionsustainableag.org/cc-ncalc/surface?lat=${parms.lat}&lon=${parms.lon}&start=${start}&end=${end}&n=${parms.N}&biomass=${biomass}&lwc=${lwc}&carb=${carb}&cell=${cell}&lign=${lign}&om=${om}&bd=${bd}&in=${In}&pmn=${pmn}`
+    const modelSrc = params.get('dev') ? `https://weather.aesl.ces.uga.edu/cc-ncalc/surface?lat=${parms.lat}&lon=${parms.lon}&start=${start}&end=${end}&n=${parms.N}&biomass=${biomass}&lwc=${lwc}&carb=${carb}&cell=${cell}&lign=${lign}&om=${om}&bd=${bd}&in=${In}&pmn=${pmn}` :
+                                         `https://weather.aesl.ces.uga.edu/cc-ncalc/surface?lat=${parms.lat}&lon=${parms.lon}&start=${start}&end=${end}&n=${parms.N}&biomass=${biomass}&lwc=${lwc}&carb=${carb}&cell=${cell}&lign=${lign}&om=${om}&bd=${bd}&in=${In}&pmn=${pmn}`
+
+    const cornNSrc =  params.get('dev') ? `https://weather.aesl.ces.uga.edu/weather/hourly?lat=${parms.lat}&lon=${parms.lon}&start=${moment(parms.plantingDate).format('yyyy-MM-DD')}&end=${end}&attributes=air_temperature` :
+                                          `https://api.precisionsustainableag.org/weather/hourly?lat=${parms.lat}&lon=${parms.lon}&start=${moment(parms.plantingDate).format('yyyy-MM-DD')}&end=${end}&attributes=air_temperature`;
+    
+    set.gotModel(false);
+    set.errorModel(false);
 
     set.gotSSURGO(false);
-    set.gotModel(false);
+    set.errorSSURGO(false);
+
+    set.cornN(false);
+    set.errorCorn(false);
 
     if (start !== 'Invalid date' && end !== 'Invalid date' && end > start) {
       console.log(modelSrc);
-  
       fetch(modelSrc)
         .then(response => response.json())
         .then(data => {
           console.log(data);
-          if (!data.surface) {
+          if (data.name === 'error' || !data.surface) {
+            set.errorModel(true);
             return;
           }
+
           const modelSurface = {};
           data.surface.forEach(data => {
             Object.keys(data).forEach(key => {
@@ -522,17 +543,39 @@ const App = () => {
           set.gotModel(true);
           console.log('model');
           console.log(data);
+        })
+        .catch((error) => {
+          alert(JSON.stringify(error));
         });
     }
+
+    fetch(cornNSrc)
+      .then(response => response.json())
+      .then(data => {
+        if (data instanceof Array) {
+          console.log('CornN:');
+          console.log(data);
+
+          set.cornN(data);
+        } else {
+          set.errorCorn(true);
+        }
+      })
+      .catch((error) => {
+        alert(JSON.stringify(error));
+      });
 
     console.log(ssurgoSrc);
     fetch(ssurgoSrc)
       .then(response => response.json())
       .then(data => {
-        if (data instanceof Array) {
-          set.gotSSURGO(true);
+        if (data.ERROR) {
+          set.errorSSURGO(true);
+        } else if (data instanceof Array) {
           console.log('SSURGO:');
           console.log(data);
+
+          set.gotSSURGO(true);
           
           data = data.filter(d => d.desgnmaster !== 'O');
 
@@ -549,9 +592,17 @@ const App = () => {
           
           set.OM(weightedAverage(data, 'om_r'));
         }
-      }
-    );
+      })
+      .catch((error) => {
+        alert(JSON.stringify(error));
+      });
   } // runModel2
+
+  const setLWC = () => {
+    if (+parms.biomass && +parms.freshBiomass) {
+      set.lwc(+((parms.freshBiomass - parms.biomass) / parms.biomass).toFixed(2));
+    }
+  } // setLWC
 
   const NDefaults = () => {
     if (!parms.edited) {
@@ -598,6 +649,7 @@ const App = () => {
       lwc                 : 4,
       highOM              : 'No',
       nutrient            : 'Left on the surface',
+      freshBiomass        : '',
       biomass             : demo ? 5235 : query('biomass', ''),
       mapZoom             : 13,
       mapType             : 'hybrid',
@@ -611,6 +663,7 @@ const App = () => {
       outputN             : 1,
       gotSSURGO           : false,
       gotModel            : false,
+      cornN               : false,
       help                : '',
       helpX               : 0,
       helpY               : 0,
@@ -623,6 +676,9 @@ const App = () => {
       species             : {},
       maxBiomass          : {},
       privacy             : false,
+      errorModel          : false,
+      errorSSURGO         : false,
+      errorCorn           : false,
       edited              : query('carb', false),
       effects : {
         lat           : runModel,
@@ -637,7 +693,8 @@ const App = () => {
         // BD            : runModel,  // TODO
         // OM            : runModel,  // TODO
         // InorganicN    : runModel,  // TODO
-        biomass       : runModel,
+        biomass       : [setLWC, runModel],
+        freshBiomass  : [setLWC, runModel],
       }
     }
   );

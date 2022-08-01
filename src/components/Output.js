@@ -6,7 +6,7 @@ import HighchartsReact from 'highcharts-react-official';
 
 import moment from 'moment';
 
-import { CSVLink } from "react-csv";
+import {CSVLink} from "react-csv";
 
 const params = new URLSearchParams(window.location.search);
 
@@ -14,19 +14,50 @@ const Output = ({props, parms, set, setScreen}) => {
   const doIncorporated = false;
 
   console.log({
-    gotModel: parms.gotModel
+    gotModel: parms.gotModel,
+    cornN: parms.cornN
   });
 
-  if (!parms.gotModel || !parms.model || !parms.biomass || !parms.N || !parms.carb || !parms.cell || !parms.lign || !parms.lwc || !parms.BD || !parms.InorganicN) {
+  if (parms.errorModel || parms.errorCorn) {
+    const errors = [];
+    if (parms.errorModel) {
+      errors.push(`Couldn't run Model.  Make sure your location is in the continental United States.`)
+    }
+    if (parms.errorCorn) {
+      errors.push(`Couldn't run corn uptake curve.`)
+    }
     return (
-      <div className="loading">
-        <p>Loading Output</p>
-        <p>Please wait</p>
-        <span></span>
-        <span></span>
-        <span></span>
-      </div>
-    );
+      <>
+        <p>
+          Errors:
+        </p>
+        <ul>
+          {errors.map(k => <li>{k}</li>)}
+        </ul>
+        <p>
+          Please review your inputs and try again.
+        </p>
+      </>
+    )
+  }
+
+  if (!parms.gotModel || !parms.cornN || !parms.model || !parms.biomass || !parms.N || !parms.carb || !parms.cell || !parms.lign || !parms.lwc || !parms.BD || !parms.InorganicN) {
+    return (
+      <>
+        <div className="loading">
+          <p>Loading Output</p>
+          <p>Please wait</p>
+          <span></span>
+          <span></span>
+          <span></span>
+        </div>
+        <ul>
+          <li>Model: {parms.errorModel.toString()}</li>
+          <li>SSURGO: {parms.errorSSURGO.toString()}</li>
+          <li>Corn uptake curve: {parms.errorCorn.toString()}</li>
+        </ul>
+      </>
+  );
   }
 
   Object.keys(parms.model.s).forEach(key => {
@@ -55,6 +86,23 @@ const Output = ({props, parms, set, setScreen}) => {
   if (cornN) {
     const f = parms.unit === 'lb/ac' ? 1 : 1.12085;
 
+    parms.cornN.forEach(rec => {
+      const temp = rec.air_temperature;
+
+      dailyTotal += temp - 8;
+      if (d1.getHours() === 0) {
+        gdd += (dailyTotal / 24);
+        NUptake.push([
+          // d1 - (1000 * 60 * 60 * 24),
+          +d1,
+          (parms.yield * 1.09) / (1 + Math.exp((-0.00615 * (gdd - 646.19)))) * f
+        ]);
+        dailyTotal = 0;
+      }
+      d1.setHours(d1.getHours() + 1);
+    });
+
+    /*
     parms.model.s.Temp.slice((parms.plantingDate - parms.killDate) / (1000 * 60 * 60)).forEach(temp => {
       dailyTotal += temp - 8;
       if (d1.getHours() === 0) {
@@ -68,6 +116,7 @@ const Output = ({props, parms, set, setScreen}) => {
       }
       d1.setHours(d1.getHours() + 1);
     });
+    */
   }
 
   let date = new Date(parms.killDate);

@@ -69,6 +69,9 @@ const GoogleMaps = ({props, parms, set, autoFocus=false, field=false}) => {
         // getOptionSelected={(option, value) => option.id === value.id}  // avoids warning, per https://stackoverflow.com/a/65347275/3903374, but prevents re-entry of data
         
         onChange={(_, newValue) => {
+          set.errorModel(false);
+          set.errorSSURGO(false);
+          set.errorCorn(false);
           setOptions(newValue ? [newValue, ...options] : options);
           if (newValue) {
             set.location(newValue.description);
@@ -205,7 +208,6 @@ const Map = ({set, parms, props, field=false, autoFocus}) => {
   return (
     <>
       <GoogleMaps set={set} props={props} parms={parms} field={field} autoFocus={autoFocus}/>
-
       {
         parms.lat && parms.lon &&
         <div style={{ height: '400px', width: '100%' }} id="GoogleMap">

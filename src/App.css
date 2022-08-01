@@ -22,6 +22,11 @@ h2 {
   font-weight: bold;
 }
 
+h3 {
+  font-size: 1rem;
+  margin-bottom: 0.5em;
+}
+
 table {
   border: 1px solid black;
   border-spacing: 0; 
@@ -573,9 +578,8 @@ footer img {
 }
 
 .advanced {
-  ztransform: scale(0.5);
   display: inline-block;
-  margin: 0.5rem;
+  margin: 0 0.5rem;
   border: 1px solid #aaa;
   position: relative;
 }
