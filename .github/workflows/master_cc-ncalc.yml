@@ -23,6 +23,7 @@ jobs:
 
       - name: npm install, build, and test
         run: |
+          npm install -g npm@latest
           rm -rf node_modules
           rm package-lock.json
           npm install --legacy-peer-deps
