@@ -1,10 +1,10 @@
 import Icon from '@mui/material/Icon';
 import {useDispatch, useSelector} from 'react-redux';
-import {get, sets} from '../store/Store';
+import {get, set} from '../store/Store';
 
 import Myslider from './Slider';
 
-const Soil = ({props, parms, set}) => {
+const Soil = () => {
   const dispatch = useDispatch();
   const gotSSURGO = useSelector(get.gotSSURGO);
 
@@ -32,13 +32,10 @@ const Soil = ({props, parms, set}) => {
         </Icon>
         <br/>
         <Myslider
-          parm={'OM'}
+          id="OM"
           min={0.1}
           max={5}
           step={0.1}
-          props={props}
-          parms={parms}
-          set={set}
         />
 
         <br/><br/>
@@ -50,13 +47,10 @@ const Soil = ({props, parms, set}) => {
         </Icon>
         <br/>
         <Myslider
-          parm={'BD'}
+          id="BD"
           min={0.8}
           max={1.8}
           step={0.1}
-          props={props}
-          parms={parms}
-          set={set}
         />
 
         <br/><br/>
@@ -67,18 +61,15 @@ const Soil = ({props, parms, set}) => {
         </Icon>
         <br/>
         <Myslider
-          parm={'InorganicN'}
+          id="InorganicN"
           min={0}
           max={25}
-          props={props}
-          parms={parms}
-          set={set}
         />
       </div>
 
       <div className="bn">
-        <button onClick={() => dispatch(sets.screen('Location'))  }>BACK</button>
-        <button onClick={() => dispatch(sets.screen('CoverCrop1'))}>NEXT</button>
+        <button onClick={() => dispatch(set.screen('Location'))  }>BACK</button>
+        <button onClick={() => dispatch(set.screen('CoverCrop1'))}>NEXT</button>
       </div>
     </div>
   )

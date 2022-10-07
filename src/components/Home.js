@@ -1,5 +1,5 @@
 import {useDispatch, useSelector} from "react-redux";
-import {get, sets} from '../store/Store';
+import {get, set} from '../store/Store';
 
 const Home = () => {
   const dispatch = useDispatch();
@@ -18,8 +18,8 @@ const Home = () => {
         <p>This calculator aids farmers with decision support regarding cover crop residue persistence, as well as the amount and timing of nitrogen availability.</p>
 
         <div>
-          <button onClick={() => dispatch(sets.screen('About'   ))}>ABOUT</button>
-          <button onClick={() => dispatch(sets.screen('Location'))}>GET STARTED</button>
+          <button onClick={() => dispatch(set.screen('About'   ))}>ABOUT</button>
+          <button onClick={() => dispatch(set.screen('Location'))}>GET STARTED</button>
         </div>
 
         <img className="crops fullwidth" src="background.png" alt="" />
@@ -29,7 +29,7 @@ const Home = () => {
         <button
           id="Privacy"
           className="bn"
-          onClick={() => dispatch(sets.privacy(!privacy))}
+          onClick={() => dispatch(set.privacy(!privacy))}
         >
           Your privacy
         </button>
@@ -38,7 +38,7 @@ const Home = () => {
           <div id="PrivacyPolicy">
             <button
               className="close"
-              onClick={() => dispatch(sets.privacy(false))}
+              onClick={() => dispatch(set.privacy(false))}
             >
               x
             </button>

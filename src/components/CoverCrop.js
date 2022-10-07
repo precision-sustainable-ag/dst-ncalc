@@ -1,34 +1,27 @@
-import {
-  Radio,
-  RadioGroup,
-  FormControlLabel
-} from '@mui/material';
+import {Radio, RadioGroup, FormControlLabel} from '@mui/material';
 
-import {Autocomplete, Input} from './Inputs';
+import {Input} from './Inputs';
 
 import Myslider from './Slider';
 
 import Icon from '@mui/material/Icon';
 import {useDispatch, useSelector} from 'react-redux';
-import {get, sets} from '../store/Store';
+import {get, set} from '../store/Store';
 
-const CoverCrops = ({props}) => {
-  props = () => {};
-
+const CoverCrops = () => {
   const species = useSelector(get.species);
   return (
-    <Autocomplete
-      multiple
+    <Input
+      zmultiple
 
-      id='coverCrop'
-      {...props('coverCrop')}
+      id="coverCrop"
 
       groupBy={
         (option) => species.Brassica.includes(option)  ? 'Brassica' :
                     species.Broadleaf.includes(option) ? 'Broadleaf' :
                     species.Grass.includes(option)     ? 'Grass' :
                     species.Legume.includes(option)    ? 'Legume' :
-                                                               'ERROR'
+                                                         'ERROR'
       }
 
       options={[
@@ -43,9 +36,7 @@ const CoverCrops = ({props}) => {
   );
 } // CoverCrops
 
-const CoverCrop1 = ({props, parms, set}) => {
-  props = () => {};
-
+const CoverCrop1 = () => {
   const dispatch = useDispatch();
   const maxBiomass = useSelector(get.maxBiomass);
   const coverCrop = useSelector(get.coverCrop);
@@ -60,13 +51,10 @@ const CoverCrop1 = ({props, parms, set}) => {
       <h1>Tell us about your Cover Crop</h1>
       <div className="inputs">
         <p>Cover Crop Species:</p>
-        <CoverCrops
-          props={props}
-          parms={parms}
-        />
+        <CoverCrops />
 
         <p>Cover Crop Termination Date:</p>
-        <Input type="date" {...props('killDate')} />
+        <Input type="date" id="killDate" />
 
         <p/>
         <div>
@@ -82,25 +70,22 @@ const CoverCrop1 = ({props, parms, set}) => {
             <FormControlLabel
               value="lb/ac"
               control={<Radio id="unit" checked={unit === 'lb/ac'}/>}
-              onChange={() => dispatch(sets.unit('lb/ac'))}
+              onChange={() => dispatch(set.unit('lb/ac'))}
               label="lb/ac"
             />
             <FormControlLabel
               value="kg/ha"
               control={<Radio id="unit" checked={unit === 'kg/ha'} />}
-              onChange={() => dispatch(sets.unit('kg/ha'))}
+              onChange={() => dispatch(set.unit('kg/ha'))}
               label="kg/ha"
             />
           </RadioGroup>
         </div>
 
         <Myslider
-          parm={'biomass'}
+          id="biomass"
           min={0}
           max={max}
-          props={props}
-          parms={parms}
-          set={set}
         />
         
         {+biomass > +max &&
@@ -121,12 +106,9 @@ const CoverCrop1 = ({props, parms, set}) => {
         </div>
 
         <Myslider
-          parm={'freshBiomass'}
+          id="freshBiomass"
           min={0}
           max={freshMax}
-          props={props}
-          parms={parms}
-          set={set}
         />
         
         {+freshBiomass > +freshMax &&
@@ -146,25 +128,22 @@ const CoverCrop1 = ({props, parms, set}) => {
           :
         </div>
         <Myslider
-          parm={'lwc'}
+          id="lwc"
           min={0}
           max={10}
-          props={props}
-          parms={parms}
-          set={set}
           step={0.1}
         />
       </div>
   
       <div className="bn">
-        <button onClick={() => dispatch(sets.screen('Soil'))}>BACK</button>
-        <button onClick={() => dispatch(sets.screen('CoverCrop2'))}>NEXT</button>
+        <button onClick={() => dispatch(set.screen('Soil'))}>BACK</button>
+        <button onClick={() => dispatch(set.screen('CoverCrop2'))}>NEXT</button>
       </div>
     </>
   )
 } // CoverCrop1
 
-const CoverCrop2 = ({props, parms, set, update}) => {
+const CoverCrop2 = () => {
   const dispatch = useDispatch();
   const N = useSelector(get.N);
 
@@ -182,14 +161,10 @@ const CoverCrop2 = ({props, parms, set, update}) => {
         </p>
         <Myslider
           autoFocus
-          parm={'N'}
+          id="N"
           min={0}
           max={6}
-          props={props}
-          parms={parms}
-          set={set}
           step={0.1}
-          update={update}
         />
         <p/>
         <hr/>
@@ -208,15 +183,11 @@ const CoverCrop2 = ({props, parms, set, update}) => {
         </div>
         <p/>
         <Myslider
-          parm={'carb'}
+          id="carb"
           min={20}
           max={70}
-          props={props}
-          parms={parms}
-          set={set}
           step={0.1}
-          update={update}
-          onInput={() => dispatch(sets.edited(true))}
+          onInput={() => dispatch(set.edited(true))}
         />
 
         <p/>
@@ -233,15 +204,11 @@ const CoverCrop2 = ({props, parms, set, update}) => {
         </div>
         <p/>
         <Myslider
-          parm="cell"
+          id="cell"
           min={20}
           max={70}
-          props={props}
-          parms={parms}
-          set={set}
           step={0.1}
-          update={update}
-          onInput={() => dispatch(sets.edited(true))}
+          onInput={() => dispatch(set.edited(true))}
         />
 
         <p/>
@@ -256,21 +223,17 @@ const CoverCrop2 = ({props, parms, set, update}) => {
         </div>
         <p/>
         <Myslider
-          parm="lign"
+          id="lign"
           min={1}
           max={10}
-          props={props}
-          parms={parms}
-          set={set}
           step={0.1}
-          update={update}
-          onInput={() => dispatch(sets.edited(true))}
+          onInput={() => dispatch(set.edited(true))}
         />
       </div>
   
       <div className="bn">
-        <button onClick={() => dispatch(sets.screen('CoverCrop1'))}>BACK</button>
-        <button onClick={() => dispatch(sets.screen('CashCrop'))}>NEXT</button>
+        <button onClick={() => dispatch(set.screen('CoverCrop1'))}>BACK</button>
+        <button onClick={() => dispatch(set.screen('CashCrop'))}>NEXT</button>
       </div>
     </>
   )

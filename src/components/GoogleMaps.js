@@ -1,12 +1,12 @@
 import React, {useCallback, useState, useEffect} from 'react';
 
-import {TextField, OutlinedInput, Icon} from '@mui/material';
+import {TextField, Icon} from '@mui/material';
 import {Input} from './Inputs';
 import throttle from 'lodash/throttle';
 import GoogleMapReact from 'google-map-react';
 
 import {useSelector, useDispatch} from 'react-redux';
-import {get, sets as set} from '../store/Store';
+import {get, set} from '../store/Store';
 
 const autocompleteService = { current: null };
 
@@ -131,12 +131,13 @@ const GoogleMaps = ({autoFocus=false, field=false, inputs=true}) => {
       {
         field &&
         <>
-          <OutlinedInput
+          <Input
             className="field"
             label="Name your Field"
             id="field"
             autoComplete="off"
             style={{width: 'calc(50% - 2em)'}}
+            
           />
           <Icon className="moveLeft">
             help
@@ -159,7 +160,7 @@ const GoogleMaps = ({autoFocus=false, field=false, inputs=true}) => {
         inputs && (
           <div style={{margin: '1rem 0'}}>
             If you know your exact coordinates, you can enter them here:
-            <p/>
+            &nbsp;
             <Input
               id="lat"
               value={lat}
@@ -174,7 +175,6 @@ const GoogleMaps = ({autoFocus=false, field=false, inputs=true}) => {
               type="number"
               sx={{margin: 1}}
             />
-            <p/>
           </div>
         )
       }
@@ -253,9 +253,9 @@ const Map = ({field=false, autoFocus, inputs=true, id='GoogleMap', mapOptions={}
       {
         inputs && (
           <>
-            <strong>Where is your Field located?</strong>
+            <h1>Where is your Field located?</h1>
             <p>
-              Enter your address or zip code to determine your field's location.<br/>
+              Enter your address or zip code to determine your field's location.
               You can then zoom in and click to pinpoint it on the map.
             </p>
           </>

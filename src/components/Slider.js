@@ -1,22 +1,21 @@
-import {Input, Slider} from '@mui/material';
+import {Slider} from '@mui/material';
+import {Input} from './Inputs'
 import {useDispatch, useSelector} from 'react-redux';
-import {get, sets} from '../store/Store';
+import {get, set} from '../store/Store';
 
-const Myslider = ({parm, min, max, props, step=1, autoFocus, onInput}) => {
-  props = () => {};
-
+const Myslider = ({id, min, max, step=1, autoFocus, onInput}) => {
   const dispatch = useDispatch();
-  let val = useSelector(get[parm]);
+  let val = useSelector(get[id]);
 
   return (
     <div className="slider">
       <Input
-        {...props(parm)}
-        id={parm}
+        id={id}
         autoComplete="off"
         autoFocus={autoFocus}
         style={{width: '5em'}}
         onInput={onInput}
+        variant="standard"
       />
       &nbsp;&nbsp;&nbsp;&nbsp;
       <span className="slider2">
@@ -34,8 +33,7 @@ const Myslider = ({parm, min, max, props, step=1, autoFocus, onInput}) => {
               if (onInput) {
                 onInput();
               }
-
-              dispatch(sets[parm](+newValue));
+              dispatch(set[id](+newValue));
             }}
         
           aria-labelledby="input-slider"

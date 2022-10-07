@@ -8,11 +8,11 @@ import moment from 'moment';
 
 import {CSVLink} from "react-csv";
 import {useDispatch, useSelector} from 'react-redux';
-import {get, sets} from '../store/Store';
+import {get, set} from '../store/Store';
 
 const params = new URLSearchParams(window.location.search);
 
-const Output = ({props, parms}) => {
+const Output = () => {
   const dispatch = useDispatch();
   const doIncorporated = false;
   const BD = useSelector(get.BD);
@@ -39,6 +39,7 @@ const Output = ({props, parms}) => {
   const Yield = useSelector(get.yield);
   const outputN = useSelector(get.outputN);
   const nweeks = useSelector(get.nweeks);
+  const targetN = useSelector(get.targetN);
 
   console.log({
     gotModel,
@@ -399,7 +400,7 @@ const Output = ({props, parms}) => {
       /*
       {
         name: 'Target N',
-        data: [+parms.targetN, +parms.targetN],
+        data: [+targetN, +targetN],
         color: '#666'
       },
       */
@@ -410,7 +411,7 @@ const Output = ({props, parms}) => {
       },
       {
         name: 'Recommended N',
-        data: doIncorporated ? [Math.max(0, parms.targetN - incorporatedNPredict), Math.max(0, parms.targetN - surfaceNPredict)] : [Math.max(0, parms.targetN - surfaceNPredict)],
+        data: doIncorporated ? [Math.max(0, targetN - incorporatedNPredict), Math.max(0, targetN - surfaceNPredict)] : [Math.max(0, targetN - surfaceNPredict)],
         color: '#7b3294',
       },
     ],
@@ -441,7 +442,7 @@ const Output = ({props, parms}) => {
         enabled: true
       },
       plotLines: [{
-        value: parms.targetN,
+        value: targetN,
         label: {
           useHTML: true,
           text: doIncorporated ? 
@@ -544,7 +545,9 @@ const Output = ({props, parms}) => {
     ]
   } // residueGraph
 
-  if (field) {
+  console.error('TODO: localStorage');
+/*  
+  if (field) {  // TODO!!!
     if (!/Example: Grass|Example: Legume/.test(field)) {
       const clone = {...parms};
       delete clone.model;
@@ -553,7 +556,7 @@ const Output = ({props, parms}) => {
       localStorage.setItem(field, JSON.stringify(clone));
     }
   }
-
+*/
   // const cols = Object.keys(model.s).sort((a, b) => a.toUpperCase().localeCompare(b.toUpperCase())).slice(0, 10);
 
   const cols = ['FOM', 'Carb', 'Cell', 'Lign', 'FON', 'CarbN', 'CellN', 'LigninN', 'RMTFAC', 'CNRF', 'ContactFactor', 'Rain', 'Temp', 'RH', 'Air_MPa', 'LitterMPa'];
@@ -566,8 +569,8 @@ const Output = ({props, parms}) => {
       By
       &nbsp;
       <select
-        {...props('nweeks')}
-        onChange={(e) => dispatch(sets.nweeks(e.target.value))}
+        id="nweeks"
+        onChange={(e) => dispatch(set.nweeks(e.target.value))}
       >
         {
           Array(Math.round(model.s.Date.length / 24 / 7)).fill().map((_, i) => <option key={i + 1}>{i + 1}</option>)
@@ -597,13 +600,13 @@ const Output = ({props, parms}) => {
           Mockup: &nbsp;
           <button
           className={mockup === 1 ? 'selected' : ''}
-          onClick={() => dispatch(sets.mockup(1))}
+          onClick={() => dispatch(set.mockup(1))}
           >
             1
           </button>
           <button
           className={mockup === 2 ? 'selected' : ''}
-          onClick={() => dispatch(sets.mockup(2))}
+          onClick={() => dispatch(set.mockup(2))}
           >
             2
           </button>
@@ -654,21 +657,21 @@ const Output = ({props, parms}) => {
                 </div>
 
                 <HighchartsReact highcharts={Highcharts} options={NGraph} className="hidden" />
-                {(outputN === 1 && parms.targetN < surfaceNPredict) && <div class="footnote">* Your cover crop is supplying all of your needs.</div>}
+                {(outputN === 1 && targetN < surfaceNPredict) && <div class="footnote">* Your cover crop is supplying all of your needs.</div>}
                 <HighchartsReact highcharts={Highcharts} options={residueGraph} />
               </td>
               <td>
                 <div className="output center" style={{marginBottom: '1em'}}>
                   <button
                     className={outputN === 1 ? 'selected' : ''}
-                    onClick={() => dispatch(sets.outputN(1))}
+                    onClick={() => dispatch(set.outputN(1))}
                   >
                     N RELEASED
                   </button>
                   
                   <button
                     className={outputN === 2 ? 'selected' : ''}
-                    onClick={() => dispatch(sets.outputN(2))}
+                    onClick={() => dispatch(set.outputN(2))}
                   >
                     RESIDUE REMAINING
                   </button>
@@ -685,9 +688,9 @@ const Output = ({props, parms}) => {
         </table>
       </div>
       <div className="bn">
-        <button onClick={() => dispatch(sets.screen('CashCrop'))}>BACK</button>
-        <button onClick={() => dispatch(sets.screen('Advanced'))}>ADVANCED</button>
-        <button onClick={() => dispatch(sets.screen('Feedback'))}>FEEDBACK</button>
+        <button onClick={() => dispatch(set.screen('CashCrop'))}>BACK</button>
+        <button onClick={() => dispatch(set.screen('Advanced'))}>ADVANCED</button>
+        <button onClick={() => dispatch(set.screen('Feedback'))}>FEEDBACK</button>
       </div>
     </>
   )

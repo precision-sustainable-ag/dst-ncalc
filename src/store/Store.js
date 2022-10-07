@@ -76,4 +76,4 @@ const reducers = {
 
 export const store = createStore(initialState, {afterChange, reducers});
 
-export {set as sets, get} from './redux-autosetters';
+export {set, get} from './redux-autosetters';

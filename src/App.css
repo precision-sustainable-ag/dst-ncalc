@@ -332,12 +332,6 @@ input::-webkit-inner-spin-button {
   width: 4em;
 }
 
-.field legend {
-  visibility: visible !important;
-  color: rgba(0, 0, 0, 0.54);
-  transform: translateY(-5px);
-}
-
 .moveLeft {
   transform: translateX(-30px);
 }
@@ -602,4 +596,22 @@ footer img {
   left: 0.8rem;
   z-index: 100000;
   transform: scale(1.1);
+}
+
+#GoogleMap {
+  height: 400px;
+  width: 100%;
+}
+
+.expand {
+  position: absolute;
+  top: 3px;
+  right: 3px;
+  font-size: 25px;
+  line-height: 1.4rem;
+  background: white;
+  color: black;
+  padding: 0.2rem;
+  z-index: 1;
+  cursor: pointer;
 }

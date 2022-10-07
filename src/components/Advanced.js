@@ -6,7 +6,7 @@ import HighchartsReact from 'highcharts-react-official';
 
 // import ZoomInIcon from '@mui/icons-material/ZoomIn';
 import {useDispatch, useSelector} from 'react-redux';
-import {get, sets} from '../store/Store';
+import {get, set} from '../store/Store';
 
 // const zoomIn = (e) => {
 //   const div = e.target.closest('.parent');
@@ -288,7 +288,7 @@ const Advanced = () => {
       }
 
       <div className="bn">
-        <button onClick={() => dispatch(sets.screen('Output'))}>BACK</button>
+        <button onClick={() => dispatch(set.screen('Output'))}>BACK</button>
       </div>
     </div>
   )

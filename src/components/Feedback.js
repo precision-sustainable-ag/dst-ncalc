@@ -2,9 +2,9 @@ import {Input} from './Inputs';
 import {Button} from '@mui/material';
 
 import {useSelector, useDispatch} from 'react-redux';
-import {get, sets} from '../store/Store';
+import {get, set} from '../store/Store';
 
-const Feedback = ({props}) => {
+const Feedback = () => {
   const dispatch = useDispatch();
   const BD = useSelector(get.BD);
   const OM = useSelector(get.OM);
@@ -115,15 +115,15 @@ __________________________________
         contentEditable
         placeholder="Enter comments here"
         dangerouslySetInnerHTML={{ __html: feedback }}
-        onBlur={(e) => dispatch(sets.feedback(e.currentTarget.innerText.replace(/[\n\r]/g, '<br>')))}
+        onBlur={(e) => dispatch(set.feedback(e.currentTarget.innerText.replace(/[\n\r]/g, '<br>')))}
       />
 
       <div>
         <p>Name</p>
-        <Input {...props('name')} />
+        <Input id="name" />
 
         <p>Email</p>
-        <Input type="email" {...props('email')} />
+        <Input type="email" id="email" />
 
         <br/>
         <br/>

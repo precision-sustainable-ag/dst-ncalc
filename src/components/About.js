@@ -1,5 +1,5 @@
 import {useDispatch} from "react-redux";
-import {sets} from '../store/Store';
+import {set} from '../store/Store';
 
 const About = () => {
   const dispatch = useDispatch();
@@ -57,7 +57,7 @@ const About = () => {
       </p>
 
       <div className="center">
-        <button onClick={() => dispatch(sets.screen('Location'))}>GET STARTED</button>
+        <button onClick={() => dispatch(set.screen('Location'))}>GET STARTED</button>
       </div>
 
       <p style={{fontSize: "90%"}}>

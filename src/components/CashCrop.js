@@ -1,13 +1,12 @@
 import Myslider from './Slider';
 
-import {Autocomplete, Input} from './Inputs';
+import {Input} from './Inputs';
 
 import Icon from '@mui/material/Icon';
 import {useDispatch, useSelector} from 'react-redux';
-import {get, sets} from '../store/Store';
+import {get, set} from '../store/Store';
 
-const CashCrops = ({props}) => {
-  props = () => {};
+const CashCrops = () => {
   const crops = [
     'Alfalfa-Establishment',
     'Alfalfa-Maintenance',
@@ -294,14 +293,14 @@ const CashCrops = ({props}) => {
   }
 */
   return (
-    <Autocomplete
-      {...props('cashCrop')}
+    <Input
+      id="cashCrop"
 
       options={crops}
 
       // onChange={(event, newValue) => {
-      //   dispatch(sets.targetN(PiedNRate[newValue] || 0));
-      //   dispatch(sets.cashCrop(newValue));
+      //   dispatch(set.targetN(PiedNRate[newValue] || 0));
+      //   dispatch(set.cashCrop(newValue));
       // }}
 
       placeholder="Select a cash crop"
@@ -309,8 +308,7 @@ const CashCrops = ({props}) => {
   );
 } // CashCrops
 
-const CashCrop = ({props, parms, set}) => {
-  props = () => {};
+const CashCrop = () => {
   const dispatch = useDispatch();
   const unit = useSelector(get.unit);
   const cashCrop = useSelector(get.cashCrop);
@@ -320,21 +318,18 @@ const CashCrop = ({props, parms, set}) => {
       <h1>Tell us about your Cash Crop</h1>
       <div className="inputs">
         <p>Cash Crop:</p>
-        <CashCrops props={props} />
+        <CashCrops />
 
         <p>Cash Crop Planting Date:</p>
-        <Input type="date" {...props('plantingDate')} />
+        <Input type="date" id="plantingDate" />
 
         {cashCrop === 'Corn' &&
           <>
             <p>Yield Goal (bu/ac):</p>
             <Myslider
-              parm={'yield'}
+              id="yield"
               min={0}
               max={300}
-              props={props}
-              parms={parms}
-              set={set}
             />
           </>
         }
@@ -348,18 +343,15 @@ const CashCrop = ({props, parms, set}) => {
         </p>
 
         <Myslider
-          parm={'targetN'}
+          id="targetN"
           min={0}
           max={300}
-          props={props}
-          parms={parms}
-          set={set}
         />
       </div>
   
       <div className="bn">
-        <button onClick={() => dispatch(sets.screen('CoverCrop2'))}>BACK</button>
-        <button onClick={() => dispatch(sets.screen('Output'))    }>NEXT</button>
+        <button onClick={() => dispatch(set.screen('CoverCrop2'))}>BACK</button>
+        <button onClick={() => dispatch(set.screen('Output'))    }>NEXT</button>
       </div>
     </>
   )

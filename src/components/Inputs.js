@@ -1,15 +1,15 @@
 import {useEffect, useState, useRef, useCallback} from 'react';
 import {useSelector, useDispatch} from 'react-redux';
-import {get, sets as set} from '../store/Store';
+import {get, set} from '../store/Store';
 
 import {
-  Autocomplete as MUIAutocomplete,
   TextField,
   Radio,
   RadioGroup,
   FormControlLabel,
   Checkbox,
   FormLabel,
+  Autocomplete as MUIAutocomplete,
 } from '@mui/material';
 
 import React from 'react';
@@ -329,5 +329,4 @@ const Input = ({type, id, options, isOptionEqualToValue, renderInput, index='', 
 
 export {
   Input,
-  MUIAutocomplete as Autocomplete,
 }
