@@ -1,50 +1,10 @@
-// npm i --no-optional
-// https://github.com/Tjatse/ansi-html/issues/19
-
-// https://itnext.io/fixing-security-vulnerabilities-in-npm-dependencies-in-less-than-3-mins-a53af735261d
-// npm i minimist --save-dev
-// "resolutions": {
-//   "minimist": "^1.2.5"
-// }
-// "scripts": {
-//   "preinstall": "npx npm-force-resolutions"
-// }
-// npm i
-// npm audit fix
-// npm audit
-
-// TODO: Advanced graphs
-// TODO: Compare *incorporated* Georgia data to Iteris
-// TODO: Inputs
-// TODO: Change NUptake to percentage. "your first mock-up could be having a common secondary y-axis for both corn N uptake and cover crop N released (0-100%). And your second mock-up could be two different labels on secondary y-axis, both going from 0-100%."
-// TODO: Saved PSA fields
-// TODO: Carb, Cell, Lignin graph
-// TODO: Rain, RH, Temp graph
-// TODO: CNRF, ContactFactor, MTRF graph (?)
-// TODO: num:  iteris moisture - Air Dry
-// TODO: Output:  Mockup:  Center or enlarge left graph
-// TODO: Flexbox Output screen:  Portrait
-// TODO: Use SSURGO to troubleshoot Iteris vs Weather Station
-// TODO: SSURGO: Field capacity and Permanent Wilting Point
-// TODO: wthirdbar_r == DUL, wfifteenbar_r == Air Dry, awc_r
-// TODO: SSURGO Air Dry / 2 === our Air Dry
-// TODO: * 100 for percent
-// TODO: MFac = (Sw - Ad) / (Dul - Ad
-// TODO: Beta testing in January
-
-// DONE: Output: Target N and Planting date:  .highcharts-plot-line-label {overflow: visible !important;}
-// DONE: Make it a backend
-// DONE: Incorporated
-
-import React, {useEffect} from 'react';
-
+import {useEffect} from 'react';
 import './App.css';
-
 import moment from 'moment';
-
 import 'react-datepicker/dist/react-datepicker.css';
+// import {defaults} from './defaults';
 
-import {defaults} from './defaults';
+import {useSelector, useDispatch} from 'react-redux';
 
 // Screens
 import Home       from './components/Home';
@@ -56,7 +16,9 @@ import CashCrop   from './components/CashCrop';
 import Output     from './components/Output';
 import Feedback   from './components/Feedback';
 import Advanced   from './components/Advanced';
-import { Button } from '@mui/material';
+import {Button}   from '@mui/material';
+
+import {get, sets} from './store/Store';
 
 const Airtable = require('airtable');
 
@@ -74,27 +36,37 @@ console.warn = (msg, ...subst) => {
   }
 }
 
-const Help = ({parms}) => {
+const Help = () => {
+  const help  = useSelector(get.help);
+  const helpX = useSelector(get.helpX);
+  const helpY = useSelector(get.helpY);
+
   const style = {
-    left: parms.helpX,
-    top: parms.helpY,
-    maxWidth:  `calc(100vw - ${parms.helpX}px - 20px)`,
-    maxHeight: `calc(100vh - ${parms.helpY}px - 20px)`,
+    left: helpX,
+    top: helpY,
+    maxWidth:  `calc(100vw - ${helpX}px - 20px)`,
+    maxHeight: `calc(100vh - ${helpY}px - 20px)`,
     overflow: 'auto'
   }
 
   return (
-    parms.help &&
+    help &&
     <div
       className="help"
       style={style}
-      dangerouslySetInnerHTML={{ __html: parms.help }}
+      dangerouslySetInnerHTML={{ __html: help }}
     />
   )
 }
 
 const Screens = ({parms, props, set}) => {
-  let [screen, setScreen2] = React.useState('Home');
+  const screen = useSelector(get.screen);
+  const dispatch = useDispatch();
+
+  const BD = useSelector(get.BD);
+  const killDate = useSelector(get.killDate);
+  const plantingDate = useSelector(get.plantingDate);
+  const field = useSelector(get.field);
 
   const screens = {
     Home,
@@ -111,27 +83,28 @@ const Screens = ({parms, props, set}) => {
 
   const setScreen = (scr) => {
     const test = (parm, scr, desc = `Please enter ${parm}`) => {
-      if (!parms[parm]) {
-        alert(desc);
-        setScreen(scr);
-        return true;
-      }
+      return false;
+      // const val = useSelector(get[parm]);
+      // 
+      // if (!val) {
+      //   alert(desc);
+      //   setScreen(scr);
+      //   return true;
+      // }
     } // test
-    
+
     if (/Output|Advanced/.test(scr)) {
-      if (demo && !parms.BD) {
-        parms.OM = 1.5;
-        set.OM(1.5);
-        parms.BD = 1.6;
-        set.BD(1.6);
+      if (demo && !BD) {
+        dispatch(sets.OM(1.5));
+        dispatch(sets.BD(1.6));
       }
 
-      if (parms.killDate - parms.plantingDate > 1814400000) {
+      if (killDate - plantingDate > 1814400000) {
         alert('Cash crop planting date must be no earlier than 3 weeks before the cover crop kill date.');
-        setScreen('CoverCrop1');
-      } else if (parms.plantingDate - parms.killDate > 7776000000) {
+        dispatch(sets.screen('CoverCrop1'));
+      } else if (plantingDate - killDate > 7776000000) {
         alert('Cash crop planting date should be within 3 months of the cover crop kill date.');
-        setScreen('CoverCrop1');
+        dispatch(sets.screen('CoverCrop1'));
       } else {
         test('lat', 'Location', 'Please enter Latitude and Longitude') ||
         test('lon', 'Location', 'Please enter Latitude and Longitude') ||
@@ -150,10 +123,10 @@ const Screens = ({parms, props, set}) => {
         test('BD', 'Soil', 'Please enter Bulk Density') ||
         test('InorganicN', 'Soil', 'Please enter Soil Inorganic N') ||
 
-        setScreen2(scr);
+        dispatch(sets.screen(scr));
       }
     } else {
-      setScreen2(scr);
+      dispatch(sets.screen(scr));
 
       // AutoComplete component doesn't understand autoFocus:
       let focus = scr === 'CoverCrop1' ? '#coverCrop' :
@@ -166,6 +139,185 @@ const Screens = ({parms, props, set}) => {
       }
     }
   } // setScreen
+
+  const loadField = (field) => {
+    if (field === 'Example: Grass') {
+      dispatch(sets.screen('Location'));
+      dispatch(sets.edited(true));
+      dispatch(sets.lat(32.865389));
+      dispatch(sets.lon(-82.258361));
+      dispatch(sets.location('Example'));
+      dispatch(sets.field('Example: Grass'));
+      dispatch(sets.OM(0.75));
+      dispatch(sets.BD(1.62));
+      dispatch(sets.InorganicN(10));
+      dispatch(sets.coverCrop(['Rye']));
+      dispatch(sets.killDate(new Date('03/21/2019')));
+      dispatch(sets.plantingDate(new Date('04/01/2019')));
+      dispatch(sets.biomass(5000));
+      dispatch(sets.lwc(1.486));
+      dispatch(sets.N(0.6));
+      dispatch(sets.carb(33.45));
+      dispatch(sets.cell(57.81));
+      dispatch(sets.lign(8.74));
+      dispatch(sets.cashCrop('Corn'));
+      dispatch(sets.yield(150));
+      dispatch(sets.targetN(150));
+    } else if (field === 'Example: Legume') {
+      dispatch(sets.screen('Location'));
+      dispatch(sets.edited(true));
+      dispatch(sets.lat(32.865389));
+      dispatch(sets.lon(-82.258361));
+      dispatch(sets.location('Example'));
+      dispatch(sets.field('Example: Legume'));
+      dispatch(sets.OM(0.75));
+      dispatch(sets.BD(1.62));
+      dispatch(sets.InorganicN(10));
+      dispatch(sets.coverCrop(['Clover, Crimson']));
+      dispatch(sets.killDate(new Date('04/27/2019')));
+      dispatch(sets.plantingDate(new Date('05/15/2019')));
+      dispatch(sets.biomass(3500));
+      dispatch(sets.lwc(7.4));
+      dispatch(sets.N(3.5));
+      dispatch(sets.carb(56.18));
+      dispatch(sets.cell(36.74));
+      dispatch(sets.lign(7.08));
+      dispatch(sets.cashCrop('Corn'));
+      dispatch(sets.yield(150));
+      dispatch(sets.targetN(100));
+    } else {
+      const inputs = JSON.parse(localStorage[field]);
+      Object.keys(inputs).forEach(key => {
+        try {
+          if (/Date/.test(key)) {
+            set[key](new Date(inputs[key]));
+          } else {
+            set[key](inputs[key]);
+          }
+        } catch(e) {
+          console.log(key, e.message);
+        }
+      });
+    }
+  } // loadField
+
+  const changeScreen = (e) => {
+    const button = e.target;
+
+    if (button.tagName === 'BUTTON') {
+      dispatch(sets.screen(button.dataset.scr));
+    }
+  } // changeScreen
+
+  const changeField=(e) => {
+    const field = e.target.value;
+    if (field === 'Clear previous runs') {
+      if (window.confirm('Clear all previous runs?')) {
+        localStorage.clear();
+        dispatch(sets.screen('Home'));
+      }
+    } else {
+      loadField(field);
+    }
+  } // changeField
+
+  const changePSA=(e) => {
+    const PSA = examples[e.target.value];
+    
+    Object.keys(PSA).forEach(key => {
+      try {
+        set[key](PSA[key]);
+      } catch(ee) {
+
+      }
+    });
+    // window.location = `?PSA=true&demo=${e.target.value}`;
+  } // changePSA
+
+  return (
+    <div>
+      <nav onClick={changeScreen}>
+        <Button className="feedback" data-scr="Feedback" variant="outlined" color="primary" >Feedback</Button>
+        {
+          isPSA ? 
+            <select id="Fields"
+              onChange={changePSA}
+              value={field}
+            >
+              <option></option>
+              <optgroup label="PSA">
+                {
+                  Object.keys(examples)
+                    .filter(site => examples[site].category === 'PSA')
+                    .sort().map(site => <option key={site}>{site}</option>)
+                }
+              </optgroup>
+              <optgroup label="Resham">
+                {
+                  Object.keys(examples)
+                    .filter(site => examples[site].category === 'Resham')
+                    .sort().map(site => <option key={site}>{site}</option>)
+                }
+              </optgroup>
+            </select>
+          :
+          true || Object.keys(localStorage).length ?
+            <select id="Fields"
+              onChange={changeField}
+              value={field}
+            >
+              <option></option>
+              <option>Example: Grass</option>
+              <option>Example: Legume</option>
+              {
+                Object.keys(localStorage).length && (
+                  <>
+                    <option>Clear previous runs</option>
+                    <option disabled>____________________</option>
+                  </>
+                )
+              }
+              {
+                Object.keys(localStorage).sort().map((fld, idx) => (
+                  <option key={idx} checked={fld === field}>{fld}</option>
+                ))
+              }
+            </select>
+            : ''
+        }
+      </nav>
+      
+      <Help />
+      
+      {screens[screen]({
+        props,
+        set,
+        parms,
+      })}
+    </div>
+  );
+} // Screens
+
+const App = () => {
+  const dispatch = useDispatch();
+
+  const BD = useSelector(get.BD);
+  const OM = useSelector(get.OM);
+  const N = useSelector(get.N);
+  const lat = useSelector(get.lat);
+  const lon = useSelector(get.lon);
+  const firstSSURGO = useSelector(get.firstSSURGO);
+  const killDate = useSelector(get.killDate);
+  const plantingDate = useSelector(get.plantingDate);
+  const Carb = useSelector(get.carb);
+  const Cell = useSelector(get.cell);
+  const Lign = useSelector(get.lign);
+  const Lwc = useSelector(get.lwc);
+  const Biomass = useSelector(get.biomass);
+  const unit = useSelector(get.unit);
+  const InorganicN = useSelector(get.InorganicN);
+  const freshBiomass = useSelector(get.freshBiomass);
+  const edited = useSelector(get.edited);
 
   useEffect(() => {
     const airtable = (table, callback, wrapup) => {
@@ -217,7 +369,7 @@ const Screens = ({parms, props, set}) => {
 
     const mb = {};
     const species = {};
-  
+
     airtable(
       'CoverCrops',
       (crop) => {
@@ -226,213 +378,12 @@ const Screens = ({parms, props, set}) => {
         mb[crop.Crop] = crop.MaxBiomass;
       },
       () => {
-        set.maxBiomass(mb);
-        set.species(species);
+        dispatch(sets.maxBiomass(mb));
+        dispatch(sets.species(species));
       }
     );
-  }, []);
+  }, [dispatch]);
 
-  const loadField = (field) => {
-    if (field === 'Example: Grass') {
-      setScreen('Location');
-      set.edited(true);
-      set.lat(32.865389);
-      set.lon(-82.258361);
-      set.location('Example');
-      set.field('Example: Grass');
-      set.OM(0.75);
-      set.BD(1.62);
-      set.InorganicN(10);
-      set.coverCrop(['Rye']);
-      set.killDate(new Date('03/21/2019'));
-      set.plantingDate(new Date('04/01/2019'));
-      set.biomass(5000);
-      set.lwc(1.486);
-      set.N(0.6);
-      set.carb(33.45);
-      set.cell(57.81);
-      set.lign(8.74);
-      set.cashCrop('Corn');
-      set.yield(150);
-      set.targetN(150);
-    } else if (field === 'Example: Legume') {
-      setScreen('Location');
-      set.edited(true);
-      set.lat(32.865389);
-      set.lon(-82.258361);
-      set.location('Example');
-      set.field('Example: Legume');
-      set.OM(0.75);
-      set.BD(1.62);
-      set.InorganicN(10);
-      set.coverCrop(['Clover, Crimson']);
-      set.killDate(new Date('04/27/2019'));
-      set.plantingDate(new Date('05/15/2019'));
-      set.biomass(3500);
-      set.lwc(7.4);
-      set.N(3.5);
-      set.carb(56.18);
-      set.cell(36.74);
-      set.lign(7.08);
-      set.cashCrop('Corn');
-      set.yield(150);
-      set.targetN(100);
-    } else {
-      const inputs = JSON.parse(localStorage[field]);
-      Object.keys(inputs).forEach(key => {
-        try {
-          if (/Date/.test(key)) {
-            set[key](new Date(inputs[key]));
-          } else {
-            set[key](inputs[key]);
-          }
-        } catch(e) {
-          console.log(key, e.message);
-        }
-      });
-    }
-  } // loadField
-
-  const changeScreen = (e) => {
-    const button = e.target;
-
-    if (button.tagName === 'BUTTON') {
-      setScreen(button.dataset.scr);
-    }
-  } // changeScreen
-
-  const changeField=(e) => {
-    const field = e.target.value;
-    if (field === 'Clear previous runs') {
-      if (window.confirm('Clear all previous runs?')) {
-        localStorage.clear();
-        setScreen('Home');
-      }
-    } else {
-      loadField(field);
-    }
-  } // changeField
-
-  const changePSA=(e) => {
-    const PSA = examples[e.target.value];
-    
-    Object.keys(PSA).forEach(key => {
-      try {
-        set[key](PSA[key]);
-      } catch(ee) {
-
-      }
-    });
-    // window.location = `?PSA=true&demo=${e.target.value}`;
-  } // changePSA
-
-  useEffect(() => {
-    if (params.get('dev')) {
-      loadField('Example: Grass');
-    }
-  }, []);
-
-  return (
-    <div
-      tabIndex="0"
-
-      onKeyDown={(e) => {
-        if (e.key === 'Escape') {
-          set.help('');
-          set.privacy(false);
-        }
-      }}
-
-      onClick={(e) => {
-        if (/^help/.test(e.target.innerHTML)) {
-          set.help(e.target.innerHTML.slice(4));
-          set.helpX(Math.min(e.pageX + 20, window.innerWidth - 400));
-          set.helpY(e.pageY - 20);
-        } else {
-          set.help('');
-        }
-      }}
-
-      id="Main"
-    >
-      <img alt="logo" src="PSALogo.png" id="PSALogo"/>
-
-      <nav onClick={changeScreen}>
-        <button className={/Home|About/.test(screen)  ? 'selected' : undefined} data-scr="Home"       >Home</button>
-        <button className={/Location/.test(screen)    ? 'selected' : undefined} data-scr="Location"   >Location</button>
-        <button className={/Soil/.test(screen)        ? 'selected' : undefined} data-scr="Soil"       >Soil</button>
-        <button className={/CoverCrop/.test(screen)   ? 'selected' : undefined} data-scr="CoverCrop1" >Cover Crop</button>
-        {/*  <button id="CCQuality" data-scr="CoverCrop2">Quality</button> */}
-        <button className={/CashCrop/.test(screen)    ? 'selected' : undefined} data-scr="CashCrop"   >Cash Crop</button>
-        <button className={/Output/.test(screen)      ? 'selected' : undefined} data-scr="Output"     >Output</button>
-        {
-          params.get('dev') && 
-          <button className={/Advanced/.test(screen)    ? 'selected' : undefined} data-scr="Advanced"   >Advanced</button>
-        }
-        
-        <Button className="feedback" data-scr="Feedback" variant="outlined" color="primary" >Feedback</Button>
-        {
-          isPSA ? 
-            <select id="Fields"
-              onChange={changePSA}
-              value={parms.field}
-            >
-              <option></option>
-              <optgroup label="PSA">
-                {
-                  Object.keys(examples)
-                    .filter(site => examples[site].category === 'PSA')
-                    .sort().map(site => <option key={site}>{site}</option>)
-                }
-              </optgroup>
-              <optgroup label="Resham">
-                {
-                  Object.keys(examples)
-                    .filter(site => examples[site].category === 'Resham')
-                    .sort().map(site => <option key={site}>{site}</option>)
-                }
-              </optgroup>
-            </select>
-          :
-          true || Object.keys(localStorage).length ?
-            <select id="Fields"
-              onChange={changeField}
-              value={parms.field}
-            >
-              <option></option>
-              <option>Example: Grass</option>
-              <option>Example: Legume</option>
-              {
-                Object.keys(localStorage).length && (
-                  <>
-                    <option>Clear previous runs</option>
-                    <option disabled>____________________</option>
-                  </>
-                )
-              }
-              {
-                Object.keys(localStorage).sort().map((field, idx) => (
-                  <option key={idx} checked={field === parms.field}>{field}</option>
-                ))
-              }
-            </select>
-            : ''
-        }
-      </nav>
-      
-      <Help parms={parms} />
-      
-      {screens[screen]({
-        props: props,
-        set: set,
-        parms: parms,
-        setScreen: setScreen,
-      })}
-    </div>
-  );
-} // Screens
-
-const App = () => {
   const runModel = () => {
     clearTimeout(modelTimer);
     modelTimer = setTimeout(runModel2, 300);
@@ -452,52 +403,52 @@ const App = () => {
       return (data.reduce((a, b) => +a + +b) / totpct).toFixed(dec);
     } // weightedAverage
   
-    if (!parms.lat || !parms.lon) {
+    if (!lat || !lon) {
       return;
     }
 
-    if (!parms.firstSSURGO) {
-      set.BD('');
+    if (!firstSSURGO) {
+      dispatch(sets.BD(''));
     }
-    set.OM('');
+    dispatch(sets.OM(''));
 
-    // const ssurgoSrc = `https://api.precisionsustainableag.org/ssurgo?lat=${parms.lat}&lon=${parms.lon}&component=major`;
-    const start = moment(parms.killDate).format('yyyy-MM-DD');
-    const end   = moment(parms.plantingDate).add(110, 'days').add(1, 'hour').format('yyyy-MM-DD');
-    const lwc = parms.lwc || 10;
-    let carb = parms.carb || (24.7 + 10.5 * parms.N);
-    let cell = parms.cell || (69 - 10.2 * parms.N);
-    let lign = parms.lign || (100 - (carb + cell));
+    // const ssurgoSrc = `https://api.precisionsustainableag.org/ssurgo?lat=${lat}&lon=${lon}&component=major`;
+    const start = moment(killDate).format('yyyy-MM-DD');
+    const end   = moment(plantingDate).add(110, 'days').add(1, 'hour').format('yyyy-MM-DD');
+    const lwc = Lwc || 10;
+    let carb = Carb || (24.7 + 10.5 * N);
+    let cell = Cell || (69 - 10.2 * N);
+    let lign = Lign || (100 - (carb + cell));
 
-    const total = +parms.carb + +parms.cell + +parms.lign;
-    carb = parms.carb * 100 / total;
-    cell = parms.cell * 100 / total;
-    lign = parms.lign * 100 / total;
-    const factor = parms.unit === 'lb/ac' ? 1.12085 : 1;
-    const biomass = parms.biomass * factor;
-    const om = parms.OM;
-    const bd = parms.BD;
-    const In = parms.InorganicN || 10;
+    const total = +carb + +cell + +lign;
+    carb = carb * 100 / total;
+    cell = cell * 100 / total;
+    lign = lign * 100 / total;
+    const factor = unit === 'lb/ac' ? 1.12085 : 1;
+    const biomass = Biomass * factor;
+    const om = OM;
+    const bd = BD;
+    const In = InorganicN || 10;
     const pmn = 10;
 
-    const ssurgoSrc = params.get('dev') ? `https://weather.aesl.ces.uga.edu/ssurgo?lat=${parms.lat}&lon=${parms.lon}&component=major` :
-                                          `https://api.precisionsustainableag.org/ssurgo?lat=${parms.lat}&lon=${parms.lon}&component=major`
+    const ssurgoSrc = params.get('dev') ? `https://weather.aesl.ces.uga.edu/ssurgo?lat=${lat}&lon=${lon}&component=major` :
+                                          `https://api.precisionsustainableag.org/ssurgo?lat=${lat}&lon=${lon}&component=major`
 
-    // const modelSrc  = `https://weather.aesl.ces.uga.edu/cc-ncalc/both?lat=${parms.lat}&lon=${parms.lon}&start=${start}&end=${end}&n=${parms.N}&biomass=${biomass}&lwc=${lwc}&carb=${carb}&cell=${cell}&lign=${lign}&om=${om}&bd=${bd}&in=${In}&pmn=${pmn}`;
-    const modelSrc = params.get('dev') ? `https://weather.aesl.ces.uga.edu/cc-ncalc/surface?lat=${parms.lat}&lon=${parms.lon}&start=${start}&end=${end}&n=${parms.N}&biomass=${biomass}&lwc=${lwc}&carb=${carb}&cell=${cell}&lign=${lign}&om=${om}&bd=${bd}&in=${In}&pmn=${pmn}` :
-                                         `https://api.precisionsustainableag.org/cc-ncalc/surface?lat=${parms.lat}&lon=${parms.lon}&start=${start}&end=${end}&n=${parms.N}&biomass=${biomass}&lwc=${lwc}&carb=${carb}&cell=${cell}&lign=${lign}&om=${om}&bd=${bd}&in=${In}&pmn=${pmn}`
+    // const modelSrc  = `https://weather.aesl.ces.uga.edu/cc-ncalc/both?lat=${lat}&lon=${lon}&start=${start}&end=${end}&n=${N}&biomass=${biomass}&lwc=${lwc}&carb=${carb}&cell=${cell}&lign=${lign}&om=${om}&bd=${bd}&in=${In}&pmn=${pmn}`;
+    const modelSrc = params.get('dev') ? `https://weather.aesl.ces.uga.edu/cc-ncalc/surface?lat=${lat}&lon=${lon}&start=${start}&end=${end}&n=${N}&biomass=${biomass}&lwc=${lwc}&carb=${carb}&cell=${cell}&lign=${lign}&om=${om}&bd=${bd}&in=${In}&pmn=${pmn}` :
+                                         `https://api.precisionsustainableag.org/cc-ncalc/surface?lat=${lat}&lon=${lon}&start=${start}&end=${end}&n=${N}&biomass=${biomass}&lwc=${lwc}&carb=${carb}&cell=${cell}&lign=${lign}&om=${om}&bd=${bd}&in=${In}&pmn=${pmn}`
 
-    const cornNSrc =  params.get('dev') ? `https://weather.aesl.ces.uga.edu/weather/hourly?lat=${parms.lat}&lon=${parms.lon}&start=${moment(parms.plantingDate).format('yyyy-MM-DD')}&end=${end}&attributes=air_temperature` :
-                                          `https://api.precisionsustainableag.org/weather/hourly?lat=${parms.lat}&lon=${parms.lon}&start=${moment(parms.plantingDate).format('yyyy-MM-DD')}&end=${end}&attributes=air_temperature`;
+    const cornNSrc =  params.get('dev') ? `https://weather.aesl.ces.uga.edu/weather/hourly?lat=${lat}&lon=${lon}&start=${moment(plantingDate).format('yyyy-MM-DD')}&end=${end}&attributes=air_temperature` :
+                                          `https://api.precisionsustainableag.org/weather/hourly?lat=${lat}&lon=${lon}&start=${moment(plantingDate).format('yyyy-MM-DD')}&end=${end}&attributes=air_temperature`;
     
-    set.gotModel(false);
-    set.errorModel(false);
+    dispatch(sets.gotModel(false));
+    dispatch(sets.errorModel(false));
 
-    set.gotSSURGO(false);
-    set.errorSSURGO(false);
+    dispatch(sets.gotSSURGO(false));
+    dispatch(sets.errorSSURGO(false));
 
-    set.cornN(false);
-    set.errorCorn(false);
+    dispatch(sets.cornN(false));
+    dispatch(sets.errorCorn(false));
 
     if (start !== 'Invalid date' && end !== 'Invalid date' && end > start) {
       console.log(modelSrc);
@@ -506,7 +457,7 @@ const App = () => {
         .then(data => {
           console.log(data);
           if (data.name === 'error' || !data.surface) {
-            set.errorModel(true);
+            dispatch(sets.errorModel(true));
             return;
           }
 
@@ -539,8 +490,8 @@ const App = () => {
             model.s[col] = new Array(model.s.Rain.length).fill(model.s[col]);
           });
         
-          set.model(model);
-          set.gotModel(true);
+          dispatch(sets.model(model));
+          dispatch(sets.gotModel(true));
           console.log('model');
           console.log(data);
         })
@@ -556,9 +507,9 @@ const App = () => {
           console.log('CornN:');
           console.log(data);
 
-          set.cornN(data);
+          dispatch(sets.cornN(data));
         } else {
-          set.errorCorn(true);
+          dispatch(sets.errorCorn(true));
         }
       })
       .catch((error) => {
@@ -570,12 +521,12 @@ const App = () => {
       .then(response => response.json())
       .then(data => {
         if (data.ERROR) {
-          set.errorSSURGO(true);
+          dispatch(sets.errorSSURGO(true));
         } else if (data instanceof Array) {
           console.log('SSURGO:');
           console.log(data);
 
-          set.gotSSURGO(true);
+          dispatch(sets.gotSSURGO(true));
           
           data = data.filter(d => d.desgnmaster !== 'O');
 
@@ -585,12 +536,12 @@ const App = () => {
           console.log(JSON.stringify(data.map(d => [d.dbthirdbar_r, d.om_r, d.comppct_r, d.hzdept_r]), null, 2));
           console.log(weightedAverage(data, 'dbthirdbar_r'));
 
-          if (!parms.firstSSURGO || !parms.BD) {
-            set.BD(weightedAverage(data, 'dbthirdbar_r'));
+          if (!firstSSURGO || !BD) {
+            dispatch(sets.BD(weightedAverage(data, 'dbthirdbar_r')));
           }
-          set.firstSSURGO(false);
+          dispatch(sets.firstSSURGO(false));
           
-          set.OM(weightedAverage(data, 'om_r'));
+          dispatch(sets.OM(weightedAverage(data, 'om_r')));
         }
       })
       .catch((error) => {
@@ -599,18 +550,18 @@ const App = () => {
   } // runModel2
 
   const setLWC = () => {
-    if (+parms.biomass && +parms.freshBiomass) {
-      set.lwc(+((parms.freshBiomass - parms.biomass) / parms.biomass).toFixed(2));
+    if (+Biomass && +freshBiomass) {
+      dispatch(sets.lwc(+((freshBiomass - Biomass) / Biomass).toFixed(2)));
     }
   } // setLWC
 
   const NDefaults = () => {
-    if (!parms.edited) {
-      const carb = Math.min(100, Math.max(0, (24.7 + 10.5 * parms.N))).toFixed(0);
-      const cell = Math.min(100, Math.max(0, (69 - 10.2 * parms.N))).toFixed(0);
-      set.carb(carb);
-      set.cell(cell);
-      set.lign(100 - (+carb + +cell));
+    if (!edited) {
+      const carb = Math.min(100, Math.max(0, (24.7 + 10.5 * N))).toFixed(0);
+      const cell = Math.min(100, Math.max(0, (69 - 10.2 * N))).toFixed(0);
+      dispatch(sets.carb(carb));
+      dispatch(sets.cell(cell));
+      dispatch(sets.lign(100 - (+carb + +cell)));
     }
   } // NDefaults
 
@@ -626,7 +577,7 @@ const App = () => {
       return params.get(parm) || def;
     }
   } // query
-
+/*
   let {parms, set, props} = defaults(
     change,
     {
@@ -698,10 +649,74 @@ const App = () => {
       }
     }
   );
+*/
+
+const changeScreen = (e) => {
+  const button = e.target;
+
+  if (button.tagName === 'BUTTON') {
+    dispatch(sets.screen(button.dataset.scr));
+  }
+} // changeScreen
+
+const screen = useSelector(get.screen);
+
+const sc = {
+  'Home'        : <Home />,
+  'About'       : <About />,
+  'Location'    : <Location />,
+  'Soil'        : <Soil />,
+  'CoverCrop1'  : <CoverCrop1 />,
+  'CoverCrop2'  : <CoverCrop2 />,
+  'CashCrop'    : <CashCrop />,
+  'Output'      : <Output />,
+  'Advanced'    : <Advanced />,
+  'Feedback'    : <Feedback />,
+}[screen] || alert(screen);
+
+return (
+  <div
+    tabIndex="0"
+
+    onKeyDown={(e) => {
+      if (e.key === 'Escape') {
+        dispatch(sets.help(''));
+        dispatch(sets.privacy(false));
+      }
+    }}
+
+    onClick={(e) => {
+      if (/^help/.test(e.target.innerHTML)) {
+        dispatch(sets.help(e.target.innerHTML.slice(4)));
+        dispatch(sets.helpX(Math.min(e.pageX + 20, window.innerWidth - 400)));
+        dispatch(sets.helpY(e.pageY - 20));
+      } else {
+        dispatch(sets.help(''));
+      }
+    }}
+
+    id="Main"
+  >
+    <img alt="logo" src="PSALogo.png" id="PSALogo" />
+    <nav onClick={changeScreen}>
+      <button className={/Home|About/.test(screen)  ? 'selected' : undefined} data-scr="Home"       >Home</button>
+      <button className={/Location/.test(screen)    ? 'selected' : undefined} data-scr="Location"   >Location</button>
+      <button className={/Soil/.test(screen)        ? 'selected' : undefined} data-scr="Soil"       >Soil</button>
+      <button className={/CoverCrop/.test(screen)   ? 'selected' : undefined} data-scr="CoverCrop1" >Cover Crop</button>
+      {/*  <button id="CCQuality" data-scr="CoverCrop2">Quality</button> */}
+      <button className={/CashCrop/.test(screen)    ? 'selected' : undefined} data-scr="CashCrop"   >Cash Crop</button>
+      <button className={/Output/.test(screen)      ? 'selected' : undefined} data-scr="Output"     >Output</button>
+
+      <Button className="feedback" data-scr="Feedback" variant="outlined" color="primary" >Feedback</Button>
+    </nav>
+    {sc}
+  </div>
+);
 
   return (
     <div>
-      <Screens parms={parms} props={props} set={set} />
+      { /* <Screens parms={parms} props={props} set={set} /> */ }
+      <Screens />
     </div>
   );
 } // App

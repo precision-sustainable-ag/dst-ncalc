@@ -7,23 +7,50 @@ import HighchartsReact from 'highcharts-react-official';
 import moment from 'moment';
 
 import {CSVLink} from "react-csv";
+import {useDispatch, useSelector} from 'react-redux';
+import {get, sets} from '../store/Store';
 
 const params = new URLSearchParams(window.location.search);
 
-const Output = ({props, parms, set, setScreen}) => {
+const Output = ({props, parms}) => {
+  const dispatch = useDispatch();
   const doIncorporated = false;
+  const BD = useSelector(get.BD);
+  const N = useSelector(get.N);
+  const killDate = useSelector(get.killDate);
+  const plantingDate = useSelector(get.plantingDate);
+  let carb = useSelector(get.carb);
+  let cell = useSelector(get.cell);
+  let lign = useSelector(get.lign);
+  const lwc = useSelector(get.lwc);
+  const biomass = useSelector(get.biomass);
+  const unit = useSelector(get.unit);
+  const InorganicN = useSelector(get.InorganicN);
+  const coverCrop = useSelector(get.coverCrop);
+  const field = useSelector(get.field);
+  const gotModel = useSelector(get.gotModel);
+  const errorModel = useSelector(get.errorModel);
+  const errorSSURGO = useSelector(get.errorSSURGO);
+  const errorCorn = useSelector(get.errorCorn);
+  const model = useSelector(get.model);
+  const mockup = useSelector(get.mockup);
+  const cornN = useSelector(get.cornN);
+  const cashCrop = useSelector(get.cashCrop);
+  const Yield = useSelector(get.yield);
+  const outputN = useSelector(get.outputN);
+  const nweeks = useSelector(get.nweeks);
 
   console.log({
-    gotModel: parms.gotModel,
-    cornN: parms.cornN
+    gotModel,
+    cornN
   });
 
-  if (parms.errorModel || parms.errorCorn) {
+  if (errorModel || errorCorn) {
     const errors = [];
-    if (parms.errorModel) {
+    if (errorModel) {
       errors.push(`Couldn't run Model.  Make sure your location is in the continental United States.`)
     }
-    if (parms.errorCorn) {
+    if (errorCorn) {
       errors.push(`Couldn't run corn uptake curve.`)
     }
     return (
@@ -41,7 +68,7 @@ const Output = ({props, parms, set, setScreen}) => {
     )
   }
 
-  if (!parms.gotModel || !parms.cornN || !parms.model || !parms.biomass || !parms.N || !parms.carb || !parms.cell || !parms.lign || !parms.lwc || !parms.BD || !parms.InorganicN) {
+  if (!gotModel || !cornN || !model || !biomass || !N || !carb || !cell || !lign || !lwc || !BD || !InorganicN) {
     return (
       <>
         <div className="loading">
@@ -52,41 +79,39 @@ const Output = ({props, parms, set, setScreen}) => {
           <span></span>
         </div>
         <ul>
-          <li>Model: {parms.errorModel.toString()}</li>
-          <li>SSURGO: {parms.errorSSURGO.toString()}</li>
-          <li>Corn uptake curve: {parms.errorCorn.toString()}</li>
+          <li>Model: {errorModel.toString()}</li>
+          <li>SSURGO: {errorSSURGO.toString()}</li>
+          <li>Corn uptake curve: {errorCorn.toString()}</li>
         </ul>
       </>
   );
   }
 
-  Object.keys(parms.model.s).forEach(key => {
+  Object.keys(model.s).forEach(key => {
     if (!/^(Temp|MinNfromFOM|FOM|Date|Rain)$/.test(key)) {
-      // delete parms.model.s[key];
+      // delete model.s[key];
     }
   });
 
-  console.log(parms.model.s);
+  console.log(model.s);
 
-  const total = +parms.carb + +parms.cell + +parms.lign;
-  const carb = parms.carb * 100 / total;
-  const cell = parms.cell * 100 / total;
-  const lign = parms.lign * 100 / total;
-  const factor = parms.unit === 'lb/ac' ? 1.12085 : 1;
+  const total = +carb + +cell + +lign;
+  carb = carb * 100 / total;
+  cell = cell * 100 / total;
+  lign = lign * 100 / total;
+  const factor = unit === 'lb/ac' ? 1.12085 : 1;
 
-  const model = parms.model;
-
-  const d1 = new Date(parms.plantingDate);
+  const d1 = new Date(plantingDate);
   let dailyTotal = 0;
   let gdd = 0;
-  // const NUptake = [[+parms.plantingDate, 0]];
+  // const NUptake = [[+plantingDate, 0]];
   const NUptake = [];
 
-  const cornN = parms.cashCrop === 'Corn' && parms.outputN === 1;
-  if (cornN) {
-    const f = parms.unit === 'lb/ac' ? 1 : 1.12085;
+  const doCornN = cashCrop === 'Corn' && outputN === 1;
+  if (doCornN) {
+    const f = unit === 'lb/ac' ? 1 : 1.12085;
 
-    parms.cornN.forEach(rec => {
+    cornN.forEach(rec => {
       const temp = rec.air_temperature;
 
       dailyTotal += temp - 8;
@@ -95,7 +120,7 @@ const Output = ({props, parms, set, setScreen}) => {
         NUptake.push([
           // d1 - (1000 * 60 * 60 * 24),
           +d1,
-          (parms.yield * 1.09) / (1 + Math.exp((-0.00615 * (gdd - 646.19)))) * f
+          (Yield * 1.09) / (1 + Math.exp((-0.00615 * (gdd - 646.19)))) * f
         ]);
         dailyTotal = 0;
       }
@@ -103,14 +128,14 @@ const Output = ({props, parms, set, setScreen}) => {
     });
 
     /*
-    parms.model.s.Temp.slice((parms.plantingDate - parms.killDate) / (1000 * 60 * 60)).forEach(temp => {
+    model.s.Temp.slice((plantingDate - killDate) / (1000 * 60 * 60)).forEach(temp => {
       dailyTotal += temp - 8;
       if (d1.getHours() === 0) {
         gdd += (dailyTotal / 24);
         NUptake.push([
           // d1 - (1000 * 60 * 60 * 24),
           +d1,
-          (parms.yield * 1.09) / (1 + Math.exp((-0.00615 * (gdd - 646.19)))) * f
+          (Yield * 1.09) / (1 + Math.exp((-0.00615 * (gdd - 646.19)))) * f
         ]);
         dailyTotal = 0;
       }
@@ -119,7 +144,7 @@ const Output = ({props, parms, set, setScreen}) => {
     */
   }
 
-  let date = new Date(parms.killDate);
+  let date = new Date(killDate);
   const surfaceData = [];
 
   let m2;
@@ -127,7 +152,7 @@ const Output = ({props, parms, set, setScreen}) => {
   let mf;
   const dates = [];
 
-  model.s[parms.outputN === 1 ? 'MinNfromFOM' : 'FOM'].forEach((d, i, a) => {
+  model.s[outputN === 1 ? 'MinNfromFOM' : 'FOM'].forEach((d, i, a) => {
     const value = +(d / factor).toFixed(2);
     
     if (i === 24 * 2 * 7) {
@@ -147,19 +172,19 @@ const Output = ({props, parms, set, setScreen}) => {
         marker: {
           radius: 5,
           fillColor: '#008837',
-          enabled: (i / 24 === parms.nweeks * 7) ||
-                   (i === a.length - 1 && parms.nweeks * 7 * 24 >= a.length)
+          enabled: (i / 24 === nweeks * 7) ||
+                   (i === a.length - 1 && nweeks * 7 * 24 >= a.length)
         }
       });
     }
     date.setHours(date.getHours() + 1);
   });
 
-  date = new Date(parms.killDate);
+  date = new Date(killDate);
   const incorporatedData = [];
 
   if (doIncorporated) {
-    model.i[parms.outputN === 1 ? 'FomCumN' : 'FOM'].forEach((d, i, a) => {
+    model.i[outputN === 1 ? 'FomCumN' : 'FOM'].forEach((d, i, a) => {
       const value = +(d / factor).toFixed(2);
       incorporatedData.push({
         x: +date,
@@ -167,19 +192,19 @@ const Output = ({props, parms, set, setScreen}) => {
         marker: {
           radius: 5,
           fillColor: '#008837',
-          enabled: (i / 24 === parms.nweeks * 7) ||
-                    (i === a.length - 1 && parms.nweeks * 7 * 24 >= a.length)
+          enabled: (i / 24 === nweeks * 7) ||
+                    (i === a.length - 1 && nweeks * 7 * 24 >= a.length)
         }
       });
       date.setDate(date.getDate() + 1);
     });
   }
 
-  const max = parms.outputN === 1 ? (parms.biomass * parms.N) / 100 : Math.max.apply(Math, surfaceData.map(d => d.y));
-  const surfaceMin = parms.outputN === 1 ? (parms.biomass * parms.N) / 100 : Math.min.apply(Math, surfaceData.map(d => d.y));
-  const incorporatedMin = parms.outputN === 1 ? (parms.biomass * parms.N) / 100 : Math.min.apply(Math, incorporatedData.map(d => d.y));
+  const max = outputN === 1 ? (biomass * N) / 100 : Math.max.apply(Math, surfaceData.map(d => d.y));
+  const surfaceMin = outputN === 1 ? (biomass * N) / 100 : Math.min.apply(Math, surfaceData.map(d => d.y));
+  const incorporatedMin = outputN === 1 ? (biomass * N) / 100 : Math.min.apply(Math, incorporatedData.map(d => d.y));
 
-  const minDate = +parms.killDate;
+  const minDate = +killDate;
 
   let labModel = '';
 
@@ -217,23 +242,23 @@ const Output = ({props, parms, set, setScreen}) => {
         return this.points.reduce((s, point) => {
           if (point.series.name === 'Corn N uptake') {
             const pct = Math.round((point.y / maxNUptake) * 100);
-            return s + '<strong>' + point.series.name + ': ' + point.y.toFixed(0) + ' ' + parms.unit + ' (' + pct + '%)<br/></strong>';
+            return s + '<strong>' + point.series.name + ': ' + point.y.toFixed(0) + ' ' + unit + ' (' + pct + '%)<br/></strong>';
           } else {
-            return s + '<strong>' + point.series.name + ': ' + point.y.toFixed(0) + ' ' + parms.unit + '<br/></strong>'
+            return s + '<strong>' + point.series.name + ': ' + point.y.toFixed(0) + ' ' + unit + '<br/></strong>'
           }
         }, `<small>${Highcharts.dateFormat('%b %e, %Y', new Date(this.x))}</small><br/>Week ${week}<br/>`);
       }
     },
     title: {
-      text: parms.mockup === 2 ? (
-              parms.outputN === 1 && cornN ? '<div class="caption">Cover crop N released and Corn N uptake over time.</div>' :
-              parms.outputN === 1          ? '<div class="caption">Cover crop N released over time.</div>'
-                                            : '<div class="caption">Undecomposed cover crop residue mass<br/>remaining over time following its termination.</div>'
+      text: mockup === 2 ? (
+              outputN === 1 && doCornN ? '<div class="caption">Cover crop N released and Corn N uptake over time.</div>' :
+              outputN === 1            ? '<div class="caption">Cover crop N released over time.</div>'
+                                             : '<div class="caption">Undecomposed cover crop residue mass<br/>remaining over time following its termination.</div>'
             ) : ''
     },
     series: [
       {
-        name: parms.outputN === 1 ? 'N released' : 'Residue Remaining',
+        name: outputN === 1 ? 'N released' : 'Residue Remaining',
         data: surfaceData,
         color: '#008837',
         showInLegend: false,
@@ -242,7 +267,7 @@ const Output = ({props, parms, set, setScreen}) => {
         }
       },
       {
-        name: parms.outputN === 1 ? 'N released' : 'Residue Remaining',
+        name: outputN === 1 ? 'N released' : 'Residue Remaining',
         data: incorporatedData,
         color: '#003788',
         showInLegend: false,
@@ -262,9 +287,9 @@ const Output = ({props, parms, set, setScreen}) => {
     yAxis: [
       {
         title: {
-          text: parms.outputN === 1 && cornN  ? `Cover Crop N Released (${parms.unit})<br><div style="color: orange;">Corn N uptake (${parms.unit})</div>` :
-                parms.outputN === 1           ? `Cover Crop N Released (${parms.unit})` :
-                                                `Residue Remaining (${parms.unit})`,
+          text: outputN === 1 && doCornN  ? `Cover Crop N Released (${unit})<br><div style="color: orange;">Corn N uptake (${unit})</div>` :
+                outputN === 1             ? `Cover Crop N Released (${unit})` :
+                                                  `Residue Remaining (${unit})`,
           style: {
             fontSize: '14px',
             fontWeight: 'bold',
@@ -278,7 +303,7 @@ const Output = ({props, parms, set, setScreen}) => {
       },
       {
         title: {
-          text: parms.outputN === 1 ? 'Cover Crop N Released (%)' : 'Residue Remaining (%)',
+          text: outputN === 1 ? 'Cover Crop N Released (%)' : 'Residue Remaining (%)',
           style: {
             fontSize: '14px',
             fontWeight: 'bold',
@@ -290,7 +315,7 @@ const Output = ({props, parms, set, setScreen}) => {
         opposite: true,
         tickPositioner: function() {
           const positions = [];
-          const increment = cornN || parms.outputN === 2 ? 25 : 10;
+          const increment = doCornN || outputN === 2 ? 25 : 10;
 
           for (let tick = 0; tick <= 100; tick += increment) {
             positions.push(tick * (max / 100));
@@ -310,10 +335,10 @@ const Output = ({props, parms, set, setScreen}) => {
       {
         type: 'datetime',
         title: {
-          text: parms.mockup === 1 ? (
-                  parms.outputN === 1 && cornN ? '<div class="caption">Cover crop N released and Corn N uptake over time.</div>' :
-                  parms.outputN === 1          ? '<div class="caption">Cover crop N released over time.</div>'
-                                              : '<div class="caption">Undecomposed cover crop residue mass remaining over time following its termination.</div>'
+          text: mockup === 1 ? (
+                  outputN === 1 && doCornN ? '<div class="caption">Cover crop N released and Corn N uptake over time.</div>' :
+                  outputN === 1            ? '<div class="caption">Cover crop N released over time.</div>'
+                                                 : '<div class="caption">Undecomposed cover crop residue mass remaining over time following its termination.</div>'
                 ) : ''
         },
         crosshair: {
@@ -340,7 +365,7 @@ const Output = ({props, parms, set, setScreen}) => {
           }
         },
         plotLines: [{
-          value: new Date(parms.plantingDate),
+          value: new Date(plantingDate),
           color: '#7b3294',
           dashStyle: 'shortdash',
           width: 0.4,
@@ -361,14 +386,14 @@ const Output = ({props, parms, set, setScreen}) => {
     chart: {
       type: 'bar',
       height: 350,
-      className: parms.outputN === 2 ? 'hidden' : '',
+      className: outputN === 2 ? 'hidden' : '',
     },
     title: {
       text: `<div class="caption">
                Cash crop recommended N rate<br>after accounting for cover crop N credits.
              </div>
             `,
-      verticalAlign: parms.mockup === 1 ? 'bottom' : 'top'
+      verticalAlign: mockup === 1 ? 'bottom' : 'top'
     },
     series: [
       /*
@@ -445,7 +470,7 @@ const Output = ({props, parms, set, setScreen}) => {
           useHTML: true,
           formatter: function() {
             const footnote = this.y === 0 ? '<sup>*</sup>' : '';
-            return `<div style="color: ${this.color}; background: white; transform: translateY(${doIncorporated ? -38 : -58}px);">${this.y} ${parms.unit}${footnote}</div>`
+            return `<div style="color: ${this.color}; background: white; transform: translateY(${doIncorporated ? -38 : -58}px);">${this.y} ${unit}${footnote}</div>`
           },
         },
         animation: false
@@ -457,11 +482,11 @@ const Output = ({props, parms, set, setScreen}) => {
     chart: {
       type: 'bar',
       height: 350,
-      className: parms.outputN === 1 ? 'hidden' : ''
+      className: outputN === 1 ? 'hidden' : ''
     },
     title: {
-      text: `<div class="caption">Cover crop residue mass remaining<br>after ${Math.floor(parms.model.s.Date.length / (24 * 7))} weeks past termination.</div>`,
-      verticalAlign: parms.mockup === 1 ? 'bottom' : 'top'
+      text: `<div class="caption">Cover crop residue mass remaining<br>after ${Math.floor(model.s.Date.length / (24 * 7))} weeks past termination.</div>`,
+      verticalAlign: mockup === 1 ? 'bottom' : 'top'
     },
     xAxis: {
       categories: 
@@ -500,7 +525,7 @@ const Output = ({props, parms, set, setScreen}) => {
         stacking: 'normal',
         dataLabels: {
           enabled: true,
-          format: `{y} ${parms.unit}`,
+          format: `{y} ${unit}`,
           style: {
             textOutline: 'none',
             textAlign: 'center',
@@ -519,13 +544,13 @@ const Output = ({props, parms, set, setScreen}) => {
     ]
   } // residueGraph
 
-  if (parms.field) {
-    if (!/Example: Grass|Example: Legume/.test(parms.field)) {
+  if (field) {
+    if (!/Example: Grass|Example: Legume/.test(field)) {
       const clone = {...parms};
       delete clone.model;
 
       console.log(parms);
-      localStorage.setItem(parms.field, JSON.stringify(clone));
+      localStorage.setItem(field, JSON.stringify(clone));
     }
   }
 
@@ -537,26 +562,26 @@ const Output = ({props, parms, set, setScreen}) => {
   const csv = 'Date,' + cols + '\n' + dates.map((date, i) => date + ',' + cols.map(col => model.s[col][i])).join('\n');
 
   const summary = 
-    <div className="inputs" style={{borderTop: parms.mockup === 1 ? '1px solid #bbb' : 'none', paddingTop: parms.mockup === 1 ? '1em' : 'none'}}>
+    <div className="inputs" style={{borderTop: mockup === 1 ? '1px solid #bbb' : 'none', paddingTop: mockup === 1 ? '1em' : 'none'}}>
       By
       &nbsp;
       <select
         {...props('nweeks')}
-        onChange={(e) => set.nweeks(e.target.value)}
+        onChange={(e) => dispatch(sets.nweeks(e.target.value))}
       >
         {
-          Array(Math.round(parms.model.s.Date.length / 24 / 7)).fill().map((_, i) => <option key={i + 1}>{i + 1}</option>)
+          Array(Math.round(model.s.Date.length / 24 / 7)).fill().map((_, i) => <option key={i + 1}>{i + 1}</option>)
         }
       </select>
       &nbsp;
-      week{parms.nweeks > 1 ? 's' : ''} after cover crop termination, 
-      {parms.outputN === 1 ? ' cumulative N released ' : ' undecomposed residue mass remaining '}
+      week{nweeks > 1 ? 's' : ''} after cover crop termination, 
+      {outputN === 1 ? ' cumulative N released ' : ' undecomposed residue mass remaining '}
       is:
       <ul>
-        <li><strong>{Math.round(surfaceData[Math.min(parms.nweeks * 7, surfaceData.length - 1)].y)}</strong> {parms.unit} for surface residues.</li>
+        <li><strong>{Math.round(surfaceData[Math.min(nweeks * 7, surfaceData.length - 1)].y)}</strong> {unit} for surface residues.</li>
         {
           doIncorporated &&
-          <li>{Math.round(incorporatedData[Math.min(parms.nweeks * 7, incorporatedData.length - 1)].y)} {parms.unit} for incorporated residues.</li>
+          <li>{Math.round(incorporatedData[Math.min(nweeks * 7, incorporatedData.length - 1)].y)} {unit} for incorporated residues.</li>
         }
         
       </ul>
@@ -571,14 +596,14 @@ const Output = ({props, parms, set, setScreen}) => {
         <div style={{display: 'none'}}>
           Mockup: &nbsp;
           <button
-          className={parms.mockup === 1 ? 'selected' : ''}
-          onClick={() => set.mockup(1)}
+          className={mockup === 1 ? 'selected' : ''}
+          onClick={() => dispatch(sets.mockup(1))}
           >
             1
           </button>
           <button
-          className={parms.mockup === 2 ? 'selected' : ''}
-          onClick={() => set.mockup(2)}
+          className={mockup === 2 ? 'selected' : ''}
+          onClick={() => dispatch(sets.mockup(2))}
           >
             2
           </button>
@@ -598,20 +623,20 @@ const Output = ({props, parms, set, setScreen}) => {
                         <tr>
                           <td>
                             <u>Field name</u><br/>
-                            (<strong>{parms.field}</strong>)
+                            (<strong>{field}</strong>)
                             <p></p>
                             <u>Species</u><br/>
-                            (<strong>{parms.coverCrop.map((crop, i, a) => <span key={crop}>{crop}{i < a.length - 1 ? <br/> : ''}</span>)}</strong>)
+                            (<strong>{coverCrop.map((crop, i, a) => <span key={crop}>{crop}{i < a.length - 1 ? <br/> : ''}</span>)}</strong>)
                             <p></p>
                             <u>Termination Date</u><br/>
-                            (<strong>{moment(parms.killDate).format('MMM D, yyyy')}</strong>)
+                            (<strong>{moment(killDate).format('MMM D, yyyy')}</strong>)
                             <p></p>
                             <u>Dry Biomass</u><br/>
-                            (<strong>{(+parms.biomass).toFixed(0)} {parms.unit}</strong>)
+                            (<strong>{(+biomass).toFixed(0)} {unit}</strong>)
                           </td>
                           <td>
                             <u>Residue N Content</u><br/>
-                            (<strong>{((parms.biomass * parms.N) / 100).toFixed(0)} {parms.unit}</strong>)
+                            (<strong>{((biomass * N) / 100).toFixed(0)} {unit}</strong>)
                             <p></p>
                             <u>Carbohydrates</u><br/>
                             (<strong>{carb.toFixed(0)} %</strong>)
@@ -629,40 +654,40 @@ const Output = ({props, parms, set, setScreen}) => {
                 </div>
 
                 <HighchartsReact highcharts={Highcharts} options={NGraph} className="hidden" />
-                {(parms.outputN === 1 && parms.targetN < surfaceNPredict) && <div class="footnote">* Your cover crop is supplying all of your needs.</div>}
+                {(outputN === 1 && parms.targetN < surfaceNPredict) && <div class="footnote">* Your cover crop is supplying all of your needs.</div>}
                 <HighchartsReact highcharts={Highcharts} options={residueGraph} />
               </td>
               <td>
                 <div className="output center" style={{marginBottom: '1em'}}>
                   <button
-                    className={parms.outputN === 1 ? 'selected' : ''}
-                    onClick={() => set.outputN(1)}
+                    className={outputN === 1 ? 'selected' : ''}
+                    onClick={() => dispatch(sets.outputN(1))}
                   >
                     N RELEASED
                   </button>
                   
                   <button
-                    className={parms.outputN === 2 ? 'selected' : ''}
-                    onClick={() => set.outputN(2)}
+                    className={outputN === 2 ? 'selected' : ''}
+                    onClick={() => dispatch(sets.outputN(2))}
                   >
                     RESIDUE REMAINING
                   </button>
                 </div>
                 
-                {parms.mockup === 2 && summary}
+                {mockup === 2 && summary}
 
                 <HighchartsReact highcharts={Highcharts} options={options}/>
                 
-                {parms.mockup === 1 && summary}
+                {mockup === 1 && summary}
               </td>
             </tr>
           </tbody>
         </table>
       </div>
       <div className="bn">
-        <button onClick={() => setScreen('CashCrop')}>BACK</button>
-        <button onClick={() => setScreen('Advanced')}>ADVANCED</button>
-        <button onClick={() => setScreen('Feedback')}>FEEDBACK</button>
+        <button onClick={() => dispatch(sets.screen('CashCrop'))}>BACK</button>
+        <button onClick={() => dispatch(sets.screen('Advanced'))}>ADVANCED</button>
+        <button onClick={() => dispatch(sets.screen('Feedback'))}>FEEDBACK</button>
       </div>
     </>
   )

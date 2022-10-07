@@ -3,8 +3,11 @@ import Myslider from './Slider';
 import {Autocomplete, Input} from './Inputs';
 
 import Icon from '@mui/material/Icon';
+import {useDispatch, useSelector} from 'react-redux';
+import {get, sets} from '../store/Store';
 
 const CashCrops = ({props}) => {
+  props = () => {};
   const crops = [
     'Alfalfa-Establishment',
     'Alfalfa-Maintenance',
@@ -185,7 +188,7 @@ const CashCrops = ({props}) => {
     'Wine Grapes',
     'Zoysia Lawn'
   ];
-
+/*
   const PiedNRate = {
     'Asparagus' : 55,
     'Bahia Grass Pasture' : 125,
@@ -289,7 +292,7 @@ const CashCrops = ({props}) => {
     'Wheat - Soybean Rotation' : 90,
     'Wildlife Plots - Chufa' : 40,
   }
-
+*/
   return (
     <Autocomplete
       {...props('cashCrop')}
@@ -297,8 +300,8 @@ const CashCrops = ({props}) => {
       options={crops}
 
       // onChange={(event, newValue) => {
-      //   set.targetN(PiedNRate[newValue] || 0);
-      //   set.cashCrop(newValue);
+      //   dispatch(sets.targetN(PiedNRate[newValue] || 0));
+      //   dispatch(sets.cashCrop(newValue));
       // }}
 
       placeholder="Select a cash crop"
@@ -306,7 +309,12 @@ const CashCrops = ({props}) => {
   );
 } // CashCrops
 
-const CashCrop = ({props, parms, set, setScreen}) => {
+const CashCrop = ({props, parms, set}) => {
+  props = () => {};
+  const dispatch = useDispatch();
+  const unit = useSelector(get.unit);
+  const cashCrop = useSelector(get.cashCrop);
+
   return (
     <>
       <h1>Tell us about your Cash Crop</h1>
@@ -317,7 +325,7 @@ const CashCrop = ({props, parms, set, setScreen}) => {
         <p>Cash Crop Planting Date:</p>
         <Input type="date" {...props('plantingDate')} />
 
-        {parms.cashCrop === 'Corn' &&
+        {cashCrop === 'Corn' &&
           <>
             <p>Yield Goal (bu/ac):</p>
             <Myslider
@@ -332,7 +340,7 @@ const CashCrop = ({props, parms, set, setScreen}) => {
         }
 
         <p>
-          What is your Target Nitrogen Fertilizer Rate? ({parms.unit}):
+          What is your Target Nitrogen Fertilizer Rate? ({unit}):
           <Icon>
             help
             Please specify the target N rate for your region.
@@ -350,8 +358,8 @@ const CashCrop = ({props, parms, set, setScreen}) => {
       </div>
   
       <div className="bn">
-        <button onClick={() => setScreen('CoverCrop2')}>BACK</button>
-        <button onClick={() => setScreen('Output')    }>NEXT</button>
+        <button onClick={() => dispatch(sets.screen('CoverCrop2'))}>BACK</button>
+        <button onClick={() => dispatch(sets.screen('Output'))    }>NEXT</button>
       </div>
     </>
   )

@@ -1,5 +1,11 @@
-const Home = ({setScreen, set, parms}) => {
-  const className = parms.privacy ? 'home background' : 'home';
+import {useDispatch, useSelector} from "react-redux";
+import {get, sets} from '../store/Store';
+
+const Home = () => {
+  const dispatch = useDispatch();
+  const privacy = useSelector(get.privacy);
+  
+  const className = privacy ? 'home background' : 'home';
 
   return (
     <>
@@ -12,8 +18,8 @@ const Home = ({setScreen, set, parms}) => {
         <p>This calculator aids farmers with decision support regarding cover crop residue persistence, as well as the amount and timing of nitrogen availability.</p>
 
         <div>
-          <button onClick={() => setScreen('About'   ) }>ABOUT</button>
-          <button onClick={() => setScreen('Location') }>GET STARTED</button>
+          <button onClick={() => dispatch(sets.screen('About'   ))}>ABOUT</button>
+          <button onClick={() => dispatch(sets.screen('Location'))}>GET STARTED</button>
         </div>
 
         <img className="crops fullwidth" src="background.png" alt="" />
@@ -23,16 +29,16 @@ const Home = ({setScreen, set, parms}) => {
         <button
           id="Privacy"
           className="bn"
-          onClick={() => set.privacy(!parms.privacy)}
+          onClick={() => dispatch(sets.privacy(!privacy))}
         >
           Your privacy
         </button>
         {
-          parms.privacy && 
+          privacy && 
           <div id="PrivacyPolicy">
             <button
               className="close"
-              onClick={() => set.privacy(false)}
+              onClick={() => dispatch(sets.privacy(false))}
             >
               x
             </button>

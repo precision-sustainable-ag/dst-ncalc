@@ -9,27 +9,33 @@ import {Autocomplete, Input} from './Inputs';
 import Myslider from './Slider';
 
 import Icon from '@mui/material/Icon';
+import {useDispatch, useSelector} from 'react-redux';
+import {get, sets} from '../store/Store';
 
-const CoverCrops = ({props, parms}) => {
+const CoverCrops = ({props}) => {
+  props = () => {};
+
+  const species = useSelector(get.species);
   return (
     <Autocomplete
       multiple
 
+      id='coverCrop'
       {...props('coverCrop')}
 
       groupBy={
-        (option) => parms.species.Brassica.includes(option)  ? 'Brassica' :
-                    parms.species.Broadleaf.includes(option) ? 'Broadleaf' :
-                    parms.species.Grass.includes(option)     ? 'Grass' :
-                    parms.species.Legume.includes(option)    ? 'Legume' :
+        (option) => species.Brassica.includes(option)  ? 'Brassica' :
+                    species.Broadleaf.includes(option) ? 'Broadleaf' :
+                    species.Grass.includes(option)     ? 'Grass' :
+                    species.Legume.includes(option)    ? 'Legume' :
                                                                'ERROR'
       }
 
       options={[
-        ...parms.species.Grass,
-        ...parms.species.Legume,
-        ...parms.species.Brassica,
-        ...parms.species.Broadleaf,
+        ...species.Grass,
+        ...species.Legume,
+        ...species.Brassica,
+        ...species.Broadleaf,
       ]}
 
       placeholder="Select one or more cover crops"
@@ -37,9 +43,17 @@ const CoverCrops = ({props, parms}) => {
   );
 } // CoverCrops
 
-const CoverCrop1 = ({props, parms, set, setScreen}) => {
-  const max = parms.coverCrop.length ? parms.coverCrop.map(s => parms.maxBiomass[s]).sort((a, b) => b - a)[0] || 15000 : 15000;
+const CoverCrop1 = ({props, parms, set}) => {
+  props = () => {};
+
+  const dispatch = useDispatch();
+  const maxBiomass = useSelector(get.maxBiomass);
+  const coverCrop = useSelector(get.coverCrop);
+  const max = coverCrop.length ? coverCrop.map(s => maxBiomass[s]).sort((a, b) => b - a)[0] || 15000 : 15000;
   const freshMax = max * 4 || 30000;
+  const biomass = useSelector(get.biomass);
+  const unit = useSelector(get.unit);
+  const freshBiomass = useSelector(get.freshBiomass);
 
   return (
     <>
@@ -67,14 +81,14 @@ const CoverCrop1 = ({props, parms, set, setScreen}) => {
           <RadioGroup row aria-label="position" name="position" style={{display: 'inline-block', marginLeft: '1em'}}>
             <FormControlLabel
               value="lb/ac"
-              control={<Radio id="unit" checked={parms.unit === 'lb/ac'}/>}
-              onChange={() => set.unit('lb/ac')}
+              control={<Radio id="unit" checked={unit === 'lb/ac'}/>}
+              onChange={() => dispatch(sets.unit('lb/ac'))}
               label="lb/ac"
             />
             <FormControlLabel
               value="kg/ha"
-              control={<Radio id="unit" checked={parms.unit === 'kg/ha'} />}
-              onChange={() => set.unit('kg/ha')}
+              control={<Radio id="unit" checked={unit === 'kg/ha'} />}
+              onChange={() => dispatch(sets.unit('kg/ha'))}
               label="kg/ha"
             />
           </RadioGroup>
@@ -89,9 +103,9 @@ const CoverCrop1 = ({props, parms, set, setScreen}) => {
           set={set}
         />
         
-        {+parms.biomass > +max &&
+        {+biomass > +max &&
           <p className="warning">
-            This biomass seems too high{parms.coverCrop.length > 1 ? ' for these particular species' : parms.coverCrop.length ? ' for this particular species' : ''}.<br/>
+            This biomass seems too high{coverCrop.length > 1 ? ' for these particular species' : coverCrop.length ? ' for this particular species' : ''}.<br/>
             Please make sure the biomass entered is on a dry matter basis.
           </p>
         }
@@ -115,9 +129,9 @@ const CoverCrop1 = ({props, parms, set, setScreen}) => {
           set={set}
         />
         
-        {+parms.freshBiomass > +freshMax &&
+        {+freshBiomass > +freshMax &&
           <p className="warning">
-            This biomass seems too high{parms.coverCrop.length > 1 ? ' for these particular species' : parms.coverCrop.length ? ' for this particular species' : ''}.<br/>
+            This biomass seems too high{coverCrop.length > 1 ? ' for these particular species' : coverCrop.length ? ' for this particular species' : ''}.<br/>
             Please make sure the biomass entered is on a fresh matter basis.
           </p>
         }
@@ -143,14 +157,17 @@ const CoverCrop1 = ({props, parms, set, setScreen}) => {
       </div>
   
       <div className="bn">
-        <button onClick={() => setScreen('Soil')}>BACK</button>
-        <button onClick={() => setScreen('CoverCrop2')}>NEXT</button>
+        <button onClick={() => dispatch(sets.screen('Soil'))}>BACK</button>
+        <button onClick={() => dispatch(sets.screen('CoverCrop2'))}>NEXT</button>
       </div>
     </>
   )
 } // CoverCrop1
 
-const CoverCrop2 = ({props, parms, set, setScreen, update}) => {
+const CoverCrop2 = ({props, parms, set, update}) => {
+  const dispatch = useDispatch();
+  const N = useSelector(get.N);
+
   return (
     <>
       <h1>Tell us about your Cover Crop Quality</h1>
@@ -176,7 +193,7 @@ const CoverCrop2 = ({props, parms, set, setScreen, update}) => {
         />
         <p/>
         <hr/>
-        {parms.N ? <p className="note">Adjust default values below based on lab results.</p> : ''}
+        {N ? <p className="note">Adjust default values below based on lab results.</p> : ''}
         <p/>
         <div>
           Carbohydrates (%)
@@ -199,7 +216,7 @@ const CoverCrop2 = ({props, parms, set, setScreen, update}) => {
           set={set}
           step={0.1}
           update={update}
-          onInput={() => set.edited(true)}
+          onInput={() => dispatch(sets.edited(true))}
         />
 
         <p/>
@@ -224,7 +241,7 @@ const CoverCrop2 = ({props, parms, set, setScreen, update}) => {
           set={set}
           step={0.1}
           update={update}
-          onInput={() => set.edited(true)}
+          onInput={() => dispatch(sets.edited(true))}
         />
 
         <p/>
@@ -247,13 +264,13 @@ const CoverCrop2 = ({props, parms, set, setScreen, update}) => {
           set={set}
           step={0.1}
           update={update}
-          onInput={() => set.edited(true)}
+          onInput={() => dispatch(sets.edited(true))}
         />
       </div>
   
       <div className="bn">
-        <button onClick={() => setScreen('CoverCrop1')}>BACK</button>
-        <button onClick={() => setScreen('CashCrop')}>NEXT</button>
+        <button onClick={() => dispatch(sets.screen('CoverCrop1'))}>BACK</button>
+        <button onClick={() => dispatch(sets.screen('CashCrop'))}>NEXT</button>
       </div>
     </>
   )

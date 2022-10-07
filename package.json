@@ -12,6 +12,7 @@
     "@mui/icons-material": "^5.4.4",
     "@mui/lab": "^5.0.0-alpha.63",
     "@mui/material": "^5.1.1",
+    "@reduxjs/toolkit": "^1.8.5",
     "@testing-library/jest-dom": "^5.15.0",
     "@testing-library/react": "^11.2.3",
     "@testing-library/user-event": "^12.6.2",
@@ -23,12 +24,13 @@
     "highcharts": "^9.3.1",
     "highcharts-react-official": "^3.0.0",
     "material-ui-autocomplete-google-places": "^2.3.0",
-    "moment": "^2.29.1",
+    "moment": "^2.29.4",
     "npm-force-resolutions": "0.0.10",
     "prop-types": "^15.7.2",
     "react-csv": "^2.0.3",
     "react-datepicker": "^3.4.1",
     "react-number-format": "^4.8.0",
+    "react-redux": "^8.0.4",
     "react-router-dom": "^5.2.0",
     "react-scripts": "^4.0.3",
     "web-vitals": "^0.2.4"
@@ -66,6 +68,7 @@
     "nth-check": "^2.0.1",
     "react": "^17.0.2",
     "react-dom": "^17.0.2",
+    "react-error-overlay": "^6.0.9",
     "set-value": "^4.1.0"
   },
   "resolutions": {

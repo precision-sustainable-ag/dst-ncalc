@@ -1,15 +1,44 @@
 import {Input} from './Inputs';
-import { Button } from '@mui/material';
+import {Button} from '@mui/material';
 
-const Feedback = ({set, parms, props}) => {
+import {useSelector, useDispatch} from 'react-redux';
+import {get, sets} from '../store/Store';
+
+const Feedback = ({props}) => {
+  const dispatch = useDispatch();
+  const BD = useSelector(get.BD);
+  const OM = useSelector(get.OM);
+  const lat = useSelector(get.lat);
+  const lon = useSelector(get.lon);
+
+  const field = useSelector(get.field);
+  const targetN = useSelector(get.targetN);
+  const coverCrop = useSelector(get.coverCrop);
+  const killDate = useSelector(get.killDate);
+  const cashCrop = useSelector(get.cashCrop);
+  const plantingDate = useSelector(get.plantingDate);
+
+  const N = useSelector(get.N);
+  const InorganicN = useSelector(get.InorganicN);
+  const carb = useSelector(get.carb);
+  const cell = useSelector(get.cell);
+  const lign = useSelector(get.lign);
+  const lwc = useSelector(get.lwc);
+  const biomass = useSelector(get.biomass);
+  const Yield = useSelector(get.yield);
+
+  const feedback = useSelector(get.feedback);
+  const name = useSelector(get.name);
+  const email = useSelector(get.email);
+
   const submit = (e) => {
-    if (!parms.feedback.trim()) {
+    if (!feedback.trim()) {
       alert('Please enter Feedback before submitting.');
       return
-    } else if (!parms.name.trim()) {
+    } else if (!name.trim()) {
       alert('Please enter Name before submitting.');
       return;
-    } else if (!parms.email.trim()) {
+    } else if (!email.trim()) {
       alert('Please enter Email before submitting.');
       return;
     }
@@ -25,29 +54,29 @@ const Feedback = ({set, parms, props}) => {
         },
         body: JSON.stringify({
           feedback: `
-Name: ${parms.name.replace(/"/g, '')}
-Email: ${parms.email.replace(/"/g, '')}
+Name: ${name.replace(/"/g, '')}
+Email: ${email.replace(/"/g, '')}
 Feedback:
-${parms.feedback.replace(/"/g, '')}
+${feedback.replace(/"/g, '')}
 __________________________________
-field        : ${parms.field.replace(/"/g, '')}
-targetN      : ${parms.targetN}
-coverCrop    : ${parms.coverCrop}
-killDate     : ${parms.killDate}
-cashCrop     : ${parms.cashCrop}
-plantingDate : ${parms.plantingDate}
-lat          : ${parms.lat}
-lon          : ${parms.lon}
-N            : ${parms.N}
-InorganicN   : ${parms.InorganicN}
-carb         : ${parms.carb}
-cell         : ${parms.cell}
-lign         : ${parms.lign}
-lwc          : ${parms.lwc}
-biomass      : ${parms.biomass}
-OM           : ${parms.OM}
-BD           : ${parms.BD}
-yield        : ${parms.yield}
+field        : ${field.replace(/"/g, '')}
+targetN      : ${targetN}
+coverCrop    : ${coverCrop}
+killDate     : ${killDate}
+cashCrop     : ${cashCrop}
+plantingDate : ${plantingDate}
+lat          : ${lat}
+lon          : ${lon}
+N            : ${N}
+InorganicN   : ${InorganicN}
+carb         : ${carb}
+cell         : ${cell}
+lign         : ${lign}
+lwc          : ${lwc}
+biomass      : ${biomass}
+OM           : ${OM}
+BD           : ${BD}
+yield        : ${Yield}
 __________________________________
           `
         }),
@@ -85,8 +114,8 @@ __________________________________
         id="Feedback"
         contentEditable
         placeholder="Enter comments here"
-        dangerouslySetInnerHTML={{ __html: parms.feedback }}
-        onBlur={(e) => set.feedback(e.currentTarget.innerText.replace(/[\n\r]/g, '<br>'))}
+        dangerouslySetInnerHTML={{ __html: feedback }}
+        onBlur={(e) => dispatch(sets.feedback(e.currentTarget.innerText.replace(/[\n\r]/g, '<br>')))}
       />
 
       <div>

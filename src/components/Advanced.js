@@ -4,17 +4,35 @@ import Highcharts from 'highcharts';
 
 import HighchartsReact from 'highcharts-react-official';
 
-import ZoomInIcon from '@mui/icons-material/ZoomIn';
+// import ZoomInIcon from '@mui/icons-material/ZoomIn';
+import {useDispatch, useSelector} from 'react-redux';
+import {get, sets} from '../store/Store';
 
-const zoomIn = (e) => {
-  const div = e.target.closest('.parent');
-  div.classList.toggle('advanced');
-  div.classList.toggle('zoomed');
-} // zoomIn
+// const zoomIn = (e) => {
+//   const div = e.target.closest('.parent');
+//   div.classList.toggle('advanced');
+//   div.classList.toggle('zoomed');
+// } // zoomIn
 
-const Advanced = ({parms, setScreen}) => {
-  // const factor = parms.unit === 'lb/ac' ? 1.12085 : 1;
-  if (!parms.gotModel || !parms.model || !parms.biomass || !parms.N || !parms.carb || !parms.cell || !parms.lign || !parms.lwc || !parms.BD || !parms.InorganicN) {
+const Advanced = () => {
+  // const factor = unit === 'lb/ac' ? 1.12085 : 1;
+  const dispatch = useDispatch();
+  const BD = useSelector(get.BD);
+  const N = useSelector(get.N);
+  const killDate = useSelector(get.killDate);
+  const carb = useSelector(get.carb);
+  const cell = useSelector(get.cell);
+  const lign = useSelector(get.lign);
+  const lwc = useSelector(get.lwc);
+  const biomass = useSelector(get.biomass);
+  const unit = useSelector(get.unit);
+  const InorganicN = useSelector(get.InorganicN);
+  const gotModel = useSelector(get.gotModel);
+  const model = useSelector(get.model);
+  // const nweeks = useSelector(get.nweeks);
+  // const plantingDate = useSelector(get.plantingDate);
+
+  if (!gotModel || !model || !biomass || !N || !carb || !cell || !lign || !lwc || !BD || !InorganicN) {
     return (
       <div className="loading">
         <p>Loading Output</p>
@@ -28,9 +46,7 @@ const Advanced = ({parms, setScreen}) => {
 
   const factor = 1;
 
-  const model = parms.model;
-
-  const minDate = +parms.killDate;
+  const minDate = +killDate;
 
   Highcharts.setOptions({
     chart: {
@@ -51,7 +67,7 @@ const Advanced = ({parms, setScreen}) => {
 // alert(`<div style={{color: ${colors[0]}}}>Rainfall (mm)</div><div style={{color: ${colors[1]}}}}>Air temperature (&deg;C)</div>`);
     [parm].flat().forEach((parm, i) => {
       const cdata = [];
-      date = new Date(parms.killDate);
+      date = new Date(killDate);
       let total = 0;
       model.s[parm].forEach((d, i) => {
         const value = +(d / factor).toFixed(2);
@@ -62,8 +78,8 @@ const Advanced = ({parms, setScreen}) => {
               x: +date,
               y: +value,
               // marker: {
-              //   enabled: (i / 24 === parms.nweeks * 7) ||
-              //           (i === a.length - 1 && parms.nweeks * 7 * 24 >= a.length)
+              //   enabled: (i / 24 === nweeks * 7) ||
+              //           (i === a.length - 1 && nweeks * 7 * 24 >= a.length)
               // }
             });
           } else {
@@ -71,8 +87,8 @@ const Advanced = ({parms, setScreen}) => {
               x: +date,
               y: hourly ? +value : parm === 'Rain' ? total : total / 24,
               // marker: {
-              //   enabled: (i / 24 === parms.nweeks * 7) ||
-              //           (i === a.length - 1 && parms.nweeks * 7 * 24 >= a.length)
+              //   enabled: (i / 24 === nweeks * 7) ||
+              //           (i === a.length - 1 && nweeks * 7 * 24 >= a.length)
               // }
             });
           }
@@ -134,7 +150,7 @@ const Advanced = ({parms, setScreen}) => {
           const week = Math.floor((this.x - minDate) / (24 * 3600 * 1000) / 7);
   
           return this.points.reduce((s, point) => (
-            s + '<strong>' + point.series.name + ': ' + point.y.toFixed(0) + ' ' + parms.unit + '<br/></strong>'
+            s + '<strong>' + point.series.name + ': ' + point.y.toFixed(0) + ' ' + unit + '<br/></strong>'
           ), `<small>${Highcharts.dateFormat('%b %e, %Y', new Date(this.x))}</small><br/>Week ${week}<br/>`);
         }
       },
@@ -188,7 +204,7 @@ const Advanced = ({parms, setScreen}) => {
           },
           /*
           plotLines: [{
-            value: new Date(parms.plantingDate),
+            value: new Date(plantingDate),
             color: 'green',
             dashStyle: 'shortdash',
             width: 0.4,
@@ -272,7 +288,7 @@ const Advanced = ({parms, setScreen}) => {
       }
 
       <div className="bn">
-        <button onClick={() => setScreen('Output')}>BACK</button>
+        <button onClick={() => dispatch(sets.screen('Output'))}>BACK</button>
       </div>
     </div>
   )
