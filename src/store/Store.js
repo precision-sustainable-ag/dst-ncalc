@@ -77,8 +77,8 @@ const afterChange = {
   carb: (state)           => {fetchModel(state); state.edited = true;},
   cell: (state)           => {fetchModel(state); state.edited = true;},
   lign: (state)           => {fetchModel(state); state.edited = true;},
-  lat: (state)            => {fetchModel(state); fetchSSURGO(state);},
-  lon: (state)            => {fetchModel(state); fetchSSURGO(state);},
+  lat: (state)            => {fetchSSURGO(state); fetchModel(state);},  // TODO: fetchModel _after_ fetchSSURGO
+  lon: (state)            => {fetchSSURGO(state); fetchModel(state);},  // TODO: fetchModel _after_ fetchSSURGO
   lwc: (state)            => {fetchModel(state);},
   killDate: (state)       => {fetchModel(state);},
   plantingDate: (state)   => {fetchModel(state);},
@@ -165,6 +165,8 @@ const fetchModel = (state) => {
         store.dispatch(set.gotModel(true));
         console.log('model');
         console.log(data);
+
+        fetchCornN(store.getState());
       },
       'model',
       2000
@@ -175,6 +177,8 @@ const fetchModel = (state) => {
 const fetchSSURGO = (state) => {
   const {lat, lon} = state;
 
+  state.gotSSURGO = false;
+
   api(
     `https://api.precisionsustainableag.org/ssurgo?lat=${lat}&lon=${lon}&component=major`,
     (data) => {
@@ -182,7 +186,6 @@ const fetchSSURGO = (state) => {
         console.log(`No SSURGO data at ${lat}, ${lon}`);
         store.dispatch(set.BD(''));
         store.dispatch(set.OM(''));
-        store.dispatch(set.gotSSURGO(false));
       } else {
         data = data.filter(d => d.desgnmaster !== 'O');
         const minhzdept = Math.min.apply(Math, data.map(d => d.hzdept_r));
@@ -192,11 +195,40 @@ const fetchSSURGO = (state) => {
         store.dispatch(set.OM(weightedAverage(data, 'om_r')));
         store.dispatch(set.gotSSURGO(true));
       }
+      // fetchModel(store.getState());
     },
     'ssurgo',
     2000
   );
 } // fetchSSURGO
+
+const fetchCornN = (state) => {
+  const {lat, lon, plantingDate} = state;
+  
+  const end = moment(state.plantingDate).add(110, 'days').add(1, 'hour').format('yyyy-MM-DD');
+  
+  store.dispatch(set.cornN(false));
+  store.dispatch(set.errorCorn(false));
+
+  const src = `https://api.precisionsustainableag.org/weather/hourly?lat=${lat}&lon=${lon}&start=${moment(plantingDate).format('yyyy-MM-DD')}&end=${end}&attributes=air_temperature`;
+  
+  api(
+    src,
+    (data) => {
+      if (data instanceof Array) {
+        console.log('CornN:');
+        console.log(data);
+
+        store.dispatch(set.cornN(data));
+      } else {
+        console.log('CornN error:');
+        console.log(src);
+        console.log(data);
+        store.dispatch(set.errorCorn(true));
+      }
+    }
+  );
+} // fetchCornN
 
 const reducers = {
 };

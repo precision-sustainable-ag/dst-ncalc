@@ -187,30 +187,7 @@ const App = () => {
       }
     );
   }, [dispatch]);
-/*
-  const runModel2 = () => {
-    const cornNSrc = `https://api.precisionsustainableag.org/weather/hourly?lat=${lat}&lon=${lon}&start=${moment(plantingDate).format('yyyy-MM-DD')}&end=${end}&attributes=air_temperature`;
-    
-    dispatch(set.cornN(false));
-    dispatch(set.errorCorn(false));
 
-    fetch(cornNSrc)
-      .then(response => response.json())
-      .then(data => {
-        if (data instanceof Array) {
-          console.log('CornN:');
-          console.log(data);
-
-          dispatch(set.cornN(data));
-        } else {
-          dispatch(set.errorCorn(true));
-        }
-      })
-      .catch((error) => {
-        alert(JSON.stringify(error));
-      });
-  } // runModel2
-*/
   const query = (parm, def) => {
     if (parm === 'covercrop' && params.get('covercrop')) {
       return params.get(parm).split(',');
