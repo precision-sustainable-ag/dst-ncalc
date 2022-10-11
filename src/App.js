@@ -57,67 +57,6 @@ const Help = () => {
   )
 }
 
-const Screens = ({set}) => {
-  const dispatch = useDispatch();
-
-  const killDate = useSelector(get.killDate);
-  const plantingDate = useSelector(get.plantingDate);
-
-  const setScreen = (scr) => {
-    const test = (parm, scr, desc = `Please enter ${parm}`) => {
-      return false;
-      // const val = useSelector(get[parm]);
-      // 
-      // if (!val) {
-      //   alert(desc);
-      //   setScreen(scr);
-      //   return true;
-      // }
-    } // test
-
-    if (/Output|Advanced/.test(scr)) {
-      if (killDate - plantingDate > 1814400000) {
-        alert('Cash crop planting date must be no earlier than 3 weeks before the cover crop kill date.');
-        dispatch(set.screen('CoverCrop1'));
-      } else if (plantingDate - killDate > 7776000000) {
-        alert('Cash crop planting date should be within 3 months of the cover crop kill date.');
-        dispatch(set.screen('CoverCrop1'));
-      } else {
-        test('lat', 'Location', 'Please enter Latitude and Longitude') ||
-        test('lon', 'Location', 'Please enter Latitude and Longitude') ||
-
-        test('killDate', 'CoverCrop1', 'Please enter Cover Crop Termination Date') ||
-        test('biomass', 'CoverCrop1', 'Please enter Biomass') ||
-        test('lwc', 'CoverCrop1', 'Please enter Water Content') ||
-
-        test('N', 'CoverCrop2', 'Please enter Nitrogen') ||
-        test('carb', 'CoverCrop2', 'Please enter Carbohydrates') ||
-        test('cell', 'CoverCrop2', 'Please enter Cellulose') ||
-        test('lign', 'CoverCrop2', 'Please enter Lignin') ||
-
-        test('plantingDate', 'CashCrop', 'Please enter Cash Crop Planting Date') ||
-
-        test('BD', 'Soil', 'Please enter Bulk Density') ||
-        test('InorganicN', 'Soil', 'Please enter Soil Inorganic N') ||
-
-        dispatch(set.screen(scr));
-      }
-    } else {
-      dispatch(set.screen(scr));
-
-      // AutoComplete component doesn't understand autoFocus:
-      let focus = scr === 'CoverCrop1' ? '#coverCrop' :
-                  scr === 'CashCrop'   ? '#cashCrop'  :
-                  scr === 'Feedback'   ? '#Feedback'  :
-                                         null;
-        
-      if (focus) {
-        setTimeout(() => document.querySelector(focus).focus(), 10);
-      }
-    }
-  } // setScreen
-} // Screens
-
 const App = () => {
   const dispatch = useDispatch();
 
@@ -187,16 +126,6 @@ const App = () => {
       }
     );
   }, [dispatch]);
-
-  const query = (parm, def) => {
-    if (parm === 'covercrop' && params.get('covercrop')) {
-      return params.get(parm).split(',');
-    } else if (/date/.test(parm) && params.get(parm)) {
-      return moment(params.get(parm));
-    } else {
-      return params.get(parm) || def;
-    }
-  } // query
 
   const changeScreen = (e) => {
     const button = e.target;
@@ -292,7 +221,65 @@ const App = () => {
     // window.location = `?PSA=true&demo=${e.target.value}`;
   } // changePSA
 
-  const screen = useSelector(get.screen);
+  let screen = useSelector(get.screen);
+  const killDate = useSelector(get.killDate);
+  const plantingDate = useSelector(get.plantingDate);
+
+  const lat = useSelector(get.lat);
+  const lon = useSelector(get.lon);
+  const biomass = useSelector(get.biomass);
+  const lwc = useSelector(get.lwc);
+  const N = useSelector(get.N);
+  const carb = useSelector(get.carb);
+  const cell = useSelector(get.cell);
+  const lign = useSelector(get.lign);
+  const BD = useSelector(get.BD);
+  const InorganicN   = useSelector(get.InorganicN  );
+
+  if (/Output|Advanced/.test(screen)) {
+    const test = (parm, val, scr, desc = `Please enter ${parm}`) => {
+      if (!val) {
+        alert(desc);
+        dispatch(set.screen(scr));
+        return true;
+      }
+    } // test
+
+    if (killDate - plantingDate > 1814400000) {
+      alert('Cash crop planting date must be no earlier than 3 weeks before the cover crop kill date.');
+      screen = 'CoverCrop1';
+    } else if (plantingDate - killDate > 7776000000) {
+      alert('Cash crop planting date should be within 3 months of the cover crop kill date.');
+      screen = 'CoverCrop1';
+    } else {
+      test('lat', lat, 'Location', 'Please enter Latitude and Longitude') ||
+      test('lon', lon, 'Location', 'Please enter Latitude and Longitude') ||
+      
+      test('killDate', killDate, 'CoverCrop1', 'Please enter Cover Crop Termination Date') ||
+      test('biomass', biomass, 'CoverCrop1', 'Please enter Biomass') ||
+      test('lwc', lwc, 'CoverCrop1', 'Please enter Water Content') ||
+      
+      test('N', N, 'CoverCrop2', 'Please enter Nitrogen') ||
+      test('carb', carb, 'CoverCrop2', 'Please enter Carbohydrates') ||
+      test('cell', cell, 'CoverCrop2', 'Please enter Cellulose') ||
+      test('lign', lign, 'CoverCrop2', 'Please enter Lignin') ||
+      
+      test('plantingDate', plantingDate, 'CashCrop', 'Please enter Cash Crop Planting Date') ||
+      
+      test('BD', BD, 'Soil', 'Please enter Bulk Density') ||
+      test('InorganicN', InorganicN, 'Soil', 'Please enter Soil Inorganic N');
+    }
+  } else {
+    // AutoComplete component doesn't understand autoFocus:
+    const focus = screen === 'CoverCrop1' ? '#coverCrop' :
+                  screen === 'CashCrop'   ? '#cashCrop'  :
+                  screen === 'Feedback'   ? '#Feedback'  :
+                                             null;
+      
+    if (focus) {
+      setTimeout(() => document.querySelector(focus).focus(), 10);
+    }
+  }
 
   const sc = {
     'Home'        : <Home />,
