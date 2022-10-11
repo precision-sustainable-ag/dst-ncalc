@@ -72,12 +72,21 @@ const afterChange = {
       state.cell = Math.min(100, Math.max(0, (69 - 10.2 * payload))).toFixed(0);
       state.lign = 100 - (+state.carb + +state.cell);
     }
+    fetchModel(state);
   },
-  carb: (state) => {state.edited = true;},
-  cell: (state) => {state.edited = true;},
-  lign: (state) => {state.edited = true;},
-  lat: (state) => {getSSURGO(state)},
-  lon: (state) => {getSSURGO(state)},
+  carb: (state)           => {fetchModel(state); state.edited = true;},
+  cell: (state)           => {fetchModel(state); state.edited = true;},
+  lign: (state)           => {fetchModel(state); state.edited = true;},
+  lat: (state)            => {fetchModel(state); fetchSSURGO(state);},
+  lon: (state)            => {fetchModel(state); fetchSSURGO(state);},
+  lwc: (state)            => {fetchModel(state);},
+  killDate: (state)       => {fetchModel(state);},
+  plantingDate: (state)   => {fetchModel(state);},
+  biomass: (state)        => {fetchModel(state);},
+  freshBiomass: (state)   => {fetchModel(state);},
+  // BD: (state)             => {fetchModel(state);},
+  // OM: (state)             => {fetchModel(state);},
+  // InorganicN: (state)     => {fetchModel(state);},
 };
 
 const weightedAverage = (data, parm, dec = 2) => {
@@ -93,7 +102,77 @@ const weightedAverage = (data, parm, dec = 2) => {
   return (data.reduce((a, b) => +a + +b) / totpct).toFixed(dec);
 } // weightedAverage
 
-const getSSURGO = (state) => {
+const fetchModel = (state) => {
+  state.gotModel = false;
+  state.errorModel = false;
+
+  let {lat, lon, N, biomass, lwc, carb, cell, lign, OM, BD, InorganicN, unit} = state;
+  console.log({lat, lon, N, biomass, lwc, carb, cell, lign, OM, BD, InorganicN, unit});
+
+  const start = moment(state.killDate).format('yyyy-MM-DD');
+  const end   = moment(state.plantingDate).add(110, 'days').add(1, 'hour').format('yyyy-MM-DD');
+  const validDates = start !== 'Invalid date' && end !== 'Invalid date' && end > start;
+  console.log({start, end}, state.killDate, validDates);
+  if (validDates) {
+    const pmn = 10;
+
+    InorganicN = InorganicN || 10;
+
+    lwc = lwc || 10;
+    carb = carb || (24.7 + 10.5 * N);
+    cell = cell || (69 - 10.2 * N);
+    lign = lign || (100 - (carb + cell));
+
+    const total = +carb + +cell + +lign;
+    carb = carb * 100 / total;
+    cell = cell * 100 / total;
+    lign = lign * 100 / total;
+
+    const factor = unit === 'lb/ac' ? 1.12085 : 1;
+    
+    biomass *= factor;
+
+    api(
+      `https://api.precisionsustainableag.org/cc-ncalc/surface?lat=${lat}&lon=${lon}&start=${start}&end=${end}&n=${N}&biomass=${biomass}&lwc=${lwc}&carb=${carb}&cell=${cell}&lign=${lign}&om=${OM}&bd=${BD}&in=${InorganicN}&pmn=${pmn}`,
+      (data) => {
+        if (data.name === 'error' || !data.surface) {
+          store.dispatch(set.errorModel(true));
+          return;
+        }
+
+        const modelSurface = {};
+        data.surface.forEach(data => {
+          Object.keys(data).forEach(key => {
+            modelSurface[key] = modelSurface[key] || [];
+            modelSurface[key].push(data[key]);
+          });
+        });
+      
+        const modelIncorporated = {};
+      
+        const model = {
+          s: modelSurface,
+          i: modelIncorporated
+        }
+      
+        const cols = Object.keys(model.s).sort((a, b) => a.toUpperCase().localeCompare(b.toUpperCase()));
+
+        cols.filter(col => !model.s[col].length).forEach(col => {
+          model.s[col] = new Array(model.s.Rain.length).fill(model.s[col]);
+        });
+      
+        store.dispatch(set.model(model));
+        store.dispatch(set.gotModel(true));
+        console.log('model');
+        console.log(data);
+      },
+      'model',
+      2000
+    );
+  }
+} // fetchModel
+
+const fetchSSURGO = (state) => {
   const {lat, lon} = state;
 
   api(
@@ -115,9 +194,9 @@ const getSSURGO = (state) => {
       }
     },
     'ssurgo',
-    1000
+    2000
   );
-} // getSSURGO
+} // fetchSSURGO
 
 const reducers = {
 };
