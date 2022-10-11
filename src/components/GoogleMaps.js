@@ -46,6 +46,7 @@ const GoogleMaps = ({autoFocus=false, field=false, inputs=true}) => {
           dispatch(set.state(''));
         }
         
+        console.log(results);
         if (results && results[0]) {
           dispatch(set.lat(results[0].geometry.location.lat().toFixed(4)));
           dispatch(set.lon(results[0].geometry.location.lng().toFixed(4)));

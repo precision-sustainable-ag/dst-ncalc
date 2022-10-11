@@ -187,7 +187,6 @@ const CoverCrop2 = () => {
           min={20}
           max={70}
           step={0.1}
-          onInput={() => dispatch(set.edited(true))}
         />
 
         <p/>
@@ -208,7 +207,6 @@ const CoverCrop2 = () => {
           min={20}
           max={70}
           step={0.1}
-          onInput={() => dispatch(set.edited(true))}
         />
 
         <p/>
@@ -227,7 +225,6 @@ const CoverCrop2 = () => {
           min={1}
           max={10}
           step={0.1}
-          onInput={() => dispatch(set.edited(true))}
         />
       </div>
   

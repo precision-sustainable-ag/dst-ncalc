@@ -30,7 +30,6 @@ const Output = () => {
   const field = useSelector(get.field);
   const gotModel = useSelector(get.gotModel);
   const errorModel = useSelector(get.errorModel);
-  const errorSSURGO = useSelector(get.errorSSURGO);
   const errorCorn = useSelector(get.errorCorn);
   const model = useSelector(get.model);
   const mockup = useSelector(get.mockup);
@@ -81,7 +80,6 @@ const Output = () => {
         </div>
         <ul>
           <li>Model: {errorModel.toString()}</li>
-          <li>SSURGO: {errorSSURGO.toString()}</li>
           <li>Corn uptake curve: {errorCorn.toString()}</li>
         </ul>
       </>

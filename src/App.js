@@ -2,8 +2,6 @@ import {useEffect} from 'react';
 import './App.css';
 import moment from 'moment';
 import 'react-datepicker/dist/react-datepicker.css';
-// import {defaults} from './defaults';
-
 import {useSelector, useDispatch} from 'react-redux';
 
 // Screens
@@ -304,7 +302,6 @@ const App = () => {
   const N = useSelector(get.N);
   const lat = useSelector(get.lat);
   const lon = useSelector(get.lon);
-  const firstSSURGO = useSelector(get.firstSSURGO);
   const killDate = useSelector(get.killDate);
   const plantingDate = useSelector(get.plantingDate);
   const Carb = useSelector(get.carb);
@@ -314,9 +311,12 @@ const App = () => {
   const Biomass = useSelector(get.biomass);
   const unit = useSelector(get.unit);
   const InorganicN = useSelector(get.InorganicN);
-  const freshBiomass = useSelector(get.freshBiomass);
-  const edited = useSelector(get.edited);
 
+  // const { data, error, isLoading } = useGetPokemonByNameQuery('bulbasaur');
+  // console.log(data);
+  // console.log(error);
+  // console.log(isLoading);
+  
   useEffect(() => {
     const airtable = (table, callback, wrapup) => {
       base(table).select({
@@ -388,29 +388,6 @@ const App = () => {
   } // runModel
 
   const runModel2 = () => {
-    const weightedAverage = (data, parm, dec = 2) => {
-      let totpct = 0;
-  
-      data = data
-              .filter(d => d[parm])
-              .map(d => {
-                totpct += +d.comppct_r;
-                return d[parm] * d.comppct_r;
-              });
-  
-      return (data.reduce((a, b) => +a + +b) / totpct).toFixed(dec);
-    } // weightedAverage
-  
-    if (!lat || !lon) {
-      return;
-    }
-
-    if (!firstSSURGO) {
-      dispatch(set.BD(''));
-    }
-    dispatch(set.OM(''));
-
-    // const ssurgoSrc = `https://api.precisionsustainableag.org/ssurgo?lat=${lat}&lon=${lon}&component=major`;
     const start = moment(killDate).format('yyyy-MM-DD');
     const end   = moment(plantingDate).add(110, 'days').add(1, 'hour').format('yyyy-MM-DD');
     const lwc = Lwc || 10;
@@ -429,9 +406,6 @@ const App = () => {
     const In = InorganicN || 10;
     const pmn = 10;
 
-    const ssurgoSrc = params.get('dev') ? `https://weather.aesl.ces.uga.edu/ssurgo?lat=${lat}&lon=${lon}&component=major` :
-                                          `https://api.precisionsustainableag.org/ssurgo?lat=${lat}&lon=${lon}&component=major`
-
     // const modelSrc  = `https://weather.aesl.ces.uga.edu/cc-ncalc/both?lat=${lat}&lon=${lon}&start=${start}&end=${end}&n=${N}&biomass=${biomass}&lwc=${lwc}&carb=${carb}&cell=${cell}&lign=${lign}&om=${om}&bd=${bd}&in=${In}&pmn=${pmn}`;
     const modelSrc = params.get('dev') ? `https://weather.aesl.ces.uga.edu/cc-ncalc/surface?lat=${lat}&lon=${lon}&start=${start}&end=${end}&n=${N}&biomass=${biomass}&lwc=${lwc}&carb=${carb}&cell=${cell}&lign=${lign}&om=${om}&bd=${bd}&in=${In}&pmn=${pmn}` :
                                          `https://api.precisionsustainableag.org/cc-ncalc/surface?lat=${lat}&lon=${lon}&start=${start}&end=${end}&n=${N}&biomass=${biomass}&lwc=${lwc}&carb=${carb}&cell=${cell}&lign=${lign}&om=${om}&bd=${bd}&in=${In}&pmn=${pmn}`
@@ -441,9 +415,6 @@ const App = () => {
     
     dispatch(set.gotModel(false));
     dispatch(set.errorModel(false));
-
-    dispatch(set.gotSSURGO(false));
-    dispatch(set.errorSSURGO(false));
 
     dispatch(set.cornN(false));
     dispatch(set.errorCorn(false));
@@ -513,58 +484,7 @@ const App = () => {
       .catch((error) => {
         alert(JSON.stringify(error));
       });
-
-    console.log(ssurgoSrc);
-    fetch(ssurgoSrc)
-      .then(response => response.json())
-      .then(data => {
-        if (data.ERROR) {
-          dispatch(set.errorSSURGO(true));
-        } else if (data instanceof Array) {
-          console.log('SSURGO:');
-          console.log(data);
-
-          dispatch(set.gotSSURGO(true));
-          
-          data = data.filter(d => d.desgnmaster !== 'O');
-
-          const minhzdept = Math.min.apply(Math, data.map(d => d.hzdept_r));
-          data = data.filter(d => +d.hzdept_r === +minhzdept);
-
-          console.log(JSON.stringify(data.map(d => [d.dbthirdbar_r, d.om_r, d.comppct_r, d.hzdept_r]), null, 2));
-          console.log(weightedAverage(data, 'dbthirdbar_r'));
-
-          if (!firstSSURGO || !BD) {
-            dispatch(set.BD(weightedAverage(data, 'dbthirdbar_r')));
-          }
-          dispatch(set.firstSSURGO(false));
-          
-          dispatch(set.OM(weightedAverage(data, 'om_r')));
-        }
-      })
-      .catch((error) => {
-        alert(JSON.stringify(error));
-      });
   } // runModel2
-
-  const setLWC = () => {
-    if (+Biomass && +freshBiomass) {
-      dispatch(set.lwc(+((freshBiomass - Biomass) / Biomass).toFixed(2)));
-    }
-  } // setLWC
-
-  const NDefaults = () => {
-    if (!edited) {
-      const carb = Math.min(100, Math.max(0, (24.7 + 10.5 * N))).toFixed(0);
-      const cell = Math.min(100, Math.max(0, (69 - 10.2 * N))).toFixed(0);
-      dispatch(set.carb(carb));
-      dispatch(set.cell(cell));
-      dispatch(set.lign(100 - (+carb + +cell)));
-    }
-  } // NDefaults
-
-  const change = (parm, value, target, index) => {
-  } // change
 
   const query = (parm, def) => {
     if (parm === 'covercrop' && params.get('covercrop')) {
@@ -576,77 +496,22 @@ const App = () => {
     }
   } // query
 /*
-  let {parms, set, props} = defaults(
-    change,
-    {
-      name                : '',
-      email               : '',
-      feedback            : '',
-      field               : demo ? 'My field' : query('field', ''),
-      targetN             : demo ? '150' : '150',
-      coverCrop           : demo ? ['Oats, Black'] : query('covercrop', []),
-      killDate            : demo ? new Date('05/08/2021') : query('date1', ''),
-      cashCrop            : demo ? 'Corn' : '',
-      plantingDate        : demo ? new Date('05/20/2021') : query('date2', ''),
-      lat                 : demo ? 32.5714 : query('lat', 40.7849),
-      lon                 : demo ? -82.0760 : query('lon', -74.8073),
-      N                   : demo ? 1.52 : query('N', ''),
-      InorganicN          : demo ? 10   : 10,
-      carb                : demo ? 44.34 : query('carb', ''),
-      cell                : demo ? 50.77 : query('cell', ''),
-      lign                : demo ? 4.88 : query('lign', ''),
-      lwc                 : 4,
-      highOM              : 'No',
-      nutrient            : 'Left on the surface',
-      freshBiomass        : '',
-      biomass             : demo ? 5235 : query('biomass', ''),
-      mapZoom             : 13,
-      mapType             : 'hybrid',
-      model               : {},
-      OM                  : demo ? 5   : '',
-      BD                  : demo ? 1.5 : '',
-      yield               : demo ? 150 : 150,
-      residue             : 'surface',
-      NContent            : demo ? 1000 : '',
-      residueC            : demo ? 100 : '',
-      outputN             : 1,
-      gotSSURGO           : false,
-      gotModel            : false,
-      cornN               : false,
-      help                : '',
-      helpX               : 0,
-      helpY               : 0,
-      state               : '',
-      unit                : 'lb/ac',
-      location            : demo ? '' : '',
-      nweeks              : 4,
-      firstSSURGO         : true,
-      mockup              : 2,
-      species             : {},
-      maxBiomass          : {},
-      privacy             : false,
-      errorModel          : false,
-      errorSSURGO         : false,
-      errorCorn           : false,
-      edited              : query('carb', false),
-      effects : {
-        lat           : runModel,
-        lon           : runModel,
-        plantingDate  : runModel,
-        killDate      : runModel,
-        N             : [NDefaults, runModel],
-        carb          : runModel,
-        cell          : runModel,
-        lign          : runModel,
-        lwc           : runModel,
-        // BD            : runModel,  // TODO
-        // OM            : runModel,  // TODO
-        // InorganicN    : runModel,  // TODO
-        biomass       : [setLWC, runModel],
-        freshBiomass  : [setLWC, runModel],
-      }
-    }
-  );
+  effects : {
+    lat           : runModel,
+    lon           : runModel,
+    plantingDate  : runModel,
+    killDate      : runModel,
+    N             : runModel,
+    carb          : runModel,
+    cell          : runModel,
+    lign          : runModel,
+    lwc           : runModel,
+    // BD            : runModel,  // TODO
+    // OM            : runModel,  // TODO
+    // InorganicN    : runModel,  // TODO
+    biomass       : runModel,
+    freshBiomass  : runModel,
+  }
 */
 
 const changeScreen = (e) => {
@@ -670,7 +535,7 @@ const sc = {
   'Output'      : <Output />,
   'Advanced'    : <Advanced />,
   'Feedback'    : <Feedback />,
-}[screen] || alert(screen);
+}[screen] || console.log(screen);
 
 return (
   <div

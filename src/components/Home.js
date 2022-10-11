@@ -4,7 +4,7 @@ import {get, set} from '../store/Store';
 const Home = () => {
   const dispatch = useDispatch();
   const privacy = useSelector(get.privacy);
-  
+
   const className = privacy ? 'home background' : 'home';
 
   return (

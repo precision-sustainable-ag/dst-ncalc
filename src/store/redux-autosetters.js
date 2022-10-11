@@ -49,7 +49,8 @@ export const createStore = (initialState, {afterChange={}, reducers={}}) => {
             }
           }
   
-          obj[key] = 0; // TODO: Can't be undefined
+          obj[key] = funcs[fullkey](initialState);  // TODO: Does this work with CC-Econ?
+          // obj[key] = 0; // TODO: Can't be undefined
         }
   
         set[key] = createAction(fullkey);
@@ -99,12 +100,39 @@ export const createStore = (initialState, {afterChange={}, reducers={}}) => {
       builder.addCase(action, reducers[key]);
     }
 
+    builder.addCase(createAction('api'), (state, {payload}) => {
+      fetch(payload.url)
+        .then(response => response.json())
+        .then(data => {
+          if (typeof payload.callback === 'function') {
+            payload.callback(data);
+          // } else if (payload.callback in state) {  // state is no longer applicable here
+          //   state[payload.callback] = data;
+          } else {
+            alert('Error: ' + JSON.stringify(payload, null, 2));
+          }
+        })
+        .catch(error => {
+          console.error('Error:', error);
+        });
+    });
+
     recurse(initialState, set, get);
+
+    builder.addDefaultCase((state, action) => {
+      if (action.type !== '@@INIT') {
+        alert('Unknown action: ' + JSON.stringify(action));
+      }
+    });
   } // builders
 
   const reducer = createReducer(initialState, builders);
 
   return configureStore({
-    reducer
+    reducer,
+    middleware: getDefaultMiddleware =>
+      getDefaultMiddleware({
+        serializableCheck: false,
+      }),
   });
 } // createStore
