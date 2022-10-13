@@ -76,12 +76,12 @@ table.coverCrop td:nth-child(1) {
 
 nav {
   display: flex;
+  align-items: baseline;
   position: sticky;
   top: 0;
   background: white;
   z-index: 999;
   height: 3rem;
-  vertical-align: bottom;
 }
 
 nav select {
@@ -89,30 +89,25 @@ nav select {
   vertical-align: bottom;
 }
 
-nav > :not(img):not(select) {
+nav > a {
   flex-grow: 1;
-  flex-basis: 0;
-  font-weight: bold;
+  font-family: arial;
+  font-weight: 600;
+  font-size: 1.2rem;
   padding: 0em 1.2rem;
   width: 9rem;
   background: transparent;
-  border: none;
-  font-size: 1.2rem;
   white-space: nowrap;
-  font-style: normal;
-  font-weight: 600;
   color: gray;
+  text-align: center;
+  padding: 0.5rem;
 }
 
-nav > :not(img):not(select):hover {
+nav > a:hover {
   background: #eee;
 }
 
-nav > .selected {
-  color: #385E1B;
-}
-
-nav > :not(select):first-of-type {
+nav > a:first-of-type {
   margin-left: 85px;
 }
 
@@ -133,7 +128,7 @@ nav img {
   width: 100%;
 }
 
-div.center {
+.center {
   text-align: center;
 }
 
@@ -141,7 +136,7 @@ div.center {
   font-size: 1rem;
 }
 
-.home button, .about button, .bn button, button.bn {
+.link, .bn button, button.bn {
   background: #6B9333;
   box-shadow: 0px 2px 2px rgba(160, 160, 160, 0.3);
   border-radius: 2rem;
@@ -150,10 +145,12 @@ div.center {
   margin-right: 3em;
   font-weight: bold;
   padding: 1em 2em;
+  text-align: center;
 }
 
-.home button, .about button {
-  width: 12rem;
+.home .link, .home button, .about button {
+  display: inline-block;
+  width: 12rem !important;
 }
 
 img {
@@ -523,17 +520,19 @@ div.feedback > * {
   background: white !important;
 }
 
-button.feedback {
-  font-size: 0.7rem;
+a.feedback {
   position: absolute;
-  width: auto;
-  height: auto;
-  padding: 0 0.2rem;
-  background: #eee;
+  font-size: 0.7rem;
   font-weight: bold;
+  padding: 0.2rem 0.5rem;
+  color: rgb(25, 118, 210);
+  border: 1px solid rgb(25, 118, 210);
+  border-radius: 5px;
+  background: #eee;
   right: calc(-3rem + 2px);
   top: calc(-2rem + 2px);
   width: 7rem;
+  text-align: center;
 }
 
 [contenteditable=true]:empty:before{

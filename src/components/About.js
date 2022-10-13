@@ -1,5 +1,6 @@
 import {useDispatch} from "react-redux";
 import {set} from '../store/Store';
+import {Link} from 'react-router-dom';
 
 const About = () => {
   const dispatch = useDispatch();
@@ -56,9 +57,9 @@ const About = () => {
         <strong><em>CC-NCALC uses real-time weather data and five year historic averages for days where data are not yet available.</em></strong>
       </p>
 
-      <div className="center">
-        <button onClick={() => dispatch(set.screen('Location'))}>GET STARTED</button>
-      </div>
+      <p className="center" style={{margin: 25}}>
+        <Link className="link" to={'/location'}>GET STARTED</Link>
+      </p>
 
       <p style={{fontSize: "90%"}}>
         <em>For more information about <strong>Precision Sustainable Agriculture</strong> projects, please visit <a href="https://precisionsustainableag.org/">https://precisionsustainableag.org/</a>.</em>

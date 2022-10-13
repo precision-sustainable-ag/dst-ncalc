@@ -22,6 +22,10 @@ export const createStore = (initialState, {afterChange={}, reducers={}}) => {
       
   const builders = (builder) => {
     const recurse = (obj, set, get, parents = []) => {
+      if (!obj) {   // TODO
+        console.log(set);
+        return;
+      }
       Object.keys(obj).forEach((key) => {
         const isArray = Array.isArray(obj[key]);
         const isObject = !isArray && obj[key] instanceof Object;
@@ -49,6 +53,7 @@ export const createStore = (initialState, {afterChange={}, reducers={}}) => {
             }
           }
   
+          console.log(key);
           obj[key] = funcs[fullkey](initialState);  // TODO: Does this work with CC-Econ?
           // obj[key] = 0; // TODO: Can't be undefined
         }

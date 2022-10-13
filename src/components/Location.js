@@ -1,16 +1,14 @@
-import {useDispatch} from 'react-redux';
 import Map from './GoogleMaps';
-import {set} from '../store/Store';
+import {Link} from 'react-router-dom';
 
 const Location = () => {
-  const dispatch = useDispatch();
   return (
     <>
       <Map field autoFocus />
       
       <div className="bn">
-        <button onClick={() => dispatch(set.screen('Home'))}>BACK</button>
-        <button onClick={() => dispatch(set.screen('Soil'))}>NEXT</button>
+        <Link className="link" to={'/home'}>BACK</Link>
+        <Link className="link" to={'/soil'}>NEXT</Link>
       </div>
     </>
   )

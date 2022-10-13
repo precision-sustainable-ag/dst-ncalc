@@ -7,6 +7,7 @@ import Myslider from './Slider';
 import Icon from '@mui/material/Icon';
 import {useDispatch, useSelector} from 'react-redux';
 import {get, set} from '../store/Store';
+import {Link} from 'react-router-dom';
 
 const CoverCrops = () => {
   const species = useSelector(get.species);
@@ -136,8 +137,8 @@ const CoverCrop1 = () => {
       </div>
   
       <div className="bn">
-        <button onClick={() => dispatch(set.screen('Soil'))}>BACK</button>
-        <button onClick={() => dispatch(set.screen('CoverCrop2'))}>NEXT</button>
+        <Link className="link" to={'/soil'}       >BACK</Link>
+        <Link className="link" to={'/covercrop2'} >NEXT</Link>
       </div>
     </>
   )
@@ -229,8 +230,8 @@ const CoverCrop2 = () => {
       </div>
   
       <div className="bn">
-        <button onClick={() => dispatch(set.screen('CoverCrop1'))}>BACK</button>
-        <button onClick={() => dispatch(set.screen('CashCrop'))}>NEXT</button>
+        <Link className="link" to={'/covercrop'}>BACK</Link>
+        <Link className="link" to={'/cashcrop'} >NEXT</Link>
       </div>
     </>
   )

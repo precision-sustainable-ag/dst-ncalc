@@ -1,5 +1,6 @@
 import {useDispatch, useSelector} from "react-redux";
 import {get, set} from '../store/Store';
+import {Link} from 'react-router-dom';
 
 const Home = () => {
   const dispatch = useDispatch();
@@ -18,8 +19,8 @@ const Home = () => {
         <p>This calculator aids farmers with decision support regarding cover crop residue persistence, as well as the amount and timing of nitrogen availability.</p>
 
         <div>
-          <button onClick={() => dispatch(set.screen('About'   ))}>ABOUT</button>
-          <button onClick={() => dispatch(set.screen('Location'))}>GET STARTED</button>
+          <Link className="link about"    to={'/about'}    >ABOUT</Link>
+          <Link className="link location" to={'/location'} >GET STARTED</Link>
         </div>
 
         <img className="crops fullwidth" src="background.png" alt="" />

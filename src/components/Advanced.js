@@ -5,8 +5,9 @@ import Highcharts from 'highcharts';
 import HighchartsReact from 'highcharts-react-official';
 
 // import ZoomInIcon from '@mui/icons-material/ZoomIn';
-import {useDispatch, useSelector} from 'react-redux';
-import {get, set} from '../store/Store';
+import {useSelector} from 'react-redux';
+import {get} from '../store/Store';
+import {Link} from 'react-router-dom';
 
 // const zoomIn = (e) => {
 //   const div = e.target.closest('.parent');
@@ -16,7 +17,6 @@ import {get, set} from '../store/Store';
 
 const Advanced = () => {
   // const factor = unit === 'lb/ac' ? 1.12085 : 1;
-  const dispatch = useDispatch();
   const BD = useSelector(get.BD);
   const N = useSelector(get.N);
   const killDate = useSelector(get.killDate);
@@ -288,7 +288,7 @@ const Advanced = () => {
       }
 
       <div className="bn">
-        <button onClick={() => dispatch(set.screen('Output'))}>BACK</button>
+        <Link className="link" to={'/output'}>BACK</Link>
       </div>
     </div>
   )

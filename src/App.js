@@ -1,22 +1,18 @@
 import {useEffect} from 'react';
+
 import './App.css';
 import moment from 'moment';
 import 'react-datepicker/dist/react-datepicker.css';
 import {useSelector, useDispatch} from 'react-redux';
 
-// Screens
-import Home       from './components/Home';
-import About      from './components/About';
-import Location   from './components/Location';
-import Soil       from './components/Soil';
-import {CoverCrop1, CoverCrop2} from './components/CoverCrop';
-import CashCrop   from './components/CashCrop';
-import Output     from './components/Output';
-import Feedback   from './components/Feedback';
-import Advanced   from './components/Advanced';
-import {Button}   from '@mui/material';
-
 import {get, set} from './store/Store';
+
+import {
+  BrowserRouter as Router,
+  Switch,
+  Route,
+  NavLink
+} from 'react-router-dom';
 
 const Airtable = require('airtable');
 
@@ -58,6 +54,29 @@ const Help = () => {
 }
 
 const App = () => {
+  const screens = {};
+
+  if (true) {
+    screens.Home        = require('./components/Home').default;
+    screens.Location    = require('./components/Location').default;
+    screens.About       = require('./components/About').default;
+    screens.Soil        = require('./components/Soil').default;
+    screens.CoverCrop   = require('./components/CoverCrop').CoverCrop1;
+    screens.CoverCrop2  = require('./components/CoverCrop').CoverCrop2;
+    screens.CashCrop    = require('./components/CashCrop').default;
+    screens.Output      = require('./components/Output').default;
+    screens.Feedback    = require('./components/Feedback').default;
+    screens.Advanced    = require('./components/Advanced').default;
+
+    screens.About.menu      = false;
+    screens.CoverCrop2.menu = false;
+    screens.Advanced.menu   = false;
+
+    screens.CoverCrop.desc  = 'Cover Crop';
+    screens.CashCrop.desc   = 'Cash Crop';
+    screens.Feedback.desc   = 'FEEDBACK';
+  }
+  
   const dispatch = useDispatch();
 
   const field = useSelector(get.field);
@@ -126,14 +145,6 @@ const App = () => {
       }
     );
   }, [dispatch]);
-
-  const changeScreen = (e) => {
-    const button = e.target;
-
-    if (button.tagName === 'BUTTON') {
-      dispatch(set.screen(button.dataset.scr));
-    }
-  } // changeScreen
 
   const loadField = (field) => {
     if (field === 'Example: Grass') {
@@ -247,17 +258,17 @@ const App = () => {
 
     if (killDate - plantingDate > 1814400000) {
       alert('Cash crop planting date must be no earlier than 3 weeks before the cover crop kill date.');
-      screen = 'CoverCrop1';
+      screen = 'CoverCrop';
     } else if (plantingDate - killDate > 7776000000) {
       alert('Cash crop planting date should be within 3 months of the cover crop kill date.');
-      screen = 'CoverCrop1';
+      screen = 'CoverCrop';
     } else {
       test('lat', lat, 'Location', 'Please enter Latitude and Longitude') ||
       test('lon', lon, 'Location', 'Please enter Latitude and Longitude') ||
       
-      test('killDate', killDate, 'CoverCrop1', 'Please enter Cover Crop Termination Date') ||
-      test('biomass', biomass, 'CoverCrop1', 'Please enter Biomass') ||
-      test('lwc', lwc, 'CoverCrop1', 'Please enter Water Content') ||
+      test('killDate', killDate, 'CoverCrop', 'Please enter Cover Crop Termination Date') ||
+      test('biomass', biomass, 'CoverCrop', 'Please enter Biomass') ||
+      test('lwc', lwc, 'CoverCrop', 'Please enter Water Content') ||
       
       test('N', N, 'CoverCrop2', 'Please enter Nitrogen') ||
       test('carb', carb, 'CoverCrop2', 'Please enter Carbohydrates') ||
@@ -271,7 +282,7 @@ const App = () => {
     }
   } else {
     // AutoComplete component doesn't understand autoFocus:
-    const focus = screen === 'CoverCrop1' ? '#coverCrop' :
+    const focus = screen === 'CoverCrop'  ? '#coverCrop' :
                   screen === 'CashCrop'   ? '#cashCrop'  :
                   screen === 'Feedback'   ? '#Feedback'  :
                                              null;
@@ -282,103 +293,132 @@ const App = () => {
   }
 
   const sc = {
-    'Home'        : <Home />,
-    'About'       : <About />,
-    'Location'    : <Location />,
-    'Soil'        : <Soil />,
-    'CoverCrop1'  : <CoverCrop1 />,
-    'CoverCrop2'  : <CoverCrop2 />,
-    'CashCrop'    : <CashCrop />,
-    'Output'      : <Output />,
-    'Advanced'    : <Advanced />,
-    'Feedback'    : <Feedback />,
-  }[screen] || console.log('Unknown screen:', screen);
+    'Home'        : screens.Home(),
+    'About'       : screens.About(),
+    'Location'    : screens.Location(),
+    'Soil'        : screens.Soil(),
+    'CoverCrop'  : screens.CoverCrop(),
+    'CoverCrop2'  : screens.CoverCrop2(),
+    'CashCrop'    : screens.CashCrop(),
+    'Output'      : screens.Output(),
+    'Advanced'    : screens.Advanced(),
+    'Feedback'    : screens.Feedback(),
+  }[screen];
+
+  // console.log(sc);
+  // console.log(screens[screen]());
+
+  // const sc = (screens[screen])();
 
   return (
-    <div
-      tabIndex="0"
+    <Router>
+      <div
+        tabIndex="0"
 
-      onKeyDown={(e) => {
-        if (e.key === 'Escape') {
-          dispatch(set.help(''));
-          dispatch(set.privacy(false));
-        }
-      }}
+        onKeyDown={(e) => {
+          if (e.key === 'Escape') {
+            dispatch(set.help(''));
+            dispatch(set.privacy(false));
+          }
+        }}
 
-      onClick={(e) => {
-        if (/^help/.test(e.target.innerHTML)) {
-          dispatch(set.help(e.target.innerHTML.slice(4)));
-          dispatch(set.helpX(Math.min(e.pageX + 20, window.innerWidth - 400)));
-          dispatch(set.helpY(e.pageY - 20));
-        } else {
-          dispatch(set.help(''));
-        }
-      }}
+        onClick={(e) => {
+          if (/^help/.test(e.target.innerHTML)) {
+            dispatch(set.help(e.target.innerHTML.slice(4)));
+            dispatch(set.helpX(Math.min(e.pageX + 20, window.innerWidth - 400)));
+            dispatch(set.helpY(e.pageY - 20));
+          } else {
+            dispatch(set.help(''));
+          }
+        }}
 
-      id="Main"
-    >
-      <img alt="logo" src="PSALogo.png" id="PSALogo" />
-      <nav onClick={changeScreen}>
-        <button className={/Home|About/.test(screen)  ? 'selected' : undefined} data-scr="Home"       >Home</button>
-        <button className={/Location/.test(screen)    ? 'selected' : undefined} data-scr="Location"   >Location</button>
-        <button className={/Soil/.test(screen)        ? 'selected' : undefined} data-scr="Soil"       >Soil</button>
-        <button className={/CoverCrop/.test(screen)   ? 'selected' : undefined} data-scr="CoverCrop1" >Cover Crop</button>
-        {/*  <button id="CCQuality" data-scr="CoverCrop2">Quality</button> */}
-        <button className={/CashCrop/.test(screen)    ? 'selected' : undefined} data-scr="CashCrop"   >Cash Crop</button>
-        <button className={/Output/.test(screen)      ? 'selected' : undefined} data-scr="Output"     >Output</button>
+        id="Main"
+      >
+        <img alt="logo" src="PSALogo.png" id="PSALogo" />
 
-        <Button className="feedback" data-scr="Feedback" variant="outlined" color="primary" >Feedback</Button>
-        {
-          isPSA ? 
-            <select id="Fields"
-              onChange={changePSA}
-              value={field}
-            >
-              <option></option>
-              <optgroup label="PSA">
-                {
-                  Object.keys(examples)
-                    .filter(site => examples[site].category === 'PSA')
-                    .sort().map(site => <option key={site}>{site}</option>)
-                }
-              </optgroup>
-              <optgroup label="Resham">
-                {
-                  Object.keys(examples)
-                    .filter(site => examples[site].category === 'Resham')
-                    .sort().map(site => <option key={site}>{site}</option>)
-                }
-              </optgroup>
-            </select>
-          :
-          true || Object.keys(localStorage).length ?
-            <select id="Fields"
-              onChange={changeField}
-              value={field}
-            >
-              <option></option>
-              <option>Example: Grass</option>
-              <option>Example: Legume</option>
-              {
-                Object.keys(localStorage).length && (
-                  <>
-                    <option>Clear previous runs</option>
-                    <option disabled>____________________</option>
-                  </>
+        <nav>
+          {
+            Object.keys(screens)
+              .filter(scr => screens[scr].menu !== false)
+              .map(scr => {
+                return (
+                  <NavLink
+                    className={scr.toLowerCase()}
+                    to={'/' + scr.toLowerCase()}
+                    activeStyle={{color: '#385E1B'}}
+                  >
+                    {screens[scr].desc || scr}
+                  </NavLink>
                 )
-              }
-              {
-                Object.keys(localStorage).sort().map((fld, idx) => (
-                  <option key={idx} checked={fld === field}>{fld}</option>
-                ))
-              }
-            </select>
-            : ''
-        }
-      </nav>
-      {sc}
+              })
+          }
+          
+          {
+            isPSA ? 
+              <select id="Fields"
+                onChange={changePSA}
+                value={field}
+              >
+                <option></option>
+                <optgroup label="PSA">
+                  {
+                    Object.keys(examples)
+                      .filter(site => examples[site].category === 'PSA')
+                      .sort().map(site => <option key={site}>{site}</option>)
+                  }
+                </optgroup>
+                <optgroup label="Resham">
+                  {
+                    Object.keys(examples)
+                      .filter(site => examples[site].category === 'Resham')
+                      .sort().map(site => <option key={site}>{site}</option>)
+                  }
+                </optgroup>
+              </select>
+            :
+            true || Object.keys(localStorage).length ?
+              <select id="Fields"
+                onChange={changeField}
+                value={field}
+              >
+                <option></option>
+                <option>Example: Grass</option>
+                <option>Example: Legume</option>
+                {
+                  Object.keys(localStorage).length && (
+                    <>
+                      <option>Clear previous runs</option>
+                      <option disabled>____________________</option>
+                    </>
+                  )
+                }
+                {
+                  Object.keys(localStorage).sort().map((fld, idx) => (
+                    <option key={idx} checked={fld === field}>{fld}</option>
+                  ))
+                }
+              </select>
+              : ''
+          }
+        </nav>
+
+        <Switch>
+          {
+            Object.keys(screens).map(scr => {
+              return (
+                <Route path={'/' + scr.toLowerCase()}>
+                  {screens[scr]()}
+                </Route>
+              )
+            })
+          }
+          <Route path={'/'}>
+            {screens.Home()}
+          </Route>
+        </Switch>
+      </div>
       <Help />
-    </div>
+    </Router>
   );
 } // App
 

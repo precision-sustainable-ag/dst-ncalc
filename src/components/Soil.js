@@ -1,11 +1,11 @@
 import Icon from '@mui/material/Icon';
-import {useDispatch, useSelector} from 'react-redux';
-import {get, set} from '../store/Store';
+import {useSelector} from 'react-redux';
+import {get} from '../store/Store';
 
 import Myslider from './Slider';
+import {Link} from 'react-router-dom';
 
 const Soil = () => {
-  const dispatch = useDispatch();
   const gotSSURGO = useSelector(get.gotSSURGO);
 
   return (
@@ -68,8 +68,8 @@ const Soil = () => {
       </div>
 
       <div className="bn">
-        <button onClick={() => dispatch(set.screen('Location'))  }>BACK</button>
-        <button onClick={() => dispatch(set.screen('CoverCrop1'))}>NEXT</button>
+        <Link className="link" to={'/location'} >BACK</Link>
+        <Link className="link" to={'/covercrop'}>NEXT</Link>
       </div>
     </div>
   )

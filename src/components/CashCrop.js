@@ -4,7 +4,8 @@ import {Input} from './Inputs';
 
 import Icon from '@mui/material/Icon';
 import {useDispatch, useSelector} from 'react-redux';
-import {get, set} from '../store/Store';
+import {get} from '../store/Store';
+import {Link} from 'react-router-dom';
 
 const CashCrops = () => {
   const crops = [
@@ -350,8 +351,8 @@ const CashCrop = () => {
       </div>
   
       <div className="bn">
-        <button onClick={() => dispatch(set.screen('CoverCrop2'))}>BACK</button>
-        <button onClick={() => dispatch(set.screen('Output'))    }>NEXT</button>
+        <Link className="link" to={'/covercrop2'} >BACK</Link>
+        <Link className="link" to={'/output'}     >NEXT</Link>
       </div>
     </>
   )

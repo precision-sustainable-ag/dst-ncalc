@@ -9,6 +9,7 @@ import moment from 'moment';
 import {CSVLink} from "react-csv";
 import {useDispatch, useSelector} from 'react-redux';
 import {get, set} from '../store/Store';
+import {Link} from 'react-router-dom';
 
 const params = new URLSearchParams(window.location.search);
 
@@ -686,9 +687,9 @@ const Output = () => {
         </table>
       </div>
       <div className="bn">
-        <button onClick={() => dispatch(set.screen('CashCrop'))}>BACK</button>
-        <button onClick={() => dispatch(set.screen('Advanced'))}>ADVANCED</button>
-        <button onClick={() => dispatch(set.screen('Feedback'))}>FEEDBACK</button>
+        <Link className="link" to={'/cashcrop'} >BACK</Link>
+        <Link className="link" to={'/advanced'} >ADVANCED</Link>
+        <Link className="link" to={'/feedback'} >FEEDBACK</Link>
       </div>
     </>
   )
