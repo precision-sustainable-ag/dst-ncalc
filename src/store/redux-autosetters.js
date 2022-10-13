@@ -53,7 +53,6 @@ export const createStore = (initialState, {afterChange={}, reducers={}}) => {
             }
           }
   
-          console.log(key);
           obj[key] = funcs[fullkey](initialState);  // TODO: Does this work with CC-Econ?
           // obj[key] = 0; // TODO: Can't be undefined
         }

@@ -14,7 +14,6 @@ const query = (parm, def) => {
 } // query
 
 let initialState = {
-  screen              : 'Home',
   help                : '',
   helpX               : 0,
   helpY               : 0,
@@ -132,8 +131,10 @@ const fetchModel = (state) => {
     
     biomass *= factor;
 
+    const src = `https://api.precisionsustainableag.org/cc-ncalc/surface?lat=${lat}&lon=${lon}&start=${start}&end=${end}&n=${N}&biomass=${biomass}&lwc=${lwc}&carb=${carb}&cell=${cell}&lign=${lign}&om=${OM}&bd=${BD}&in=${InorganicN}&pmn=${pmn}`;
+
     api(
-      `https://api.precisionsustainableag.org/cc-ncalc/surface?lat=${lat}&lon=${lon}&start=${start}&end=${end}&n=${N}&biomass=${biomass}&lwc=${lwc}&carb=${carb}&cell=${cell}&lign=${lign}&om=${OM}&bd=${BD}&in=${InorganicN}&pmn=${pmn}`,
+      src,
       (data) => {
         if (data.name === 'error' || !data.surface) {
           store.dispatch(set.errorModel(true));
@@ -210,8 +211,8 @@ const fetchCornN = (state) => {
   store.dispatch(set.cornN(false));
   store.dispatch(set.errorCorn(false));
 
-  const src = `https://api.precisionsustainableag.org/weather/hourly?lat=${lat}&lon=${lon}&start=${moment(plantingDate).format('yyyy-MM-DD')}&end=${end}&attributes=air_temperature`;
-  
+  const src = `https://api.precisionsustainableag.org/weather/hourly?lat=${lat}&lon=${lon}&start=${moment(plantingDate).format('yyyy-MM-DD')}&end=${end}&attributes=air_temperature&options=predicted`;
+
   api(
     src,
     (data) => {

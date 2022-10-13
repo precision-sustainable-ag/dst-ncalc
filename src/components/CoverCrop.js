@@ -46,6 +46,11 @@ const CoverCrop1 = () => {
   const biomass = useSelector(get.biomass);
   const unit = useSelector(get.unit);
   const freshBiomass = useSelector(get.freshBiomass);
+  const species = useSelector(get.species);
+
+  if (!species.Grass) {
+    return '';
+  }
 
   return (
     <>
