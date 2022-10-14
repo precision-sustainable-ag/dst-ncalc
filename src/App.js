@@ -35,7 +35,7 @@ if (true) {
   screens.advanced.menu   = false;
 
   Object.keys(screens).forEach(key => {
-    screens[key].desc = screens[key].name;
+    screens[key].desc = key[0].toUpperCase() + key.slice(1);
   });
 
   screens.covercrop.desc  = 'Cover Crop';
@@ -225,8 +225,8 @@ const App = () => {
     }
   } // changeField
 
-  const path = window.location.pathname.slice(1).toLowerCase();
-  const Screen = screens[path];
+  const path = window.location.toString().split('/').pop().toLowerCase();
+  const Screen = screens[path] || screens.home;
 
   const changePSA = (e) => {
     const PSA = examples[e.target.value];
@@ -249,8 +249,6 @@ const App = () => {
 //  if (focus) {
 //    setTimeout(() => document.querySelector(focus).focus(), 10);
 //  }
-
-//   return <Home />;
 
   return (
     <div
@@ -357,14 +355,14 @@ const App = () => {
             return (
               <Route
                 key={scr}
-                path={'/' + scr.toLowerCase()}
+                path={scr.toLowerCase()}
                 element={<Screen />}
               />
             )
           })
         }
         <Route
-          path={'/'}
+          path={''}
           element={<Screen />}
         />
       </Routes>

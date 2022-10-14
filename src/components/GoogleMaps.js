@@ -137,7 +137,7 @@ const GoogleMaps = ({autoFocus=false, field=false, inputs=true}) => {
             label="Name your Field"
             id="field"
             autoComplete="off"
-            style={{width: 'calc(50% - 2em)'}}
+            style={{width: 'calc(50% - 2em)', height: '3rem'}}
             
           />
           <Icon className="moveLeft">
@@ -159,7 +159,7 @@ const GoogleMaps = ({autoFocus=false, field=false, inputs=true}) => {
 
       {
         inputs && (
-          <div style={{margin: '1rem 0'}}>
+          <div style={{margin: '2rem 0 1rem 0'}}>
             If you know your exact coordinates, you can enter them here:
             &nbsp;
             <Input

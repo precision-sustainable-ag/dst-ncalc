@@ -6,8 +6,8 @@ import HighchartsReact from 'highcharts-react-official';
 
 // import ZoomInIcon from '@mui/icons-material/ZoomIn';
 import {useSelector} from 'react-redux';
-import {get} from '../store/Store';
-import {Link} from 'react-router-dom';
+import {get, missingData} from '../store/Store';
+import {Link, useNavigate} from 'react-router-dom';
 
 // const zoomIn = (e) => {
 //   const div = e.target.closest('.parent');
@@ -19,7 +19,7 @@ const Advanced = () => {
   // const factor = unit === 'lb/ac' ? 1.12085 : 1;
   const BD = useSelector(get.BD);
   const N = useSelector(get.N);
-  const killDate = useSelector(get.killDate);
+  const killDate = new Date(useSelector(get.killDate));
   const carb = useSelector(get.carb);
   const cell = useSelector(get.cell);
   const lign = useSelector(get.lign);
@@ -31,6 +31,14 @@ const Advanced = () => {
   const model = useSelector(get.model);
   // const nweeks = useSelector(get.nweeks);
   // const plantingDate = useSelector(get.plantingDate);
+
+  const navigate = useNavigate();
+
+  const scr = missingData();
+  if (scr) {
+    setTimeout(() => navigate('../' + scr), 1);
+    return '';
+  }
 
   if (!gotModel || !model || !biomass || !N || !carb || !cell || !lign || !lwc || !BD || !InorganicN) {
     return (
@@ -47,6 +55,7 @@ const Advanced = () => {
   const factor = 1;
 
   const minDate = new Date(killDate);
+  minDate.setHours(0,0,0,0);
 
   Highcharts.setOptions({
     chart: {
@@ -68,6 +77,7 @@ const Advanced = () => {
     [parm].flat().forEach((parm, i) => {
       const cdata = [];
       date = new Date(killDate);
+      date.setHours(0,0,0,0);
       let total = 0;
       model.s[parm].forEach((d, i) => {
         const value = +(d / factor).toFixed(2);

@@ -63,7 +63,7 @@ const Input = ({type, id, options, isOptionEqualToValue, renderInput, index='', 
 
   const [changed, setChanged] = useState(false);
 
-  const isArray = Array.isArray(sel2);
+  const isArray = Array.isArray(sel2) && !props.multiple; // TODO
 
   if (!type && /\$/.test(id)) {
     type = 'dollar';
@@ -112,6 +112,7 @@ const Input = ({type, id, options, isOptionEqualToValue, renderInput, index='', 
   } // change
 
   const update = useCallback((e, newValue) => {
+    console.log(e);
     // eslint-disable-next-line
     if (newValue == value && sel2 !== undefined) return;  // == in case numeric
 
@@ -195,6 +196,7 @@ const Input = ({type, id, options, isOptionEqualToValue, renderInput, index='', 
     )
   } else if (options) {
     // let max = Math.max.apply(Math, options.map(option => option.description ? option.description.length : option.length));
+
     const max = '100%';
     if (!isOptionEqualToValue) {
       isOptionEqualToValue = (option, value) => option.value === value?.value;
@@ -212,7 +214,12 @@ const Input = ({type, id, options, isOptionEqualToValue, renderInput, index='', 
         )
       }
     }
-  
+
+    if (props.multiple && typeof v === 'string') {  // TODO
+      v = [v];
+    }
+
+    console.log(v);
     return (
       <MUIAutocomplete
         {...props}
@@ -228,6 +235,7 @@ const Input = ({type, id, options, isOptionEqualToValue, renderInput, index='', 
         groupBy={props.groupBy}
         getOptionLabel={props.getOptionLabel}
         onInputChange={props.onInputChange}
+
         includeInputInList={props.includeInputInList}
         filterSelectedOptions={props.filterSelectedOptions}
 
@@ -237,8 +245,16 @@ const Input = ({type, id, options, isOptionEqualToValue, renderInput, index='', 
 
         value={v}
 
-        onChange={(e, value) => {
-          update(e, value);
+        onChange={(e, value, _, f) => {
+          console.log(e);
+          console.log(value);  // TODO ???
+          console.log(f);
+          if (props.zmultiple) {
+            console.log([...v, f.option]);
+            update(e, [...v, f.option]);
+          } else {
+            update(e, value);
+          }
         }}
       />
     )

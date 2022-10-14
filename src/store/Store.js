@@ -134,7 +134,7 @@ const fetchModel = (state) => {
     biomass *= factor;
 
     const src = `https://api.precisionsustainableag.org/cc-ncalc/surface?lat=${lat}&lon=${lon}&start=${start}&end=${end}&n=${N}&biomass=${biomass}&lwc=${lwc}&carb=${carb}&cell=${cell}&lign=${lign}&om=${OM}&bd=${BD}&in=${InorganicN}&pmn=${pmn}`;
-    console.log(src);
+
     api(
       src,
       (data) => {
@@ -183,7 +183,6 @@ const fetchSSURGO = (state) => {
   state.gotSSURGO = false;
 
   const src = `https://api.precisionsustainableag.org/ssurgo?lat=${lat}&lon=${lon}&component=major`;
-  console.log(src);
 
   api(
     src,
@@ -217,7 +216,6 @@ const fetchCornN = (state) => {
   store.dispatch(set.errorCorn(false));
 
   const src = `https://api.precisionsustainableag.org/weather/hourly?lat=${lat}&lon=${lon}&start=${moment(plantingDate).format('yyyy-MM-DD')}&end=${end}&attributes=air_temperature&options=predicted`;
-  console.log(src);
   
   api(
     src,
@@ -247,7 +245,7 @@ export const missingData = () => {
     const test = (parm, val, scr, desc = `Please enter ${parm}`) => {
       if (!val) {
         alert(desc);
-        result = '/' + scr;
+        result = scr;
         return true;
       }
     } // test
@@ -290,6 +288,7 @@ export const api = (url, callback, timer, delay=0) => {
   }
 
   api[timer] = setTimeout(() => {
+    console.log(url);
     store.dispatch({
       type: 'api',
       payload: {

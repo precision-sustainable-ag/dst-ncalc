@@ -2,7 +2,7 @@ import React from 'react';
 import {createRoot} from 'react-dom/client';
 import {Provider} from 'react-redux';
 import {store} from './store/Store';
-import {BrowserRouter} from 'react-router-dom';
+import {HashRouter as Router} from 'react-router-dom';
 import App from './App';
 import './index.css';
 
@@ -13,19 +13,19 @@ const root = createRoot(container);
 /*
   root.render(
     <React.StrictMode>
-      <BrowserRouter>
+      <Router>
         <Provider store={store}>
           <App />
         </Provider>
-      </BrowserRouter>
+      </Router>
     </React.StrictMode>
   );
 */
 
 root.render(
-  <BrowserRouter>
+  <Router>
     <Provider store={store}>
       <App />
     </Provider>
-  </BrowserRouter>
+  </Router>
 );

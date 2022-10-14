@@ -44,7 +44,7 @@ const Output = () => {
 
   const scr = missingData();
   if (scr) {
-    setTimeout(() => navigate(scr), 1);
+    setTimeout(() => navigate('../' + scr), 1);
     return '';
   }
 
@@ -149,6 +149,7 @@ const Output = () => {
   }
 
   let date = new Date(killDate);
+  date.setHours(0,0,0,0);
   const surfaceData = [];
 
   let m2;
@@ -176,7 +177,7 @@ const Output = () => {
         marker: {
           radius: 5,
           fillColor: '#008837',
-          enabled: (i / 24 === nweeks * 7) ||
+          enabled: (Math.round(i / 24) === nweeks * 7) ||
                    (i === a.length - 1 && nweeks * 7 * 24 >= a.length)
         }
       });
@@ -208,7 +209,7 @@ const Output = () => {
   const surfaceMin = outputN === 1 ? (biomass * N) / 100 : Math.min.apply(Math, surfaceData.map(d => d.y));
   const incorporatedMin = outputN === 1 ? (biomass * N) / 100 : Math.min.apply(Math, incorporatedData.map(d => d.y));
 
-  const minDate = +killDate;
+  const minDate = new Date(killDate);
 
   let labModel = '';
 
@@ -574,6 +575,7 @@ const Output = () => {
       <select
         id="nweeks"
         onChange={(e) => dispatch(set.nweeks(e.target.value))}
+        value={nweeks}
       >
         {
           Array(Math.round(model.s.Date.length / 24 / 7)).fill().map((_, i) => <option key={i + 1}>{i + 1}</option>)

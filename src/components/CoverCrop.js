@@ -13,7 +13,7 @@ const CoverCrops = () => {
   const species = useSelector(get.species);
   return (
     <Input
-      zmultiple
+      multiple
 
       id="coverCrop"
 
