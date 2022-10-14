@@ -3,7 +3,7 @@ import Myslider from './Slider';
 import {Input} from './Inputs';
 
 import Icon from '@mui/material/Icon';
-import {useDispatch, useSelector} from 'react-redux';
+import {useSelector} from 'react-redux';
 import {get} from '../store/Store';
 import {Link} from 'react-router-dom';
 
@@ -310,7 +310,6 @@ const CashCrops = () => {
 } // CashCrops
 
 const CashCrop = () => {
-  const dispatch = useDispatch();
   const unit = useSelector(get.unit);
   const cashCrop = useSelector(get.cashCrop);
 

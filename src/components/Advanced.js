@@ -46,7 +46,7 @@ const Advanced = () => {
 
   const factor = 1;
 
-  const minDate = +killDate;
+  const minDate = new Date(killDate);
 
   Highcharts.setOptions({
     chart: {
@@ -85,7 +85,7 @@ const Advanced = () => {
           } else {
             cdata.push({
               x: +date,
-              y: hourly ? +value : parm === 'Rain' ? total : total / 24,
+              y: hourly ? +value : parm === 'Rain' ? +(total.toFixed(2)) : +((total / 24).toFixed(2)),
               // marker: {
               //   enabled: (i / 24 === nweeks * 7) ||
               //           (i === a.length - 1 && nweeks * 7 * 24 >= a.length)

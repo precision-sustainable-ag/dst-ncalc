@@ -19,24 +19,28 @@ const Airtable = require('airtable');
 const screens = {};
 
 if (true) {
-  screens.Home        = require('./components/Home').default;
-  screens.Location    = require('./components/Location').default;
-  screens.About       = require('./components/About').default;
-  screens.Soil        = require('./components/Soil').default;
-  screens.CoverCrop   = require('./components/CoverCrop').CoverCrop1;
-  screens.CoverCrop2  = require('./components/CoverCrop').CoverCrop2;
-  screens.CashCrop    = require('./components/CashCrop').default;
-  screens.Output      = require('./components/Output').default;
-  screens.Feedback    = require('./components/Feedback').default;
-  screens.Advanced    = require('./components/Advanced').default;
+  screens.home        = require('./components/Home').default;
+  screens.location    = require('./components/Location').default;
+  screens.about       = require('./components/About').default;
+  screens.soil        = require('./components/Soil').default;
+  screens.covercrop   = require('./components/CoverCrop').CoverCrop1;
+  screens.covercrop2  = require('./components/CoverCrop').CoverCrop2;
+  screens.cashcrop    = require('./components/CashCrop').default;
+  screens.output      = require('./components/Output').default;
+  screens.feedback    = require('./components/Feedback').default;
+  screens.advanced    = require('./components/Advanced').default;
 
-  screens.About.menu      = false;
-  screens.CoverCrop2.menu = false;
-  screens.Advanced.menu   = false;
+  screens.about.menu      = false;
+  screens.covercrop2.menu = false;
+  screens.advanced.menu   = false;
 
-  screens.CoverCrop.desc  = 'Cover Crop';
-  screens.CashCrop.desc   = 'Cash Crop';
-  screens.Feedback.desc   = 'FEEDBACK';
+  Object.keys(screens).forEach(key => {
+    screens[key].desc = screens[key].name;
+  });
+
+  screens.covercrop.desc  = 'Cover Crop';
+  screens.cashcrop.desc   = 'Cash Crop';
+  screens.feedback.desc   = 'FEEDBACK';
 }
 
 const holdError = console.error;
@@ -162,8 +166,6 @@ const App = () => {
       dispatch(set.coverCrop(['Rye']));
       dispatch(set.killDate('2019-03-21'));
       dispatch(set.plantingDate('2019-04-01'));
-      dispatch(set.killDate('2023-03-21'));
-      dispatch(set.plantingDate('2023-04-01'));
       dispatch(set.biomass(5000));
       dispatch(set.lwc(1.486));
       dispatch(set.N(0.6));
@@ -223,6 +225,9 @@ const App = () => {
     }
   } // changeField
 
+  const path = window.location.pathname.slice(1).toLowerCase();
+  const Screen = screens[path];
+
   const changePSA = (e) => {
     const PSA = examples[e.target.value];
     
@@ -244,6 +249,8 @@ const App = () => {
 //  if (focus) {
 //    setTimeout(() => document.querySelector(focus).focus(), 10);
 //  }
+
+//   return <Home />;
 
   return (
     <div
@@ -351,14 +358,14 @@ const App = () => {
               <Route
                 key={scr}
                 path={'/' + scr.toLowerCase()}
-                element={screens[scr]()}
+                element={<Screen />}
               />
             )
           })
         }
         <Route
           path={'/'}
-          element={screens.Home()}
+          element={<Screen />}
         />
       </Routes>
     </div>

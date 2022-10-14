@@ -8,7 +8,7 @@ import moment from 'moment';
 
 import {CSVLink} from "react-csv";
 import {useDispatch, useSelector} from 'react-redux';
-import {get, set} from '../store/Store';
+import {get, set, missingData} from '../store/Store';
 import {Link, useNavigate} from 'react-router-dom';
 
 const params = new URLSearchParams(window.location.search);
@@ -41,42 +41,11 @@ const Output = () => {
   const outputN = useSelector(get.outputN);
   const nweeks = useSelector(get.nweeks);
   const targetN = useSelector(get.targetN);
-  const lat = useSelector(get.lat);
-  const lon = useSelector(get.lon);
 
-  // console.log({gotModel, cornN});
-
-  if (/output/.test(window.location)) {
-    const test = (parm, val, scr, desc = `Please enter ${parm}`) => {
-      if (!val) {
-        alert(desc);
-        setTimeout(() => navigate(scr), 10);
-        return true;
-      }
-    } // test
-
-    if (killDate - plantingDate > 1814400000) {
-      alert('Cash crop planting date must be no earlier than 3 weeks before the cover crop kill date.');
-      navigate('covercrop');
-      return;
-    } else if (plantingDate - killDate > 7776000000) {
-      alert('Cash crop planting date should be within 3 months of the cover crop kill date.');
-      navigate('covercrop');
-      return;
-    } else {
-      if (test('lat', lat, 'Location', 'Please enter Latitude and Longitude')) return;
-      if (test('lon', lon, 'Location', 'Please enter Latitude and Longitude')) return;
-      if (test('killDate', killDate, 'CoverCrop', 'Please enter Cover Crop Termination Date')) return;
-      if (test('biomass', biomass, 'CoverCrop', 'Please enter Biomass')) return;
-      if (test('lwc', lwc, 'CoverCrop', 'Please enter Water Content')) return;
-      if (test('N', N, 'CoverCrop2', 'Please enter Nitrogen')) return;
-      if (test('carb', carb, 'CoverCrop2', 'Please enter Carbohydrates')) return;
-      if (test('cell', cell, 'CoverCrop2', 'Please enter Cellulose')) return;
-      if (test('lign', lign, 'CoverCrop2', 'Please enter Lignin')) return;
-      if (test('plantingDate', plantingDate, 'CashCrop', 'Please enter Cash Crop Planting Date')) return;
-      if (test('BD', BD, 'Soil', 'Please enter Bulk Density')) return;
-      if (test('InorganicN', InorganicN, 'Soil', 'Please enter Soil Inorganic N')) return;
-    }
+  const scr = missingData();
+  if (scr) {
+    setTimeout(() => navigate(scr), 1);
+    return '';
   }
 
   if (errorModel || errorCorn) {
@@ -102,6 +71,8 @@ const Output = () => {
     )
   }
 
+  console.log({gotModel, cornN, model, biomass, N, carb, cell, lign, lwc, BD, InorganicN});
+
   if (!gotModel || !cornN || !model || !biomass || !N || !carb || !cell || !lign || !lwc || !BD || !InorganicN) {
     return (
       <>
@@ -117,7 +88,7 @@ const Output = () => {
           <li>Corn uptake curve: {errorCorn.toString()}</li>
         </ul>
       </>
-  );
+    );
   }
 
   Object.keys(model.s).forEach(key => {

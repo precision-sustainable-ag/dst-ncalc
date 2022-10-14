@@ -1,9 +1,6 @@
-import {useDispatch} from "react-redux";
-import {set} from '../store/Store';
 import {Link} from 'react-router-dom';
 
 const About = () => {
-  const dispatch = useDispatch();
   return (
     <div className="about">
       <h2>CC-NCALC estimates:</h2>

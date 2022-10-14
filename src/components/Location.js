@@ -5,7 +5,7 @@ const Location = () => {
   return (
     <>
       <Map field autoFocus />
-      
+
       <div className="bn">
         <Link className="link" to={'/home'}>BACK</Link>
         <Link className="link" to={'/soil'}>NEXT</Link>

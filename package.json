@@ -29,6 +29,7 @@
     "prop-types": "^15.7.2",
     "react-csv": "^2.0.3",
     "react-datepicker": "^3.4.1",
+    "react-hot-loader": "^4.13.0",
     "react-number-format": "^4.8.0",
     "react-redux": "^8.0.4",
     "react-router-dom": "^6.4.2",

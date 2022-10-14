@@ -106,12 +106,14 @@ const fetchModel = (state) => {
   state.errorModel = false;
 
   let {lat, lon, N, biomass, lwc, carb, cell, lign, OM, BD, InorganicN, unit} = state;
-  console.log({lat, lon, N, biomass, lwc, carb, cell, lign, OM, BD, InorganicN, unit});
+  // console.log({lat, lon, N, biomass, lwc, carb, cell, lign, OM, BD, InorganicN, unit});
 
   const start = moment(state.killDate).format('yyyy-MM-DD');
   const end   = moment(state.plantingDate).add(110, 'days').add(1, 'hour').format('yyyy-MM-DD');
   const validDates = start !== 'Invalid date' && end !== 'Invalid date' && end > start;
+  
   console.log({start, end}, state.killDate, validDates);
+  
   if (validDates) {
     const pmn = 10;
 
@@ -132,7 +134,7 @@ const fetchModel = (state) => {
     biomass *= factor;
 
     const src = `https://api.precisionsustainableag.org/cc-ncalc/surface?lat=${lat}&lon=${lon}&start=${start}&end=${end}&n=${N}&biomass=${biomass}&lwc=${lwc}&carb=${carb}&cell=${cell}&lign=${lign}&om=${OM}&bd=${BD}&in=${InorganicN}&pmn=${pmn}`;
-
+    console.log(src);
     api(
       src,
       (data) => {
@@ -180,8 +182,11 @@ const fetchSSURGO = (state) => {
 
   state.gotSSURGO = false;
 
+  const src = `https://api.precisionsustainableag.org/ssurgo?lat=${lat}&lon=${lon}&component=major`;
+  console.log(src);
+
   api(
-    `https://api.precisionsustainableag.org/ssurgo?lat=${lat}&lon=${lon}&component=major`,
+    src,
     (data) => {
       if (data.ERROR) {
         console.log(`No SSURGO data at ${lat}, ${lon}`);
@@ -212,7 +217,8 @@ const fetchCornN = (state) => {
   store.dispatch(set.errorCorn(false));
 
   const src = `https://api.precisionsustainableag.org/weather/hourly?lat=${lat}&lon=${lon}&start=${moment(plantingDate).format('yyyy-MM-DD')}&end=${end}&attributes=air_temperature&options=predicted`;
-
+  console.log(src);
+  
   api(
     src,
     (data) => {
@@ -230,6 +236,48 @@ const fetchCornN = (state) => {
     }
   );
 } // fetchCornN
+
+export const missingData = () => {
+  const state = store.getState();
+  const {lat, lon, killDate, plantingDate, biomass, lwc, N, carb, cell, lign, BD, InorganicN} = state;
+
+  let result = '';
+
+  if (/output|advanced/i.test(window.location)) {
+    const test = (parm, val, scr, desc = `Please enter ${parm}`) => {
+      if (!val) {
+        alert(desc);
+        result = '/' + scr;
+        return true;
+      }
+    } // test
+
+    if (killDate - plantingDate > 1814400000) {
+      alert('Cash crop planting date must be no earlier than 3 weeks before the cover crop kill date.');
+      return 'covercrop';
+    } else if (plantingDate - killDate > 7776000000) {
+      alert('Cash crop planting date should be within 3 months of the cover crop kill date.');
+      return 'covercrop';
+    } else {
+      if (test('lat', lat, 'location', 'Please enter Latitude and Longitude')) return result;
+      if (test('lon', lon, 'location', 'Please enter Latitude and Longitude')) return result;
+      
+      if (test('killDate', killDate, 'covercrop', 'Please enter Cover Crop Termination Date')) return result;
+      if (test('biomass', biomass, 'covercrop', 'Please enter Biomass')) return result;
+      if (test('lwc', lwc, 'covercrop', 'Please enter Water Content')) return result;
+      
+      if (test('N', N, 'covercrop2', 'Please enter Nitrogen')) return result;
+      if (test('carb', carb, 'covercrop2', 'Please enter Carbohydrates')) return result;
+      if (test('cell', cell, 'covercrop2', 'Please enter Cellulose')) return result;
+      if (test('lign', lign, 'covercrop2', 'Please enter Lignin')) return result;
+      
+      if (test('plantingDate', plantingDate, 'cashcrop', 'Please enter Cash Crop Planting Date')) return result;
+      
+      if (test('BD', BD, 'soil', 'Please enter Bulk Density')) return result;
+      if (test('InorganicN', InorganicN, 'soil', 'Please enter Soil Inorganic N')) return result;
+    }
+  }
+} // missingData
 
 const reducers = {
 };

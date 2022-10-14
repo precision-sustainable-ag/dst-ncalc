@@ -150,7 +150,6 @@ const CoverCrop1 = () => {
 } // CoverCrop1
 
 const CoverCrop2 = () => {
-  const dispatch = useDispatch();
   const N = useSelector(get.N);
 
   return (
