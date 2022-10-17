@@ -304,4 +304,6 @@ const Advanced = () => {
   )
 } // Advanced
 
+Advanced.showInMenu = false;
+
 export default Advanced;

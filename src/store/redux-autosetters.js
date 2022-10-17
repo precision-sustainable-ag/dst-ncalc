@@ -124,7 +124,7 @@ export const createStore = (initialState, {afterChange={}, reducers={}}) => {
 
     builder.addDefaultCase((state, action) => {
       if (action.type !== '@@INIT') {
-        alert('Unknown action: ' + JSON.stringify(action));
+        console.log('Unknown action: ' + JSON.stringify(action));
       }
     });
   } // builders

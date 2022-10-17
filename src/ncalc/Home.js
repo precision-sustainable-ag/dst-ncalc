@@ -1,13 +1,20 @@
 import {useDispatch, useSelector} from "react-redux";
 import {get, set} from '../store/Store';
 import {Link} from 'react-router-dom';
+import {useEffect} from "react";
 
 const Home = () => {
   const dispatch = useDispatch();
   const privacy = useSelector(get.privacy);
 
-  const className = privacy ? 'home background' : 'home';
+  useEffect(() => {
+    if (window.location.toString().includes('PSA')) {
+      dispatch(set.PSA(true));
+    }
+  }, [dispatch]);
 
+  const className = privacy ? 'home background' : 'home';
+  
   return (
     <>
       <div

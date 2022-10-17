@@ -21,6 +21,7 @@ let initialState = {
   name                : '',
   email               : '',
   feedback            : '',
+  PSA                 : false,
   field               : query('field', ''),
   targetN             : '150',
   coverCrop           : query('covercrop', []),

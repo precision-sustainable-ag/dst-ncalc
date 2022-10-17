@@ -359,4 +359,6 @@ const CashCrop = () => {
   )
 } // CashCrop
   
+CashCrop.desc = 'Cash Crop';
+
 export default CashCrop;

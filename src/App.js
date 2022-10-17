@@ -29,19 +29,11 @@ if (true) {
   screens.output      = require('./ncalc/Output').default;
   screens.feedback    = require('./ncalc/Feedback').default;
   screens.advanced    = require('./ncalc/Advanced').default;
-
-  screens.about.menu      = false;
-  screens.covercrop2.menu = false;
-  screens.advanced.menu   = false;
-
-  Object.keys(screens).forEach(key => {
-    screens[key].desc = key[0].toUpperCase() + key.slice(1);
-  });
-
-  screens.covercrop.desc  = 'Cover Crop';
-  screens.cashcrop.desc   = 'Cash Crop';
-  screens.feedback.desc   = 'FEEDBACK';
 }
+
+Object.keys(screens).forEach(key => {
+  screens[key].desc = screens[key].desc || (key[0].toUpperCase() + key.slice(1));
+});
 
 const holdError = console.error;
 console.error = (msg, ...subst) => {
@@ -84,6 +76,7 @@ const App = () => {
   const dispatch = useDispatch();
 
   const field = useSelector(get.field);
+  const PSA = useSelector(get.PSA);
 
   let navigate = useNavigate();
 
@@ -238,7 +231,6 @@ const App = () => {
 
       }
     });
-    // window.location = `?PSA=true&demo=${e.target.value}`;
   } // changePSA
 
   return (
@@ -270,7 +262,7 @@ const App = () => {
       <nav>
         {
           Object.keys(screens)
-            .filter(scr => screens[scr].menu !== false)
+            .filter(scr => screens[scr].showInMenu !== false)
             .map(scr => {
               return (
                 <NavLink
@@ -292,7 +284,7 @@ const App = () => {
         }
         
         {
-          isPSA ? 
+          PSA ?
             <select id="Fields"
               onChange={changePSA}
               value={field}
@@ -361,22 +353,6 @@ const App = () => {
   );
 } // App
 
-const params = new URLSearchParams(window.location.search);
-let demo = params.get('site');
-const isPSA = params.get('PSA');
-
-if (params.get('fy')) {
-  setTimeout(() => {
-    document.querySelector('button[data-scr=Output]').click();
-    setTimeout(() => {
-      window.close();
-    }, 2000);
-  }, 5000);
-}
-
-if (isPSA && !demo) {
-  demo = 'AMD';
-}
 
 let examples = {};
 
