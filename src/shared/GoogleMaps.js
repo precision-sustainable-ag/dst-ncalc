@@ -105,8 +105,6 @@ const GoogleMaps = ({autoFocus=false, field=false, inputs=true}) => {
             includeInputInList
             filterSelectedOptions
     
-            isOptionEqualToValue={(option, value) => {return false;}}  // TODO
-            
             onChange={(_, newValue) => {geocode(newValue);}}
     
             onInputChange={(_, newInputValue) => {

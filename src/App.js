@@ -19,16 +19,16 @@ const Airtable = require('airtable');
 const screens = {};
 
 if (true) {
-  screens.home        = require('./components/Home').default;
-  screens.location    = require('./components/Location').default;
-  screens.about       = require('./components/About').default;
-  screens.soil        = require('./components/Soil').default;
-  screens.covercrop   = require('./components/CoverCrop').CoverCrop1;
-  screens.covercrop2  = require('./components/CoverCrop').CoverCrop2;
-  screens.cashcrop    = require('./components/CashCrop').default;
-  screens.output      = require('./components/Output').default;
-  screens.feedback    = require('./components/Feedback').default;
-  screens.advanced    = require('./components/Advanced').default;
+  screens.home        = require('./ncalc/Home').default;
+  screens.location    = require('./ncalc/Location').default;
+  screens.about       = require('./ncalc/About').default;
+  screens.soil        = require('./ncalc/Soil').default;
+  screens.covercrop   = require('./ncalc/CoverCrop').CoverCrop1;
+  screens.covercrop2  = require('./ncalc/CoverCrop').CoverCrop2;
+  screens.cashcrop    = require('./ncalc/CashCrop').default;
+  screens.output      = require('./ncalc/Output').default;
+  screens.feedback    = require('./ncalc/Feedback').default;
+  screens.advanced    = require('./ncalc/Advanced').default;
 
   screens.about.menu      = false;
   screens.covercrop2.menu = false;
@@ -52,7 +52,7 @@ console.error = (msg, ...subst) => {
 
 const holdWarn = console.warn;
 console.warn = (msg, ...subst) => {
-  if (!/StrictMode|Deprecation/.test(msg)) {
+  if (!/StrictMode|Deprecation|Autocomplete/.test(msg)) {
     holdWarn(msg, ...subst);
   }
 }

@@ -22,7 +22,7 @@ export const createStore = (initialState, {afterChange={}, reducers={}}) => {
       
   const builders = (builder) => {
     const recurse = (obj, set, get, parents = []) => {
-      if (!obj) {   // TODO
+      if (!obj) {   // TODO dst-econ
         console.log(set);
         return;
       }
@@ -53,8 +53,7 @@ export const createStore = (initialState, {afterChange={}, reducers={}}) => {
             }
           }
   
-          obj[key] = funcs[fullkey](initialState);  // TODO: Does this work with CC-Econ?
-          // obj[key] = 0; // TODO: Can't be undefined
+          obj[key] = funcs[fullkey](initialState);
         }
   
         set[key] = createAction(fullkey);

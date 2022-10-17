@@ -1,8 +1,8 @@
 import {Radio, RadioGroup, FormControlLabel} from '@mui/material';
 
-import {Input} from './Inputs';
+import {Input} from '../shared/Inputs';
 
-import Myslider from './Slider';
+import Myslider from '../shared/Slider';
 
 import Icon from '@mui/material/Icon';
 import {useDispatch, useSelector} from 'react-redux';

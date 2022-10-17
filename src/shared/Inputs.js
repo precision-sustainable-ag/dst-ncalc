@@ -95,7 +95,7 @@ const Input = ({type, id, options, isOptionEqualToValue, renderInput, index='', 
       setValue(val);
       setChanged(false);
     }
-    if (focus) { // TODO: is props.autoFocus working?
+    if (focus) {
       if (focusRef.current) {
         const input = focusRef.current.querySelector('input');
         input.focus();
@@ -214,11 +214,6 @@ const Input = ({type, id, options, isOptionEqualToValue, renderInput, index='', 
       }
     }
 
-    if (props.multiple && typeof v === 'string') {  // TODO
-      v = [v];
-    }
-
-    // console.log(v);
     return (
       <MUIAutocomplete
         {...props}

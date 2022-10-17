@@ -1,4 +1,4 @@
-import Map from './GoogleMaps';
+import Map from '../shared/GoogleMaps';
 import {Link} from 'react-router-dom';
 
 const Location = () => {

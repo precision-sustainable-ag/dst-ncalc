@@ -1,6 +1,6 @@
-import Myslider from './Slider';
+import Myslider from '../shared/Slider';
 
-import {Input} from './Inputs';
+import {Input} from '../shared/Inputs';
 
 import Icon from '@mui/material/Icon';
 import {useSelector} from 'react-redux';

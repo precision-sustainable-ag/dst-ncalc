@@ -7,6 +7,8 @@ const Myslider = ({id, min, max, step=1, autoFocus, onInput}) => {
   const dispatch = useDispatch();
   let val = useSelector(get[id]);
 
+  min = +min;
+  max = +max;
   return (
     <div className="slider">
       <Input

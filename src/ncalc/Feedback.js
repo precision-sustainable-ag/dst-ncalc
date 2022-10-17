@@ -1,4 +1,4 @@
-import {Input} from './Inputs';
+import {Input} from '../shared/Inputs';
 import {Button} from '@mui/material';
 
 import {useSelector, useDispatch} from 'react-redux';
