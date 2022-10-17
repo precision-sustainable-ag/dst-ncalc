@@ -112,7 +112,6 @@ const Input = ({type, id, options, isOptionEqualToValue, renderInput, index='', 
   } // change
 
   const update = useCallback((e, newValue) => {
-    console.log(e);
     // eslint-disable-next-line
     if (newValue == value && sel2 !== undefined) return;  // == in case numeric
 
@@ -219,7 +218,7 @@ const Input = ({type, id, options, isOptionEqualToValue, renderInput, index='', 
       v = [v];
     }
 
-    console.log(v);
+    // console.log(v);
     return (
       <MUIAutocomplete
         {...props}
@@ -230,7 +229,7 @@ const Input = ({type, id, options, isOptionEqualToValue, renderInput, index='', 
 
         sx={{width: max}}
 
-        isOptionEqualToValue={isOptionEqualToValue}   // avoids warning, per https://stackoverflow.com/q/61947941/3903374
+        // isOptionEqualToValue={isOptionEqualToValue}   // avoids warning, per https://stackoverflow.com/q/61947941/3903374
 
         groupBy={props.groupBy}
         getOptionLabel={props.getOptionLabel}
@@ -245,16 +244,8 @@ const Input = ({type, id, options, isOptionEqualToValue, renderInput, index='', 
 
         value={v}
 
-        onChange={(e, value, _, f) => {
-          console.log(e);
-          console.log(value);  // TODO ???
-          console.log(f);
-          if (props.zmultiple) {
-            console.log([...v, f.option]);
-            update(e, [...v, f.option]);
-          } else {
-            update(e, value);
-          }
+        onChange={(evt, value) => {
+          update(evt, value);
         }}
       />
     )

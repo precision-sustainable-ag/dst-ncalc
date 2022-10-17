@@ -241,15 +241,6 @@ const App = () => {
     // window.location = `?PSA=true&demo=${e.target.value}`;
   } // changePSA
 
-//  // AutoComplete component doesn't understand autoFocus:
-//  const focus = screen === 'CoverCrop'  ? '#coverCrop' :
-//                screen === 'CashCrop'   ? '#cashCrop'  :
-//                screen === 'Feedback'   ? '#Feedback'  :
-//                                            null;
-//  if (focus) {
-//    setTimeout(() => document.querySelector(focus).focus(), 10);
-//  }
-
   return (
     <div
       tabIndex="0"

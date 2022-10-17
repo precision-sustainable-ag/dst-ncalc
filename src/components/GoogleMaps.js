@@ -242,7 +242,7 @@ const Map = ({field=false, autoFocus, inputs=true, id='GoogleMap', mapOptions={}
       left: 0,
       width: '100vw',
       height: '100vh',
-      zIndex: 999,
+      zIndex: 10000,
     }
     : {
       position: 'relative',

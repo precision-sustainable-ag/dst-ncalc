@@ -299,6 +299,8 @@ const CashCrops = () => {
 
       options={crops}
 
+      autoFocus
+
       // onChange={(event, newValue) => {
       //   dispatch(set.targetN(PiedNRate[newValue] || 0));
       //   dispatch(set.cashCrop(newValue));

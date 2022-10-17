@@ -17,6 +17,8 @@ const CoverCrops = () => {
 
       id="coverCrop"
 
+      autoFocus
+
       groupBy={
         (option) => species.Brassica.includes(option)  ? 'Brassica' :
                     species.Broadleaf.includes(option) ? 'Broadleaf' :
