@@ -11,12 +11,12 @@ resources:
 variables:
 
   # Container registry service connection established during pipeline creation
-  dockerRegistryServiceConnection: 'ff85e13b-a015-4480-ac7e-d242ee26d36f'
+  dockerRegistryServiceConnection: 'c0e89e5e-60bf-4a63-ba95-e2c461e45906'
   imageRepository: 'dstncalc'
   containerRegistry: 'containerregistry4pd7i.azurecr.io'
   dockerfilePath: '**/Dockerfile'
   tag: '$(Build.BuildId)'
-  imagePullSecret: 'containerregistry4pd7i7521-auth'
+  imagePullSecret: 'containerregistry4pd7i10346590-auth'
 
   # Agent VM image name
   vmImageName: 'ubuntu-latest'
@@ -42,7 +42,6 @@ stages:
         containerRegistry: $(dockerRegistryServiceConnection)
         tags: |
           $(tag)
-
     - upload: manifests
       artifact: manifests
 
@@ -56,7 +55,7 @@ stages:
     displayName: Deploy
     pool:
       vmImage: $(vmImageName)
-    environment: 'precisionsustainableagdstncalc.develop'
+    environment: 'precisionsustainableagdstncalc-7092.production'
     strategy:
       runOnce:
         deploy:
@@ -79,19 +78,18 @@ stages:
                 $(imagePullSecret)
               containers: |
                 $(containerRegistry)/$(imageRepository):$(tag)
-
   - deployment: DeployPullRequest
     displayName: Deploy Pull request
     condition: and(succeeded(), startsWith(variables['Build.SourceBranch'], 'refs/pull/'))
     pool:
       vmImage: $(vmImageName)
 
-    environment: 'precisionsustainableagdstncalc.$(k8sNamespaceForPR)'
+    environment: 'precisionsustainableagdstncalc-7092.$(k8sNamespaceForPR)'
     strategy:
       runOnce:
         deploy:
           steps:
-          - reviewApp: develop
+          - reviewApp: production
 
           - task: Kubernetes@1
             displayName: 'Create a new namespace for the pull request'
@@ -120,7 +118,6 @@ stages:
                 $(imagePullSecret)
               containers: |
                 $(containerRegistry)/$(imageRepository):$(tag)
-
           - task: Kubernetes@1
             name: get
             displayName: 'Get services in the new namespace'
