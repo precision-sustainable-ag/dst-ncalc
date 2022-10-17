@@ -243,6 +243,9 @@ const CoverCrop2 = () => {
   )
 } // CoverCrop2
 
+CoverCrop1.desc = 'Cover Crop';
+CoverCrop2.showInMenu = false;
+
 export {
   CoverCrop1,
   CoverCrop2,

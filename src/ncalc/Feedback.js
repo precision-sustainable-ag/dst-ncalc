@@ -140,4 +140,6 @@ __________________________________
   )
 } // Feedback
   
+Feedback.desc = 'FEEDBACK';
+
 export default Feedback;

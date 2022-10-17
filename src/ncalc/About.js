@@ -65,4 +65,6 @@ const About = () => {
   );
 } // About
 
+About.showInMenu = false;
+
 export default About;
