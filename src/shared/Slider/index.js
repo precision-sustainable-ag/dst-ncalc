@@ -1,9 +1,10 @@
+import {useDispatch, useSelector} from 'react-redux';
 import {Slider} from '@mui/material';
 import {Input} from '../Inputs'
-import {useDispatch, useSelector} from 'react-redux';
+
 import {get, set} from '../../store/Store';
 
-import './index.css';
+import './index.scss';
 
 const Myslider = ({id, min, max, step=1, autoFocus, onInput}) => {
   const dispatch = useDispatch();

@@ -7,7 +7,7 @@ import {useDispatch, useSelector} from 'react-redux';
 import {get, set, missingData} from '../../store/Store';
 import {Link, useNavigate} from 'react-router-dom';
 
-import './index.css';
+import './styles.scss';
 
 const params = new URLSearchParams(window.location.search);
 

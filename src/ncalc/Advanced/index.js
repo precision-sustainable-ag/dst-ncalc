@@ -1,12 +1,11 @@
 import React from 'react';
-
 import Highcharts from 'highcharts';
-
 import HighchartsReact from 'highcharts-react-official';
-
 import {useSelector} from 'react-redux';
 import {get, missingData} from '../../store/Store';
 import {Link, useNavigate} from 'react-router-dom';
+
+import './styles.scss';
 
 const Advanced = () => {
   // const factor = unit === 'lb/ac' ? 1.12085 : 1;

@@ -3,7 +3,7 @@ import {Button} from '@mui/material';
 import {useSelector, useDispatch} from 'react-redux';
 import {get, set} from '../../store/Store';
 
-import './index.css';
+import './styles.scss';
 
 const Feedback = () => {
   const dispatch = useDispatch();
@@ -47,7 +47,7 @@ const Feedback = () => {
     e.target.disabled = true;
 
     fetch(
-      'https://weather.aesl.ces.uga.edu/cc-ncalc/feedback',
+      'https://api.precisionsustainableag.org/cc-ncalc/feedback',
       {
         method: 'POST',
         headers: {

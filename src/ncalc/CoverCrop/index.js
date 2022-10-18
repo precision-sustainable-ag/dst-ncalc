@@ -1,13 +1,11 @@
-import {Radio, RadioGroup, FormControlLabel} from '@mui/material';
-
-import {Input} from '../../shared/Inputs';
-
-import Myslider from '../../shared/Slider';
-
-import Icon from '@mui/material/Icon';
 import {useDispatch, useSelector} from 'react-redux';
-import {get, set} from '../../store/Store';
 import {Link} from 'react-router-dom';
+import {Radio, RadioGroup, FormControlLabel} from '@mui/material';
+import Icon from '@mui/material/Icon';
+
+import {get, set} from '../../store/Store';
+import {Input} from '../../shared/Inputs';
+import Myslider from '../../shared/Slider';
 
 const CoverCrops = () => {
   const species = useSelector(get.species);

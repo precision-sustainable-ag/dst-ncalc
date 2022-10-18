@@ -1,14 +1,15 @@
 import React, {useCallback, useState, useEffect} from 'react';
-
+import {useSelector, useDispatch} from 'react-redux';
 import {TextField, Icon} from '@mui/material';
-import {Input} from '../Inputs';
 import throttle from 'lodash/throttle';
 import GoogleMapReact from 'google-map-react';
 
-import {useSelector, useDispatch} from 'react-redux';
+import {Input} from '../Inputs';
 import {get, set} from '../../store/Store';
 
-const autocompleteService = { current: null };
+import './styles.scss';
+
+const autocompleteService = {current: null};
 
 const GoogleMaps = ({autoFocus=false, field=false, inputs=true}) => {
   const dispatch = useDispatch();
