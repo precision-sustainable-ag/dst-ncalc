@@ -9,14 +9,18 @@ import 'react-datepicker/dist/react-datepicker.css';
 
 const screens = {
   init: () => <></>,
-  feedback: () => <></>
 };
 
-if (true) {
+if (window.location.toString().includes('water')) {
+  screens.home        = require('./water/Home').default;
+  screens.about       = require('./water/About').default;
+  screens.location    = require('./water/Location').default;
+  screens.soil        = require('./water/Soil').default;
+} else {
   screens.init        = require('./ncalc/Init').default;
   screens.home        = require('./ncalc/Home').default;
-  screens.location    = require('./ncalc/Location').default;
   screens.about       = require('./ncalc/About').default;
+  screens.location    = require('./ncalc/Location').default;
   screens.soil        = require('./ncalc/Soil').default;
   screens.covercrop   = require('./ncalc/CoverCrop').CoverCrop1;
   screens.covercrop2  = require('./ncalc/CoverCrop').CoverCrop2;
@@ -27,7 +31,10 @@ if (true) {
 }
 
 screens.init.showInMenu = false;
-screens.feedback.showInMenu = false;
+
+if (screens.feedback) {
+  screens.feedback.showInMenu = false;
+}
 
 Object.keys(screens).forEach(key => {
   screens[key].desc = screens[key].desc || (key[0].toUpperCase() + key.slice(1));

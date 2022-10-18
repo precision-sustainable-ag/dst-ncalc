@@ -49,6 +49,7 @@ let initialState = {
   NContent            : '',
   residueC            : '',
   outputN             : 1,
+  SSURGO              : {},
   gotSSURGO           : false,
   gotModel            : false,
   cornN               : false,
@@ -201,6 +202,7 @@ const fetchSSURGO = (state) => {
         store.dispatch(set.BD(weightedAverage(data, 'dbthirdbar_r')));
         store.dispatch(set.OM(weightedAverage(data, 'om_r')));
         store.dispatch(set.gotSSURGO(true));
+        store.dispatch(set.SSURGO(data));
       }
       // fetchModel(store.getState());
     },
