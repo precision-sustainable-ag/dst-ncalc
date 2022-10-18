@@ -1,8 +1,8 @@
 import Icon from '@mui/material/Icon';
 import {useSelector} from 'react-redux';
-import {get} from '../store/Store';
+import {get} from '../../store/Store';
 
-import Myslider from '../shared/Slider';
+import Myslider from '../../shared/Slider';
 import {Link} from 'react-router-dom';
 
 const Soil = () => {

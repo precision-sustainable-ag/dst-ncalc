@@ -175,14 +175,6 @@ div.bn {
   zmin-width: 12em;
 }
 
-.MuiSlider-root {
-  max-width: 20em;
-  vertical-align: bottom;
-  color: #4F6B14 !important;  /* Yeah, I know */
-  position: relative;  
-  top: 12px;  /* align with Input */
-}
-
 .loading {
   font-size: 2rem;
   font-weight: bold;
@@ -211,27 +203,6 @@ input[name="residue"] {
   display: inline-block;
   padding: 0.5em 0;
   text-align: center;
-}
-
-#Output .underscore {
-  border-bottom: 1px solid #4F6B14;
-  width: 200px;
-}
-
-#Output {
-  font-size: 70%;
-  margin-top: 0.5rem;
-}
-
-#Output td:nth-child(1) {
-  width: 40%;
-}
-
-.tiny {
-  font-size: 70%;
-  position: relative;
-  top: 1.5em;
-  color: silver;
 }
 
 .noborder {
@@ -264,10 +235,6 @@ input[name="residue"] {
 
 .coverCropSummary td:nth-child(n + 2) {
   padding: 0.1em;
-}
-
-.MuiSlider-rail, .MuiSlider-track {
-  height: 5px !important;
 }
 
 .help {
@@ -375,16 +342,6 @@ div.mockup1, div.mockup2, div.mockup3, div.mockup4, div.mockup5 {
   overflow: visible !important;
 }
 
-.MuiSlider-thumbColorPrimary {
-  zoom: 0.6;
-  border-radius: 0% !important;
-  width: 3px !important;
-}
-
-.MuiSlider-root {
-  zpointer-events: none;
-}
-
 .SurfaceOnlyTargetN {
   transform: rotate(-90deg);
   position: relative;
@@ -476,63 +433,6 @@ div.mockup1, div.mockup2, div.mockup3, div.mockup4, div.mockup5 {
 button[data-scr=CoverCrop1]:hover ~ #CCQuality,
 #CCQuality:hover {
   display: inline-block;
-}
-
-.slider * {
-  vertical-align: bottom;
-}
-
-.zslider2 {
-  position: absolute;
-  left: 3rem;
-  width: 20em;
-  ztop: 3em;
-}
-
-#Feedback {
-  background: white;
-  border: 1px solid #ccc;
-  min-height: 10rem;
-  padding: 0.5rem;
-  margin: 1rem auto;
-}
-
-div.feedback {
-  background: #f8f8f8;
-  min-height: calc(100vh - 100px);
-  font-size: 90%;
-  border: 1px solid #ccc;
-  margin-top: 1rem;
-  padding: 2rem;
-  margin: 1rem 5rem;
-  color: #333;
-}
-
-div.feedback > * {
-  margin: auto;
-  max-width: 40rem;
-}
-
-#name, #email {
-  width: 30rem;
-  border: 1px solid #ccc;
-  padding: 0.5rem;
-  background: white !important;
-}
-
-a.feedback {
-  position: absolute;
-  font-size: 0.7rem;
-  font-weight: bold;
-  padding: 0.2rem 0.5rem;
-  color: rgb(25, 118, 210);
-  border: 1px solid rgb(25, 118, 210);
-  border-radius: 5px;
-  background: #eee;
-  right: calc(-3rem + 2px);
-  top: calc(-2rem + 2px);
-  width: 7rem;
-  text-align: center;
 }
 
 [contenteditable=true]:empty:before{

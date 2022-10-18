@@ -1,12 +1,12 @@
 import {Radio, RadioGroup, FormControlLabel} from '@mui/material';
 
-import {Input} from '../shared/Inputs';
+import {Input} from '../../shared/Inputs';
 
-import Myslider from '../shared/Slider';
+import Myslider from '../../shared/Slider';
 
 import Icon from '@mui/material/Icon';
 import {useDispatch, useSelector} from 'react-redux';
-import {get, set} from '../store/Store';
+import {get, set} from '../../store/Store';
 import {Link} from 'react-router-dom';
 
 const CoverCrops = () => {

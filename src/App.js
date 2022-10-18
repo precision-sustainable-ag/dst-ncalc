@@ -1,20 +1,14 @@
 import {useEffect} from 'react';
+import {useSelector, useDispatch} from 'react-redux';
+import {Route, NavLink, Routes, useNavigate} from 'react-router-dom';
+import moment from 'moment';
+import Airtable from 'airtable';
 
 import './App.css';
-import moment from 'moment';
 import 'react-datepicker/dist/react-datepicker.css';
-import {useSelector, useDispatch} from 'react-redux';
 
 import {get, set} from './store/Store';
-
-import {
-  Route,
-  NavLink,
-  Routes,
-  useNavigate
-} from 'react-router-dom';
-
-const Airtable = require('airtable');
+import {Help} from './shared/Help';
 
 const screens = {};
 
@@ -35,41 +29,15 @@ Object.keys(screens).forEach(key => {
   screens[key].desc = screens[key].desc || (key[0].toUpperCase() + key.slice(1));
 });
 
-const holdError = console.error;
-console.error = (msg, ...subst) => {
-  if (!/StrictMode|Deprecation/.test(msg)) {
-    holdError(msg, ...subst);
-  }
-}
-
 const holdWarn = console.warn;
 console.warn = (msg, ...subst) => {
-  if (!/StrictMode|Deprecation|Autocomplete/.test(msg)) {
+  // Deprecation: moment
+  // Autocomplete: useless warning, which has an overcomplicated isOptionEqualTo solution
+  //               https://github.com/mui/material-ui/issues/29727
+  
+  if (!/Deprecation|Autocomplete/.test(msg)) {
     holdWarn(msg, ...subst);
   }
-}
-
-const Help = () => {
-  const help  = useSelector(get.help);
-  const helpX = useSelector(get.helpX);
-  const helpY = useSelector(get.helpY);
-
-  const style = {
-    left: helpX,
-    top: helpY,
-    maxWidth:  `calc(100vw - ${helpX}px - 20px)`,
-    maxHeight: `calc(100vh - ${helpY}px - 20px)`,
-    overflow: 'auto'
-  }
-
-  return (
-    help &&
-    <div
-      className="help"
-      style={style}
-      dangerouslySetInnerHTML={{ __html: help }}
-    />
-  )
 }
 
 const App = () => {

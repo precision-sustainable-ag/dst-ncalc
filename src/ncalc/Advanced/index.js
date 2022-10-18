@@ -4,16 +4,9 @@ import Highcharts from 'highcharts';
 
 import HighchartsReact from 'highcharts-react-official';
 
-// import ZoomInIcon from '@mui/icons-material/ZoomIn';
 import {useSelector} from 'react-redux';
-import {get, missingData} from '../store/Store';
+import {get, missingData} from '../../store/Store';
 import {Link, useNavigate} from 'react-router-dom';
-
-// const zoomIn = (e) => {
-//   const div = e.target.closest('.parent');
-//   div.classList.toggle('advanced');
-//   div.classList.toggle('zoomed');
-// } // zoomIn
 
 const Advanced = () => {
   // const factor = unit === 'lb/ac' ? 1.12085 : 1;
@@ -294,7 +287,7 @@ const Advanced = () => {
       <h3>Weather information</h3>
       {
         [['Rain', 'Temp', 'RH'], 'Air_MPa']
-          .map(parm => <Chart parm={parm} />)
+          .map(parm => <Chart key={parm} parm={parm} />)
       }
 
       <div className="bn">

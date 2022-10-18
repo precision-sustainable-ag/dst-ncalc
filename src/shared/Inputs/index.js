@@ -1,6 +1,6 @@
 import {useEffect, useState, useRef, useCallback} from 'react';
 import {useSelector, useDispatch} from 'react-redux';
-import {get, set} from '../store/Store';
+import {get, set} from '../../store/Store';
 
 import {
   TextField,

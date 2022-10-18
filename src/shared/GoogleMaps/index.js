@@ -1,12 +1,12 @@
 import React, {useCallback, useState, useEffect} from 'react';
 
 import {TextField, Icon} from '@mui/material';
-import {Input} from './Inputs';
+import {Input} from '../Inputs';
 import throttle from 'lodash/throttle';
 import GoogleMapReact from 'google-map-react';
 
 import {useSelector, useDispatch} from 'react-redux';
-import {get, set} from '../store/Store';
+import {get, set} from '../../store/Store';
 
 const autocompleteService = { current: null };
 
@@ -276,7 +276,7 @@ const Map = ({field=false, autoFocus, inputs=true, id='GoogleMap', mapOptions={}
             </span>
 
             <GoogleMapReact
-              bootstrapURLKeys={{key: 'AIzaSyD8U1uYvUozOeQI0LCEB_emU9Fo3wsAylg'}}
+              bootstrapURLKeys={{key: 'AIzaSyD8U1uYvUozOeQI0LCEB_emU9Fo3wsAylg', libraries: ['places']}}
               center={{lat: +lat, lng: +lon}}
               zoom={mapOptions.zoom || mapZoom}
 

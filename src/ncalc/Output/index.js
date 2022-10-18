@@ -1,15 +1,13 @@
 import React from 'react';
-
 import Highcharts from 'highcharts';
-
 import HighchartsReact from 'highcharts-react-official';
-
 import moment from 'moment';
-
-import {CSVLink} from "react-csv";
+import {CSVLink} from 'react-csv';
 import {useDispatch, useSelector} from 'react-redux';
-import {get, set, missingData} from '../store/Store';
+import {get, set, missingData} from '../../store/Store';
 import {Link, useNavigate} from 'react-router-dom';
+
+import './index.css';
 
 const params = new URLSearchParams(window.location.search);
 

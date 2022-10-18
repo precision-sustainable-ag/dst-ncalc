@@ -1,10 +1,10 @@
-import Myslider from '../shared/Slider';
+import Myslider from '../../shared/Slider';
 
-import {Input} from '../shared/Inputs';
+import {Input} from '../../shared/Inputs';
 
 import Icon from '@mui/material/Icon';
 import {useSelector} from 'react-redux';
-import {get} from '../store/Store';
+import {get} from '../../store/Store';
 import {Link} from 'react-router-dom';
 
 const CashCrops = () => {

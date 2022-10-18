@@ -1,0 +1,13 @@
+#Output .underscore {
+  border-bottom: 1px solid #4F6B14;
+  width: 200px;
+}
+
+#Output {
+  font-size: 70%;
+  margin-top: 0.5rem;
+}
+
+#Output td:nth-child(1) {
+  width: 40%;
+}

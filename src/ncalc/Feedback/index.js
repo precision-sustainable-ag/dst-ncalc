@@ -1,8 +1,9 @@
-import {Input} from '../shared/Inputs';
+import {Input} from '../../shared/Inputs';
 import {Button} from '@mui/material';
-
 import {useSelector, useDispatch} from 'react-redux';
-import {get, set} from '../store/Store';
+import {get, set} from '../../store/Store';
+
+import './index.css';
 
 const Feedback = () => {
   const dispatch = useDispatch();
