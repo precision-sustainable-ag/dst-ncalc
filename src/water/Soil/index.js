@@ -1,45 +1,54 @@
-import Icon from '@mui/material/Icon';
-import {useSelector} from 'react-redux';
-import {get} from '../../store/Store';
-
-import Myslider from '../../shared/Slider';
+import {useEffect} from 'react';
 import {Link} from 'react-router-dom';
+import {useDispatch, useSelector} from 'react-redux';
+
+import {get, set} from '../../store/Store';
+import './styles.scss';
 
 const Soil = () => {
+  const dispatch = useDispatch();
   const gotSSURGO = useSelector(get.gotSSURGO);
   const SSURGO = useSelector(get.SSURGO);
+  const lat = useSelector(get.lat);
+
+  useEffect(() => {
+    if (!gotSSURGO) {
+      dispatch(set.lat(lat));
+    }
+  }, [gotSSURGO, dispatch, lat]);
 
   if (!gotSSURGO) {
-    return '';
+    return <>Querying SSURGO database &hellip;</>;
   }
 
   console.log(SSURGO);
 
   const depth = {};
   SSURGO.forEach(data => {
-    console.log(data);
     depth[`${data.hzdept_r} - ${data.hzdepb_r} cm`] = {
       sand: (+data.sandtotal_r).toFixed(1),
       silt: (+data.silttotal_r).toFixed(1),
       clay: (+data.claytotal_r).toFixed(1),
       om:   (+data.om_r).toFixed(2),
-      bd:   data.dbthirdbar_r,
-      th33:  data.wthirdbar_r,
-      th1500: data.wfifteenbar_r      
+      bd:   (+data.dbthirdbar_r).toFixed(2),
+      th33:  (+data.wthirdbar_r).toFixed(2),
+      th1500: (+data.wfifteenbar_r).toFixed(2)
     }
   });  
 
   return (
-    <div>
+    <div className="Soil">
       <h1>Tell us about your Soil</h1>
       {gotSSURGO ? 
         <>
           <p className="note">
             The data below was pulled from NRCS' Soil Survey Geographic database (SSURGO) based on your field's latitude/longitude coordinates.
           </p>
-          <p className="note">
-            You can adjust them if you have lab results.
-          </p>
+          {/*
+            <p className="note">
+              You can adjust them if you have lab results.
+            </p>
+          */}
         </>
         :
         ''
@@ -47,7 +56,7 @@ const Soil = () => {
 
       <table>
         <thead>
-          <tr style={{background: 'darkgreen', color: 'white', verticalAlign: 'bottom'}}>
+          <tr>
             <th>Soil depth</th>
             <th>Sand<br/>(%)</th>
             <th>Silt<br/>(%)</th>
@@ -63,11 +72,8 @@ const Soil = () => {
           {
             Object.keys(depth).sort((a, b) => parseInt(a) - parseInt(b)).map(d => {
               return (
-                <tr
-                  key={d}
-                  style={{textAlign: 'right'}}
-                >
-                  <td style={{textAlign: 'left', whiteSpace: 'nowrap'}}>{d}</td>
+                <tr key={d}>
+                  <td>{d}</td>
                   <td>{depth[d].sand}</td>
                   <td>{depth[d].silt}</td>
                   <td>{depth[d].clay}</td>
@@ -88,71 +94,6 @@ const Soil = () => {
       </div>
     </div>
   );  
-  return (
-    <div>
-      <h1>Tell us about your Soil</h1>
-      {gotSSURGO ? 
-        <>
-          <p className="note">
-            The data below was pulled from NRCS' Soil Survey Geographic database (SSURGO) based on your field's latitude/longitude coordinates.
-          </p>
-          <p className="note">
-            You can adjust them if you have lab results.
-          </p>
-        </>
-        :
-        ''
-      }
-
-      <div className="inputs">
-        Organic Matter (%):
-        <Icon>
-          help
-          <p>Soil organic matter in the surface (0-10cm) soil</p>
-        </Icon>
-        <br/>
-        <Myslider
-          id="OM"
-          min={0.1}
-          max={5}
-          step={0.1}
-        />
-
-        <br/><br/>
-
-        Bulk Density (g/cm<sup>3</sup>):
-        <Icon>
-          help
-          <p>Soil bulk density in the surface (0-10cm) soil</p>
-        </Icon>
-        <br/>
-        <Myslider
-          id="BD"
-          min={0.8}
-          max={1.8}
-          step={0.1}
-        />
-
-        <br/><br/>
-        Soil Inorganic N (ppm or mg/kg):
-        <Icon>
-          help
-          <p>Soil inorganic nitrogen in the surface (0-10cm) soil</p>
-        </Icon>
-        <br/>
-        <Myslider
-          id="InorganicN"
-          min={0}
-          max={25}
-        />
-      </div>
-
-      <div className="bn">
-        <Link className="link" to={'/location'} >BACK</Link>
-        <Link className="link" to={'/covercrop'}>NEXT</Link>
-      </div>
-    </div>
-  )
 } // Soil
 
 export default Soil;

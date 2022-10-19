@@ -11,16 +11,18 @@ const screens = {
   init: () => <></>,
 };
 
-if (window.location.toString().includes('water')) {
+if (/water/i.test(window.location)) {
+  screens.init        = require('./water/Init').default;
   screens.home        = require('./water/Home').default;
   screens.about       = require('./water/About').default;
-  screens.location    = require('./water/Location').default;
+  screens.location    = require('./shared/Location').default;
   screens.soil        = require('./water/Soil').default;
+  screens.worksheet   = require('./water/Worksheet').default;
 } else {
   screens.init        = require('./ncalc/Init').default;
   screens.home        = require('./ncalc/Home').default;
   screens.about       = require('./ncalc/About').default;
-  screens.location    = require('./ncalc/Location').default;
+  screens.location    = require('./shared/Location').default;
   screens.soil        = require('./ncalc/Soil').default;
   screens.covercrop   = require('./ncalc/CoverCrop').CoverCrop1;
   screens.covercrop2  = require('./ncalc/CoverCrop').CoverCrop2;

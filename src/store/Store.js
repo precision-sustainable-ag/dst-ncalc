@@ -65,30 +65,61 @@ let initialState = {
   errorModel          : false,
   errorCorn           : false,
   edited              : false,
+
+  site: '',
+  sites: [],
+  worksheetName: '',
+  worksheet: [],
+  data: '',
+  xl: {
+    Description:    [],
+    Biology:        [],
+    Climate:        [],
+    Fertilization:  [],
+    GridRatio:      [],
+    Irrig:          [],
+    Drip:           [],
+    DripNodes:      [],
+    Init:           [],
+    Soil:           [],
+    Solute:         [],
+    Time:           [],
+    Variety:        [],
+    Weather:        [],
+    Gas:            [],
+    MulchDecomp:    [],
+    MulchGeo:       [],
+  },
 };
 
-const afterChange = {
-  N: (state, {payload}) => {
-    if (!state.edited) {
-      state.carb = Math.min(100, Math.max(0, (24.7 + 10.5 * payload))).toFixed(0);
-      state.cell = Math.min(100, Math.max(0, (69 - 10.2 * payload))).toFixed(0);
-      state.lign = 100 - (+state.carb + +state.cell);
-    }
-    fetchModel(state);
+const ac = {
+  ncalc: {
+    N: (state, {payload}) => {
+      if (!state.edited) {
+        state.carb = Math.min(100, Math.max(0, (24.7 + 10.5 * payload))).toFixed(0);
+        state.cell = Math.min(100, Math.max(0, (69 - 10.2 * payload))).toFixed(0);
+        state.lign = 100 - (+state.carb + +state.cell);
+      }
+      fetchModel(state);
+    },
+    carb: (state)           => {fetchModel(state); state.edited = true;},
+    cell: (state)           => {fetchModel(state); state.edited = true;},
+    lign: (state)           => {fetchModel(state); state.edited = true;},
+    lat: (state)            => {fetchSSURGO(state); fetchModel(state);},  // TODO: fetchModel _after_ fetchSSURGO
+    lon: (state)            => {fetchSSURGO(state); fetchModel(state);},  // TODO: fetchModel _after_ fetchSSURGO
+    lwc: (state)            => {fetchModel(state);},
+    killDate: (state)       => {fetchModel(state);},
+    plantingDate: (state)   => {fetchModel(state);},
+    biomass: (state)        => {fetchModel(state);},
+    freshBiomass: (state)   => {fetchModel(state);},
+    // BD: (state)             => {fetchModel(state);},
+    // OM: (state)             => {fetchModel(state);},
+    // InorganicN: (state)     => {fetchModel(state);},
   },
-  carb: (state)           => {fetchModel(state); state.edited = true;},
-  cell: (state)           => {fetchModel(state); state.edited = true;},
-  lign: (state)           => {fetchModel(state); state.edited = true;},
-  lat: (state)            => {fetchSSURGO(state); fetchModel(state);},  // TODO: fetchModel _after_ fetchSSURGO
-  lon: (state)            => {fetchSSURGO(state); fetchModel(state);},  // TODO: fetchModel _after_ fetchSSURGO
-  lwc: (state)            => {fetchModel(state);},
-  killDate: (state)       => {fetchModel(state);},
-  plantingDate: (state)   => {fetchModel(state);},
-  biomass: (state)        => {fetchModel(state);},
-  freshBiomass: (state)   => {fetchModel(state);},
-  // BD: (state)             => {fetchModel(state);},
-  // OM: (state)             => {fetchModel(state);},
-  // InorganicN: (state)     => {fetchModel(state);},
+  water: {
+    lat: (state)            => fetchSSURGOWater(state),
+    lon: (state)            => fetchSSURGOWater(state),
+  }
 };
 
 const weightedAverage = (data, parm, dec = 2) => {
@@ -179,6 +210,32 @@ const fetchModel = (state) => {
     );
   }
 } // fetchModel
+
+const fetchSSURGOWater = (state) => {
+  const {lat, lon} = state;
+
+  state.gotSSURGO = false;
+
+  const src = `https://api.precisionsustainableag.org/ssurgo?lat=${lat}&lon=${lon}&component=major`;
+
+  api(
+    src,
+    (data) => {
+      if (data.ERROR) {
+        console.log(`No SSURGO data at ${lat}, ${lon}`);
+        store.dispatch(set.BD(''));
+        store.dispatch(set.OM(''));
+      } else {
+        // store.dispatch(set.BD(weightedAverage(data, 'dbthirdbar_r')));
+        // store.dispatch(set.OM(weightedAverage(data, 'om_r')));
+        store.dispatch(set.gotSSURGO(true));
+        store.dispatch(set.SSURGO(data));
+      }
+    },
+    'ssurgo',
+    2000
+  );
+} // fetchSSURGOWater
 
 const fetchSSURGO = (state) => {
   const {lat, lon} = state;
@@ -284,7 +341,9 @@ export const missingData = () => {
 const reducers = {
 };
 
-export const store = createStore(initialState, {afterChange, reducers});
+const dst = /water/i.test(window.location) ? 'water' : 'ncalc';
+
+export const store = createStore(initialState, {afterChange: ac[dst], reducers});
 
 export const api = (url, callback, timer, delay=0) => {
   if (timer) {
