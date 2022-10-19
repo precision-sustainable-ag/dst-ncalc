@@ -39,8 +39,7 @@ const dateFormat = (date) => {
   return month + '/' + day + '/' + year;
 } // dateFormat
 
-const Worksheet = () => {
-  const dispatch = useDispatch();
+const WorksheetData = () => {
   const xl = useSelector(get.xl);
 
   let soilFile;
@@ -496,37 +495,6 @@ const Worksheet = () => {
       </pre>
     )
   } else {
-    return (
-      <div className="Worksheet">
-        <div
-          onClick={(e) => {
-            const button = e.target;
-            if (button.tagName === 'BUTTON') {
-              const text = button.textContent;
-              dispatch(set.worksheetName(text));
-              if (text !== 'Output') {
-                dispatch(set.worksheet(xl[text]));
-              }
-            }
-          }}
-        >
-          <button>Output</button>
-          {
-            Object.keys(xl).map(key => (
-              <button
-                key={key}
-                className={key === button ? 'selected' : ''}
-                onClick={(e) => dispatch(set.worksheetName(e.target.textContent))}
-              >
-                {key}
-              </button>
-            ))
-          }
-        </div>
-        {data.length && <Worksheet />}
-      </div>
-    )
-
     console.log(data);
     if (!data.length) {
       return null;
@@ -571,6 +539,42 @@ const Worksheet = () => {
       </div>
     );
   }
+} // WorksheetData
+
+const Worksheet = () => {
+  const dispatch = useDispatch();
+  const xl = useSelector(get.xl);
+  const data = useSelector(get.data);
+  const button = useSelector(get.worksheetName);
+
+  return (
+    <div className="Worksheet">
+      <div
+        onClick={(e) => {
+          const button = e.target;
+          if (button.tagName === 'BUTTON') {
+            const text = button.textContent;
+            dispatch(set.worksheetName(text));
+            if (text !== 'Output') {
+              dispatch(set.worksheet(xl[text]));
+            }
+          }
+        }}
+      >
+        {
+          ['Output', ...Object.keys(xl)].map(key => (
+            <button
+              key={key}
+              className={key === button ? 'selected' : ''}
+            >
+              {key}
+            </button>
+          ))
+        }
+      </div>
+      {data && <WorksheetData />}
+    </div>
+  );
 } // Worksheet
 
 export default Worksheet;
