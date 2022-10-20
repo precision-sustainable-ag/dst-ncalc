@@ -259,6 +259,7 @@ const Map = ({field=false, autoFocus, inputs=true, id='GoogleMap', mapOptions={}
       map,
       icon: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.3.1/images/marker-icon.png',
       draggable: true,
+      title: 'Click and hold to drag',
     });
     setLoaded(true);
   };
