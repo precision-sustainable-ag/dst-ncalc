@@ -3,6 +3,8 @@ import {get, set} from '../../store/Store';
 import {Link} from 'react-router-dom';
 import {useEffect} from 'react';
 
+import './styles.scss';
+
 const Home = () => {
   const dispatch = useDispatch();
   const privacy = useSelector(get.privacy);

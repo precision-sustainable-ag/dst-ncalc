@@ -168,51 +168,55 @@ const Init = () => {
   } // changeField
 
   return (
-    PSA ?
-      <select id="Fields"
-        onChange={changePSA}
-        value={field}
-      >
-        <option></option>
-        <optgroup label="PSA">
-          {
-            Object.keys(examples)
-              .filter(site => examples[site].category === 'PSA')
-              .sort().map(site => <option key={site}>{site}</option>)
-          }
-        </optgroup>
-        <optgroup label="Resham">
-          {
-            Object.keys(examples)
-              .filter(site => examples[site].category === 'Resham')
-              .sort().map(site => <option key={site}>{site}</option>)
-          }
-        </optgroup>
-      </select>
-    :
-    true || Object.keys(localStorage).length ?
-      <select id="Fields"
-        onChange={changeField}
-        value={field}
-      >
-        <option></option>
-        <option>Example: Grass</option>
-        <option>Example: Legume</option>
-        {
-          Object.keys(localStorage).length && (
-            <>
-              <option>Clear previous runs</option>
-              <option disabled>____________________</option>
-            </>
-          )
-        }
-        {
-          Object.keys(localStorage).sort().map((fld, idx) => (
-            <option key={idx} checked={fld === field}>{fld}</option>
-          ))
-        }
-      </select>
-      : ''
+    <div className="Init">
+      {
+        PSA ?
+          <select className="fields"
+            onChange={changePSA}
+            value={field}
+          >
+            <option></option>
+            <optgroup label="PSA">
+              {
+                Object.keys(examples)
+                  .filter(site => examples[site].category === 'PSA')
+                  .sort().map(site => <option key={site}>{site}</option>)
+              }
+            </optgroup>
+            <optgroup label="Resham">
+              {
+                Object.keys(examples)
+                  .filter(site => examples[site].category === 'Resham')
+                  .sort().map(site => <option key={site}>{site}</option>)
+              }
+            </optgroup>
+          </select>
+        :
+        true || Object.keys(localStorage).length ?
+          <select className="fields"
+            onChange={changeField}
+            value={field}
+          >
+            <option></option>
+            <option>Example: Grass</option>
+            <option>Example: Legume</option>
+            {
+              Object.keys(localStorage).length && (
+                <>
+                  <option>Clear previous runs</option>
+                  <option disabled>____________________</option>
+                </>
+              )
+            }
+            {
+              Object.keys(localStorage).sort().map((fld, idx) => (
+                <option key={idx} checked={fld === field}>{fld}</option>
+              ))
+            }
+          </select>
+          : ''
+      }
+    </div>
   )
 }
 

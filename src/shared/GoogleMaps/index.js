@@ -132,7 +132,6 @@ const GoogleMaps = ({autoFocus=false, field=false, inputs=true}) => {
         field &&
         <>
           <Input
-            className="field"
             label="Name your Field"
             id="field"
             autoComplete="off"
@@ -249,7 +248,7 @@ const Map = ({field=false, autoFocus, inputs=true, id='GoogleMap', mapOptions={}
     }
 
   return (
-    <div id={id}>
+    <div className="Map" id={id}>
       {
         inputs && (
           <>

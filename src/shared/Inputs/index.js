@@ -1,7 +1,5 @@
-import {useEffect, useState, useRef, useCallback} from 'react';
+import React, {useEffect, useState, useRef, useCallback} from 'react';
 import {useSelector, useDispatch} from 'react-redux';
-import {get, set} from '../../store/Store';
-
 import {
   TextField,
   Radio,
@@ -12,7 +10,9 @@ import {
   Autocomplete as MUIAutocomplete,
 } from '@mui/material';
 
-import React from 'react';
+import {get, set} from '../../store/Store';
+
+import './styles.scss';
 
 const keyPress = (event) => {
   if (event.key === 'Enter') {  // focus next field

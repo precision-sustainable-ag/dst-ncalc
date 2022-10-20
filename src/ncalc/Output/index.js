@@ -687,6 +687,7 @@ const Output = () => {
           </tbody>
         </table>
       </div>
+      
       <div className="bn">
         <Link className="link" to={'/cashcrop'} >BACK</Link>
         <Link className="link" to={'/advanced'} >ADVANCED</Link>

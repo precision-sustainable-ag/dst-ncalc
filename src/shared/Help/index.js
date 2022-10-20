@@ -1,5 +1,7 @@
 import {useSelector} from 'react-redux';
+
 import {get} from '../../store/Store';
+import './styles.scss';
 
 export const Help = () => {
   const help  = useSelector(get.help);

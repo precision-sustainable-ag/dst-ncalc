@@ -43,7 +43,6 @@ const WorksheetData = () => {
   const xl = useSelector(get.xl);
 
   let soilFile;
-  let hybridFile;
   let climateID;
 
   const max = (table, id, col) => {
@@ -177,8 +176,6 @@ const WorksheetData = () => {
     const textureCl = [];
     
     soilRecs.forEach(rec => {
-      const texture = '/loam /clay  /silt';
-      const slashes = texture.split('/');
       textureCl.push('clay'); // TODO
     });
 
@@ -257,7 +254,7 @@ const WorksheetData = () => {
     `;
 
     // TODO:  Why iterate above but not here?
-    if (fertRecs[0].date_residue || (fertRecs[0]['rate (t/ha or  cm)'] && fertRecs[0]['rate (t/ha or  cm)'] != 0)) {
+    if (fertRecs[0].date_residue || (fertRecs[0]['rate (t/ha or  cm)'] && +fertRecs[0]['rate (t/ha or  cm)'] !== 0)) {
       const date2 = dateFormat(fertRecs[0]['date_residue'], 'mm/dd/yyyy');
       s += `
         1
@@ -327,7 +324,6 @@ const WorksheetData = () => {
     const descRec = dbRecord('Description', site);
     const path = `${descRec.Path}\\${descRec.VarietyFile}`;
 
-    hybridFile = descRec.Hybrid;
     const varietyRec = dbRecord('Variety', descRec.Hybrid);
 
     return output(`writeVar: ${path}`, `
@@ -399,15 +395,15 @@ const WorksheetData = () => {
       averageData   += climateRec.AvgWind;
     }
 
-    if (climateRec.RainIntensity == 0 && weatherRec.Time == 'daily') {
+    if (+climateRec.RainIntensity === 0 && weatherRec.Time === 'daily') {
       averageHeader += 'irav    ';
       averageData   += `        ${climateRec.AvgRainRate}`;
     }
-    if (climateRec.DailyConc == 0) {
+    if (+climateRec.DailyConc === 0) {
       averageHeader += 'ChemConc    ';
       averageData   += `        ${climateRec.ChemCOnc}`;
     }
-    if (climateRec.DailyCO2 == 0) {
+    if (+climateRec.DailyCO2 === 0) {
       averageHeader += '  CO2  ';
       averageData   += `        ${climateRec.AvgCO2}`;
     }
@@ -463,7 +459,7 @@ const WorksheetData = () => {
         No drip irrigation
       `);
     } else {
-      const nodesRec = dbRecords('Dripnodes', site);
+      // const nodesRec = dbRecords('Dripnodes', site);
       output(`<b>writeDrip: ${path}</b>`, `
         TODO!!!
         *****Script for Drip application module  ******* mAppl is cm water per hour to a 45 x 30 cm area
@@ -511,7 +507,7 @@ const WorksheetData = () => {
     });
 
     return (
-      <div id="Worksheet">
+      <div class="data">
         <table>
           <thead>
             <tr>

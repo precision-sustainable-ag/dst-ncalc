@@ -1,5 +1,4 @@
 @import url('https://fonts.googleapis.com/css?family=IBM+Plex+Sans');
-
 @import url('https://fonts.googleapis.com/icon?family=Material+Icons');
 
 * {
@@ -38,12 +37,6 @@ td, th {
   border-right: 1px solid #ddd;
   border-bottom: 1px solid #bbb;
   vertical-align: top;
-}
-
-.marker {
-	transform: translate(-50%, -100%);
-	display: inline-block;
-	height: 40px;
 }
 
 #lat, #lon {
@@ -163,7 +156,6 @@ div.bn {
   margin-top: 1em;
   text-align: center;
   position: absolute;
-  ztop: 700px;
   bottom: 50px;
   width: 100%;
 }
@@ -171,10 +163,6 @@ div.bn {
 .inputs {
   color: #4F6B14;
   font-size: 110%;
-}
-
-.MuiInputBase-root {
-  zmin-width: 12em;
 }
 
 .loading {
@@ -201,12 +189,6 @@ input[name="residue"] {
   zoom: 1.5;
 }
 
-.percent > div {
-  display: inline-block;
-  padding: 0.5em 0;
-  text-align: center;
-}
-
 .noborder {
   border: none;
   width: 100%;
@@ -224,29 +206,6 @@ input[name="residue"] {
 .warning {
   background: yellow;
   font-size: 80%;
-}
-
-.coverCropSummary {
-  width: 10px;
-  white-space: nowrap;
-}
-
-.coverCropSummary, .coverCropSummary * {
-  border: none;
-}
-
-.coverCropSummary td:nth-child(n + 2) {
-  padding: 0.1em;
-}
-
-.help {
-  position: fixed;
-  background: #eee;
-  z-index: 1000;
-  padding: 0.5em;
-  border-radius: 5px;
-  box-shadow: 5px 5px 15px 5px #000;
-  font-size: 70%;
 }
 
 a {
@@ -294,23 +253,8 @@ input::-webkit-inner-spin-button {
   margin: 0;
 }
 
-#nweeks {
-  width: 4em;
-}
-
-.moveLeft {
-  transform: translateX(-30px);
-}
-
-.download {
-  position: fixed;
-  top: 5px;
-  right: 5px;
-}
-
 .highcharts-point {
   zoom: 50 !important;
-  zdisplay: none;
 }
 
 .note {
@@ -328,66 +272,8 @@ input::-webkit-inner-spin-button {
   font-weight: bold;
 }
 
-div.mockup1, div.mockup2, div.mockup3, div.mockup4, div.mockup5 {
-  display: none;
-}
-
-.mockup1 .mockup1,
-.mockup2 .mockup2,
-.mockup3 .mockup3,
-.mockup4 .mockup4,
-.mockup5 .mockup5 {
-  display: block;
-}
-
 .highcharts-plot-line-label {
   overflow: visible !important;
-}
-
-.SurfaceOnlyTargetN {
-  transform: rotate(-90deg);
-  position: relative;
-  left: 11.0em;
-  top: 0.8em;
-  font-size: 1em;
-  color: blue;
-}
-
-.SurfaceOnlyTargetN::before {
-  content: '';
-  position: absolute;
-  top: -9.3em;
-  left: calc(50% - 1px);
-  height: 9em;
-  border: 2px solid blue;
-}
-
-.IncorporatedTargetN {
-  transform: rotate(-90deg);
-  position: relative;
-  left: 4.5em;
-  top: 0.6em;
-  font-size: 1em;
-  color: blue;
-}
-
-.SurfaceTargetN {
-  transform: rotate(-90deg);
-  position: relative;
-  left: 13.0em;
-  top: -0.9em;
-  font-size: 1em;
-  color: blue;
-}
-
-.SurfaceTargetN::before,
-.IncorporatedTargetN::before {
-  content: '';
-  position: absolute;
-  top: -4.8em;
-  left: calc(50% - 1px);
-  height: 4.6em;
-  border: 2px solid blue;
 }
 
 #Privacy {
@@ -424,19 +310,6 @@ div.mockup1, div.mockup2, div.mockup3, div.mockup4, div.mockup5 {
   cursor: pointer;
 }
 
-#CCQuality {
-  display: none;
-  position: absolute;
-  z-index: 999;
-  top: 2rem;
-  left: 52%;
-}
-
-button[data-scr=CoverCrop1]:hover ~ #CCQuality,
-#CCQuality:hover {
-  display: inline-block;
-}
-
 [contenteditable=true]:empty:before{
   content: attr(placeholder);
   pointer-events: none;
@@ -466,19 +339,6 @@ button[data-scr=CoverCrop1]:hover ~ #CCQuality,
   left: 0.8rem;
   z-index: 1000;
   transform: scale(1.1);
-}
-
-.expand {
-  position: absolute;
-  top: 3px;
-  right: 3px;
-  font-size: 25px;
-  line-height: 1.4rem;
-  background: white;
-  color: black;
-  padding: 0.2rem;
-  z-index: 1;
-  cursor: pointer;
 }
 
 button.feedback {
