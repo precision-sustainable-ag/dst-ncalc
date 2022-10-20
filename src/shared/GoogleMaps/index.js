@@ -1,8 +1,11 @@
 import React, {useCallback, useState, useEffect} from 'react';
 import {useSelector, useDispatch} from 'react-redux';
-import {TextField, Icon} from '@mui/material';
+import {TextField, Icon, Grid, Typography} from '@mui/material';
+import LocationOnIcon from '@mui/icons-material/LocationOn';
 import throttle from 'lodash/throttle';
+import parse from 'autosuggest-highlight/parse';
 import GoogleMapReact from 'google-map-react';
+import {Fullscreen, FullscreenExit} from '@mui/icons-material';
 
 import {Input} from '../Inputs';
 import {get, set} from '../../store/Store';
@@ -124,6 +127,38 @@ const GoogleMaps = ({autoFocus=false, field=false, inputs=true}) => {
                 </>
               )
             }}
+
+            renderOption={(props, option) => {
+              let matches = [];
+              let parts = [];
+              if (option.structured_formatting) {
+                matches = option.structured_formatting.main_text_matched_substrings;
+      
+                parts = parse(
+                  option.structured_formatting.main_text,
+                  matches.map((match) => [match.offset, match.offset + match.length]),
+                );
+              }
+      
+              return (
+                <Grid container spacing={1} alignItems="center" {...props}>
+                  <Grid item>
+                    <LocationOnIcon />
+                  </Grid>
+                  <Grid item xs>
+                    {parts.map((part, index) => (
+                      <span key={index} style={{ fontWeight: part.highlight ? 700 : 400 }}>
+                        {part.text}
+                      </span>
+                    ))}
+      
+                    <Typography variant="body2" color="textSecondary">
+                      {option.structured_formatting ? option.structured_formatting.secondary_text : ''}
+                    </Typography>
+                  </Grid>
+                </Grid>
+              );
+            }}
           />
         )
       }
@@ -188,6 +223,8 @@ const Map = ({field=false, autoFocus, inputs=true, id='GoogleMap', mapOptions={}
   const mapType = useSelector(get.mapType);
   const mapZoom = useSelector(get.mapZoom);
 
+  const [, setLoaded] = React.useState(false);
+
   const mapChange = (e) => {
     dispatch(set.lat(e.lat.toFixed(4)));
     dispatch(set.lon(e.lng.toFixed(4)));
@@ -198,7 +235,7 @@ const Map = ({field=false, autoFocus, inputs=true, id='GoogleMap', mapOptions={}
     };
 
     Geocoder
-      .geocode({ location: latlng })
+      .geocode({location: latlng})
       .then(response => {
         const results = response.results;
         const location = results[0].formatted_address;
@@ -215,14 +252,21 @@ const Map = ({field=false, autoFocus, inputs=true, id='GoogleMap', mapOptions={}
       .catch((e) => window.alert('Geocoder failed due to: ' + e));
   } // mapChange
 
-  const Marker = () => (
-    <img alt="marker" className="marker" src="marker.png" style={{height: '40px'}} />
-  )
-
-  const initGeocoder = ({ maps }) => {
+  const initGeocoder = ({map, maps}) => {
     Geocoder = new maps.Geocoder();
+    marker = new maps.Marker({
+      position: { lat: 40.856795, lng: -73.954298  },
+      map,
+      icon: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.3.1/images/marker-icon.png',
+      draggable: true,
+    });
+    setLoaded(true);
   };
 
+  if (marker) {
+    marker.setPosition({lat, lng: lon});
+  }
+  
   const [fullsize, setFullsize] = useState(false);
 
   useEffect(() => {
@@ -266,13 +310,17 @@ const Map = ({field=false, autoFocus, inputs=true, id='GoogleMap', mapOptions={}
         lat && lon ? (
           <div style={mapStyle}>
             <span
-              className="expand"
+              className="fullsize"
+
               onClick={() => {
                 setFullsize(!fullsize);
               }}
+
               title="Toggle fullscreen view"
             >
-              &#x26F6;
+              {
+                fullsize ? <FullscreenExit /> : <Fullscreen />
+              }
             </span>
 
             <GoogleMapReact
@@ -317,9 +365,7 @@ const Map = ({field=false, autoFocus, inputs=true, id='GoogleMap', mapOptions={}
                 },
                 ...mapOptions
               })}
-            >
-              <Marker lat={+lat} lng={+lon} />
-            </GoogleMapReact>
+            />
           </div>
         )
         : null
@@ -329,5 +375,6 @@ const Map = ({field=false, autoFocus, inputs=true, id='GoogleMap', mapOptions={}
 } // Map
 
 let Geocoder;
+let marker;
 
 export default Map;
