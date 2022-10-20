@@ -1,12 +1,21 @@
 @import url('https://fonts.googleapis.com/css?family=IBM+Plex+Sans');
 @import url('https://fonts.googleapis.com/icon?family=Material+Icons');
 
+body {
+  background: #eee;
+}
+
 * {
   box-sizing: border-box;
 }
 
-body {
-  background: #eee;
+#root {
+  max-width: 1200px;
+  min-width: 800px;
+  min-height: 800px;
+  margin: auto;
+  background: white;
+  border: 1px solid #aaa;
   font-family: IBM Plex Sans;
   font-size: 1.2rem;
 }
@@ -45,15 +54,6 @@ td, th {
 
 .hidden {
 	display: none;
-}
-
-#root {
-  max-width: 1200px;
-  min-width: 800px;
-  min-height: 800px;
-  margin: auto;
-  background: white;
-  border: 1px solid #aaa;
 }
 
 table.coverCrop {
@@ -172,18 +172,6 @@ div.bn {
   margin: 3rem;
   height: 70vh;
 }
-
-.loading span {
-  display: inline-block;
-  height: 2rem;
-  width: 2rem;
-  border-radius: 50%;
-  margin: 0 1rem;
-}
-
-.loading span:nth-of-type(1) {background: #DCE8C5;}
-.loading span:nth-of-type(2) {background: #AFCB7C;}
-.loading span:nth-of-type(3) {background: #6B9333;}
 
 input[name="residue"] {
   zoom: 1.5;

@@ -1,10 +1,12 @@
-import React from 'react';
+import React, {useEffect} from 'react';
 import Highcharts from 'highcharts';
 import HighchartsReact from 'highcharts-react-official';
 import moment from 'moment';
 import {CSVLink} from 'react-csv';
 import {useDispatch, useSelector} from 'react-redux';
-import {get, set, missingData} from '../../store/Store';
+import CircularProgress from '@mui/material/CircularProgress';
+
+import {get, set, fetchModel, missingData} from '../../store/Store';
 import {Link, useNavigate} from 'react-router-dom';
 
 import './styles.scss';
@@ -40,6 +42,12 @@ const Output = () => {
   const nweeks = useSelector(get.nweeks);
   const targetN = useSelector(get.targetN);
 
+  useEffect(() => {
+    if (!gotModel) {
+      fetchModel();
+    }
+  }, [dispatch, gotModel]);
+
   const scr = missingData();
   if (scr) {
     setTimeout(() => navigate('../' + scr), 1);
@@ -71,20 +79,24 @@ const Output = () => {
 
   console.log({gotModel, cornN, model, biomass, N, carb, cell, lign, lwc, BD, InorganicN});
 
-  if (!gotModel || !cornN || !model || !biomass || !N || !carb || !cell || !lign || !lwc || !BD || !InorganicN) {
+  if (!gotModel || !cornN) {
     return (
       <>
         <div className="loading">
           <p>Loading Output</p>
           <p>Please wait</p>
-          <span></span>
-          <span></span>
-          <span></span>
+          <CircularProgress color="secondary" />
+          &nbsp;&nbsp;
+          <CircularProgress color="success" />
+          &nbsp;&nbsp;
+          <CircularProgress color="inherit" />
         </div>
-        <ul>
-          <li>Model: {errorModel.toString()}</li>
-          <li>Corn uptake curve: {errorCorn.toString()}</li>
-        </ul>
+        {/*
+          <ul>
+            <li>Model: {errorModel.toString()}</li>
+            <li>Corn uptake curve: {errorCorn.toString()}</li>
+          </ul>
+        */}
       </>
     );
   }

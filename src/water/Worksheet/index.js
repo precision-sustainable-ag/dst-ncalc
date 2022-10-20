@@ -477,7 +477,7 @@ const WorksheetData = () => {
 
   if (button === 'Output') {
     return (
-      <pre style={{padding: 10}}>
+      <pre tabIndex={1}>
         <WriteBio />
         <WriteIni />
         <WriteSol />
@@ -507,7 +507,7 @@ const WorksheetData = () => {
     });
 
     return (
-      <div class="data">
+      <div className="data" tabIndex={1}>
         <table>
           <thead>
             <tr>

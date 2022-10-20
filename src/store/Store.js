@@ -38,7 +38,7 @@ let initialState = {
   lign                : query('lign', ''),
   freshBiomass        : '',
   biomass             : query('biomass', ''),
-  lwc                 : (state) => (+((state.freshBiomass - state.biomass) / state.biomass).toFixed(2)) || 4,
+  lwc                 : (state) => Math.max((+((state.freshBiomass - state.biomass) / state.biomass).toFixed(2)), 0) || 4,
   mapZoom             : 13,
   mapType             : 'hybrid',
   model               : {},
@@ -65,7 +65,6 @@ let initialState = {
   errorModel          : false,
   errorCorn           : false,
   edited              : false,
-
   site: '',
   sites: [],
   worksheetName: '',
@@ -100,21 +99,21 @@ const ac = {
         state.cell = Math.min(100, Math.max(0, (69 - 10.2 * payload))).toFixed(0);
         state.lign = 100 - (+state.carb + +state.cell);
       }
-      fetchModel(state);
+      state.gotModel = false;
     },
-    carb: (state)           => {fetchModel(state); state.edited = true;},
-    cell: (state)           => {fetchModel(state); state.edited = true;},
-    lign: (state)           => {fetchModel(state); state.edited = true;},
-    lat: (state)            => {fetchSSURGO(state); fetchModel(state);},  // TODO: fetchModel _after_ fetchSSURGO
-    lon: (state)            => {fetchSSURGO(state); fetchModel(state);},  // TODO: fetchModel _after_ fetchSSURGO
-    lwc: (state)            => {fetchModel(state);},
-    killDate: (state)       => {fetchModel(state);},
-    plantingDate: (state)   => {fetchModel(state);},
-    biomass: (state)        => {fetchModel(state);},
-    freshBiomass: (state)   => {fetchModel(state);},
-    // BD: (state)             => {fetchModel(state);},
-    // OM: (state)             => {fetchModel(state);},
-    // InorganicN: (state)     => {fetchModel(state);},
+    carb: (state)           => {state.gotModel = false; state.edited = true;},
+    cell: (state)           => {state.gotModel = false; state.edited = true;},
+    lign: (state)           => {state.gotModel = false; state.edited = true;},
+    lat: (state)            => {state.gotModel = false; fetchSSURGO(state);},
+    lon: (state)            => {state.gotModel = false; fetchSSURGO(state);},
+    lwc: (state)            => {state.gotModel = false;},
+    killDate: (state)       => {state.gotModel = false;},
+    plantingDate: (state)   => {state.gotModel = false;},
+    biomass: (state)        => {state.gotModel = false;},
+    freshBiomass: (state)   => {state.gotModel = false;},
+    BD: (state)             => {state.gotModel = false;},
+    OM: (state)             => {state.gotModel = false;},
+    InorganicN: (state)     => {state.gotModel = false;},
   },
   water: {
     lat: (state)            => fetchSSURGOWater(state),
@@ -135,9 +134,10 @@ const weightedAverage = (data, parm, dec = 2) => {
   return (data.reduce((a, b) => +a + +b) / totpct).toFixed(dec);
 } // weightedAverage
 
-const fetchModel = (state) => {
-  state.gotModel = false;
-  state.errorModel = false;
+export const fetchModel = () => {
+  const state = store.getState();
+  store.dispatch(set.gotModel(false));
+  store.dispatch(set.errorModel(false));
 
   let {lat, lon, N, biomass, lwc, carb, cell, lign, OM, BD, InorganicN, unit} = state;
   // console.log({lat, lon, N, biomass, lwc, carb, cell, lign, OM, BD, InorganicN, unit});
@@ -261,7 +261,6 @@ const fetchSSURGO = (state) => {
         store.dispatch(set.gotSSURGO(true));
         store.dispatch(set.SSURGO(data));
       }
-      // fetchModel(store.getState());
     },
     'ssurgo',
     2000
