@@ -41,6 +41,7 @@ let initialState = {
   lwc                 : (state) => Math.max((+((state.freshBiomass - state.biomass) / state.biomass).toFixed(2)), 0) || 4,
   mapZoom             : 13,
   mapType             : 'hybrid',
+  mapPolygon          : [],
   model               : {},
   OM                  : '',
   BD                  : '',

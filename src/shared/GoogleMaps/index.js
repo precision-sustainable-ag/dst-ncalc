@@ -50,7 +50,6 @@ const GoogleMaps = ({autoFocus=false, field=false, inputs=true}) => {
           dispatch(set.state(''));
         }
         
-        console.log(results);
         if (results && results[0]) {
           dispatch(set.lat(results[0].geometry.location.lat().toFixed(4)));
           dispatch(set.lon(results[0].geometry.location.lng().toFixed(4)));
@@ -220,6 +219,9 @@ const Map = ({field=false, autoFocus, inputs=true, id='GoogleMap', mapOptions={}
   const dispatch = useDispatch();
   const lat = +useSelector(get.lat);
   const lon = +useSelector(get.lon);
+  const mapPolygon = useSelector(get.mapPolygon);
+
+  // const [mapType, setMapType] = useState('hybrid');
   const mapType = useSelector(get.mapType);
   const mapZoom = useSelector(get.mapZoom);
 
@@ -253,14 +255,95 @@ const Map = ({field=false, autoFocus, inputs=true, id='GoogleMap', mapOptions={}
   } // mapChange
 
   const initGeocoder = ({map, maps}) => {
+    let drawing = false;
+
     Geocoder = new maps.Geocoder();
+
     marker = new maps.Marker({
-      position: { lat: 40.856795, lng: -73.954298  },
       map,
       icon: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.3.1/images/marker-icon.png',
       draggable: true,
       title: 'Click and hold to drag',
     });
+
+    polygon = new maps.Polygon({
+      geodesic: true,
+      strokeColor: '#FF0000',
+      strokeOpacity: 1,
+      strokeWeight: 2,      
+    });
+    polygon.setMap(map);
+
+    mapPolygon.forEach(point => {
+      polygon.getPath().insertAt(0, point)
+    });
+
+    maps.event.addListener(map, 'mousedown', (e) => {
+      if (e.domEvent.button === 2) {
+        if (polyLine) {
+          polyLine.setMap(null);
+          points = [];
+        }
+
+        polyLine = new maps.Polyline({
+          geodesic: true,
+          strokeColor: '#FF0000',
+          strokeOpacity: 1,
+          strokeWeight: 2,      
+        });
+        polyLine.setMap(map);
+    
+        drawing = true;
+
+        map.setOptions({
+          draggable: false,
+        });
+      }
+    });
+
+    const finished = () => {
+      if (drawing) {
+        drawing = false;
+
+        if (polygon) {
+          polygon.setMap(null);
+        }
+
+        polygon = new maps.Polygon({
+          geodesic: true,
+          strokeColor: '#FF0000',
+          strokeOpacity: 1,
+          strokeWeight: 2,      
+        });
+        polygon.setMap(map);
+
+        const bounds = new maps.LatLngBounds();
+
+        points.forEach(point => {
+          polygon.getPath().insertAt(0, point)
+          bounds.extend(point);
+        });
+
+        dispatch(set.lat(bounds.getCenter().lat()));
+        dispatch(set.lon(bounds.getCenter().lng()));
+        dispatch(set.mapPolygon(points));
+
+        polyLine.setMap(null);
+        map.setOptions({
+          draggable: true,
+        });
+      }
+    }
+
+    document.addEventListener('mouseup', finished);
+
+    maps.event.addListener(map, 'mousemove', (e) => {
+      if (drawing) {
+        points.push(e.latLng);
+        polyLine.getPath().insertAt(0, e.latLng);
+      }
+    });      
+    
     setLoaded(true);
   };
 
@@ -271,11 +354,17 @@ const Map = ({field=false, autoFocus, inputs=true, id='GoogleMap', mapOptions={}
   const [fullsize, setFullsize] = useState(false);
 
   useEffect(() => {
-    document.addEventListener('keydown', ({key}) => {
+    const kd = ({key}) => {
       if (key === 'Escape') {
         setFullsize(false);
       }
-    });
+    };
+
+    document.addEventListener('keydown', kd);
+    
+    return () => {
+      document.removeEventListener('keydown', kd);  
+    }
   }, []);
 
   const mapStyle = fullsize 
@@ -334,6 +423,7 @@ const Map = ({field=false, autoFocus, inputs=true, id='GoogleMap', mapOptions={}
               yesIWantToUseGoogleMapApiInternals
               onClick={mapChange}
               onZoomAnimationEnd={(zoom) => dispatch(set.mapZoom(zoom))}
+              // onMapTypeIdChange={(type)  => setMapType(type)}
               onMapTypeIdChange={(type)  => dispatch(set.mapType(type))}
 
               onLoad={
@@ -377,5 +467,8 @@ const Map = ({field=false, autoFocus, inputs=true, id='GoogleMap', mapOptions={}
 
 let Geocoder;
 let marker;
+let polyLine;
+let polygon;
+let points = [];
 
 export default Map;
