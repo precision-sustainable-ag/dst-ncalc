@@ -231,6 +231,10 @@ const Map = ({field=false, autoFocus, inputs=true, id='GoogleMap', mapOptions={}
     dispatch(set.lat(e.lat.toFixed(4)));
     dispatch(set.lon(e.lng.toFixed(4)));
 
+    if (polygon) {
+      polygon.setMap(null);
+    }
+
     const latlng = {
       lat: e.lat,
       lng: e.lng,
@@ -278,8 +282,12 @@ const Map = ({field=false, autoFocus, inputs=true, id='GoogleMap', mapOptions={}
       polygon.getPath().insertAt(0, point)
     });
 
-    maps.event.addListener(map, 'mousedown', (e) => {
-      if (e.domEvent.button === 2) {
+    document.querySelector('.gm-style')?.addEventListener('mousedown', (e) => {
+      if (e.button === 2) {
+        if (polygon) {
+          polygon.setMap(null);
+        }
+
         if (polyLine) {
           polyLine.setMap(null);
           points = [];
@@ -292,12 +300,12 @@ const Map = ({field=false, autoFocus, inputs=true, id='GoogleMap', mapOptions={}
           strokeWeight: 2,      
         });
         polyLine.setMap(map);
-    
-        drawing = true;
 
         map.setOptions({
           draggable: false,
         });
+        
+        drawing = true;
       }
     });
 
@@ -324,9 +332,11 @@ const Map = ({field=false, autoFocus, inputs=true, id='GoogleMap', mapOptions={}
           bounds.extend(point);
         });
 
-        dispatch(set.lat(bounds.getCenter().lat()));
-        dispatch(set.lon(bounds.getCenter().lng()));
-        dispatch(set.mapPolygon(points));
+        if (points.length) {
+          dispatch(set.lat(bounds.getCenter().lat()));
+          dispatch(set.lon(bounds.getCenter().lng()));
+          dispatch(set.mapPolygon(points));
+        }
 
         polyLine.setMap(null);
         map.setOptions({
@@ -424,7 +434,7 @@ const Map = ({field=false, autoFocus, inputs=true, id='GoogleMap', mapOptions={}
               onClick={mapChange}
               onZoomAnimationEnd={(zoom) => dispatch(set.mapZoom(zoom))}
               // onMapTypeIdChange={(type)  => setMapType(type)}
-              onMapTypeIdChange={(type)  => dispatch(set.mapType(type))}
+              onMapTypeIdChange={(type) => dispatch(set.mapType(type))}
 
               onLoad={
                 // prevent tabbing through map
