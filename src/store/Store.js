@@ -78,8 +78,6 @@ let initialState = {
     Fertilization:  [],
     GridRatio:      [],
     Irrig:          [],
-    Drip:           [],
-    DripNodes:      [],
     Init:           [],
     Soil:           [],
     Solute:         [],
@@ -89,6 +87,7 @@ let initialState = {
     Gas:            [],
     MulchDecomp:    [],
     MulchGeo:       [],
+    Tillage:        [],
   },
 };
 
