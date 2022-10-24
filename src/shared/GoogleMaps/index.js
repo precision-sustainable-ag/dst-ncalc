@@ -222,84 +222,117 @@ const Map = ({field=false, autoFocus, inputs=true, id='GoogleMap', mapOptions={}
   const mapPolygon = useSelector(get.mapPolygon);
 
   // const [mapType, setMapType] = useState('hybrid');
+  // console.log(mapType);  // TODO
   const mapType = useSelector(get.mapType);
   const mapZoom = useSelector(get.mapZoom);
 
   const [, setLoaded] = React.useState(false);
 
-  const mapChange = (e) => {
-    dispatch(set.lat(e.lat.toFixed(4)));
-    dispatch(set.lon(e.lng.toFixed(4)));
+  const initGeocoder = ({map, maps, ref}) => {
+    const geocode = ({latLng}) => {
+      const lat = latLng.lat();
+      const lon = latLng.lng();
+      dispatch(set.lat(lat));
+      dispatch(set.lon(lon));
+      
+      const latlng = {
+        lat,
+        lng: lon
+      };
+  
+      Geocoder
+        .geocode({location: latlng})
+        .then(response => {
+          const results = response.results;
+          const location = results[0].formatted_address;
+          dispatch(set.location(location));
+  
+          let state = results ? results[0].address_components.filter(obj => obj.types[0] === 'administrative_area_level_1') : '';
+          if (state) {
+            state = state[0].long_name;
+            dispatch(set.state(state));
+          } else {
+            dispatch(set.state(''));
+          }
+        })
+        .catch((e) => window.alert('Geocoder failed due to: ' + e));
+    } // geocode
 
-    if (polygon) {
-      polygon.setMap(null);
-    }
+    const click = ({latLng}) => {
+      const lat = latLng.lat();
+      const lon = latLng.lng();
+  
+      dispatch(set.lat(lat.toFixed(4)));
+      dispatch(set.lon(lon.toFixed(4)));
+  
+      marker.setPosition({lat, lng: lon});
+    
+      if (polygon) {
+        polygon.setMap(null);
+        points = [];
+        dispatch(set.mapPolygon([]));
+      }
 
-    const latlng = {
-      lat: e.lat,
-      lng: e.lng,
-    };
+      geocode({latLng});
+    } // click
+  
+    const clearPolygon = () => {
+      const options = {
+        geodesic: true,
+        strokeColor: '#FF0000',
+        strokeOpacity: 1,
+        strokeWeight: 2,      
+      };
 
-    Geocoder
-      .geocode({location: latlng})
-      .then(response => {
-        const results = response.results;
-        const location = results[0].formatted_address;
-        dispatch(set.location(location));
+      if (polygon) {
+        polygon.setMap(null);
+      }
+      polygon = new maps.Polygon(options);
+      polygon.setMap(map);
 
-        let state = results ? results[0].address_components.filter(obj => obj.types[0] === 'administrative_area_level_1') : '';
-        if (state) {
-          state = state[0].long_name;
-          dispatch(set.state(state));
-        } else {
-          dispatch(set.state(''));
-        }
-      })
-      .catch((e) => window.alert('Geocoder failed due to: ' + e));
-  } // mapChange
+      if (polyline) {
+        polyline.setMap(null);
+      }
+      polyline = new maps.Polyline(options);
+      polyline.setMap(map);
+    } // clearPolygon
 
-  const initGeocoder = ({map, maps}) => {
     let drawing = false;
+    let polygon;
+    let polyline;
+    let points = [];
 
-    Geocoder = new maps.Geocoder();
+    setTimeout(() => {
+      ref
+        .querySelectorAll('#GoogleMap *')
+        .forEach(item => {
+          item.setAttribute('tabIndex', -1);
+        });
+    }, 1000);
 
-    marker = new maps.Marker({
+    const Geocoder = new maps.Geocoder();
+
+    const marker = new maps.Marker({
       map,
       icon: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.3.1/images/marker-icon.png',
       draggable: true,
       title: 'Click and hold to drag',
     });
+    
+    marker.setPosition({lat, lng: lon});
 
-    polygon = new maps.Polygon({
-      geodesic: true,
-      strokeColor: '#FF0000',
-      strokeOpacity: 1,
-      strokeWeight: 2,      
-    });
-    polygon.setMap(map);
+    marker.addListener('dragend', geocode);
+
+    clearPolygon();
 
     mapPolygon.forEach(point => {
-      polygon.getPath().insertAt(0, point)
+      polygon.getPath().insertAt(0, point);
     });
 
-    document.querySelector('.gm-style')?.addEventListener('mousedown', (e) => {
+    const mousedown = (e) => {
       if (e.button === 2) {
-        if (polygon) {
-          polygon.setMap(null);
-        }
-
-        if (polyLine) {
-          polyLine.setMap(null);
-          points = [];
-        }
-
-        polyLine = new maps.Polyline({
-          geodesic: true,
-          strokeColor: '#FF0000',
-          strokeOpacity: 1,
-          strokeWeight: 2,      
-        });
-        polyLine.setMap(map);
+        clearPolygon();
+        points = [];
 
         map.setOptions({
           draggable: false,
@@ -307,23 +340,16 @@ const Map = ({field=false, autoFocus, inputs=true, id='GoogleMap', mapOptions={}
         
         drawing = true;
       }
-    });
+    } // mousedown
+    
+    ref.addEventListener('mousedown', mousedown);
+    map.addListener('click', click);
 
     const finished = () => {
       if (drawing) {
         drawing = false;
 
-        if (polygon) {
-          polygon.setMap(null);
-        }
-
-        polygon = new maps.Polygon({
-          geodesic: true,
-          strokeColor: '#FF0000',
-          strokeOpacity: 1,
-          strokeWeight: 2,      
-        });
-        polygon.setMap(map);
+        clearPolygon();
 
         const bounds = new maps.LatLngBounds();
 
@@ -333,34 +359,32 @@ const Map = ({field=false, autoFocus, inputs=true, id='GoogleMap', mapOptions={}
         });
 
         if (points.length) {
-          dispatch(set.lat(bounds.getCenter().lat()));
-          dispatch(set.lon(bounds.getCenter().lng()));
+          const lat = bounds.getCenter().lat();
+          const lon = bounds.getCenter().lng();
+          dispatch(set.lat(lat));
+          dispatch(set.lon(lon));
           dispatch(set.mapPolygon(points));
+          marker.setPosition({lat, lng: lon});
         }
 
-        polyLine.setMap(null);
         map.setOptions({
           draggable: true,
         });
       }
-    }
+    } // finished
 
-    document.addEventListener('mouseup', finished);
+    ref.addEventListener('mouseup', finished);
 
     maps.event.addListener(map, 'mousemove', (e) => {
       if (drawing) {
         points.push(e.latLng);
-        polyLine.getPath().insertAt(0, e.latLng);
+        polyline.getPath().insertAt(0, e.latLng);
       }
     });      
     
     setLoaded(true);
-  };
+  } // initGeocoder
 
-  if (marker) {
-    marker.setPosition({lat, lng: lon});
-  }
-  
   const [fullsize, setFullsize] = useState(false);
 
   useEffect(() => {
@@ -428,27 +452,12 @@ const Map = ({field=false, autoFocus, inputs=true, id='GoogleMap', mapOptions={}
               center={{lat: +lat, lng: +lon}}
               zoom={mapOptions.zoom || mapZoom}
 
-              onGoogleApiLoaded={initGeocoder}
-              
               yesIWantToUseGoogleMapApiInternals
-              onClick={mapChange}
+              onGoogleApiLoaded={initGeocoder}
+
               onZoomAnimationEnd={(zoom) => dispatch(set.mapZoom(zoom))}
               // onMapTypeIdChange={(type)  => setMapType(type)}
               onMapTypeIdChange={(type) => dispatch(set.mapType(type))}
-
-              onLoad={
-                // prevent tabbing through map
-                // got to be a better way than setting a timeout
-                setTimeout(() => {
-                  document
-                    .querySelectorAll('#GoogleMap *')
-                    .forEach(item => {
-                      if (item.tagName !== 'INPUT') {
-                        item.setAttribute('tabIndex', -1);
-                      }
-                    });
-                }, 1000)
-              }
 
               options={(map) => ({
                 mapTypeId: mapType,
@@ -474,11 +483,5 @@ const Map = ({field=false, autoFocus, inputs=true, id='GoogleMap', mapOptions={}
     </div>
   );
 } // Map
-
-let Geocoder;
-let marker;
-let polyLine;
-let polygon;
-let points = [];
 
 export default Map;
