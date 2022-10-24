@@ -365,6 +365,12 @@ const Map = ({field=false, autoFocus, inputs=true, id='GoogleMap', mapOptions={}
           dispatch(set.lon(lon));
           dispatch(set.mapPolygon(points));
           marker.setPosition({lat, lng: lon});
+          geocode({
+            latLng: {
+              lat: () => lat,
+              lng: () => lon
+            }
+          })
         }
 
         map.setOptions({
