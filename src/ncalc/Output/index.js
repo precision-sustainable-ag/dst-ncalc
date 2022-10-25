@@ -17,6 +17,8 @@ const Output = () => {
   const dispatch = useDispatch();
   const navigate = useNavigate();
   const doIncorporated = false;
+  const lat = useSelector(get.lat);
+  const lon = useSelector(get.lon);
   const BD = useSelector(get.BD);
   const N = useSelector(get.N);
   const killDate = useSelector(get.killDate);
@@ -41,6 +43,39 @@ const Output = () => {
   const outputN = useSelector(get.outputN);
   const nweeks = useSelector(get.nweeks);
   const targetN = useSelector(get.targetN);
+
+  if (field) {
+    if (!/Example: Grass|Example: Legume/.test(field)) {
+      localStorage.setItem(field, JSON.stringify({
+        lat,
+        lon,
+        BD,
+        N,
+        killDate,
+        plantingDate,
+        carb,
+        cell,
+        lign,
+        lwc,
+        biomass,
+        unit,
+        InorganicN,
+        coverCrop,
+        field,
+        gotModel,
+        errorModel,
+        errorCorn,
+        model,
+        mockup,
+        cornN,
+        cashCrop,
+        yield: Yield,
+        outputN,
+        nweeks,
+        targetN,
+      }));
+    }
+  }
 
   useEffect(() => {
     if (!gotModel) {
@@ -559,18 +594,6 @@ const Output = () => {
     ]
   } // residueGraph
 
-  console.error('TODO: localStorage');
-/*  
-  if (field) {  // TODO!!!
-    if (!/Example: Grass|Example: Legume/.test(field)) {
-      const clone = {...parms};
-      delete clone.model;
-
-      console.log(parms);
-      localStorage.setItem(field, JSON.stringify(clone));
-    }
-  }
-*/
   const cols = ['FOM', 'Carb', 'Cell', 'Lign', 'FON', 'CarbN', 'CellN', 'LigninN', 'RMTFAC', 'CNRF', 'ContactFactor', 'Rain', 'Temp', 'RH', 'Air_MPa', 'LitterMPa'];
 
   const csv = 'Date,' + cols + '\n' + dates.map((date, i) => date + ',' + cols.map(col => model.s[col][i])).join('\n');

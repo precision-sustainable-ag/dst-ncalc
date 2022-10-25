@@ -131,14 +131,17 @@ const Init = () => {
       Object.keys(inputs).forEach(key => {
         try {
           if (/Date/.test(key)) {
-            set[key](new Date(inputs[key]));
+            const date = moment(inputs[key]).format('yyyy-MM-DD');
+            dispatch(set[key](date));
           } else {
-            set[key](inputs[key]);
+            dispatch(set[key](inputs[key]));
           }
         } catch(e) {
           console.log(key, e.message);
         }
       });
+      
+      dispatch(set.lwc(inputs.lwc));  // avoid calculation
     }
   } // loadField
 
