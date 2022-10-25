@@ -1,0 +1,27 @@
+.Worksheet {
+  font: 13px console;
+  
+  .selected {
+    background: lightgreen;
+  }
+
+  table {
+    font: 13px arial;
+  }
+
+  th {
+    background: #eee;
+    vertical-align: bottom;
+  }
+
+  .data, pre {
+    width: 100%;
+    max-height: calc(100vh - 8rem);
+    overflow: auto;
+    border: 1px solid #ccc;
+  }
+
+  pre {
+    padding: 10px;
+  }
+}

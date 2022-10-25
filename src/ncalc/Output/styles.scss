@@ -1,0 +1,78 @@
+#Output {
+  font-size: 70%;
+  margin-top: 0.5rem;
+
+  .underscore {
+    border-bottom: 1px solid #4F6B14;
+    width: 200px;
+  }  
+
+  td:nth-child(1) {
+    width: 40%;
+  }  
+
+  .coverCropSummary {
+    width: 10px;
+    white-space: nowrap;
+  }
+  
+  .coverCropSummary, .coverCropSummary * {
+    border: none;
+  }
+  
+  .coverCropSummary td:nth-child(n + 2) {
+    padding: 0.1em;
+  }
+
+  .download {
+    position: fixed;
+    top: 5px;
+    right: 5px;
+  }
+
+  .SurfaceOnlyTargetN {
+    transform: rotate(-90deg);
+    position: relative;
+    left: 11.0em;
+    top: 0.8em;
+    font-size: 1em;
+    color: blue;
+  }
+  
+  .SurfaceOnlyTargetN::before {
+    content: '';
+    position: absolute;
+    top: -9.3em;
+    left: calc(50% - 1px);
+    height: 9em;
+    border: 2px solid blue;
+  }
+
+  .IncorporatedTargetN {
+    transform: rotate(-90deg);
+    position: relative;
+    left: 4.5em;
+    top: 0.6em;
+    font-size: 1em;
+    color: blue;
+  }
+  
+  .SurfaceTargetN {
+    transform: rotate(-90deg);
+    position: relative;
+    left: 13.0em;
+    top: -0.9em;
+    font-size: 1em;
+    color: blue;
+  }
+  
+  .SurfaceTargetN::before,
+  .IncorporatedTargetN::before {
+    content: '';
+    position: absolute;
+    top: -4.8em;
+    left: calc(50% - 1px);
+    height: 4.6em;
+    border: 2px solid blue;
+  }
+}
