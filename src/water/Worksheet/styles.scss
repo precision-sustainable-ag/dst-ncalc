@@ -1,6 +1,4 @@
 .Worksheet {
-  font: 13px console;
-  
   .selected {
     background: lightgreen;
   }
@@ -23,5 +21,18 @@
 
   pre {
     padding: 10px;
+    margin: 0;
+    font: 13px consolas, monospace;
+    background: lightyellow;
+  }
+
+  section summary {
+    font: 13px arial;
+    font-weight: bold;
+    background: #eee;
+    padding: 0.5rem;
+    cursor: pointer;
+    margin: 0;
+    border-top: 1px solid #aaa;
   }
 }
