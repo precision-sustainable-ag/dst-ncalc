@@ -1,6 +1,7 @@
 import {useSelector, useDispatch} from 'react-redux';
 
 import {get, set} from '../../store/Store';
+import createSoilFiles from './createsoilfiles';
 import './styles.scss';
 
 const cols = (...data) => {
@@ -54,6 +55,22 @@ const dateFormat = (date) => {
 
 const WorksheetData = () => {
   const xl = useSelector(get.xl);
+  // const files = useSelector(get.files);
+  const files = {
+    'biology.bio': '',
+    'run_01.ini': '',
+    'nitrogen.sol': '',
+    'gasid.gas': '',
+    'run_01.man': '',
+    'mulchgeo1.mul': '',
+    'run_01.lyr': '',
+    'run_01.tim': '',
+    'variety.var': '',
+    'climate.dat': '',
+    'nitrogen.nit': '',
+    'water.dat': '',
+    'waterbound.dat': '',
+  };
 
   let soilFile;
   let climateID;
@@ -106,29 +123,28 @@ const WorksheetData = () => {
     }
   } // dbRecord
 
-  const output = (heading, s) => {
+  const output = (path, s) => {
+    // console.log('output', path);
     const spaces = ' '.repeat(s.match(/ +/)[0].length);
     const re = new RegExp('^' + spaces, 'mg');
 
-    return (
-      <div>
-        <p><b>{heading}</b></p>
-        {s.replace(re, '').trim()}
-        <hr/>
-      </div>
-    );
+    s = s.replace(re, '').trim();
+
+    // dispatch(set.files({...files, [path]: s}));
+    files[path] = s;
   } // output
 
-  const WriteBio = () => {
+  const writeBio = () => {
     const rec = dbRecord('Description', site);
     const biology = rec.Biology;
-    const path = `${rec.Path}\\${biology}.bio`;
+    // const path = `${rec.Path}\\${biology}.bio`;
+    const path = 'biology.bio';
 
     return (
       xl.Biology
         .filter(d => d.id === biology)
         .map(d => 
-          output(`writeBio: ${path}`, `
+          output(path, `
             *** Example 12.3: Parameters of abiotic response: file 'SetAbio.dat'
             Dehumification, mineralization, nitrification dependencies on moisture:
             dThH    dThL    es    Th_m
@@ -142,14 +158,15 @@ const WorksheetData = () => {
           `)
         )
     );
-  } // WriteBio
+  } // writeBio
 
-  const WriteIni = () => {
+  const writeIni = () => {
     const descRec = dbRecord('Description', site);
     const initRec = dbRecord('Init', site);
     const depth = max('Soil', descRec.SoilFile, 'bottom depth');
 
-    const path = `${dbRecord('Description', site).Path}\\${site}.ini`;
+    // const path = `${dbRecord('Description', site).Path}\\${site}.ini`;
+    const path = 'run_01.ini';
  
     const rowSP = initRec.RowSpacing;
     const density = initRec.Population / 10000;
@@ -157,7 +174,7 @@ const WorksheetData = () => {
     const date1 = dateFormat(ExcelDateToJSDate(initRec.sowing));
     const date2 = dateFormat(ExcelDateToJSDate(initRec.end));
 
-    return output(`writeIni: ${path}`, `
+    return output(path, `
       ***INitialization data for ${site} location
       POPROW  ROWSP  Plant Density      ROWANG  xSeed  ySeed         CEC    EOMult
       ${cols(popRow, +rowSP, density, +initRec.RowAngle, initRec.Xseed, depth - initRec.ySeed, +initRec.CEC, +initRec.EOMult)}
@@ -171,14 +188,15 @@ const WorksheetData = () => {
                                 no soil files        output soil files
           0                     1           
     `);
-  } // WriteIni
+  } // writeIni
 
-  const WriteSol = () => {
+  const writeSol = () => {
     const descRec = dbRecord('Description', site);
     const solFile = descRec.Solute;
     soilFile = descRec.SoilFile;
 
-    const path = `${descRec.Path}\\${solFile}.sol`;
+    // const path = `${descRec.Path}\\${solFile}.sol`;
+    const path = 'nitrogen.sol';
 
     const soilRecs = dbRecord('Soil', soilFile);
 
@@ -224,14 +242,40 @@ const WorksheetData = () => {
       s += '1             ' + cols(i + 1, 12.8, 12.8 / 2) + '\n';  // TODO: hardcoded for clay
     });
 
-    return output(`writeSol: ${path}`, s);
-  } // WriteSol
+    return output(path, s);
+  } // writeSol
 
-  const WriteMan = () => {
+  const writeGas = () => {
+    const descRec = dbRecord('Description', site);
+    const CO2ID = descRec.Gas_CO2;
+    const O2ID = descRec.Gas_O2;
+    // const path = `${descRec.Gas_File}.gas`;
+    const path = 'gasid.gas';
+
+    const CO2Rec = dbRecord('Gas', CO2ID);
+    const O2Rec = dbRecord('Gas', O2ID);
+    return output(path, `
+      *** Gas Movement Parameters Information ***
+       Number of gases
+       2
+       Computational parameters
+       EPSI
+       ${CO2Rec.EPSI}
+       Reduced tortousity rate change with water content (bTort)
+       for entire soil domain 
+       ${CO2Rec.bTort}
+      Gas diffusion coefficients in air at standard conditions, cm2/day
+      Gas # 1 (CO2) Gas # 2 (Oxygen) Gas # 3 (Methane)
+      ${cols(CO2Rec['Diffusion_Coeff(cm2/day)'], O2Rec['Diffusion_Coeff(cm2/day)'])}
+    `);
+  } // writeGas
+
+  const writeMan = () => {
     const descRec = dbRecord('Description', site);
     soilFile = descRec.SoilFile;
 
-    const path = `${site}.man`;
+    // const path = `${site}.man`;
+    const path = 'run_01.man';
 
     const maxX = dbRecord('Init', site).RowSpacing / 2;
     
@@ -318,12 +362,60 @@ const WorksheetData = () => {
       `);
     }
 
-    return output(`writeMan: ${path}`, s);
-  } // WriteMan
+    return output(path, s);
+  } // writeMan
 
-  const WriteLayer = () => {
+  const writeMulch = () => {
     const descRec = dbRecord('Description', site);
-    const path = `${descRec.Path}\\${site}.lyr`;
+    const idStrMulchDecomp = descRec.MulchDecomp;
+    const idStrMulchGeo = descRec.MulchGeo;
+    // const path = `${idStrMulchGeo}.mul`;
+    const path = 'mulchgeo1.mul';
+
+    const mulchRec = dbRecord('MulchGeo', idStrMulchGeo);
+    const mulchDecompRec = dbRecord('MulchDecomp', idStrMulchDecomp);
+    
+    return output(path, `
+      *** Mulch Material information ****  based on g, m^3, J and oC
+      [Basic_Mulch_Configuration]
+      ********The mulch grid configuration********
+      Minimal Grid Size for Horizontal Element
+       ${mulchRec.Min_Hori_Size}
+      ********Simulation Specifications (1=Yes; 0=No)********
+      Only_Diffusive_Flux     Neglect_LongWave_Radiation      Include_Mulch_Decomputions
+      ${cols(mulchRec.Diffusion_Restriction, mulchRec.LongWaveRadiationCtrl, mulchRec.Decomposition_ctrl)}
+      [Mulch_Radiation]
+      ********Mulch Radiation Properties********
+      DeltaRshort DeltaRlong  Omega   epsilon_mulch   alpha_mulch
+      ${cols(mulchRec.DeltaRshort, mulchRec.DeltaRlong, mulchRec.Omega, mulchRec.epsilon_mulch, mulchRec.alpha_mulch)}
+      [Numerical_Controls]
+      ********Picard Iteration COntrol********
+      Max Iteration Step (before time step shrinkage) Tolerence for Convergence (%)
+      ${cols(mulchRec['MaxStep in Picard Iteration'], mulchRec['Tolerance_head'])}
+      [Mulch_Mass_Properties]
+      ********Some Basic Information such as density, porosity and empirical parameters********
+      VRho_Mulch g/m3  Pore_Space  Max Held Ponding Depth
+      ${cols(mulchRec.rho_mulch, mulchRec.pore_space, mulchRec.MaxPondingDepth)}
+      [Mulch_Decomposition]
+      ********Overall Factors********
+      Contacting_Fraction Feeding_Coef
+      ${cols(mulchDecompRec.ContactFraction, mulchDecompRec.alpha_feeding)}
+      The Fraction of Three Carbon Formats (Initial Value)
+       Carbonhydrate(CARB)    Holo-Cellulose (CEL)   Lignin (LIG)
+      ${cols(mulchDecompRec['CARB MASS'], mulchDecompRec['CELL MASS'], mulchDecompRec['LIGN MASS'])}
+      The Fraction of N in Three Carbon Formats (Initial Value)
+       Carbonhydrate(CARB)    Holo-Cellulose (CEL)   Lignin (LIG)
+      ${cols(mulchDecompRec['CARB N MASS'], mulchDecompRec['CELL N MASS'], mulchDecompRec['LIGN N MASS'])}
+      The Intrinsic Decomposition Speed of Three Carbon Formats (day^-1)
+       Carbonhydrate(CARB)    Holo-Cellulose (CEL)   Lignin (LIG)
+      ${cols(mulchDecompRec['CARB Decomp'], mulchDecompRec['CELL Decomp'], mulchDecompRec['LIGN Decomp'])}
+    `);
+  } // writeMulch
+
+  const writeLayer = () => {
+    const descRec = dbRecord('Description', site);
+    // const path = `${descRec.Path}\\${site}.lyr`;
+    const path = 'run_01.lyr';
 
     soilFile = descRec.SoilFile;
 
@@ -350,13 +442,13 @@ const WorksheetData = () => {
       s += ' ' + cols(rec['bottom depth'], rec['init type'], noe(rec['om (%/100)'], 5), noe(rec['no3 (ppm)'], 5), rec['nh4'], rec['hnew'], rec['tmpr'], rec['co2(ppm)'], rec['o2(ppm)'], rec['sand'] / 100, rec['silt'] / 100, rec['clay'] / 100, rec['bd'], rec['th33'], rec['th1500'], rec['thr'], rec['ths'], rec['tha'], rec['th'], rec['alfa'], rec['n'], rec['ks'], rec['kk'], rec['thk']) + '\n';
     });
     
-    return output(`writeLayer: ${path}`, s);
-    // TODO:  Batch file
-  } // WriteLayer
+    return output(path, s);
+  } // writeLayer
 
-  const WriteTime = () => {
-    const descRec = dbRecord('Description', site);
-    const path = `${descRec.Path}\\${site}.tim`;
+  const writeTime = () => {
+    // const descRec = dbRecord('Description', site);
+    // const path = `${descRec.Path}\\${site}.tim`;
+    const path = 'run_01.tim';
 
     const timeRec = dbRecord('Time', site);
     const date1 = dateFormat(ExcelDateToJSDate(timeRec.startDate));
@@ -374,16 +466,17 @@ const WorksheetData = () => {
       ${cols(timeRec.runtoend)}
     `);
     
-    return output(`writeTime: ${path}`, s);
-  } // WriteTime
+    return output(path, s);
+  } // writeTime
 
-  const WriteVar = () => { // TODO: 0.0001059 becomes 0.000106.  May not matter
+  const writeVar = () => { // TODO: 0.0001059 becomes 0.000106.  May not matter
     const descRec = dbRecord('Description', site);
-    const path = `${descRec.Path}\\${descRec.VarietyFile}`;
+    // const path = `${descRec.Path}\\${descRec.VarietyFile}`;
+    const path = 'variety.var';
 
     const varietyRec = dbRecord('Variety', descRec.Hybrid);
 
-    return output(`writeVar: ${path}`, `
+    return output(path, `
       Corn growth simulation for  ${descRec.Hybrid}   variety 
        Juvenile   Daylength   StayGreen  LA_min  Rmax_LTAR              Rmax_LTIR                Phyllochrons from
        leaves     Sensitive               Leaf tip appearance   Leaf tip initiation       TassellInit
@@ -433,11 +526,13 @@ const WorksheetData = () => {
       T_base                 T_opt            t_ceil  t_opt_GDD
       8.0                   32.1              43.7       34.0
     `);
-  } // WriteVar
+  } // writeVar
 
-  const WriteClim = () => {
+  const writeClim = () => {
     const descRec = dbRecord('Description', site);
-    const path = descRec.ClimateFile;
+    // const path = descRec.ClimateFile;
+    const path = 'climate.dat';
+
     climateID = descRec.ClimateID;
     const climateRec = dbRecord('Climate', climateID);
     let weatherRec = dbRecord('Weather', climateID);
@@ -465,7 +560,7 @@ const WorksheetData = () => {
       averageData.push('', climateRec.AvgCO2);
     }
 
-    return output(`WriteClim: ${path}`, `
+    return output(path, `
       ***STANDARD METEOROLOGICAL DATA  Header fle for ${descRec.ClimateID}
       Latitude Longitude
       ${cols(climateRec.Latitude, climateRec.Longitude)}
@@ -479,11 +574,12 @@ const WorksheetData = () => {
 
       ${cols(...averageData)}
     `);
-  } // WriteClim
+  } // writeClim
 
-  const WriteNit = () => {
-    const descRec = dbRecord('Description', site);
-    const path = descRec.NitrogenFile;
+  const writeNit = () => {
+    // const descRec = dbRecord('Description', site);
+    // const path = descRec.NitrogenFile;
+    const path = 'nitrogen.nit';
     const soilRecs = dbRecord('Soil', soilFile);
     const maxX = dbRecord('Init', site).RowSpacing / 2 / 100 * 2;
     
@@ -498,8 +594,35 @@ const WorksheetData = () => {
       s += ' ' + cols(i + 1, noe(rec.kh), noe(rec.kl), noe(rec.km), noe(rec.kn), noe(rec.kd), rec.fe, rec.fh, rec.r0, rec.rl, rec.rm, rec.fa, rec.nq, noe(rec.cs)) + '\n';
     });
 
-    return output(`WriteNit: ${path}`, s);
-  } // WriteNit
+    return output(path, s);
+  } // writeNit
+
+  const writeWater = () => {
+    // all of this is hard-coded:
+    const path = `water.dat`;
+
+    return output(path, `
+      *** WATER MOVER PARAMETERINFORMATION ***************************
+      MaxIt   TolTh TolH    hCritA       hCritS      DtMx  htab1   htabN EPSI.Heat  EPSI.Solute
+        20     0.01  0.05  -1.00000E+005 1.0E+010       0.02 0.001   1000     0.5        0.5
+    `);
+  } // writeWater
+
+  const writeWaterBound = () => {
+    // all of this is hard-coded:
+    const path = `waterbound.dat`;
+
+    return output(path, `
+      *** WATER MOVER TIME-DEPENDENT BOUNDARY
+      Time  Node  VarB
+      252.542
+        6 0.000000E+000
+        7 0.000000E+000
+        12 0.000000E+000
+        13 0.000000E+000
+    `);
+  } // writeWaterBound
+
 
   /*
   const WriteDrip = () => {
@@ -535,22 +658,42 @@ const WorksheetData = () => {
   const button = useSelector(get.worksheetName);
 
   if (button === 'Output') {
+    writeBio();
+    writeIni();
+    writeSol();
+    writeGas();
+    writeMan();
+    writeMulch();
+    writeLayer();
+    writeTime();
+    writeVar();
+    writeClim();
+    writeNit();
+    writeWater();
+    writeWaterBound();
+    createSoilFiles(files);
+    
     return (
-      <pre tabIndex={1}>
-        <WriteBio />
-        <WriteIni />
-        <WriteSol />
-        <WriteMan />
-        <WriteLayer />
-        <WriteTime />
-        <WriteVar />
-        <WriteClim />
-        <WriteNit />
-        {/* <WriteDrip /> */}
-      </pre>
-    )
+      <div tabIndex={1}>
+        <button
+          onClick={() => {
+            document.querySelectorAll('details').forEach((obj) => {obj.open = false});
+          }}
+        >
+          Collapse all
+        </button>
+        {/* Object.keys(files).map(file => <button>{file}</button>) */}
+        {Object.keys(files).map(file => (
+          <section key={file}>
+            <details open>
+              <summary>{file}</summary>
+              <pre>{files[file]}</pre>
+            </details>
+          </section>
+        ))}
+      </div>
+    );
   } else {
-    console.log(data);
     if (!data.length) {
       return null;
     }

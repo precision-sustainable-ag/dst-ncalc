@@ -22,4 +22,14 @@
   .moveLeft {
     transform: translateX(-30px);
   }
+
+  #coordinates {
+    margin: 1rem 0;
+
+    > div {
+      display: inline-block;
+      white-space: nowrap;
+      margin-top: 1rem;
+    }
+  }
 }
