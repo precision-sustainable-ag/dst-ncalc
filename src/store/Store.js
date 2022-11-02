@@ -340,6 +340,10 @@ export const missingData = () => {
 } // missingData
 
 const reducers = {
+  updateLocation: (state, {payload}) => {
+    state = {...state, ...payload};
+    return state;
+  }
 };
 
 const dst = /water/i.test(window.location) ? 'water' : 'ncalc';

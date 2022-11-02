@@ -34,9 +34,9 @@ const Map = ({field=false, autoFocus, inputs=true, id='GoogleMap', mapOptions={}
     );
   
     const geocode = useCallback((newValue) => {
-      setOptions(newValue ? [newValue, ...options] : options);
-      if (newValue) {
-        dispatch(set.location(newValue.description));
+      if (newValue?.description) {
+        setOptions([newValue, ...options.filter(d => d.description !== newValue.description)]);
+
         const geocoder = new window.google.maps.Geocoder();
   
         geocoder.geocode({
@@ -44,38 +44,46 @@ const Map = ({field=false, autoFocus, inputs=true, id='GoogleMap', mapOptions={}
           region: 'en-US',
         }, (results) => {
           let state = results ? results[0].address_components.filter(obj => obj.types[0] === 'administrative_area_level_1') : '';
+          let stateAbbreviation = '';
+
           if (state) {
-            dispatch(set.state(state[0].long_name));
-            dispatch(set.stateAbbreviation(state[0].short_name))
-          } else {
-            dispatch(set.state(''));
+            stateAbbreviation = state[0].short_name;
+            state = state[0].long_name;
           }
-          
+
           if (results && results[0]) {
-            updateLatLon({
-              lat: results[0].geometry.location.lat(),
-              lon: results[0].geometry.location.lng()
+            updateLocation({
+              lat: +(results[0].geometry.location.lat().toFixed(4)),
+              lon: +(results[0].geometry.location.lng().toFixed(4)),
+              stateAbbreviation,
+              state,
+              location: newValue.description,
             });
           }
         });
       }
-    }, [dispatch, options]); // geocode
+    }, [options]); // geocode
   
-    React.useEffect(() => {
-      document.addEventListener('keydown', (e) => {
+    useEffect(() => {
+      const keydown = (e) => {
         if (e.key === 'Tab') {
-          const selected = document.querySelector('li.Mui-focused');
-          // const selected = document.querySelector('#location');
-          if (selected) {
-            console.log(selected);
-            dispatch(set.location(selected.textContent));
-            geocode({description: selected.textContent});
+          if (e.target.id === 'location') {
+            geocode({description: e.target.value});
           }
+        } else if (e.key === 'Escape') {
+          setFullsize(false);
+          noTabbing();
         }
-      });
+      };
+
+      document.addEventListener('keydown', keydown);
+
+      return () => {
+        document.removeEventListener('keydown', keydown);
+      }
     }, [dispatch, geocode]);
   
-    React.useEffect(() => {
+    useEffect(() => {
       let active = true;
       if (!autocompleteService.current && window.google) {
         autocompleteService.current = new window.google.maps.places.AutocompleteService();
@@ -224,6 +232,7 @@ const Map = ({field=false, autoFocus, inputs=true, id='GoogleMap', mapOptions={}
   const dispatch = useDispatch();
   const lat = +useSelector(get.lat);
   const lon = +useSelector(get.lon);
+
   const mapPolygon = useSelector(get.mapPolygon);
 
   // const [mapType, setMapType] = useState('hybrid');
@@ -232,24 +241,34 @@ const Map = ({field=false, autoFocus, inputs=true, id='GoogleMap', mapOptions={}
   const mapZoom = useSelector(get.mapZoom);
 
   const [, setLoaded] = React.useState(false);
+  const location = useSelector(get.location);
 
-  const updateLatLon = ({lat, lon}) => {
-    dispatch(set.lat(lat.toFixed(4)));
-    dispatch(set.lon(lon.toFixed(4)));
+  const updateLocation = ({lat, lon, ...other}) => {
+    if (other.location === location) {
+      return;
+    }
 
     const mz = new window.google.maps.MaxZoomService();
     mz.getMaxZoomAtLatLng({lat, lng: lon}, (result) => {
-      dispatch(set.maxZoom(result.zoom));
+      dispatch({
+        type: 'updateLocation',
+        payload: {
+          ...other,
+          maxZoom: result.zoom,
+          lat: lat.toFixed(4),
+          lon: lon.toFixed(4),
+        }
+      })
     });
-  } // updateLatLon
+
+    marker.setPosition({lat, lng: lon});
+  } // updateLocation
 
   const initGeocoder = ({map, maps, ref}) => {
     const geocode = ({latLng}) => {
       const lat = latLng.lat();
       const lon = latLng.lng();
 
-      updateLatLon({lat, lon});
-      
       const latlng = {
         lat,
         lng: lon
@@ -260,15 +279,19 @@ const Map = ({field=false, autoFocus, inputs=true, id='GoogleMap', mapOptions={}
         .then(response => {
           const results = response.results;
           const location = results[0].formatted_address;
-          dispatch(set.location(location));
   
           let state = results ? results[0].address_components.filter(obj => obj.types[0] === 'administrative_area_level_1') : '';
           if (state) {
             state = state[0].long_name;
-            dispatch(set.state(state));
-          } else {
-            dispatch(set.state(''));
           }
+
+          updateLocation({
+            lat,
+            lon,
+            state,
+            location,
+          });
+
         })
         .catch((e) => window.alert('Geocoder failed due to: ' + e));
     } // geocode
@@ -277,9 +300,7 @@ const Map = ({field=false, autoFocus, inputs=true, id='GoogleMap', mapOptions={}
       const lat = latLng.lat();
       const lon = latLng.lng();
   
-      updateLatLon({lat, lon});
-  
-      marker.setPosition({lat, lng: lon});
+      updateLocation({lat, lon});
 
       if (polygon) {
         polygon.setMap(null);
@@ -316,23 +337,15 @@ const Map = ({field=false, autoFocus, inputs=true, id='GoogleMap', mapOptions={}
     let polyline;
     let points = [];
 
-    setTimeout(() => {
-      ref
-        .querySelectorAll('#GoogleMap *')
-        .forEach(item => {
-          item.setAttribute('tabIndex', -1);
-        });
-    }, 1000);
-
     const Geocoder = new maps.Geocoder();
 
-    const marker = new maps.Marker({
+    marker = new maps.Marker({
       map,
       icon: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.3.1/images/marker-icon.png',
       draggable: true,
       title: 'Click and hold to drag',
     });
-    
+
     marker.setPosition({lat, lng: lon});
 
     marker.addListener('dragend', geocode);
@@ -375,9 +388,8 @@ const Map = ({field=false, autoFocus, inputs=true, id='GoogleMap', mapOptions={}
         if (points.length) {
           const lat = bounds.getCenter().lat();
           const lon = bounds.getCenter().lng();
-          updateLatLon({lat, lon});
+          updateLocation({lat, lon});
           dispatch(set.mapPolygon(points));
-          marker.setPosition({lat, lng: lon});
           geocode({
             latLng: {
               lat: () => lat,
@@ -404,21 +416,15 @@ const Map = ({field=false, autoFocus, inputs=true, id='GoogleMap', mapOptions={}
     setLoaded(true);
   } // initGeocoder
 
+  const noTabbing = () => {
+    setTimeout(() => {
+      document.querySelectorAll('#map *').forEach(item => {
+        item.setAttribute('tabindex', '-1');
+      });
+    }, 100);
+  } // noTabbing
+
   const [fullsize, setFullsize] = useState(false);
-
-  useEffect(() => {
-    const kd = ({key}) => {
-      if (key === 'Escape') {
-        setFullsize(false);
-      }
-    };
-
-    document.addEventListener('keydown', kd);
-    
-    return () => {
-      document.removeEventListener('keydown', kd);  
-    }
-  }, []);
 
   const mapStyle = fullsize 
     ? {
@@ -451,7 +457,10 @@ const Map = ({field=false, autoFocus, inputs=true, id='GoogleMap', mapOptions={}
       <GoogleMaps field={field} autoFocus={autoFocus} inputs={inputs} />
       {
         lat && lon ? (
-          <div style={mapStyle}>
+          <div
+            id="map"
+            style={mapStyle}
+          >
             <span
               className="fullsize"
 
@@ -478,6 +487,8 @@ const Map = ({field=false, autoFocus, inputs=true, id='GoogleMap', mapOptions={}
               // onMapTypeIdChange={(type)  => setMapType(type)}
               onMapTypeIdChange={(type) => dispatch(set.mapType(type))}
 
+              onTilesLoaded={noTabbing}
+
               options={(map) => ({
                 mapTypeId: mapType,
                 fullscreenControl: false,
@@ -502,5 +513,7 @@ const Map = ({field=false, autoFocus, inputs=true, id='GoogleMap', mapOptions={}
     </div>
   );
 } // Map
+
+let marker;  // TODO
 
 export default Map;
