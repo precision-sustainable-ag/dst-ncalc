@@ -14,208 +14,213 @@ import './styles.scss';
 
 const autocompleteService = {current: null};
 
-const GoogleMaps = ({autoFocus=false, field=false, inputs=true}) => {
-  const dispatch = useDispatch();
-
-  const lat = +useSelector(get.lat);
-  const lon = +useSelector(get.lon);
-  const location = useSelector(get.location);
-
-  const [inputValue, setInputValue] = React.useState('');
-  const [options, setOptions] = React.useState([]);
-
-  const fetch = React.useMemo(
-    () =>
-      throttle((request, callback) => {
-        autocompleteService.current.getPlacePredictions(request, callback);
-      }, 200),
-    [],
-  );
-
-  const geocode = useCallback((newValue) => {
-    setOptions(newValue ? [newValue, ...options] : options);
-    if (newValue) {
-      dispatch(set.location(newValue.description));
-      const geocoder = new window.google.maps.Geocoder();
-
-      geocoder.geocode({
-        address: newValue.description,
-        region: 'en-US',
-      }, (results) => {
-        let state = results ? results[0].address_components.filter(obj => obj.types[0] === 'administrative_area_level_1') : '';
-        if (state) {
-          dispatch(set.state(state[0].long_name));
-          dispatch(set.stateAbbreviation(state[0].short_name))
-        } else {
-          dispatch(set.state(''));
+const Map = ({field=false, autoFocus, inputs=true, id='GoogleMap', mapOptions={}}) => {
+  const GoogleMaps = ({autoFocus=false, field=false, inputs=true}) => {
+    const dispatch = useDispatch();
+  
+    const lat = +useSelector(get.lat);
+    const lon = +useSelector(get.lon);
+    const location = useSelector(get.location);
+  
+    const [inputValue, setInputValue] = React.useState('');
+    const [options, setOptions] = React.useState([]);
+  
+    const fetch = React.useMemo(
+      () =>
+        throttle((request, callback) => {
+          autocompleteService.current.getPlacePredictions(request, callback);
+        }, 200),
+      [],
+    );
+  
+    const geocode = useCallback((newValue) => {
+      setOptions(newValue ? [newValue, ...options] : options);
+      if (newValue) {
+        dispatch(set.location(newValue.description));
+        const geocoder = new window.google.maps.Geocoder();
+  
+        geocoder.geocode({
+          address: newValue.description,
+          region: 'en-US',
+        }, (results) => {
+          let state = results ? results[0].address_components.filter(obj => obj.types[0] === 'administrative_area_level_1') : '';
+          if (state) {
+            dispatch(set.state(state[0].long_name));
+            dispatch(set.stateAbbreviation(state[0].short_name))
+          } else {
+            dispatch(set.state(''));
+          }
+          
+          if (results && results[0]) {
+            updateLatLon({
+              lat: results[0].geometry.location.lat(),
+              lon: results[0].geometry.location.lng()
+            });
+          }
+        });
+      }
+    }, [dispatch, options]); // geocode
+  
+    React.useEffect(() => {
+      document.addEventListener('keydown', (e) => {
+        if (e.key === 'Tab') {
+          const selected = document.querySelector('li.Mui-focused');
+          // const selected = document.querySelector('#location');
+          if (selected) {
+            console.log(selected);
+            dispatch(set.location(selected.textContent));
+            geocode({description: selected.textContent});
+          }
+        }
+      });
+    }, [dispatch, geocode]);
+  
+    React.useEffect(() => {
+      let active = true;
+      if (!autocompleteService.current && window.google) {
+        autocompleteService.current = new window.google.maps.places.AutocompleteService();
+      }
+  
+      if (!autocompleteService.current) {
+        return undefined;
+      }
+  
+      if (inputValue === '') {
+        setOptions([]);
+        return;
+      } else {
+        fetch({input: inputValue}, (results) => {
+          if (active) {
+            setOptions(results || []);
+          }
+        });
+      }
+  
+      return () => {
+        active = false;
+      };
+    }, [location, inputValue, fetch]);
+  
+    return (
+      <>
+        {
+          inputs && (
+            <Input
+              id="location"
+              getOptionLabel={(option) => (typeof option === 'string' ? option : option.description)}
+              options={options}
+              autoComplete
+              includeInputInList
+              filterSelectedOptions
+      
+              onChange={(_, newValue) => {geocode(newValue);}}
+      
+              onInputChange={(_, newInputValue) => {
+                setInputValue(newInputValue);
+              }}
+      
+              renderInput={(params) => {
+                return (
+                  <>
+                    <TextField
+                      {...params}
+                      autoFocus={autoFocus}
+                      label="Find your Location"
+                      style={{width: field ? '50%' : '100%', float: field ? 'left' : ''}}
+                    />
+                  </>
+                )
+              }}
+  
+              renderOption={(props, option) => {
+                let matches = [];
+                let parts = [];
+                if (option.structured_formatting) {
+                  matches = option.structured_formatting.main_text_matched_substrings;
+        
+                  parts = parse(
+                    option.structured_formatting.main_text,
+                    matches.map((match) => [match.offset, match.offset + match.length]),
+                  );
+                }
+        
+                return (
+                  <Grid container spacing={1} alignItems="center" {...props}>
+                    <Grid item>
+                      <LocationOnIcon />
+                    </Grid>
+                    <Grid item xs>
+                      {parts.map((part, index) => (
+                        <span key={index} style={{fontWeight: part.highlight ? 700 : 400}}>
+                          {part.text}
+                        </span>
+                      ))}
+        
+                      <Typography variant="body2" color="textSecondary">
+                        {option.structured_formatting ? option.structured_formatting.secondary_text : ''}
+                      </Typography>
+                    </Grid>
+                  </Grid>
+                );
+              }}
+            />
+          )
         }
         
-        if (results && results[0]) {
-          dispatch(set.lat(results[0].geometry.location.lat().toFixed(4)));
-          dispatch(set.lon(results[0].geometry.location.lng().toFixed(4)));
-        }
-      });
-    }
-  }, [dispatch, options]); // geocode
-
-  React.useEffect(() => {
-    document.addEventListener('keydown', (e) => {
-      if (e.key === 'Tab') {
-        const selected = document.querySelector('li.Mui-focused');
-        if (selected) {
-          dispatch(set.location(selected.textContent));
-          geocode({description: selected.textContent});
-        }
-      }
-    });
-  }, [dispatch, geocode]);
-
-  React.useEffect(() => {
-    let active = true;
-    if (!autocompleteService.current && window.google) {
-      autocompleteService.current = new window.google.maps.places.AutocompleteService();
-    }
-
-    if (!autocompleteService.current) {
-      return undefined;
-    }
-
-    if (inputValue === '') {
-      setOptions([]);
-      return;
-    } else {
-      fetch({input: inputValue}, (results) => {
-        if (active) {
-          setOptions(results || []);
-        }
-      });
-    }
-
-    return () => {
-      active = false;
-    };
-  }, [location, inputValue, fetch]);
-
-  return (
-    <>
-      {
-        inputs && (
-          <Input
-            id="location"
-            getOptionLabel={(option) => (typeof option === 'string' ? option : option.description)}
-            options={options}
-            autoComplete
-            includeInputInList
-            filterSelectedOptions
-    
-            onChange={(_, newValue) => {geocode(newValue);}}
-    
-            onInputChange={(_, newInputValue) => {
-              setInputValue(newInputValue);
-            }}
-    
-            renderInput={(params) => {
-              return (
-                <>
-                  <TextField
-                    {...params}
-                    autoFocus={autoFocus}
-                    label="Find your Location"
-                    style={{width: field ? '50%' : '100%', float: field ? 'left' : ''}}
-                  />
-                </>
-              )
-            }}
-
-            renderOption={(props, option) => {
-              let matches = [];
-              let parts = [];
-              if (option.structured_formatting) {
-                matches = option.structured_formatting.main_text_matched_substrings;
-      
-                parts = parse(
-                  option.structured_formatting.main_text,
-                  matches.map((match) => [match.offset, match.offset + match.length]),
-                );
-              }
-      
-              return (
-                <Grid container spacing={1} alignItems="center" {...props}>
-                  <Grid item>
-                    <LocationOnIcon />
-                  </Grid>
-                  <Grid item xs>
-                    {parts.map((part, index) => (
-                      <span key={index} style={{ fontWeight: part.highlight ? 700 : 400 }}>
-                        {part.text}
-                      </span>
-                    ))}
-      
-                    <Typography variant="body2" color="textSecondary">
-                      {option.structured_formatting ? option.structured_formatting.secondary_text : ''}
-                    </Typography>
-                  </Grid>
-                </Grid>
-              );
-            }}
-          />
-        )
-      }
-      
-      {
-        field &&
-        <>
-          <Input
-            label="Name your Field"
-            id="field"
-            autoComplete="off"
-            style={{width: 'calc(50% - 2em)', height: '3rem'}}
-            
-          />
-          <Icon className="moveLeft">
-            help
-            <p>
-              This input is optional.  If you enter a field name, you'll be able to rerun the model on this computer without re-entering your data.
-            </p>
-            <p>
-              Notes:
-            </p>
-            <ul>
-              <li>If you have multiple fields, you'll be able to select them from a drop-down menu in the upper-right.</li>
-              <li>Your information is stored on your computer only.  It will not be uploaded to a server.</li>
-              <li>If you clear your browser's cache, you'll need to re-enter your data the next time you run the program.</li>
-            </ul>
-          </Icon>
-        </>
-      }
-
-      {
-        inputs && (
-          <div style={{margin: '2rem 0 1rem 0'}}>
-            If you know your exact coordinates, you can enter them here:
-            &nbsp;
+        {
+          field &&
+          <>
             <Input
-              id="lat"
-              value={lat}
-              label="Latitude"
-              type="number"
-              sx={{margin: 1}}
+              label="Name your Field"
+              id="field"
+              autoComplete="off"
+              style={{width: 'calc(50% - 2em)', height: '3rem'}}
+              
             />
-            <Input
-              id="lon"
-              value={lon}
-              label="Longitude"
-              type="number"
-              sx={{margin: 1}}
-            />
-          </div>
-        )
-      }
-    </>
-  );
-} // GoogleMaps
-
-const Map = ({field=false, autoFocus, inputs=true, id='GoogleMap', mapOptions={}}) => {
+            <Icon className="moveLeft">
+              help
+              <p>
+                This input is optional.  If you enter a field name, you'll be able to rerun the model on this computer without re-entering your data.
+              </p>
+              <p>
+                Notes:
+              </p>
+              <ul>
+                <li>If you have multiple fields, you'll be able to select them from a drop-down menu in the upper-right.</li>
+                <li>Your information is stored on your computer only.  It will not be uploaded to a server.</li>
+                <li>If you clear your browser's cache, you'll need to re-enter your data the next time you run the program.</li>
+              </ul>
+            </Icon>
+          </>
+        }
+  
+        {
+          inputs && (
+            <div id="coordinates">
+              If you know your exact coordinates, you can enter them here:
+              <div>
+                <Input
+                  id="lat"
+                  value={lat}
+                  label="Latitude"
+                  type="number"
+                  sx={{margin: 1}}
+                />
+                <Input
+                  id="lon"
+                  value={lon}
+                  label="Longitude"
+                  type="number"
+                  sx={{margin: 1}}
+                />
+              </div>
+            </div>
+          )
+        }
+      </>
+    );
+  } // GoogleMaps
+  
   const dispatch = useDispatch();
   const lat = +useSelector(get.lat);
   const lon = +useSelector(get.lon);
@@ -228,12 +233,22 @@ const Map = ({field=false, autoFocus, inputs=true, id='GoogleMap', mapOptions={}
 
   const [, setLoaded] = React.useState(false);
 
+  const updateLatLon = ({lat, lon}) => {
+    dispatch(set.lat(lat.toFixed(4)));
+    dispatch(set.lon(lon.toFixed(4)));
+
+    const mz = new window.google.maps.MaxZoomService();
+    mz.getMaxZoomAtLatLng({lat, lng: lon}, (result) => {
+      dispatch(set.maxZoom(result.zoom));
+    });
+  } // updateLatLon
+
   const initGeocoder = ({map, maps, ref}) => {
     const geocode = ({latLng}) => {
       const lat = latLng.lat();
       const lon = latLng.lng();
-      dispatch(set.lat(lat));
-      dispatch(set.lon(lon));
+
+      updateLatLon({lat, lon});
       
       const latlng = {
         lat,
@@ -262,11 +277,10 @@ const Map = ({field=false, autoFocus, inputs=true, id='GoogleMap', mapOptions={}
       const lat = latLng.lat();
       const lon = latLng.lng();
   
-      dispatch(set.lat(lat.toFixed(4)));
-      dispatch(set.lon(lon.toFixed(4)));
+      updateLatLon({lat, lon});
   
       marker.setPosition({lat, lng: lon});
-    
+
       if (polygon) {
         polygon.setMap(null);
         points = [];
@@ -361,8 +375,7 @@ const Map = ({field=false, autoFocus, inputs=true, id='GoogleMap', mapOptions={}
         if (points.length) {
           const lat = bounds.getCenter().lat();
           const lon = bounds.getCenter().lng();
-          dispatch(set.lat(lat));
-          dispatch(set.lon(lon));
+          updateLatLon({lat, lon});
           dispatch(set.mapPolygon(points));
           marker.setPosition({lat, lng: lon});
           geocode({
