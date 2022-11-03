@@ -70,18 +70,7 @@ const App = () => {
 
       onKeyDown={(e) => {
         if (e.key === 'Escape') {
-          dispatch(set.help(''));
           dispatch(set.privacy(false));
-        }
-      }}
-
-      onClick={(e) => {
-        if (/^help/.test(e.target.innerHTML)) {
-          dispatch(set.help(e.target.innerHTML.slice(4)));
-          dispatch(set.helpX(Math.min(e.pageX + 20, window.innerWidth - 400)));
-          dispatch(set.helpY(e.pageY - 20));
-        } else {
-          dispatch(set.help(''));
         }
       }}
 

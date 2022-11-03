@@ -1,9 +1,10 @@
-import Icon from '@mui/material/Icon';
 import {useSelector} from 'react-redux';
-import {get} from '../../store/Store';
-
-import Myslider from '../../shared/Slider';
 import {Link} from 'react-router-dom';
+
+import {get} from '../../store/Store';
+import Myslider from '../../shared/Slider';
+import {Help} from '../../shared/Help';
+
 
 const Soil = () => {
   const gotSSURGO = useSelector(get.gotSSURGO);
@@ -26,10 +27,9 @@ const Soil = () => {
 
       <div className="inputs">
         Organic Matter (%):
-        <Icon>
-          help
-          <p>Soil organic matter in the surface (0-10cm) soil</p>
-        </Icon>
+        <Help>
+          Soil organic matter in the surface (0-10cm) soil
+        </Help>
         <br/>
         <Myslider
           id="OM"
@@ -41,10 +41,9 @@ const Soil = () => {
         <br/><br/>
 
         Bulk Density (g/cm<sup>3</sup>):
-        <Icon>
-          help
-          <p>Soil bulk density in the surface (0-10cm) soil</p>
-        </Icon>
+        <Help>
+          Soil bulk density in the surface (0-10cm) soil
+        </Help>
         <br/>
         <Myslider
           id="BD"
@@ -55,10 +54,9 @@ const Soil = () => {
 
         <br/><br/>
         Soil Inorganic N (ppm or mg/kg):
-        <Icon>
-          help
-          <p>Soil inorganic nitrogen in the surface (0-10cm) soil</p>
-        </Icon>
+        <Help>
+          Soil inorganic nitrogen in the surface (0-10cm) soil
+        </Help>
         <br/>
         <Myslider
           id="InorganicN"

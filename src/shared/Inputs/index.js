@@ -208,6 +208,7 @@ const Input = ({type, id, options, isOptionEqualToValue, renderInput, index='', 
             autoFocus={props.autoFocus}
             variant={props.variant || 'outlined'}
             sx={{background: 'white', width: max, padding: 0}}
+            placeholder={props.placeholder}
             {...params}
           />
         )
@@ -221,7 +222,6 @@ const Input = ({type, id, options, isOptionEqualToValue, renderInput, index='', 
         id={id}
         onKeyPress={keyPress}
         ref={focusRef}
-
         sx={{width: max}}
 
         // isOptionEqualToValue={isOptionEqualToValue}   // avoids warning, per https://stackoverflow.com/q/61947941/3903374

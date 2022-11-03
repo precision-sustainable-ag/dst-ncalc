@@ -1,11 +1,11 @@
-import Myslider from '../../shared/Slider';
-
-import {Input} from '../../shared/Inputs';
-
-import Icon from '@mui/material/Icon';
 import {useSelector} from 'react-redux';
-import {get} from '../../store/Store';
 import {Link} from 'react-router-dom';
+
+import {get} from '../../store/Store';
+
+import Myslider from '../../shared/Slider';
+import {Input} from '../../shared/Inputs';
+import {Help} from '../../shared/Help';
 
 const CashCrops = () => {
   const crops = [
@@ -306,7 +306,7 @@ const CashCrops = () => {
       //   dispatch(set.cashCrop(newValue));
       // }}
 
-      placeholder="Select a cash crop"
+      placeholder="Start typing your crop, then select from the list"
     />
   );
 } // CashCrops
@@ -338,10 +338,9 @@ const CashCrop = () => {
 
         <p>
           What is your Target Nitrogen Fertilizer Rate? ({unit}):
-          <Icon>
-            help
+          <Help>
             Please specify the target N rate for your region.
-          </Icon>
+          </Help>
         </p>
 
         <Myslider

@@ -1,11 +1,11 @@
 import {useDispatch, useSelector} from 'react-redux';
 import {Link} from 'react-router-dom';
 import {Radio, RadioGroup, FormControlLabel} from '@mui/material';
-import Icon from '@mui/material/Icon';
 
 import {get, set} from '../../store/Store';
 import {Input} from '../../shared/Inputs';
 import Myslider from '../../shared/Slider';
+import {Help} from '../../shared/Help';
 
 const CoverCrops = () => {
   const species = useSelector(get.species);
@@ -14,9 +14,7 @@ const CoverCrops = () => {
       multiple
 
       id="coverCrop"
-
       autoFocus
-
       groupBy={
         (option) => species.Brassica.includes(option)  ? 'Brassica' :
                     species.Broadleaf.includes(option) ? 'Broadleaf' :
@@ -65,11 +63,10 @@ const CoverCrop1 = () => {
         <p/>
         <div>
           Dry Biomass
-          <Icon>
-            help
+          <Help>
             <p>The amount of cover crop biomass on a dry weight basis.</p>
             <p>For details on cover crop biomass sampling and taking a representative sub-sample for quality analysis, please refer to <a tabIndex="-1" target="_blank" rel="noreferrer" href="https://extension.uga.edu/publications/detail.html?number=C1077">here</a>.</p>
-          </Icon>
+          </Help>
           :
 
           <RadioGroup row aria-label="position" name="position" style={{display: 'inline-block', marginLeft: '1em'}}>
@@ -104,11 +101,10 @@ const CoverCrop1 = () => {
         <br/>
         <div>
           Fresh Biomass
-          <Icon>
-            help
+          <Help>
             <p>The amount of cover crop biomass on a wet weight basis.</p>
             <p>For details on cover crop biomass sampling and taking a representative sub-sample for quality analysis, please refer to <a tabIndex="-1" target="_blank" rel="noreferrer" href="https://extension.uga.edu/publications/detail.html?number=C1077">here</a>.</p>
-          </Icon>
+          </Help>
         </div>
 
         <Myslider
@@ -126,11 +122,10 @@ const CoverCrop1 = () => {
 
         <div style={{marginTop: "2rem"}}>
           Cover Crop Water Content at Termination (g water/g dry biomass)
-          <Icon>
-            help
+          <Help>
             <p>Use the following calculation to adjust default values:</p>
             <p>Cover Crop Water Content = (Total fresh weight - Total dry weight)/(Total dry weight)</p>
-          </Icon>
+          </Help>
           :
         </div>
         <Myslider
@@ -158,14 +153,12 @@ const CoverCrop2 = () => {
       <div className="inputs">
         <p>
           Nitrogen (%)
-          <Icon>
-            help
+          <Help>
             Cover crop nitrogen concentration based on lab results.
-          </Icon>
+          </Help>
           :
         </p>
         <Myslider
-          autoFocus
           id="N"
           min={0}
           max={6}
@@ -177,13 +170,12 @@ const CoverCrop2 = () => {
         <p/>
         <div>
           Carbohydrates (%)
-          <Icon>
-            help
+          <Help>
             <p>Non-structural labile carbohydrate concentration based on lab results. This represents the most readily decomposable C constituents in plant materials.</p>
             <p>The default value is based on the nitrogen concentration.</p>
             <p>If you have the raw data from near infra-red reflectance spectroscopy (NIRS) analysis, use the following equation:</p>
             <p>carbohydrates (%) = % crude protein (CP) + % fat + % non-fibrous carbohydrates (NFC)</p>
-          </Icon>
+          </Help>
           :
         </div>
         <p/>
@@ -197,13 +189,12 @@ const CoverCrop2 = () => {
         <p/>
         <div>
           Holo-cellulose (%)
-          <Icon>
-            help
+          <Help>
             <p>Structural holo-cellulose (i.e., both cellulose and hemi-cellulose) concentration based on lab results. This represents the moderately decomposable C constituents in plant materials.</p>
             <p>The default value is based on the nitrogen concentration.</p>
             <p>If you have the raw data from near infra-red reflectance spectroscopy (NIRS) analysis, use the following equation:</p>
             <p>holo-cellulose (%) = % neutral detergent fiber (NDF) – (% lignin + % ash)</p>
-          </Icon>
+          </Help>
           :
         </div>
         <p/>
@@ -217,11 +208,10 @@ const CoverCrop2 = () => {
         <p/>
         <div>
           Lignin (%)
-          <Icon>
-            help
+          <Help>
             <p>Structural lignin concentration based on lab results. This represents the most recalcitrant C constituents in plant materials.</p>
             <p>The default value is based on the nitrogen concentration.</p>
-          </Icon>
+          </Help>
           :
         </div>
         <p/>
