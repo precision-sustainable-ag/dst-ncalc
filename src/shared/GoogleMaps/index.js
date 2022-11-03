@@ -1,6 +1,6 @@
 import React, {useCallback, useState, useEffect} from 'react';
 import {useSelector, useDispatch} from 'react-redux';
-import {TextField, Icon, Grid, Typography} from '@mui/material';
+import {TextField, Grid, Typography} from '@mui/material';
 import LocationOnIcon from '@mui/icons-material/LocationOn';
 import throttle from 'lodash/throttle';
 import parse from 'autosuggest-highlight/parse';
@@ -9,6 +9,7 @@ import {Fullscreen, FullscreenExit} from '@mui/icons-material';
 
 import {Input} from '../Inputs';
 import {get, set} from '../../store/Store';
+import {Help} from '../Help';
 
 import './styles.scss';
 
@@ -185,8 +186,7 @@ const Map = ({field=false, autoFocus, inputs=true, id='GoogleMap', mapOptions={}
               style={{width: 'calc(50% - 2em)', height: '3rem'}}
               
             />
-            <Icon className="moveLeft">
-              help
+            <Help className="moveLeft">
               <p>
                 This input is optional.  If you enter a field name, you'll be able to rerun the model on this computer without re-entering your data.
               </p>
@@ -198,7 +198,7 @@ const Map = ({field=false, autoFocus, inputs=true, id='GoogleMap', mapOptions={}
                 <li>Your information is stored on your computer only.  It will not be uploaded to a server.</li>
                 <li>If you clear your browser's cache, you'll need to re-enter your data the next time you run the program.</li>
               </ul>
-            </Icon>
+            </Help>
           </>
         }
   

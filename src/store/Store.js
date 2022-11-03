@@ -14,9 +14,6 @@ const query = (parm, def) => {
 } // query
 
 let initialState = {
-  help                : '',
-  helpX               : 0,
-  helpY               : 0,
   focus               : '',
   name                : '',
   email               : '',
@@ -106,8 +103,8 @@ const ac = {
     carb: (state)           => {state.gotModel = false; state.edited = true;},
     cell: (state)           => {state.gotModel = false; state.edited = true;},
     lign: (state)           => {state.gotModel = false; state.edited = true;},
-    lat: (state)            => {state.gotModel = false; fetchSSURGO(state);},
-    lon: (state)            => {state.gotModel = false; fetchSSURGO(state);},
+    lat: (state)            => {state.gotModel = false;},
+    lon: (state)            => {state.gotModel = false;},
     lwc: (state)            => {state.gotModel = false;},
     killDate: (state)       => {state.gotModel = false;},
     plantingDate: (state)   => {state.gotModel = false;},
@@ -342,6 +339,7 @@ export const missingData = () => {
 const reducers = {
   updateLocation: (state, {payload}) => {
     state = {...state, ...payload};
+    fetchSSURGO(state);
     return state;
   }
 };
