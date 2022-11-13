@@ -138,4 +138,6 @@ const App = () => {
   );
 } // App
 
+document.title = window.location.toString().includes('water') ? 'Water DST': 'CC-NCALC';
+
 export default App;

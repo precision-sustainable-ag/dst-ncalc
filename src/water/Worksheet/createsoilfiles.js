@@ -1,5 +1,6 @@
 import {dataTable} from './utilities';
 import axios from 'axios';
+import {rosetta} from '../../store/Store';
 
 let site = 'run_01';  // TODO
 let soilFile = 'soil.soi';  // TODO
@@ -746,7 +747,7 @@ const createSoilFiles = (files) => {
     const SoilFile = soilFile.replace('.soi', '.dat');  // arg('/SN') ? arg('/SN') + '.dat' : '';
     CreateSoilFile(dtLayers, SoilFile);
     
-    console.time('Rosetta time');
+    // console.time('Rosetta time');
     const soildata = readFile(SoilFile).slice(1);
 
     const rosettaData = soildata.map(row => {
@@ -760,7 +761,9 @@ const createSoilFiles = (files) => {
       delete row.org;
       return row;
     });
-    console.log(rosettaData);
+
+    rosetta(rosettaData);
+    
     axios
       .post(`https://www.handbook60.org/api/v1/rosetta/1`, {
         soildata: rosettaData,

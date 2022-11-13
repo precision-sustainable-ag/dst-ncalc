@@ -166,11 +166,11 @@ export const fetchModel = () => {
     
     biomass *= factor;
 
-    const src = `https://api.precisionsustainableag.org/cc-ncalc/surface?lat=${lat}&lon=${lon}&start=${start}&end=${end}&n=${N}&biomass=${biomass}&lwc=${lwc}&carb=${carb}&cell=${cell}&lign=${lign}&om=${OM}&bd=${BD}&in=${InorganicN}&pmn=${pmn}`;
+    const url = `https://api.precisionsustainableag.org/cc-ncalc/surface?lat=${lat}&lon=${lon}&start=${start}&end=${end}&n=${N}&biomass=${biomass}&lwc=${lwc}&carb=${carb}&cell=${cell}&lign=${lign}&om=${OM}&bd=${BD}&in=${InorganicN}&pmn=${pmn}`;
 
-    api(
-      src,
-      (data) => {
+    api({
+      url,
+      callback: (data) => {
         if (data.name === 'error' || !data.surface) {
           store.dispatch(set.errorModel(true));
           return;
@@ -204,9 +204,9 @@ export const fetchModel = () => {
 
         fetchCornN(store.getState());
       },
-      'model',
-      2000
-    );
+      timer: 'model',
+      delay: 2000
+    });
   }
 } // fetchModel
 
@@ -215,11 +215,11 @@ const fetchSSURGOWater = (state) => {
 
   state.gotSSURGO = false;
 
-  const src = `https://api.precisionsustainableag.org/ssurgo?lat=${lat}&lon=${lon}&component=major`;
+  const url = `https://api.precisionsustainableag.org/ssurgo?lat=${lat}&lon=${lon}&component=major`;
 
-  api(
-    src,
-    (data) => {
+  api({
+    url,
+    callback: (data) => {
       if (data.ERROR) {
         console.log(`No SSURGO data at ${lat}, ${lon}`);
         store.dispatch(set.BD(''));
@@ -231,9 +231,9 @@ const fetchSSURGOWater = (state) => {
         store.dispatch(set.SSURGO(data));
       }
     },
-    'ssurgo',
-    2000
-  );
+    timer: 'ssurgo',
+    delay: 2000
+  });
 } // fetchSSURGOWater
 
 const fetchSSURGO = (state) => {
@@ -241,11 +241,11 @@ const fetchSSURGO = (state) => {
 
   state.gotSSURGO = false;
 
-  const src = `https://api.precisionsustainableag.org/ssurgo?lat=${lat}&lon=${lon}&component=major`;
+  const url = `https://api.precisionsustainableag.org/ssurgo?lat=${lat}&lon=${lon}&component=major`;
 
-  api(
-    src,
-    (data) => {
+  api({
+    url,
+    callback: (data) => {
       if (data.ERROR) {
         console.log(`No SSURGO data at ${lat}, ${lon}`);
         store.dispatch(set.BD(''));
@@ -261,9 +261,9 @@ const fetchSSURGO = (state) => {
         store.dispatch(set.SSURGO(data));
       }
     },
-    'ssurgo',
-    2000
-  );
+    timer: 'ssurgo',
+    delay: 2000
+  });
 } // fetchSSURGO
 
 const fetchCornN = (state) => {
@@ -274,11 +274,11 @@ const fetchCornN = (state) => {
   store.dispatch(set.cornN(false));
   store.dispatch(set.errorCorn(false));
 
-  const src = `https://api.precisionsustainableag.org/weather/hourly?lat=${lat}&lon=${lon}&start=${moment(plantingDate).format('yyyy-MM-DD')}&end=${end}&attributes=air_temperature&options=predicted`;
+  const url = `https://api.precisionsustainableag.org/weather/hourly?lat=${lat}&lon=${lon}&start=${moment(plantingDate).format('yyyy-MM-DD')}&end=${end}&attributes=air_temperature&options=predicted`;
   
-  api(
-    src,
-    (data) => {
+  api({
+    url,
+    callback: (data) => {
       if (data instanceof Array) {
         console.log('CornN:');
         console.log(data);
@@ -286,12 +286,12 @@ const fetchCornN = (state) => {
         store.dispatch(set.cornN(data));
       } else {
         console.log('CornN error:');
-        console.log(src);
+        console.log(url);
         console.log(data);
         store.dispatch(set.errorCorn(true));
       }
     }
-  );
+  });
 } // fetchCornN
 
 export const missingData = () => {
@@ -336,6 +336,20 @@ export const missingData = () => {
   }
 } // missingData
 
+export const rosetta = (soildata) => {
+  api({
+    url: 'https://www.handbook60.org/api/v1/rosetta/1',
+    options: {
+      method: 'post',
+      soildata
+    },
+    callback: (data) => {
+      alert(JSON.stringify(data));
+      console.log(data);
+    }
+  });
+} // rosetta
+
 const reducers = {
   updateLocation: (state, {payload}) => {
     state = {...state, ...payload};
@@ -348,7 +362,7 @@ const dst = /water/i.test(window.location) ? 'water' : 'ncalc';
 
 export const store = createStore(initialState, {afterChange: ac[dst], reducers});
 
-export const api = (url, callback, timer, delay=0) => {
+export const api = ({url, options={}, callback, timer=url, delay=0}) => {
   if (timer) {
     clearTimeout(api[timer]);
   }
@@ -359,6 +373,7 @@ export const api = (url, callback, timer, delay=0) => {
       type: 'api',
       payload: {
         url,
+        options,
         callback
       }
     });
