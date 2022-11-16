@@ -19,7 +19,6 @@ let initialState = {
   email               : '',
   feedback            : '',
   screen              : '',
-  // files               : {},
   PSA                 : window.location.toString().includes('PSA'),
   field               : query('field', ''),
   targetN             : '150',
@@ -88,6 +87,7 @@ let initialState = {
     MulchGeo:       [],
     Tillage:        [],
   },
+  soilfiles: {}
 };
 
 const ac = {
@@ -337,15 +337,45 @@ export const missingData = () => {
 } // missingData
 
 export const rosetta = (soildata) => {
+  const rosettaData = soildata.map(row => {
+    row = [...row];
+    row.splice(0, 1);  // remove Matnum
+    row.splice(4, 1);  // remove om
+    row.splice(6, 1);  // remove 'w'
+    row[0] *= 100;     // sand
+    row[1] *= 100;     // silt
+    row[2] *= 100;     // clay
+    delete row.org;
+    return row;
+  });
+
   api({
-    url: 'https://www.handbook60.org/api/v1/rosetta/1',
+    // url: 'https://www.handbook60.org/api/v1/rosetta/1', // doesn't support CORS
+    url: 'http://localhost:80/rosetta',
     options: {
       method: 'post',
-      soildata
+      soildata: rosettaData,
     },
     callback: (data) => {
-      alert(JSON.stringify(data));
-      console.log(data);
+      let s = '           *** Material information ****                                                                   g/g  \r\n';
+      s += '   thr       ths         tha       th      Alfa      n        Ks         Kk       thk       BulkD     OM    Sand    Silt    InitType\r\n';
+
+      data.van_genuchten_params.forEach((d, i) => {
+        let [theta_r, theta_s, alpha, npar, ksat] = d;
+
+        alpha = 10 ** alpha;
+        npar  = 10 ** npar;
+        ksat  = 10 ** ksat;
+
+        // eslint-disable-next-line no-unused-vars
+        const [Matnum, sand, silt, clay, bd, om, TH33, TH1500, inittype] = soildata[i];
+
+        s += `    ${theta_r.toFixed(3)}    ${theta_s.toFixed(3)}    ${theta_r.toFixed(3)}    ${theta_s.toFixed(3)}    ${alpha.toFixed(5)}    ${npar.toFixed(5)}    ${ksat.toFixed(3)}    ${ksat.toFixed(3)}    ${theta_s.toFixed(3)}    ${bd.toFixed(2)} ${om.toFixed(5)}    ${sand.toFixed(2)}    ${silt.toFixed(2)}   ${inittype}\r\n`;
+      });
+
+      const state = store.getState();
+      store.dispatch(set.soilfiles({...state.soilfiles, 'meadir_run_01.soi': s}));
+      console.log('ok');
     }
   });
 } // rosetta
