@@ -1,4 +1,5 @@
-// eslint-disable-next-line
+/* eslint-disable no-useless-escape */
+
 export const comp = `
 AgMip.nit  
  *** SoilNit parameters for: run_01***

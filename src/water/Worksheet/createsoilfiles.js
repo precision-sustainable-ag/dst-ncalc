@@ -274,6 +274,7 @@ const createSoilFiles = (files) => {
   // Creates a table to hold the grid data and fills it with data from the file.
   const ParseGridFile = (GridFile) => {
     const data = readFile(GridFile);
+    // eslint-disable-next-line no-unused-vars
     const [_, node, element] = data[2];
 
     const dtNode = dataTable(data.slice(4, node + 4), [
@@ -587,8 +588,6 @@ const createSoilFiles = (files) => {
     // we will create a gridgen file and use it to call the mesh generator 
     // This code will create the input file.
     // Get depth of profile
-
-    const myField = dtLayers[MatNum - 1];
 
     // Do first layer for testing
     const Layer = dtLayers[0];

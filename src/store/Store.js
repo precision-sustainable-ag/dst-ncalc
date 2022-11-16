@@ -358,7 +358,7 @@ export const rosetta = (soildata) => {
     },
     callback: (data) => {
       let s = '           *** Material information ****                                                                   g/g  \r\n';
-      s += '   thr       ths         tha       th      Alfa      n        Ks         Kk       thk       BulkD     OM    Sand    Silt    InitType\r\n';
+      s += '   thr       ths         tha       thm     Alfa      n        Ks         Kk       thk       BulkD     OM    Sand    Silt    InitType\r\n';
 
       data.van_genuchten_params.forEach((d, i) => {
         let [theta_r, theta_s, alpha, npar, ksat] = d;
@@ -370,7 +370,41 @@ export const rosetta = (soildata) => {
         // eslint-disable-next-line no-unused-vars
         const [Matnum, sand, silt, clay, bd, om, TH33, TH1500, inittype] = soildata[i];
 
-        s += `    ${theta_r.toFixed(3)}    ${theta_s.toFixed(3)}    ${theta_r.toFixed(3)}    ${theta_s.toFixed(3)}    ${alpha.toFixed(5)}    ${npar.toFixed(5)}    ${ksat.toFixed(3)}    ${ksat.toFixed(3)}    ${theta_s.toFixed(3)}    ${bd.toFixed(2)} ${om.toFixed(5)}    ${sand.toFixed(2)}    ${silt.toFixed(2)}   ${inittype}\r\n`;
+        let theta_m = theta_s;
+        let theta_k = theta_s;
+        let kk = ksat;
+
+        if (npar > 1 && npar < 2) {  // TODO:  && i === 0???
+          theta_k -= 0.004;
+          kk = ksat - (0.10 * ksat);
+          theta_s -= 0.002;
+        }
+
+        // if (rosoutput.vgnpar < 2.0 && rosoutput.vgnpar > 1 && count === 1) {
+				// 	vgthm = rosoutput.vgths;
+				// 	vgths = rosoutput.vgths - 0.002;
+				// 	vgthk = rosoutput.vgths - 0.004;
+				// 	vgkk = rosoutput.ks  - (0.10 * rosoutput.ks);
+				// }        
+
+        // Heading    JS var    C++ var
+        // ________   _______   ____________________
+        // thr        theta_r   rosoutput.vgthr
+        // ths        theta_s   vgths
+        // tha        theta_r   rosoutput.vgthr
+        // thm        theta_m   vgthm
+        // Alfa       alpha     rosoutput.vgalp
+        // n          npar      rosoutput.vgnpar
+        // Ks         ksat      rosoutput.ks
+        // Kk         kk        vgkk
+        // thk        theta_k   vgthk 
+        // BulkD      bd        rosinput.bd
+        // OM         om        OM
+        // Sand       sand      rosinput.sand/100.0
+        // Silt       silt      rosinput.silt/100.0
+        // InitType   inittype  InitType
+
+        s += `    ${theta_r.toFixed(3)}    ${theta_s.toFixed(3)}    ${theta_r.toFixed(3)}    ${theta_m.toFixed(3)}    ${alpha.toFixed(5)}    ${npar.toFixed(5)}    ${ksat.toFixed(3)}    ${kk.toFixed(3)}    ${theta_k.toFixed(3)}    ${bd.toFixed(2)} ${om.toFixed(5)}    ${sand.toFixed(2)}    ${silt.toFixed(2)}   ${inittype}\r\n`;
       });
 
       const state = store.getState();

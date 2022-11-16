@@ -638,32 +638,32 @@ const SoilFiles = () => {
   
       output(path, s);
     } // writeNit
-  
-    const writeWater = () => {
-      // all of this is hard-coded:
-      const path = `water.dat`;
-  
-      output(path, `
-        *** WATER MOVER PARAMETERINFORMATION ***************************
-        MaxIt   TolTh TolH    hCritA       hCritS      DtMx  htab1   htabN EPSI.Heat  EPSI.Solute
-          20     0.01  0.05  -1.00000E+005 1.0E+010       0.02 0.001   1000     0.5        0.5
-      `);
-    } // writeWater
-  
-    const writeWaterBound = () => {
-      // all of this is hard-coded:
-      const path = `waterbound.dat`;
-  
-      output(path, `
-        *** WATER MOVER TIME-DEPENDENT BOUNDARY
-        Time  Node  VarB
-        252.542
-          6 0.000000E+000
-          7 0.000000E+000
-          12 0.000000E+000
-          13 0.000000E+000
-      `);
-    } // writeWaterBound
+
+//    const writeWater = () => {
+//      // all of this is hard-coded:
+//      const path = `water.dat`;
+//  
+//      output(path, `
+//        *** WATER MOVER PARAMETERINFORMATION ***************************
+//        MaxIt   TolTh TolH    hCritA       hCritS      DtMx  htab1   htabN EPSI.Heat  EPSI.Solute
+//          20     0.01  0.05  -1.00000E+005 1.0E+010       0.02 0.001   1000     0.5        0.5
+//      `);
+//    } // writeWater
+//  
+//    const writeWaterBound = () => {
+//      // all of this is hard-coded:
+//      const path = `waterbound.dat`;
+//  
+//      output(path, `
+//        *** WATER MOVER TIME-DEPENDENT BOUNDARY
+//        Time  Node  VarB
+//        252.542
+//          6 0.000000E+000
+//          7 0.000000E+000
+//          12 0.000000E+000
+//          13 0.000000E+000
+//      `);
+//    } // writeWaterBound
   
   
     /*
@@ -729,9 +729,13 @@ const SoilFiles = () => {
 const SoilFiles2 = () => {
   const match = (file) => {
     const rep = (s) => {
+      if (!s) return s;
+
       s = s.replace(/'(\d+)\/(\d+)\/(\d+)'/g, (_, m, d, y) => `zzz'${+m}/${+d}/${+y}'`);  // dates
       s = s.replace(/\d+\.?\d+/g, d => (+d).toFixed(2)); // numbers
-      s = s.replace(/\s+/g, '').trim();
+      s = s.replace(/[\t ]+/g, ' '); // tabs and spaces
+      s = s.replace(/\s*[\n\r]+\s*/g, '\r'); // collapse newlines
+      s = s.trim();
 
       return s;
     }
@@ -739,20 +743,23 @@ const SoilFiles2 = () => {
     let s1 = rep(comps[file]);
     let s2 = rep(files[file]);
 
-    if (s2 && rep(s1) !== rep(s2)) {
-      let i = 0;
-      console.log('_'.repeat(30));
-      console.log(file);
-      while (s1[i] === s2[i++]);
-      // alert(file + ' ' + i + ' ' + s1[i - 1] + ' ' + s2[i - 1]);
+    if (s2 && s1 !== s2) {
+      console.log('_________________');
+      console.log(`%c${file}`, 'text-decoration: underline; font-weight: bold; color: brown;');
+      const c = rep(comps[file]).split(/[\n\r]/);
+      const f = rep(files[file]).split(/[\n\r]/);
 
-      console.log(s1.slice(i - 1, i + 10));
-      console.log(s2.slice(i - 1, i + 10));
-
-      console.log({
-        s1: rep(s1),
-        s2: rep(s2)
+      c.forEach((c, i) => {
+        if (rep(c) !== rep(f[i])) {
+          for (let j = 0; j < c.length; j++) {
+            if (c[j] !== f[i][j]) {
+              console.log(' ', c.slice(j - 10, j + 10), ':', f[i].slice(j - 10, j + 10));
+              j += 9;
+            }
+          }          
+        }
       });
+      console.log('_________________');
     }
 
     return rep(s1) === rep(s2);
