@@ -87,7 +87,175 @@ let initialState = {
     MulchGeo:       [],
     Tillage:        [],
   },
-  soilfiles: {}
+  soilfiles: {},
+
+  // hidden: true,
+  // label: '...',
+  // unit: '...',
+  // description: <>...</>
+  Biology: {
+    es: {
+      value: 0.06,
+      unit: <>fraction</>,
+      description: <>Relative effect of moisture when the soil is saturated</>
+    },
+    tb: {
+      value: 25,
+      unit: <>C</>,
+      description: <>Base temperature at which eT =1</>
+    },
+    dthh: {
+      value: 0.1,
+      unit: <>cm<sup>3</sup>/cm<sup>3</sup></>,
+      description: <>The highest volumetric water content for which the process is optimal</>,
+    },
+    dthl: {
+      value: 0.08,
+      unit: <>cm<sup>3</sup>/cm<sup>3</sup></>,
+      description: <>The lowest volumetric water content for which the process is optimal</>,
+    },
+    th_m: {
+      value: 1,
+      description: <>Exponent in dependencies of e(theta) on theta (water content)</>
+    },
+    qt: {
+      value: 3,
+      description: <>Factor change in rate with a 10&deg; C change in temperature</>,
+    },
+    dthd: {
+      value: 0.1,
+      unit: <>cm<sup>3</sup>/cm<sup>3</sup></>,
+      description: <>Threshold water content below which no denitrification occurs</>,
+    },
+    th_d: {
+      value: 2,
+      description: <>Exponent in dependencies of e(d) on theta (water content)</>
+    },
+  },
+  Climate: {
+    dailybulb: {
+      value: false,
+      options: ['Daily', 'Hourly'],
+      description: <>Switch to indicate if daily or hourly wet bulb temperatures are available.</>
+    },
+    dailywind: {
+      value: 1,
+    },
+    rainintensity: {
+      value: 0,
+    },
+    dailyconc: {
+      value: 0,
+    },
+    furrow: {
+      value: 0,
+    },
+    relhumid: {
+      value: 1,
+    },
+    dailyco2: {
+      value: 0,
+    },
+    bsolar: {
+      value: 1000000,
+    },
+    btemp: {
+      value: 1,
+    },
+    atemp: {
+      value: 0,
+    },
+    erain: {
+      value: 0.1,
+    },
+    bwind: {
+      value: 1,
+    },
+    bir: {
+      value: 1,
+    },
+    avgwind: {
+      value: 10,
+    },
+    avgrainrate: {
+      value: 3,
+    },
+    chemconc: {
+      value: 0,
+    },
+    rh: {
+      value: 83,
+    },
+    avgco2: {
+      value: 420,
+    },
+    altitude: {
+      value: 1048,
+    },
+  },
+  Fertilization: {
+    amount: {
+      value: 112,
+    },
+    depth: {
+      value: 5,
+    },
+    'litter_c(kg/ha)': {
+      label: 'litter_c',
+      value: 0,
+      unit: 'kg/ha',
+    },
+    litter_n: {
+      value: 0,
+    },
+    manure_c: {
+      value: 0,
+    },
+    manure_n: {
+      value: 0,
+    },
+  },
+  GridRatio: {
+    sr1: {
+      value: 1.001,
+    },
+    ir1: {
+      value: 1,
+    },
+    sr2: {
+      value: 1.001,
+    },
+    ir2: {
+      value: 3,
+    },
+    plantingdepth: {
+      value: 5,
+    },
+    xlimitroot: {
+      value: 23,
+    },
+    bottombc: {
+      value: -7,
+    },
+    gasbctop: {
+      value: -4,
+    },
+    gasbcbottom: {
+      value: 1,
+    },
+    initrtmass: {
+      value: 0,
+    },
+  },
+  Irrigation: { // Irrig
+    date: {
+      value: undefined
+    },
+    amount: {
+      value: undefined
+    },
+  },
+
 };
 
 const ac = {
@@ -374,7 +542,7 @@ export const rosetta = (soildata) => {
         let theta_k = theta_s;
         let kk = ksat;
 
-        if (npar > 1 && npar < 2) {  // TODO:  && i === 0???
+        if (npar > 1 && npar < 2) {
           theta_k -= 0.004;
           kk = ksat - (0.10 * ksat);
           theta_s -= 0.002;

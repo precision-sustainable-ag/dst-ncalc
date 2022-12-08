@@ -90,7 +90,7 @@ const Soil = () => {
 
       <div className="bn">
         <Link className="link" to={'/location'} >BACK</Link>
-        <Link className="link" to={'/covercrop'}>NEXT</Link>
+        <Link className="link" to={'/worksheet'}>NEXT</Link>
       </div>
     </div>
   );  

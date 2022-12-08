@@ -1,0 +1,19 @@
+.Inputs {
+  th {
+    vertical-align: bottom;
+    background: darkgreen;
+    color: white;
+  }
+
+  td {
+    text-align: left;
+  }
+  
+  td:empty {
+    padding: 0;
+  }
+  
+  .wait {
+    color: red;
+  }
+}
