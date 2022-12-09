@@ -1,11 +1,8 @@
-import React, { useCallback, useState, useEffect } from "react";
+import React from "react";
 import { Link } from "react-router-dom";
-// import Map from '../../shared/GoogleMaps';
 import Map from "../Map";
 import { Input } from "../Inputs";
 import { Help } from "../Help";
-import { useSelector, useDispatch } from "react-redux";
-import { get, set } from "../../store/Store";
 
 import "./styles.scss";
 
@@ -18,16 +15,16 @@ const Location = () => {
           <p>
             Enter your address or zip code to determine your field's location.
             You can then zoom in and click to pinpoint it on the map. If you
-            know your exact coordinates, you can enter them separated by comma
+            know your exact coordinates, you can enter them in search bar separated by comma
             (ex. 37.7, -80.2 ).
           </p>
         </div>
         <div className="inputsContainer">
           <Input
-            label="Name your Field"
+            label="Name your Field (optional)"
             id="field"
             autoComplete="off"
-            style={{ height: "2rem" }}
+            style={{ height: "2rem", minWidth: "13rem"}}
           />
           <Help className="moveLeft">
             <p>
