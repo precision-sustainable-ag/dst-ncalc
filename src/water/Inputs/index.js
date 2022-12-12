@@ -52,6 +52,7 @@ const Inputs = () => {
         <Section section="Fertilization" />
         <Section section="GridRatio" />
         <Section section="Irrigation" />
+        <Section section="Soil" />
       </table>
 
       <div className="bn">
