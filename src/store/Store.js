@@ -594,7 +594,7 @@ const fetchSSURGO = (state) => {
 
   state.gotSSURGO = false;
 
-  const url = `https://api.precisionsustainableag.org/ssurgo?lat=${lat}&lon=${lon}&component=major`;
+  const url = `https://ssurgo.covercrop-data.org/?lat=${lat}&lon=${lon}&component=major`;
 
   api({
     url,
