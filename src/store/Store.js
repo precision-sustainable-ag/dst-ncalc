@@ -217,7 +217,7 @@ let initialState = {
   },
   GridRatio: {
     sr1: {
-      label: <>Surface nodes  spacing ratio</>,
+      label: <>Surface nodes spacing ratio</>,
       value: 1.001,
       description: <>Determines how spacing changes with increasing depth. The closer to 1 this number (but must be always &gt;1) the more uniform the node spacing</>
     },
@@ -627,7 +627,7 @@ const fetchCornN = (state) => {
   store.dispatch(set.cornN(false));
   store.dispatch(set.errorCorn(false));
 
-  const url = `https://api.precisionsustainableag.org/weather/hourly?lat=${lat}&lon=${lon}&start=${moment(plantingDate).format('yyyy-MM-DD')}&end=${end}&attributes=air_temperature&options=predicted`;
+  const url = `https://weather.covercrop-data.org/hourly?lat=${lat}&lon=${lon}&start=${moment(plantingDate).format('yyyy-MM-DD')}&end=${end}&attributes=air_temperature&options=predicted`;
   
   api({
     url,
