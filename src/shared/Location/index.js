@@ -1,16 +1,16 @@
-import React from "react";
-import { Link } from "react-router-dom";
-import Map from "../Map";
-import { Input } from "../Inputs";
-import { Help } from "../Help";
+import React from 'react';
+import { Link } from 'react-router-dom';
+import Map from '../Map';
+import { Input } from '../Inputs';
+import { Help } from '../Help';
 
-import "./styles.scss";
+import './styles.scss';
 
 const Location = () => {
   return (
-    <div className="locationWrapper">
-      <div className="mapHeader">
-        <div className="mapHeaderText">
+    <div className='locationWrapper'>
+      <div className='mapHeader'>
+        <div className='mapHeaderText'>
           <h1>Where is your Field located?</h1>
           <p>
             Enter your address or zip code to determine your field's location.
@@ -19,14 +19,14 @@ const Location = () => {
             (ex. 37.7, -80.2 ).
           </p>
         </div>
-        <div className="inputsContainer">
+        <div className='inputsContainer'>
           <Input
-            label="Name your Field (optional)"
-            id="field"
-            autoComplete="off"
-            style={{ height: "2rem", minWidth: "13rem"}}
+            label='Name your Field (optional)'
+            id='field'
+            autoComplete='off'
+            style={{ height: '2rem', minWidth: '13rem'}}
           />
-          <Help className="moveLeft">
+          <Help className='moveLeft'>
             <p>
               This input is optional. If you enter a field name, you'll be able
               to rerun the model on this computer without re-entering your data.
@@ -49,14 +49,14 @@ const Location = () => {
           </Help>
         </div>
       </div>
-      <div className="map">
+      <div className='map'>
         <Map />
       </div>
-      <div className="bn">
-        <Link className="link" to={"/home"}>
+      <div className='bn'>
+        <Link className='link' to={'/home'}>
           BACK
         </Link>
-        <Link className="link" to={"/soil"}>
+        <Link className='link' to={'/soil'}>
           NEXT
         </Link>
       </div>

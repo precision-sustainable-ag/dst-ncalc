@@ -1,8 +1,12 @@
 {
-    "appService.zipIgnorePattern": [
-        "node_modules{,/**}",
-        ".vscode{,/**}"
-    ],
-    "appService.defaultWebAppToDeploy": "/subscriptions/5aa49bea-93fb-4d1c-ab7e-e4549cb2b935/resourceGroups/CC-NCALC/providers/Microsoft.Web/sites/CC-NCALC",
-    "appService.deploySubpath": "."
+  "editor.defaultFormatter": "rvest.vs-code-prettier-eslint",
+  "editor.formatOnPaste": false, // required
+  "editor.formatOnType": false, // required
+  "editor.formatOnSave": true, // optional
+  "editor.formatOnSaveMode": "file", // required to format on save
+  "files.autoSave": "onFocusChange", // optional but recommended
+
+  "appService.zipIgnorePattern": ["node_modules{,/**}", ".vscode{,/**}"],
+  "appService.defaultWebAppToDeploy": "/subscriptions/5aa49bea-93fb-4d1c-ab7e-e4549cb2b935/resourceGroups/CC-NCALC/providers/Microsoft.Web/sites/CC-NCALC",
+  "appService.deploySubpath": "."
 }
