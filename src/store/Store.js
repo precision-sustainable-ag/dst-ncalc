@@ -134,7 +134,7 @@ let initialState = {
   },
   Climate: {
     dailybulb: {
-      value: false,
+      value: 'Daily',
       options: ['Daily', 'Hourly'],
       description: <>Switch to indicate if daily or hourly wet bulb temperatures are available.</>
     },
@@ -247,7 +247,7 @@ let initialState = {
     },
     bottombc: {
       label: <>Bottom Boundary condition</>,
-      value: 1,
+      value: '1 constant',
       options: ['1 constant', '-2 seepage face', '-7 unit hydraulic gradient drainage']
     },
     gasbctop: {
@@ -269,62 +269,62 @@ let initialState = {
     },
   },
   Soil: {
-    Bottom_depth: {
+    bottom_depth: {
       label: <>Bottom Depth</>,
       value: 10,
       unit: <></>
     },
-    OM_pct: {
+    om_pct: {
       label: <>Organic Matter</>,
       value: 0.004,
       unit: <>fraction</>
     },
-    NO3: {
+    no3: {
       label: <>Nitrate</>,
       value: 5,
       unit: <>ug/cm3 (ppm)</>
     },
-    NH4: {
+    nh4: {
       label: <>Ammonia</>,
       value: 1,
       unit: <>ug/cm3 (ppm)</>
     },
-    HnNew: {
+    hnnew: {
       label: <>Soil Metric Potential</>,
       value: -100,
       unit: <></>
     },
-    Tmpr: {
+    tmpr: {
       label: <>Soil temperature</>,
       value: 23,
       unit: <>C</>
     },
-    Sand: {
+    sand: {
       label: <>Sand Fraction</>,
       value: 55,
       unit: <>%</>
     },
-    Silt: {
+    silt: {
       label: <>Silt Fraction</>,
       value: 35,
       unit: <>%</>
     },
-    Clay: {
+    clay: {
       label: <>Clay Fraction</>,
       value: 10,
       unit: <>%</>
     },
-    BD: {
+    bd: {
       label: <>Bulk Density of Soil in Horizon</>,
       value: 1.3,
       unit: <>g/c<sup>3</sup></>
     },
-    TH33: {
+    th33: {
       label: <>Soil Water Content at Capillary Pressure of 330 cm</>,
       value: 0.34,
       unit: <>cm<sup>3</sup>/cm<sup>3</sup></>
     },
-    TH1500: {
+    th1500: {
       label: <>Soil Water Content at Capillary Pressure of 1500 cm</>,
       value: 0.05,
       unit: <>cm<sup>3</sup>/cm<sup>3</sup></>
@@ -349,7 +349,7 @@ let initialState = {
       value: 0.39,
       unit: <>cm<sup>3</sup>/cm<sup>3</sup></>
     },
-    Alfa: {
+    alfa: {
       label: <>slope in van Genuchten's equation</>,
       value: 0.003,
       unit: <></>
@@ -359,12 +359,12 @@ let initialState = {
       value: 1.2,
       unit: <></>
     },
-    Ks: {
+    ks: {
       label: <>Saturated Hydraulic Conductivity</>,
       value: 12,
       unit: <>cm/day</>
     },
-    Kk: {
+    kk: {
       label: <>Saturated Hydraulic Conductivity for alternanative version of van Genuchten's equation that allows for representing saturated hydrualic conductivity when the soil is near saturation</>,
       value: 12,
       unit: <>cm/day</>
@@ -414,7 +414,7 @@ let initialState = {
       value: 10,
       unit: <></>
     },
-    rL: {
+    rl: {
       label: <>C/N ratio of plant residues</>,
       value: 50,
       unit: <></>
@@ -568,7 +568,7 @@ const fetchSSURGOWater = (state) => {
 
   state.gotSSURGO = false;
 
-  const url = `https://api.precisionsustainableag.org/ssurgo?lat=${lat}&lon=${lon}&component=major`;
+  const url = `https://ssurgo.covercrop-data.org/?lat=${lat}&lon=${lon}&component=major`;
 
   api({
     url,
