@@ -32,7 +32,7 @@ const About = () => {
       <ul>
         <li>Local soil properties (organic matter and bulk density) from the NRCS' Soil Survey Geographic database (<a target="_blank" rel="noreferrer" href="https://ssurgo.covercrop-data.org/">SSURGO</a>),</li>
         <li>Daily soil moisture and soil temperature from <a target="_blank" rel="noreferrer" href="https://docs.clearag.com/documentation/Soil_Conditions/Soil_Conditions/latest">Iteris</a>, and</li>
-        <li>Hourly weather (air relative humidity, air temperature, and rain) data from a <a target="_blank" rel="noreferrer" href="https://api.precisionsustainableag.org/weather">weather API</a> to estimate surface residue environmental conditions.</li>
+        <li>Hourly weather (air relative humidity, air temperature, and rain) data from a <a target="_blank" rel="noreferrer" href="https://weather.covercrop-data.org/">weather API</a> to estimate surface residue environmental conditions.</li>
       </ul>
 
       <p>At a minimum, users need to provide:</p>
