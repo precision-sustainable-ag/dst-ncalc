@@ -17,6 +17,7 @@ if (/water/i.test(window.location)) {
   screens.about       = require('./water/About').default;
   screens.location    = require('./shared/Location').default;
   screens.soil        = require('./water/Soil').default;
+  screens.inputs      = require('./water/Inputs').default;
   screens.worksheet   = require('./water/Worksheet').default;
 } else {
   screens.init        = require('./ncalc/Init').default;
@@ -137,5 +138,7 @@ const App = () => {
     </div>
   );
 } // App
+
+document.title = window.location.toString().includes('water') ? 'Water DST': 'CC-NCALC';
 
 export default App;

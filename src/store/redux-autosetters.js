@@ -1,4 +1,5 @@
 import {configureStore, createAction, createReducer} from '@reduxjs/toolkit';
+import axios from 'axios';
 
 export const set = {};
 export const get = {};
@@ -104,19 +105,18 @@ export const createStore = (initialState, {afterChange={}, reducers={}}) => {
     }
 
     builder.addCase(createAction('api'), (state, {payload}) => {
-      fetch(payload.url)
-        .then(response => response.json())
+      const method = payload.options.method || 'get';
+
+      axios[method](payload.url, payload.options)
         .then(data => {
           if (typeof payload.callback === 'function') {
-            payload.callback(data);
-          // } else if (payload.callback in state) {  // state is no longer applicable here
-          //   state[payload.callback] = data;
+            payload.callback(data.data);
           } else {
             alert('Error: ' + JSON.stringify(payload, null, 2));
           }
         })
         .catch(error => {
-          console.error('Error:', error);
+          console.log('api error: ', error);
         });
     });
 

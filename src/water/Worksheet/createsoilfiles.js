@@ -1,13 +1,16 @@
 import {dataTable} from './utilities';
-import axios from 'axios';
+import {rosetta} from '../../store/Store';
 
 let site = 'run_01';  // TODO
-let soilFile = 'soil.soi';  // TODO
+let soilFile = 'meadir_run_01.dat';  // TODO
 
 // ____________________________________________________________________________________________________________________________________
 const createSoilFiles = (files) => {
   const fs = { // TODO
-    writeFileSync: (path, s) => files[path] = s
+    writeFileSync: (path, s) => {
+      console.log(path);
+      files[path] = s;
+    }
   }
 
   const readFile = (path, removeQuotes) => {
@@ -271,6 +274,7 @@ const createSoilFiles = (files) => {
   // Creates a table to hold the grid data and fills it with data from the file.
   const ParseGridFile = (GridFile) => {
     const data = readFile(GridFile);
+    // eslint-disable-next-line no-unused-vars
     const [_, node, element] = data[2];
 
     const dtNode = dataTable(data.slice(4, node + 4), [
@@ -585,8 +589,6 @@ const createSoilFiles = (files) => {
     // This code will create the input file.
     // Get depth of profile
 
-    const myField = dtLayers[MatNum - 1];
-
     // Do first layer for testing
     const Layer = dtLayers[0];
     const Layer1 = Layer[0];
@@ -746,50 +748,10 @@ const createSoilFiles = (files) => {
     const SoilFile = soilFile.replace('.soi', '.dat');  // arg('/SN') ? arg('/SN') + '.dat' : '';
     CreateSoilFile(dtLayers, SoilFile);
     
-    console.time('Rosetta time');
+    // console.time('Rosetta time');
     const soildata = readFile(SoilFile).slice(1);
 
-    const rosettaData = soildata.map(row => {
-      row = [...row];
-      row.splice(0, 1);  // remove Matnum
-      row.splice(4, 1);  // remove om
-      row.splice(6, 1);  // remove 'w'
-      row[0] *= 100;     // sand
-      row[1] *= 100;     // silt
-      row[2] *= 100;     // clay
-      delete row.org;
-      return row;
-    });
-    console.log(rosettaData);
-    axios
-      .post(`https://www.handbook60.org/api/v1/rosetta/1`, {
-        soildata: rosettaData,
-      })
-      .then(data => {
-        let s = '           *** Material information ****                                                                   g/g  \r\n';
-        s += '   thr       ths         tha       th      Alfa      n        Ks         Kk       thk       BulkD     OM    Sand    Silt    InitType\r\n';
-
-        data.data.van_genuchten_params.forEach((d, i) => {
-          let [theta_r, theta_s, alpha, npar, ksat] = d;
-
-          alpha = 10 ** alpha;
-          npar  = 10 ** npar;
-          ksat  = 10 ** ksat;
-
-          // eslint-disable-next-line no-unused-vars
-          const [Matnum, sand, silt, clay, bd, om, TH33, TH1500, inittype] = soildata[i];
-
-          s += `    ${theta_r.toFixed(3)}    ${theta_s.toFixed(3)}    ${theta_r.toFixed(3)}    ${theta_s.toFixed(3)}    ${alpha.toFixed(5)}    ${npar.toFixed(5)}    ${ksat.toFixed(3)}    ${ksat.toFixed(3)}    ${theta_s.toFixed(3)}    ${bd.toFixed(2)} ${om.toFixed(5)}    ${sand.toFixed(2)}    ${silt.toFixed(2)}   ${inittype}\r\n`;
-        });
-
-        fs.writeFileSync(`${SoilFile.replace('dat', 'soi')}`, s);
-        console.timeEnd('Rosetta time');
-        console.timeEnd('Total time');
-      })
-      .catch(error => {
-        console.error(error);
-      }
-    );
+    rosetta(soildata);
   };
 } // createSoilFiles
 

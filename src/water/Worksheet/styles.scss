@@ -35,4 +35,16 @@
     margin: 0;
     border-top: 1px solid #aaa;
   }
+
+  .match summary {
+    background: lightgreen !important;
+  }
+  
+  .mismatch summary {
+    background: orange !important;
+  }
+  
+  .missing summary {
+    background: red !important;
+  }  
 }
