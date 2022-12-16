@@ -15,9 +15,9 @@ const Init = () => {
     if (!xl.Description.length) {
       fetch('AGMIPET2Sim.xlsx')
       // fetch('kansas.xlsx')
-        .then(response => response.arrayBuffer())
-        .then(data => {
-          const wb = XLSX.read(data, {type: 'binary'});
+        .then((response) => response.arrayBuffer())
+        .then((data) => {
+          const wb = XLSX.read(data, { type: 'binary' });
 
           dispatch(set.data(wb));
 

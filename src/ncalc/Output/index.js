@@ -1,3 +1,5 @@
+/* eslint-disable react/no-this-in-sfc */
+/* eslint-disable max-len */
 import React, { useEffect } from 'react';
 import Highcharts from 'highcharts';
 import HighchartsReact from 'highcharts-react-official';
@@ -114,9 +116,9 @@ const Output = () => {
     );
   }
 
-  console.log({
-    gotModel, cornN, model, biomass, N, carb, cell, lign, lwc, BD, InorganicN,
-  });
+  // console.log({
+  //   gotModel, cornN, model, biomass, N, carb, cell, lign, lwc, BD, InorganicN,
+  // });
 
   if (!gotModel || !cornN) {
     return (
@@ -146,12 +148,12 @@ const Output = () => {
     }
   });
 
-  console.log(model.s);
+  // console.log(model.s);
 
   const total = +carb + +cell + +lign;
-  carb = carb * 100 / total;
-  cell = cell * 100 / total;
-  lign = lign * 100 / total;
+  carb = (carb * 100) / total;
+  cell = (cell * 100) / total;
+  lign = (lign * 100) / total;
   const factor = unit === 'lb/ac' ? 1.12085 : 1;
 
   const d1 = new Date(plantingDate);
@@ -173,7 +175,7 @@ const Output = () => {
         NUptake.push([
           // d1 - (1000 * 60 * 60 * 24),
           +d1,
-          (Yield * 1.09) / (1 + Math.exp((-0.00615 * (gdd - 646.19)))) * f,
+          ((Yield * 1.09) / (1 + Math.exp((-0.00615 * (gdd - 646.19))))) * f,
         ]);
         dailyTotal = 0;
       }
@@ -254,9 +256,9 @@ const Output = () => {
     });
   }
 
-  const max = outputN === 1 ? (biomass * N) / 100 : Math.max.apply(Math, surfaceData.map((d) => d.y));
-  const surfaceMin = outputN === 1 ? (biomass * N) / 100 : Math.min.apply(Math, surfaceData.map((d) => d.y));
-  const incorporatedMin = outputN === 1 ? (biomass * N) / 100 : Math.min.apply(Math, incorporatedData.map((d) => d.y));
+  const max = outputN === 1 ? (biomass * N) / 100 : Math.max(...surfaceData.map((d) => d.y));
+  const surfaceMin = outputN === 1 ? (biomass * N) / 100 : Math.min(...surfaceData.map((d) => d.y));
+  const incorporatedMin = outputN === 1 ? (biomass * N) / 100 : Math.min(...incorporatedData.map((d) => d.y));
 
   const minDate = new Date(killDate);
 
@@ -277,6 +279,41 @@ const Output = () => {
     },
   });
 
+  let titleText;
+  if (mockup === 2) {
+    if (outputN === 1 && doCornN) {
+      titleText = '<div class="caption">Cover crop N released and Corn N uptake over time.</div>';
+    } else if (outputN === 1) {
+      titleText = '<div class="caption">Cover crop N released over time.</div>';
+    } else {
+      titleText = '<div class="caption">Undecomposed cover crop residue mass<br/>remaining over time following its termination.</div>';
+    }
+  } else {
+    titleText = '';
+  }
+
+  let yAxisTitle;
+  if (outputN === 1 && doCornN) {
+    yAxisTitle = `Cover Crop N Released (${unit})<br><div style="color: orange;">Corn N uptake (${unit})</div>`;
+  } else if (outputN === 1) {
+    yAxisTitle = `Cover Crop N Released (${unit})`;
+  } else {
+    yAxisTitle = `Residue Remaining (${unit})`;
+  }
+
+  let xAxisTitle;
+  if (mockup === 1) {
+    if (outputN === 1 && doCornN) {
+      xAxisTitle = '<div class="caption">Cover crop N released and Corn N uptake over time.</div>';
+    } else if (outputN === 1) {
+      xAxisTitle = '<div class="caption">Cover crop N released over time.</div>';
+    } else {
+      xAxisTitle = '<div class="caption">Undecomposed cover crop residue mass remaining over time following its termination.</div>';
+    }
+  } else {
+    xAxisTitle = '';
+  }
+
   const options = {
     chart: {
       height: 405,
@@ -291,7 +328,7 @@ const Output = () => {
       useHTML: true,
       formatter() {
         const week = Math.floor((this.x - minDate) / (24 * 3600 * 1000) / 7);
-        const maxNUptake = Math.max.apply(Math, NUptake.map((n) => n[1]));
+        const maxNUptake = Math.max(...NUptake.map((n) => n[1]));
 
         return this.points.reduce((s, point) => {
           if (point.series.name === 'Corn N uptake') {
@@ -303,11 +340,7 @@ const Output = () => {
       },
     },
     title: {
-      text: mockup === 2 ? (
-        outputN === 1 && doCornN ? '<div class="caption">Cover crop N released and Corn N uptake over time.</div>'
-          : outputN === 1 ? '<div class="caption">Cover crop N released over time.</div>'
-            : '<div class="caption">Undecomposed cover crop residue mass<br/>remaining over time following its termination.</div>'
-      ) : '',
+      text: titleText,
     },
     series: [
       {
@@ -340,9 +373,7 @@ const Output = () => {
     yAxis: [
       {
         title: {
-          text: outputN === 1 && doCornN ? `Cover Crop N Released (${unit})<br><div style="color: orange;">Corn N uptake (${unit})</div>`
-            : outputN === 1 ? `Cover Crop N Released (${unit})`
-              : `Residue Remaining (${unit})`,
+          text: yAxisTitle,
           style: {
             fontSize: '14px',
             fontWeight: 'bold',
@@ -388,11 +419,7 @@ const Output = () => {
       {
         type: 'datetime',
         title: {
-          text: mockup === 1 ? (
-            outputN === 1 && doCornN ? '<div class="caption">Cover crop N released and Corn N uptake over time.</div>'
-              : outputN === 1 ? '<div class="caption">Cover crop N released over time.</div>'
-                : '<div class="caption">Undecomposed cover crop residue mass remaining over time following its termination.</div>'
-          ) : '',
+          text: xAxisTitle,
         },
         crosshair: {
           color: '#7b3294',
@@ -594,7 +621,7 @@ const Output = () => {
 
   const cols = ['FOM', 'Carb', 'Cell', 'Lign', 'FON', 'CarbN', 'CellN', 'LigninN', 'RMTFAC', 'CNRF', 'ContactFactor', 'Rain', 'Temp', 'RH', 'Air_MPa', 'LitterMPa'];
 
-  const csv = `Date,${cols}\n${dates.map((date, i) => `${date},${cols.map((col) => model.s[col][i])}`).join('\n')}`;
+  const csv = `Date,${cols}\n${dates.map((dt, i) => `${dt},${cols.map((col) => model.s[col][i])}`).join('\n')}`;
 
   const summary = (
     <div className="inputs" style={{ borderTop: mockup === 1 ? '1px solid #bbb' : 'none', paddingTop: mockup === 1 ? '1em' : 'none' }}>
@@ -650,12 +677,14 @@ const Output = () => {
         <div style={{ display: 'none' }}>
           Mockup: &nbsp;
           <button
+            type="button"
             className={mockup === 1 ? 'selected' : ''}
             onClick={() => dispatch(set.mockup(1))}
           >
             1
           </button>
           <button
+            type="button"
             className={mockup === 2 ? 'selected' : ''}
             onClick={() => dispatch(set.mockup(2))}
           >
@@ -765,6 +794,7 @@ const Output = () => {
               <td>
                 <div className="output center" style={{ marginBottom: '1em' }}>
                   <button
+                    type="button"
                     className={outputN === 1 ? 'selected' : ''}
                     onClick={() => dispatch(set.outputN(1))}
                   >
@@ -772,6 +802,7 @@ const Output = () => {
                   </button>
 
                   <button
+                    type="button"
                     className={outputN === 2 ? 'selected' : ''}
                     onClick={() => dispatch(set.outputN(2))}
                   >

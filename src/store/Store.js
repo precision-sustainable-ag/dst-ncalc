@@ -1,3 +1,9 @@
+// // code breaking eslint rules were disabled --- MILAD
+/* eslint-disable no-alert */
+/* eslint-disable camelcase */
+/* eslint-disable max-len */
+/* eslint-disable no-use-before-define */
+import React from 'react';
 import moment from 'moment';
 import { createStore, set } from './redux-autosetters';
 
@@ -96,26 +102,38 @@ const initialState = {
     es: {
       value: 0.06,
       unit: <>fraction</>,
-      description: <>Relative effect of moisture when the soil is saturated</>
+      description: <>Relative effect of moisture when the soil is saturated</>,
     },
     tb: {
       value: 25,
       unit: <>C</>,
-      description: <>Base temperature at which eT =1</>
+      description: <>Base temperature at which eT =1</>,
     },
     dthh: {
       value: 0.1,
-      unit: <>cm<sup>3</sup>/cm<sup>3</sup></>,
+      unit:
+  <>
+    cm
+    <sup>3</sup>
+    /cm
+    <sup>3</sup>
+  </>,
       description: <>The highest volumetric water content for which the process is optimal</>,
     },
     dthl: {
       value: 0.08,
-      unit: <>cm<sup>3</sup>/cm<sup>3</sup></>,
+      unit:
+  <>
+    cm
+    <sup>3</sup>
+    /cm
+    <sup>3</sup>
+  </>,
       description: <>The lowest volumetric water content for which the process is optimal</>,
     },
     th_m: {
       value: 1,
-      description: <>Exponent in dependencies of e(theta) on theta (water content)</>
+      description: <>Exponent in dependencies of e(theta) on theta (water content)</>,
     },
     qt: {
       value: 3,
@@ -123,19 +141,25 @@ const initialState = {
     },
     dthd: {
       value: 0.1,
-      unit: <>cm<sup>3</sup>/cm<sup>3</sup></>,
+      unit:
+  <>
+    cm
+    <sup>3</sup>
+    /cm
+    <sup>3</sup>
+  </>,
       description: <>Threshold water content below which no denitrification occurs</>,
     },
     th_d: {
       value: 2,
-      description: <>Exponent in dependencies of e(d) on theta (water content)</>
+      description: <>Exponent in dependencies of e(d) on theta (water content)</>,
     },
   },
   Climate: {
     dailybulb: {
       value: 'Daily',
       options: ['Daily', 'Hourly'],
-      description: <>Switch to indicate if daily or hourly wet bulb temperatures are available.</>
+      description: <>Switch to indicate if daily or hourly wet bulb temperatures are available.</>,
     },
     dailywind: {
       value: 1,
@@ -218,7 +242,11 @@ const initialState = {
     sr1: {
       label: <>Surface nodes spacing ratio</>,
       value: 1.001,
-      description: <>Determines how spacing changes with increasing depth. The closer to 1 this number (but must be always &gt;1) the more uniform the node spacing</>
+      description:
+  <>
+    Determines how spacing changes with increasing depth. The closer to 1
+    this number (but must be always &gt;1) the more uniform the node spacing
+  </>,
     },
     ir1: {
       label: <>Interior nodes spacing ratio</>,
@@ -227,27 +255,27 @@ const initialState = {
     sr2: {
       label: <>Surface nodes  mininimum distance</>,
       value: 1.001,
-      description: <>initial distance between vertical nodes from the surface to the first layer</>
+      description: <>initial distance between vertical nodes from the surface to the first layer</>,
     },
     ir2: {
       label: <>Interior nodes minimum distance</>,
       value: 3,
-      description: <>initial distance between vertical nodes at a boundary</>
+      description: <>initial distance between vertical nodes at a boundary</>,
     },
     plantingdepth: {
       label: <>depth of seed</>,
       value: 5,
-      unit: 'cm'
+      unit: 'cm',
     },
     xlimitroot: {
       label: <>maximum initial rooting depth at emergence (for potato)</>,
       value: 23,
-      unit: 'cm'
+      unit: 'cm',
     },
     bottombc: {
       label: <>Bottom Boundary condition</>,
       value: '1 constant',
-      options: ['1 constant', '-2 seepage face', '-7 unit hydraulic gradient drainage']
+      options: ['1 constant', '-2 seepage face', '-7 unit hydraulic gradient drainage'],
     },
     gasbctop: {
       value: -4,
@@ -261,187 +289,289 @@ const initialState = {
   },
   Irrigation: { // Irrig
     date: {
-      value: undefined
+      value: undefined,
     },
     amount: {
-      value: undefined
+      value: undefined,
     },
   },
   Soil: {
     bottom_depth: {
       label: <>Bottom Depth</>,
       value: 10,
-      unit: <></>
+      unit: <div />,
     },
     om_pct: {
       label: <>Organic Matter</>,
       value: 0.004,
-      unit: <>fraction</>
+      unit: <>fraction</>,
     },
     no3: {
       label: <>Nitrate</>,
       value: 5,
-      unit: <>ug/cm3 (ppm)</>
+      unit: <>ug/cm3 (ppm)</>,
     },
     nh4: {
       label: <>Ammonia</>,
       value: 1,
-      unit: <>ug/cm3 (ppm)</>
+      unit: <>ug/cm3 (ppm)</>,
     },
     hnnew: {
       label: <>Soil Metric Potential</>,
       value: -100,
-      unit: <></>
+      unit: <div />,
     },
     tmpr: {
       label: <>Soil temperature</>,
       value: 23,
-      unit: <>C</>
+      unit: <>C</>,
     },
     sand: {
       label: <>Sand Fraction</>,
       value: 55,
-      unit: <>%</>
+      unit: <>%</>,
     },
     silt: {
       label: <>Silt Fraction</>,
       value: 35,
-      unit: <>%</>
+      unit: <>%</>,
     },
     clay: {
       label: <>Clay Fraction</>,
       value: 10,
-      unit: <>%</>
+      unit: <>%</>,
     },
     bd: {
       label: <>Bulk Density of Soil in Horizon</>,
       value: 1.3,
-      unit: <>g/c<sup>3</sup></>
+      unit:
+  <>
+    g/c
+    <sup>3</sup>
+  </>,
     },
     th33: {
       label: <>Soil Water Content at Capillary Pressure of 330 cm</>,
       value: 0.34,
-      unit: <>cm<sup>3</sup>/cm<sup>3</sup></>
+      unit:
+  <>
+    cm
+    <sup>3</sup>
+    /cm
+    <sup>3</sup>
+  </>,
     },
     th1500: {
       label: <>Soil Water Content at Capillary Pressure of 1500 cm</>,
       value: 0.05,
-      unit: <>cm<sup>3</sup>/cm<sup>3</sup></>
+      unit:
+  <>
+    cm
+    <sup>3</sup>
+    /cm
+    <sup>3</sup>
+  </>,
     },
     thr: {
       label: <>Residual Soil Water Content</>,
       value: 0.02,
-      unit: <>cm<sup>3</sup>/cm<sup>3</sup></>
+      unit:
+  <>
+    cm
+    <sup>3</sup>
+    /cm
+    <sup>3</sup>
+  </>,
     },
     ths: {
       label: <>Saturated Soil Water Content</>,
       value: 0.39,
-      unit: <>cm<sup>3</sup>/cm<sup>3</sup></>
+      unit:
+  <>
+    cm
+    <sup>3</sup>
+    /cm
+    <sup>3</sup>
+  </>,
     },
     tha: {
       label: <>Residual Soil Water content</>,
       value: 0.02,
-      unit: <>cm<sup>3</sup>/cm<sup>3</sup></>
+      unit:
+  <>
+    cm
+    <sup>3</sup>
+    /cm
+    <sup>3</sup>
+  </>,
     },
     th: {
       label: <>Saturated Volumetric Soil Water Content</>,
       value: 0.39,
-      unit: <>cm<sup>3</sup>/cm<sup>3</sup></>
+      unit:
+  <>
+    cm
+    <sup>3</sup>
+    /cm
+    <sup>3</sup>
+  </>,
     },
     alfa: {
-      label: <>slope in van Genuchten's equation</>,
+      label: <>slope in van Genuchten`&apos;`s equation</>,
       value: 0.003,
-      unit: <></>
+      unit: <div />,
     },
     n: {
       label: <>Measure of the Pore-Size Distribution</>,
       value: 1.2,
-      unit: <></>
+      unit: <div />,
     },
     ks: {
       label: <>Saturated Hydraulic Conductivity</>,
       value: 12,
-      unit: <>cm/day</>
+      unit: <>cm/day</>,
     },
     kk: {
-      label: <>Saturated Hydraulic Conductivity for alternanative version of van Genuchten's equation that allows for representing saturated hydrualic conductivity when the soil is near saturation</>,
+      label:
+  <>
+    Saturated Hydraulic Conductivity for alternanative version of van Genuchten`&apos;`s
+    equation that allows for representing saturated hydrualic conductivity when the soil is near saturation
+  </>,
       value: 12,
-      unit: <>cm/day</>
+      unit: <>cm/day</>,
     },
     thk: {
       label: <>Near saturated volumetric water content where Kk is used</>,
       value: 0.39,
-      unit: <>cm<sup>3</sup>/cm<sup>3</sup></>
+      unit:
+  <>
+    cm
+    <sup>3</sup>
+    /cm
+    <sup>3</sup>
+  </>,
     },
     kh: {
-      label: <>Potential mineralization rate fro the stable humus pool, day<sup>-1</sup></>,
+      label:
+  <>
+    Potential mineralization rate fro the stable humus pool, day
+    <sup>-1</sup>
+  </>,
       value: 0.00007,
-      unit: <>day<sup>-1</sup></>
+      unit:
+  <>
+    day
+    <sup>-1</sup>
+  </>,
     },
     kL: {
-      label: <>Potential plant residue decomposition rate, day<sup>-1</sup></>,
+      label:
+  <>
+    Potential plant residue decomposition rate, day
+    <sup>-1</sup>
+  </>,
       value: 0.035,
-      unit: <>day<sup>-1</sup></>
+      unit:
+  <>
+    day
+    <sup>-1</sup>
+  </>,
     },
     km: {
-      label: <>Potential rate of the organic fertilizer decomposition, day<sup>-1</sup></>,
+      label:
+  <>
+    Potential rate of the organic fertilizer decomposition, day
+    <sup>-1</sup>
+  </>,
       value: 0.07,
-      unit: <>day<sup>-1</sup></>
+      unit:
+  <>
+    day
+    <sup>-1</sup>
+  </>,
     },
     kn: {
-      label: <>Potential rate of nitrification, day<sup>-1</sup></>,
+      label:
+  <>
+    Potential rate of nitrification, day
+    <sup>-1</sup>
+  </>,
       value: 0.02,
-      unit: <>day<sup>-1</sup></>
+      unit:
+  <>
+    day
+    <sup>-1</sup>
+  </>,
     },
     kd: {
-      label: <>Potential rate of denitrification, mg L<sup>-1</sup> day<sup>-1</sup></>,
+      label:
+  <>
+    Potential rate of denitrification, mg L
+    <sup>-1</sup>
+    {' '}
+    day
+    <sup>-1</sup>
+  </>,
       value: 0.00001,
-      unit: <>day<sup>-1</sup></>
+      unit:
+  <>
+    day
+    <sup>-1</sup>
+  </>,
     },
     fe: {
       label: <>Microbial synthesis efficiency</>,
       value: 0.6,
-      unit: <></>
+      unit: <div />,
     },
     fh: {
       label: <>Humification fraction</>,
       value: 0.2,
-      unit: <></>
+      unit: <div />,
     },
     r0: {
       label: <>C/N ratio of the decomposer biomass and humification products</>,
       value: 10,
-      unit: <></>
+      unit: <div />,
     },
     rl: {
       label: <>C/N ratio of plant residues</>,
       value: 50,
-      unit: <></>
+      unit: <div />,
     },
     rm: {
       label: <>C/N ratio of the organic fertilizer</>,
       value: 10,
-      unit: <></>
+      unit: <div />,
     },
     fa: {
       label: <>Fraction of the mineral nitrogen available for immobilization</>,
       value: 0.1,
-      unit: <></>
+      unit: <div />,
     },
     nq: {
       label: <>Ratio of the mineral nitrate amount to the mineral ammonium amount characteristic to the particular soil material</>,
       value: 8,
-      unit: <></>
+      unit: <div />,
     },
     cs: {
-      label: <>Michaelis-Menten constant of denitrification, mg L<sup>-1</sup></>,
+      label:
+  <>
+    Michaelis-Menten constant of denitrification, mg L
+    <sup>-1</sup>
+  </>,
       value: 0.00001,
-      unit: <>mg L<sup>-1</sup></>
+      unit:
+  <>
+    mg L
+    <sup>-1</sup>
+  </>,
     },
 
-  }
+  },
 };
 
+// const api;
 const fetchSSURGOWater = (state) => {
   const { lat, lon } = state;
 
@@ -453,7 +583,7 @@ const fetchSSURGOWater = (state) => {
     url,
     callback: (data) => {
       if (data.ERROR) {
-        console.log(`No SSURGO data at ${lat}, ${lon}`);
+        // console.log(`No SSURGO data at ${lat}, ${lon}`);
         store.dispatch(set.BD(''));
         store.dispatch(set.OM(''));
       } else {
@@ -517,7 +647,10 @@ export const fetchModel = () => {
   store.dispatch(set.errorModel(false));
 
   let {
-    lat, lon, N, biomass, lwc, carb, cell, lign, OM, BD, InorganicN, unit,
+    biomass, lwc, carb, cell, lign, InorganicN,
+  } = state;
+  const {
+    lat, lon, N, OM, BD, unit,
   } = state;
   // console.log({lat, lon, N, biomass, lwc, carb, cell, lign, OM, BD, InorganicN, unit});
 
@@ -525,7 +658,7 @@ export const fetchModel = () => {
   const end = moment(state.plantingDate).add(110, 'days').add(1, 'hour').format('yyyy-MM-DD');
   const validDates = start !== 'Invalid date' && end !== 'Invalid date' && end > start;
 
-  console.log({ start, end }, state.killDate, validDates);
+  // console.log({ start, end }, state.killDate, validDates);
 
   if (validDates) {
     const pmn = 10;
@@ -538,9 +671,9 @@ export const fetchModel = () => {
     lign = lign || (100 - (carb + cell));
 
     const total = +carb + +cell + +lign;
-    carb = carb * 100 / total;
-    cell = cell * 100 / total;
-    lign = lign * 100 / total;
+    carb = (carb * 100) / total;
+    cell = (cell * 100) / total;
+    lign = (lign * 100) / total;
 
     const factor = unit === 'lb/ac' ? 1.12085 : 1;
 
@@ -557,10 +690,10 @@ export const fetchModel = () => {
         }
 
         const modelSurface = {};
-        data.surface.forEach((data) => {
-          Object.keys(data).forEach((key) => {
+        data.surface.forEach((ddata) => {
+          Object.keys(ddata).forEach((key) => {
             modelSurface[key] = modelSurface[key] || [];
-            modelSurface[key].push(data[key]);
+            modelSurface[key].push(ddata[key]);
           });
         });
 
@@ -579,8 +712,8 @@ export const fetchModel = () => {
 
         store.dispatch(set.model(model));
         store.dispatch(set.gotModel(true));
-        console.log('model');
-        console.log(data);
+        // console.log('model');
+        // console.log(data);
 
         fetchCornN(store.getState());
       },
@@ -601,14 +734,14 @@ const fetchSSURGO = (state) => {
     url,
     callback: (data) => {
       if (data.ERROR) {
-        console.log(`No SSURGO data at ${lat}, ${lon}`);
+        // console.log(`No SSURGO data at ${lat}, ${lon}`);
         store.dispatch(set.BD(''));
         store.dispatch(set.OM(''));
       } else {
         data = data.filter((d) => d.desgnmaster !== 'O');
-        const minhzdept = Math.min.apply(Math, data.map((d) => d.hzdept_r));
+        // const minhzdept = Math.min.apply(Math, data.map((d) => d.hzdept_r));
+        const minhzdept = Math.min(...data.map((d) => d.hzdept_r));
         data = data.filter((d) => +d.hzdept_r === +minhzdept);
-
         store.dispatch(set.BD(weightedAverage(data, 'dbthirdbar_r')));
         store.dispatch(set.OM(weightedAverage(data, 'om_r')));
         store.dispatch(set.gotSSURGO(true));
@@ -629,19 +762,18 @@ const fetchCornN = (state) => {
   store.dispatch(set.errorCorn(false));
 
   const url = `https://weather.covercrop-data.org/hourly?lat=${lat}&lon=${lon}&start=${moment(plantingDate).format('yyyy-MM-DD')}&end=${end}&attributes=air_temperature&options=predicted`;
-  
+
   api({
     url,
     callback: (data) => {
       if (data instanceof Array) {
-        console.log('CornN:');
-        console.log(data);
-
+        // console.log('CornN:');
+        // console.log(data);
         store.dispatch(set.cornN(data));
       } else {
-        console.log('CornN error:');
-        console.log(url);
-        console.log(data);
+        // console.log('CornN error:');
+        // console.log(url);
+        // console.log(data);
         store.dispatch(set.errorCorn(true));
       }
     },
@@ -663,6 +795,7 @@ export const missingData = () => {
         result = scr;
         return true;
       }
+      return null;
     }; // test
 
     if (killDate - plantingDate > 1814400000) {
@@ -689,6 +822,7 @@ export const missingData = () => {
     if (test('BD', BD, 'soil', 'Please enter Bulk Density')) return result;
     if (test('InorganicN', InorganicN, 'soil', 'Please enter Soil Inorganic N')) return result;
   }
+  return null;
 }; // missingData
 
 export const rosetta = (soildata) => {
@@ -716,7 +850,8 @@ export const rosetta = (soildata) => {
       s += '   thr       ths         tha       thm     Alfa      n        Ks         Kk       thk       BulkD     OM    Sand    Silt    InitType\r\n';
 
       data.van_genuchten_params.forEach((d, i) => {
-        let [theta_r, theta_s, alpha, npar, ksat] = d;
+        let [alpha, npar, ksat, theta_s] = d;
+        const [theta_r] = d;
 
         alpha = 10 ** alpha;
         npar = 10 ** npar;
@@ -736,10 +871,10 @@ export const rosetta = (soildata) => {
         }
 
         // if (rosoutput.vgnpar < 2.0 && rosoutput.vgnpar > 1 && count === 1) {
-        // 	vgthm = rosoutput.vgths;
-        // 	vgths = rosoutput.vgths - 0.002;
-        // 	vgthk = rosoutput.vgths - 0.004;
-        // 	vgkk = rosoutput.ks  - (0.10 * rosoutput.ks);
+        //   vgthm = rosoutput.vgths;
+        //   vgths = rosoutput.vgths - 0.002;
+        //   vgthk = rosoutput.vgths - 0.004;
+        //   vgkk = rosoutput.ks  - (0.10 * rosoutput.ks);
         // }
 
         // Heading    JS var    C++ var
@@ -764,7 +899,7 @@ export const rosetta = (soildata) => {
 
       const state = store.getState();
       store.dispatch(set.soilfiles({ ...state.soilfiles, 'meadir_run_01.soi': s }));
-      console.log('ok');
+      // console.log('ok');
     },
   });
 }; // rosetta
@@ -789,7 +924,7 @@ export const api = ({
   }
 
   api[timer] = setTimeout(() => {
-    console.log(url);
+    // console.log(url);
     store.dispatch({
       type: 'api',
       payload: {
