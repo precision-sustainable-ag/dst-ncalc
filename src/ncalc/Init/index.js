@@ -81,13 +81,14 @@ const Init = () => {
   }, [dispatch]);
 
   const loadField = (fieldVal) => {
+    console.log('localStorage', localStorage);
     if (fieldVal === 'Example: Grass') {
       navigate('location');
       dispatch(set.edited(true));
       dispatch(set.lat(32.865389));
       dispatch(set.lon(-82.258361));
       dispatch(set.location('Example'));
-      dispatch(set.fieldVal('Example: Grass'));
+      dispatch(set.field('Example: Grass'));
       dispatch(set.OM(0.75));
       dispatch(set.BD(1.62));
       dispatch(set.InorganicN(10));
@@ -109,7 +110,7 @@ const Init = () => {
       dispatch(set.lat(32.865389));
       dispatch(set.lon(-82.258361));
       dispatch(set.location('Example'));
-      dispatch(set.fieldVal('Example: Legume'));
+      dispatch(set.field('Example: Legume'));
       dispatch(set.OM(0.75));
       dispatch(set.BD(1.62));
       dispatch(set.InorganicN(10));
@@ -126,7 +127,7 @@ const Init = () => {
       dispatch(set.yield(150));
       dispatch(set.targetN(100));
     } else {
-      const inputs = JSON.parse(localStorage[fieldVal]);
+      const inputs = JSON.parse(localStorage[field]);
       Object.keys(inputs).forEach((key) => {
         try {
           if (/Date/.test(key)) {
@@ -171,58 +172,6 @@ const Init = () => {
     }
   }; // changeField
 
-  let PSArender;
-  if (PSA) {
-    PSArender = (
-      <select
-        className="fields"
-        onChange={changePSA}
-        value={field}
-      >
-        <option />
-        <optgroup label="PSA">
-          {
-          Object.keys(examples)
-            .filter((site) => examples[site].category === 'PSA')
-            .sort().map((site) => <option key={site}>{site}</option>)
-        }
-        </optgroup>
-        <optgroup label="Resham">
-          {
-          Object.keys(examples)
-            .filter((site) => examples[site].category === 'Resham')
-            .sort().map((site) => <option key={site}>{site}</option>)
-        }
-        </optgroup>
-      </select>
-    );
-  } else {
-    PSArender = (
-      <select
-        className="fields"
-        onChange={changeField}
-        value={field}
-      >
-        <option aria-label="none" />
-        <option>Example: Grass</option>
-        <option>Example: Legume</option>
-        {
-      Object.keys(localStorage).length && (
-        <>
-          <option>Clear previous runs</option>
-          <option disabled>____________________</option>
-        </>
-      )
-    }
-        {
-      Object.keys(localStorage).sort().map((fld, idx) => (
-        <option key={idx} checked={fld === field}>{fld}</option> // eslint-disable-line react/no-unknown-property
-      ))
-    }
-      </select>
-    );
-  }
-
   return (
     <div className="Init">
       {
@@ -233,30 +182,34 @@ const Init = () => {
             onChange={changePSA}
             value={field}
           >
-            <option></option>
+            <option>examples</option>
             <optgroup label="PSA">
               {
                 Object.keys(examples)
-                  .filter(site => examples[site].category === 'PSA')
-                  .sort().map(site => <option key={site}>{site}</option>)
+                  .filter((site) => examples[site].category === 'PSA')
+                  .sort().map((site) => <option key={site}>{site}</option>)
               }
             </optgroup>
             <optgroup label="Resham">
               {
                 Object.keys(examples)
-                  .filter(site => examples[site].category === 'Resham')
-                  .sort().map(site => <option key={site}>{site}</option>)
+                  .filter((site) => examples[site].category === 'Resham')
+                  .sort().map((site) => <option key={site}>{site}</option>)
               }
             </optgroup>
-          </select>)
+          </select>
+        )
       }
-        
-       { (!PSA && Object.keys(localStorage).length) &&
-          (<select className="fields"
+
+      {
+        (!PSA && Object.keys(localStorage).length)
+        && (
+          <select
+            className="fields"
             onChange={changeField}
             value={field}
           >
-            <option></option>
+            <option>examples</option>
             <option>Example: Grass</option>
             <option>Example: Legume</option>
             {
@@ -269,13 +222,14 @@ const Init = () => {
             }
             {
               Object.keys(localStorage).sort().map((fld, idx) => (
-                <option key={idx} checked={fld === field}>{fld}</option>
+                <option key={idx} checked={fld === field}>{fld}</option> // eslint-disable-line react/no-unknown-property
               ))
             }
-          </select>)
+          </select>
+        )
       }
     </div>
-  )
-}
+  );
+};
 
 export default Init;
