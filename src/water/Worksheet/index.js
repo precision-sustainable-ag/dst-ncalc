@@ -1,5 +1,7 @@
-import React, { useEffect } from 'react';
-import { useSelector, useDispatch } from 'react-redux';
+import {useEffect} from 'react';
+import {useSelector, useDispatch} from 'react-redux';
+import JSZip from 'jszip';
+import {saveAs} from 'file-saver';
 
 import { get, set } from '../../store/Store';
 import createSoilFiles from './createsoilfiles';
@@ -779,7 +781,24 @@ const SoilFiles2 = () => {
         Expand all
       </button>
 
-      {Object.keys(files).map((file) => {
+      <button
+        onClick={() => {
+          if (Object.keys(files).length) {
+            const zip = new JSZip();
+            Object.keys(files).forEach(file => {
+              zip.file(file, files[file]);
+            });
+            
+            zip.generateAsync({type: 'blob'}).then((content) => {
+              saveAs(content, 'output.zip');
+            });
+          }
+        }}
+      >
+        Download
+      </button>
+
+      {Object.keys(files).map(file => {
         let cname = '';
 
         if (site === 'run_01') {

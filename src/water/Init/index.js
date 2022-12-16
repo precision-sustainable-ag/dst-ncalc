@@ -14,9 +14,10 @@ const Init = () => {
   useEffect(() => {
     if (!xl.Description.length) {
       fetch('AGMIPET2Sim.xlsx')
-        .then((response) => response.arrayBuffer())
-        .then((data) => {
-          const wb = XLSX.read(data, { type: 'binary' });
+      // fetch('kansas.xlsx')
+        .then(response => response.arrayBuffer())
+        .then(data => {
+          const wb = XLSX.read(data, {type: 'binary'});
 
           dispatch(set.data(wb));
 

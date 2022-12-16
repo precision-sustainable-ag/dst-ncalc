@@ -31,6 +31,7 @@
         "highcharts": "^9.3.1",
         "highcharts-react-official": "^3.0.0",
         "mapbox-gl": "^2.10.0",
+        "file-saver": "^2.0.5",
         "material-ui-autocomplete-google-places": "^2.3.0",
         "moment": "^2.29.4",
         "npm-force-resolutions": "0.0.10",
