@@ -1,7 +1,7 @@
-import {useDispatch, useSelector} from 'react-redux';
-import {get, set} from '../../store/Store';
-import {Link} from 'react-router-dom';
-import {useEffect} from 'react';
+import { useDispatch, useSelector } from 'react-redux';
+import { Link } from 'react-router-dom';
+import React, { useEffect } from 'react';
+import { get, set } from '../../store/Store';
 
 import './styles.scss';
 
@@ -16,7 +16,7 @@ const Home = () => {
   }, [dispatch]);
 
   const className = privacy ? 'home background' : 'home';
-  
+
   return (
     <>
       <div
@@ -28,8 +28,8 @@ const Home = () => {
         <p>This calculator aids farmers with decision support regarding &hellip;</p>
 
         <div>
-          <Link className="link about"    to={'/about'}    >ABOUT</Link>
-          <Link className="link location" to={'/location'} >GET STARTED</Link>
+          <Link className="link about" to="/about">ABOUT</Link>
+          <Link className="link location" to="/location">GET STARTED</Link>
         </div>
 
         <img className="crops fullwidth" src="background.png" alt="" />
@@ -44,7 +44,8 @@ const Home = () => {
           Your privacy
         </button>
         {
-          privacy && 
+          privacy
+          && (
           <div id="PrivacyPolicy">
             <button
               className="close"
@@ -56,10 +57,11 @@ const Home = () => {
             <p>If you enter a fieldname, you can select it from the upper-right drop down list the next time you run the program.</p>
             <p>If you clear your browser's cache, you'll need to re-enter your data the next time you run the program.</p>
           </div>
+          )
         }
       </div>
     </>
-  )
-} // Home
+  );
+}; // Home
 
 export default Home;

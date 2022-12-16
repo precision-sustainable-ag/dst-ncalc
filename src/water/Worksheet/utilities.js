@@ -2,7 +2,7 @@
 // emulate C# DataTable
 const dataTable = (data, columns) => {
   if (!data[0]) {
-    data = Array(data.length).fill().map(e => Array(columns.length).fill(0));
+    data = Array(data.length).fill().map((e) => Array(columns.length).fill(0));
   }
 
   data.forEach((row, i) => {
@@ -13,17 +13,16 @@ const dataTable = (data, columns) => {
           const origMethod = target.splice;
           return function (...args) {
             origMethod.apply(target, args);
-          }
+          };
         }
         if (key in target) {
           return target[key];
-        } else {
-          const idx = columns.indexOf(key);
-          if (idx === -1) {
-            console.error('Error: ' + key + '\n' + columns);
-          }
-          return target[idx];
         }
+        const idx = columns.indexOf(key);
+        if (idx === -1) {
+          console.error(`Error: ${key}\n${columns}`);
+        }
+        return target[idx];
       },
       set(target, key, value) {
         if (Number.isFinite(+key)) {
@@ -31,12 +30,12 @@ const dataTable = (data, columns) => {
         } else {
           const idx = columns.indexOf(key);
           if (idx === -1) {
-            console.error('Error: ' + key + '\n' + columns);
+            console.error(`Error: ${key}\n${columns}`);
           }
           target[idx] = value;
         }
         return true; // prevent "'set' on proxy: trap returned falsish for property ..."
-      }
+      },
     });
   });
 
@@ -44,13 +43,13 @@ const dataTable = (data, columns) => {
 
   data.remove = (column) => {
     const idx = columns.indexOf(column);
-    data.forEach(row => {
+    data.forEach((row) => {
       row.splice(idx, 1);
     });
     data.columns.splice(idx, 1);
-  }
+  };
 
   return data;
-} // dataTable
+}; // dataTable
 
-export {dataTable};
+export { dataTable };

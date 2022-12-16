@@ -1,64 +1,63 @@
-import {useEffect} from 'react';
-import {useDispatch, useSelector} from 'react-redux';
-import {useNavigate} from 'react-router-dom';
+/* eslint-disable no-console */
+import React, { useEffect } from 'react';
+import { useDispatch, useSelector } from 'react-redux';
+import { useNavigate } from 'react-router-dom';
 import Airtable from 'airtable';
 import moment from 'moment';
 
-import {set, get} from '../../store/redux-autosetters';
+import { set, get } from '../../store/redux-autosetters';
 import './styles.scss';
 
-let examples = {};
+const examples = {};
 
 const Init = () => {
   const dispatch = useDispatch();
-  let navigate = useNavigate();
+  const navigate = useNavigate();
 
   const PSA = useSelector(get.PSA);
   const field = useSelector(get.field);
 
   useEffect(() => {
+    const base = new Airtable({ apiKey: 'keySO0dHQzGVaSZp2' }).base('appOEj4Ag9MgTTrMg');
+
     const airtable = (table, callback, wrapup) => {
       base(table).select({
-        view: 'Grid view'
+        view: 'Grid view',
       }).eachPage((records, fetchNextPage) => {
-        records.forEach(record => {
+        records.forEach((record) => {
           callback(record.fields);
         });
-    
+
         fetchNextPage();
-      }, function done(err) {
-        if (err) {
-          console.error(err);
-        } else if (wrapup) {
+      }, (err) => {
+        if (!err && wrapup) {
           wrapup();
         }
       });
-    } // airtable
-
-    const base = new Airtable({apiKey: 'keySO0dHQzGVaSZp2'}).base('appOEj4Ag9MgTTrMg');
+    }; // airtable
 
     airtable('PSA', (site) => {
       localStorage.removeItem(site.ID);
       if (site.Hour === 0) {
         examples[site.ID] = {
-          field             : site.ID,
-          lat               : site.Lat,
-          lon               : site.Lon,
-          location          : '',
-          BD                : site.BD,
-          coverCrop         : [site['Cover Crop']],
-          cashCrop          : site['Cash Crop'],
-          killDate          : new Date(site.Date),
-          lwc               : site.LitterWaterContent,
-          biomass           : Math.round(site.FOM),
-          unit              : 'kg/ha',
-          N                 : +(site.FOMpctN.toFixed(2)),
-          carb              : +(site.Carb.toFixed(2)),
-          cell              : +(site.Cell.toFixed(2)),
-          lign              : +(site.Lign.toFixed(2)),
-          targetN           : 150,
-          category          : site.Category,
-        } 
+          field: site.ID,
+          lat: site.Lat,
+          lon: site.Lon,
+          location: '',
+          BD: site.BD,
+          coverCrop: [site['Cover Crop']],
+          cashCrop: site['Cash Crop'],
+          killDate: new Date(site.Date),
+          lwc: site.LitterWaterContent,
+          biomass: Math.round(site.FOM),
+          unit: 'kg/ha',
+          N: +(site.FOMpctN.toFixed(2)),
+          carb: +(site.Carb.toFixed(2)),
+          cell: +(site.Cell.toFixed(2)),
+          lign: +(site.Lign.toFixed(2)),
+          targetN: 150,
+          category: site.Category,
+        };
       } else {
         examples[site.ID].plantingDate = new Date(moment(site.Date).add(-111, 'days'));
       }
@@ -77,18 +76,18 @@ const Init = () => {
       () => {
         dispatch(set.maxBiomass(mb));
         dispatch(set.species(species));
-      }
+      },
     );
   }, [dispatch]);
 
-  const loadField = (field) => {
-    if (field === 'Example: Grass') {
+  const loadField = (fieldVal) => {
+    if (fieldVal === 'Example: Grass') {
       navigate('location');
       dispatch(set.edited(true));
       dispatch(set.lat(32.865389));
       dispatch(set.lon(-82.258361));
       dispatch(set.location('Example'));
-      dispatch(set.field('Example: Grass'));
+      dispatch(set.fieldVal('Example: Grass'));
       dispatch(set.OM(0.75));
       dispatch(set.BD(1.62));
       dispatch(set.InorganicN(10));
@@ -104,13 +103,13 @@ const Init = () => {
       dispatch(set.cashCrop('Corn'));
       dispatch(set.yield(150));
       dispatch(set.targetN(150));
-    } else if (field === 'Example: Legume') {
+    } else if (fieldVal === 'Example: Legume') {
       navigate('location');
       dispatch(set.edited(true));
       dispatch(set.lat(32.865389));
       dispatch(set.lon(-82.258361));
       dispatch(set.location('Example'));
-      dispatch(set.field('Example: Legume'));
+      dispatch(set.fieldVal('Example: Legume'));
       dispatch(set.OM(0.75));
       dispatch(set.BD(1.62));
       dispatch(set.InorganicN(10));
@@ -127,8 +126,8 @@ const Init = () => {
       dispatch(set.yield(150));
       dispatch(set.targetN(100));
     } else {
-      const inputs = JSON.parse(localStorage[field]);
-      Object.keys(inputs).forEach(key => {
+      const inputs = JSON.parse(localStorage[fieldVal]);
+      Object.keys(inputs).forEach((key) => {
         try {
           if (/Date/.test(key)) {
             const date = moment(inputs[key]).format('yyyy-MM-DD');
@@ -136,45 +135,101 @@ const Init = () => {
           } else {
             dispatch(set[key](inputs[key]));
           }
-        } catch(e) {
+        } catch (e) {
+          // eslint-disable-next-line no-console
           console.log(key, e.message);
         }
       });
-      
-      dispatch(set.lwc(inputs.lwc));  // avoid calculation
+
+      dispatch(set.lwc(inputs.lwc)); // avoid calculation
     }
-  } // loadField
+  }; // loadfield
 
   const changePSA = (e) => {
-    const PSA = examples[e.target.value];
-    
-    Object.keys(PSA).forEach(key => {
+    const PSAval = examples[e.target.value];
+
+    Object.keys(PSAval).forEach((key) => {
       try {
-        dispatch(set[key](PSA[key]));
-      } catch(ee) {
+        dispatch(set[key](PSAval[key]));
+      } catch (ee) {
         console.log(ee);
         console.log(key);
       }
     });
-  } // changePSA
+  }; // changePSA
 
-  const changeField=(e) => {
-    const field = e.target.value;
-    if (field === 'Clear previous runs') {
+  const changeField = (e) => {
+    const fieldStr = e.target.value;
+    if (fieldStr === 'Clear previous runs') {
+      // eslint-disable-next-line no-alert
       if (window.confirm('Clear all previous runs?')) {
         localStorage.clear();
         navigate('home');
       }
     } else {
-      loadField(field);
+      loadField(fieldStr);
     }
-  } // changeField
+  }; // changeField
+
+  let PSArender;
+  if (PSA) {
+    PSArender = (
+      <select
+        className="fields"
+        onChange={changePSA}
+        value={field}
+      >
+        <option />
+        <optgroup label="PSA">
+          {
+          Object.keys(examples)
+            .filter((site) => examples[site].category === 'PSA')
+            .sort().map((site) => <option key={site}>{site}</option>)
+        }
+        </optgroup>
+        <optgroup label="Resham">
+          {
+          Object.keys(examples)
+            .filter((site) => examples[site].category === 'Resham')
+            .sort().map((site) => <option key={site}>{site}</option>)
+        }
+        </optgroup>
+      </select>
+    );
+  } else {
+    PSArender = (
+      <select
+        className="fields"
+        onChange={changeField}
+        value={field}
+      >
+        <option aria-label="none" />
+        <option>Example: Grass</option>
+        <option>Example: Legume</option>
+        {
+      Object.keys(localStorage).length && (
+        <>
+          <option>Clear previous runs</option>
+          <option disabled>____________________</option>
+        </>
+      )
+    }
+        {
+      Object.keys(localStorage).sort().map((fld, idx) => (
+        <option key={idx} checked={fld === field}>{fld}</option> // eslint-disable-line react/no-unknown-property
+      ))
+    }
+      </select>
+    );
+  }
 
   return (
     <div className="Init">
       {
-        PSA ?
-          <select className="fields"
+        PSA
+        && (
+          <select
+            className="fields"
             onChange={changePSA}
             value={field}
           >
@@ -193,10 +248,11 @@ const Init = () => {
                   .sort().map(site => <option key={site}>{site}</option>)
               }
             </optgroup>
-          </select>
-        :
-        true || Object.keys(localStorage).length ?
-          <select className="fields"
+          </select>)
+      }
+        
+       { (!PSA && Object.keys(localStorage).length) &&
+          (<select className="fields"
             onChange={changeField}
             value={field}
           >
@@ -216,8 +272,7 @@ const Init = () => {
                 <option key={idx} checked={fld === field}>{fld}</option>
               ))
             }
-          </select>
-          : ''
+          </select>)
       }
     </div>
   )

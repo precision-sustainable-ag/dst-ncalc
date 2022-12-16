@@ -1,7 +1,9 @@
-import {Input} from '../../shared/Inputs';
-import {Button} from '@mui/material';
-import {useSelector, useDispatch} from 'react-redux';
-import {get, set} from '../../store/Store';
+/* eslint-disable no-alert */
+import React from 'react';
+import { Button } from '@mui/material';
+import { useSelector, useDispatch } from 'react-redux';
+import Input from '../../shared/Inputs';
+import { get, set } from '../../store/Store';
 
 import './styles.scss';
 
@@ -35,11 +37,11 @@ const Feedback = () => {
   const submit = (e) => {
     if (!feedback.trim()) {
       alert('Please enter Feedback before submitting.');
-      return
-    } else if (!name.trim()) {
+      return;
+    } if (!name.trim()) {
       alert('Please enter Name before submitting.');
       return;
-    } else if (!email.trim()) {
+    } if (!email.trim()) {
       alert('Please enter Email before submitting.');
       return;
     }
@@ -51,7 +53,7 @@ const Feedback = () => {
       {
         method: 'POST',
         headers: {
-          'Content-Type': 'application/json'
+          'Content-Type': 'application/json',
         },
         body: JSON.stringify({
           feedback: `
@@ -79,42 +81,44 @@ OM           : ${OM}
 BD           : ${BD}
 yield        : ${Yield}
 __________________________________
-          `
+          `,
         }),
-      })
-      .then(response => response.json())
-      .then(data => {
-        console.log(data);
+      },
+    )
+      .then((response) => response.json())
+      .then(() => {
         e.target.disabled = false;
         alert(`
           Thank you for the feedback!
           We will contact you if we have any updates or questions.
         `);
-        console.log(JSON.stringify(data, null, 2));
       });
-  } // submit
+  }; // submit
 
   return (
     <div className="feedback">
       <h2>CC-NCALC Feedback</h2>
-      <br/>
+      <br />
 
       <p>
-        Please provide any comments or suggestions that will help us improve the tool.<br/>
+        Please provide any comments or suggestions that will help us improve the tool.
+        <br />
         Include any difficulties you may have encountered while running the program.
-        <br/><br/>
+        <br />
+        <br />
       </p>
 
       <p>
         Note that your inputs will be sent to us along with your feedback, in order to help us troubleshoot.
         Please delete any personal information that you do not wish to share with us.
-        <span style={{display: 'none'}}>You can attach a screenshot of your feedback below.</span>
+        <span style={{ display: 'none' }}>You can attach a screenshot of your feedback below.</span>
       </p>
 
       <div
         id="Feedback"
         contentEditable
         placeholder="Enter comments here"
+        // eslint-disable-next-line react/no-danger
         dangerouslySetInnerHTML={{ __html: feedback }}
         onBlur={(e) => dispatch(set.feedback(e.currentTarget.innerText.replace(/[\n\r]/g, '<br>')))}
       />
@@ -126,8 +130,8 @@ __________________________________
         <p>Email</p>
         <Input type="email" id="email" />
 
-        <br/>
-        <br/>
+        <br />
+        <br />
         <div>
           <Button
             variant="contained"
@@ -138,9 +142,9 @@ __________________________________
         </div>
       </div>
     </div>
-  )
-} // Feedback
-  
+  );
+}; // Feedback
+
 Feedback.desc = 'FEEDBACK';
 
 export default Feedback;

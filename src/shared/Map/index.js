@@ -1,12 +1,11 @@
 import React, { useState, useEffect } from 'react';
 import { Map } from '@psa/dst.ui.map';
 import { useDispatch } from 'react-redux';
-import { set } from '../../store/Store';
 import mapboxgl from 'mapbox-gl';
+import { set } from '../../store/Store';
 import './styles.scss';
 // eslint-disable-next-line import/no-webpack-loader-syntax, import/no-unresolved
 mapboxgl.workerClass = require('worker-loader!mapbox-gl/dist/mapbox-gl-csp-worker').default;
-
 
 const MapComp = () => {
   const [address, setAddress] = useState({});
@@ -22,12 +21,12 @@ const MapComp = () => {
   }, [address, geometry, dispatch]);
 
   return (
-    <div className='map'>
+    <div className="map">
       <Map
         setAddress={setAddress}
         setGeometry={setGeometry}
-        initWidth='100%'
-        initHeight='400px'
+        initWidth="100%"
+        initHeight="400px"
         initLon={-80.16}
         initLat={37.75}
         initStartZoom={initStartZoom}
