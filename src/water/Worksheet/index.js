@@ -1,4 +1,8 @@
-import { useEffect } from 'react';
+/* eslint-disable no-use-before-define */
+/* eslint-disable no-alert */
+/* eslint-disable camelcase */
+/* eslint-disable import/no-unresolved */
+import React, { useEffect } from 'react';
 import { useSelector, useDispatch } from 'react-redux';
 import JSZip from 'jszip';
 import { saveAs } from 'file-saver';
@@ -65,30 +69,30 @@ const dateFormat = (date) => {
 
 const WorksheetData = () => {
   const data = useSelector(get.worksheet);
-  console.log(data);
+  // console.log(data);
   const site = useSelector(get.site);
-  console.log(site);
+  // console.log(site);
 
   if (!data.length) {
     return null;
   }
 
-  const cols = Object.keys(data[0]);
+  const ccols = Object.keys(data[0]);
 
   data.forEach((row) => { // first row may be missing data
     Object.keys(row).forEach((col) => {
-      if (!cols.includes(col)) {
-        cols.push(col);
+      if (!ccols.includes(col)) {
+        ccols.push(col);
       }
     });
   });
 
   return (
-    <div className="data" tabIndex={1}>
+    <div className="data">
       <table>
         <thead>
           <tr>
-            {cols.map((key) => <th key={key}>{key}</th>)}
+            {ccols.map((key) => <th key={key}>{key}</th>)}
           </tr>
         </thead>
         <tbody>
@@ -96,7 +100,7 @@ const WorksheetData = () => {
             data.map((row, i) => (
               <tr key={i} className={JSON.stringify(row).includes(site) ? 'selected' : ''}>
                 {
-                  cols.map((key) => (
+                  ccols.map((key) => (
                     <td key={key}>
                       {
                         Number.isFinite(row[key]) ? +(+row[key]).toFixed(5) : row[key]
@@ -113,22 +117,70 @@ const WorksheetData = () => {
   );
 }; // WorksheetData
 
+const files = useSelector(get.soilfiles);
+const site = useSelector(get.site);
+const xl = useSelector(get.xl);
+
 const SoilFiles = () => {
   const getSoilFiles = () => {
     let soilFile;
     let climateID;
 
-    const max = (table, id, col) => Math.max.apply(Math, dbRecord(table, id).map((d) => +d[col])); // max
+    const dbRecord = (table, id) => {
+      let key;
+      if (table === 'Soil') {
+        key = 'soilfile';
+      } else if (table === 'GridRatio') {
+        key = 'soilfile';
+      } else if (table === 'Climate') {
+        key = 'climateid';
+      } else if (table === 'Weather') {
+        key = 'climateid';
+      } else if (table === 'Variety') {
+        key = 'hybrid';
+      } else {
+        key = 'id';
+      }
+
+      const data = xl[table];
+
+      if (!data) alert(table);
+      const recs = data.filter((d) => (d[key] || '').toLowerCase().trim() === id.toLowerCase().trim());
+
+      if (!recs.length) {
+        alert(`Unknown: ${table} ${id}`);
+      } else if (recs.length > 1) {
+        return recs;
+      } else {
+        return new Proxy(recs[0], {
+          // eslint-disable-next-line no-shadow
+          get(target, key) {
+            return key in target ? target[key] : target[key.toLowerCase()];
+          },
+        });
+      }
+      return null;
+    }; // dbRecord
+
+    const max = (table, id, col) => Math.max(...dbRecord(table, id).map((d) => +d[col])); // max
 
     const noe = (n, round = 16) => (+n).toFixed(round).replace(/0+$/, '').replace(/\.$/, '');
 
     const dbRecords = (table, id) => {
-      const key = table === 'Soil' ? 'soilfile'
-        : table === 'GridRatio' ? 'soilfile'
-          : table === 'Climate' ? 'climateid'
-            : table === 'Weather' ? 'climateid'
-              : table === 'Variety' ? 'hybrid'
-                : 'id';
+      let key;
+      if (table === 'Soil') {
+        key = 'soilfile';
+      } else if (table === 'GridRatio') {
+        key = 'soilfile';
+      } else if (table === 'Climate') {
+        key = 'climateid';
+      } else if (table === 'Weather') {
+        key = 'climateid';
+      } else if (table === 'Variety') {
+        key = 'hybrid';
+      } else {
+        key = 'id';
+      }
 
       if (!xl[table]) {
         alert(`dbRecords('${table}')`);
@@ -138,31 +190,6 @@ const SoilFiles = () => {
 
       return recs;
     }; // dbRecords
-
-    const dbRecord = (table, id) => {
-      const key = table === 'Soil' ? 'soilfile'
-        : table === 'GridRatio' ? 'soilfile'
-          : table === 'Climate' ? 'climateid'
-            : table === 'Weather' ? 'climateid'
-              : table === 'Variety' ? 'hybrid'
-                : 'id';
-      const data = xl[table];
-      if (!data) alert(table);
-      const recs = data.filter((d) => (d[key] || '').toLowerCase().trim() === id.toLowerCase().trim());
-
-      if (!recs.length) {
-        console.log(data);
-        alert(`Unknown: ${table} ${id}`);
-      } else if (recs.length > 1) {
-        return recs;
-      } else {
-        return new Proxy(recs[0], {
-          get(target, key) {
-            return key in target ? target[key] : target[key.toLowerCase()];
-          },
-        });
-      }
-    }; // dbRecord
 
     const output = (path, s) => {
       // console.log('output', path);
@@ -208,7 +235,7 @@ const SoilFiles = () => {
 
       const rowSP = initRec['RowSpacing(cm)'];
       const density = initRec['population(p/ha)'] / 10000;
-      const popRow = rowSP / 100 * density;
+      const popRow = (rowSP / 100) * density;
       const date1 = dateFormat(ExcelDateToJSDate(initRec.sowing));
       const date2 = dateFormat(ExcelDateToJSDate(initRec.end));
 
@@ -242,9 +269,7 @@ const SoilFiles = () => {
 
       const textureCl = [];
 
-      soilRecs.forEach((rec) => {
-        // const texture = '/loam /clay  /silt';
-        // const slashes = texture.split('/');
+      soilRecs.forEach(() => {
         textureCl.push('clay'); // TODO
       });
 
@@ -265,7 +290,7 @@ const SoilFiles = () => {
       //   'clay loam'       : 8.1,
       //   'clay'            : 12.8,
       //   'loam'            : 4.6,
-      //   'loamy sand'      :	1.6,
+      //   'loamy sand'      : 1.6,
       //   'sand'            : 0.8,
       //   'sandy clay'      : 10.9,
       //   'sandy clay loam' : 6,
@@ -325,23 +350,24 @@ const SoilFiles = () => {
           *** Script for management practices fertilizer, residue and tillage
           [N Fertilizer]
           ****Script for chemical application module  *******mg/cm2= kg/ha* 0.01*rwsp*eomult*100
-          Number of Fertilizer applications (max=25) mappl is in total mg N applied to grid (1 kg/ha = 1 mg/m2/width of application) application divided by width of grid in cm is kg ha-1
+          Number of Fertilizer applications (max=25) mappl is in total mg N applied to 
+          grid (1 kg/ha = 1 mg/m2/width of application) application divided by width of grid in cm is kg ha-1
            ${fertRecs.length}
           mAppl is manure, lAppl is litter. Apply as mg/cm2 of slab same units as N
           tAppl(i)  AmtAppl(i) depth(i) lAppl_C(i) lAppl_N(i)  mAppl_C(i) mAppl_N(i)  (repeat these 3 lines for the number of fertilizer applications)
         `);
 
         // fert data are in the rs record set
-        const factor = 0.01 * maxX / 100; // m2 of slab
+        const factor = (0.01 * maxX) / 100; // m2 of slab
 
         fertRecs.forEach((rec) => {
           // area of slab m2/slab x kg/ha x 1 ha/10000 m2 *1e6 mg/kg = mg/slab
-          const amount = +(rec.amount * factor / 10000 * 1000000).toFixed(4);
+          const amount = +((rec.amount * factor) / (10000 * 1000000)).toFixed(4);
           const { depth } = rec;
-          const L_C = rec['litter_c(kg/ha)'] * factor / 10000 * 1000000; // litter
-          const L_N = rec.litter_n * factor / 10000 * 1000000;
-          const M_C = rec.manure_c * factor / 10000 * 1000000; // manure
-          const M_N = rec.manure_n * factor / 10000 * 1000000;
+          const L_C = (rec['litter_c(kg/ha)'] * factor) / (10000 * 1000000); // litter
+          const L_N = (rec.litter_n * factor) / (10000 * 1000000);
+          const M_C = (rec.manure_c * factor) / (10000 * 1000000); // manure
+          const M_N = (rec.manure_n * factor) / (10000 * 1000000);
           const date1 = dateFormat(ExcelDateToJSDate(rec.date));
           s += `${cols(date1, amount, depth, L_C, L_N, M_C, M_N)}\n`;
         });
@@ -469,15 +495,42 @@ const SoilFiles = () => {
         Surface water Boundary Code  surface and bottom Gas boundary codes
         for the  (water boundary code for bottom layer (for all bottom nodes) 1 constant -2 seepage face,  7 drainage
         ${cols(gridRec.BottomBC, gridRec.GasBCTop, gridRec.GasBCBottom)}
-         Bottom depth Init Type  OM (%/100)   no3(ppm)       NH4         hNew       Tmpr     CO2     O2    Sand     Silt    Clay     BD     TH33     TH1500  thr ths tha th  Alfa    n   Ks  Kk  thk
-         cm         w/m              Frac      ppm          ppm           cm         0C     ppm   ppm  ----  fraction---     g/cm3    cm3/cm3   cm3/cm3
+         Bottom depth Init Type  OM (%/100)   no3(ppm)       NH4         hNew       Tmpr     CO2     O2    Sand     
+         Silt    Clay     BD     TH33     TH1500  thr ths tha th  Alfa    n   Ks  Kk  thk
+         cm         w/m              Frac      ppm          ppm           cm         0C     ppm   ppm  ----  
+         fraction---     g/cm3    cm3/cm3   cm3/cm3
       `);
 
       // now add soil properties
       const soilRecs = dbRecords('Soil', soilFile);
 
       soilRecs.forEach((rec) => {
-        s += ` ${cols(rec['bottom depth'], rec['init type'], noe(rec['om (%/100)'], 5), noe(rec['no3 (ppm)'], 5), rec.nh4, rec.hnew, rec.tmpr, rec['co2(ppm)'], rec['o2(ppm)'], rec.sand / 100, rec.silt / 100, rec.clay / 100, rec.bd, rec.th33, rec.th1500, rec.thr, rec.ths, rec.tha, rec.th, rec.alfa, rec.n, rec.ks, rec.kk, rec.thk)}\n`;
+        s += ` ${cols(
+          rec['bottom depth'],
+          rec['init type'],
+          noe(rec['om (%/100)'], 5),
+          noe(rec['no3 (ppm)'], 5),
+          rec.nh4,
+          rec.hnew,
+          rec.tmpr,
+          rec['co2(ppm)'],
+          rec['o2(ppm)'],
+          rec.sand / 100,
+          rec.silt / 100,
+          rec.clay / 100,
+          rec.bd,
+          rec.th33,
+          rec.th1500,
+          rec.thr,
+          rec.ths,
+          rec.tha,
+          rec.th,
+          rec.alfa,
+          rec.n,
+          rec.ks,
+          rec.kk,
+          rec.thk,
+        )}\n`;
       });
 
       output(path, s);
@@ -518,7 +571,15 @@ const SoilFiles = () => {
         Corn growth simulation for  ${descRec.Hybrid}   variety 
          Juvenile   Daylength   StayGreen  LA_min  Rmax_LTAR              Rmax_LTIR                Phyllochrons from
          leaves     Sensitive               Leaf tip appearance   Leaf tip initiation       TassellInit
-        ${cols(varietyRec.JuvenileLeaves, varietyRec.DaylengthSensitive, varietyRec.StayGreen, varietyRec.LM_min, varietyRec.Rmax_LTAR, varietyRec.Rmax_LTIR, varietyRec.PhyllFrmTassel)}
+        ${cols(
+    varietyRec.JuvenileLeaves,
+    varietyRec.DaylengthSensitive,
+    varietyRec.StayGreen,
+    varietyRec.LM_min,
+    varietyRec.Rmax_LTAR,
+    varietyRec.Rmax_LTIR,
+    varietyRec.PhyllFrmTassel,
+  )}
         [SoilRoot]
         *** WATER UPTAKE PARAMETER INFORMATION **************************
          RRRM       RRRY    RVRL
@@ -575,6 +636,7 @@ const SoilFiles = () => {
       const climateRec = dbRecord('Climate', climateID);
       let weatherRec = dbRecord('Weather', climateID);
       if (weatherRec.length) {
+        // eslint-disable-next-line prefer-destructuring
         weatherRec = weatherRec[0];
       }
 
@@ -603,7 +665,15 @@ const SoilFiles = () => {
         Latitude Longitude
         ${cols(climateRec.Latitude, climateRec.Longitude)}
         ^Daily Bulb T(1) ^ Daily Wind(2) ^RainIntensity(3) ^Daily Conc^(4) ,Furrow(5) ^Rel_humid(6) ^CO2(7)
-        ${cols(climateRec.DailyBulb, climateRec.DailyWind, climateRec.RainIntensity, climateRec.DailyConc, climateRec.Furrow, climateRec.RelHumid, climateRec.DailyCO2)}
+        ${cols(
+    climateRec.DailyBulb,
+    climateRec.DailyWind,
+    climateRec.RainIntensity,
+    climateRec.DailyConc,
+    climateRec.Furrow,
+    climateRec.RelHumid,
+    climateRec.DailyCO2,
+  )}
         Parameters for changing of units: BSOLAR BTEMP ATEMP ERAIN BWIND BIR
          BSOLAR is 1e6/3600 to go from j m-2 h-1 to wm-2
         ${cols(climateRec.Bsolar, climateRec.Btemp, climateRec.Atemp, climateRec.Erain, climateRec.BWind, climateRec.BIR)}
@@ -619,7 +689,7 @@ const SoilFiles = () => {
       // const path = descRec.NitrogenFile;
       const path = 'agmip.nit';
       const soilRecs = dbRecord('Soil', soilFile);
-      const maxX = dbRecord('Init', site)['RowSpacing(cm)'] / 2 / 100 * 2;
+      const maxX = dbRecord('Init', site)['RowSpacing(cm)'] / ((2 / 100) * 2);
 
       let s = ` ${unindent(0, `
         *** SoilNit parameters for: ${site}***
@@ -629,7 +699,22 @@ const SoilFiles = () => {
           m      kh     kL       km       kn        kd             fe   fh    r0   rL    rm   fa    nq   cs\n`)}`;
 
       soilRecs.forEach((rec, i) => {
-        s += ` ${cols(i + 1, noe(rec.kh), noe(rec.kl), noe(rec.km), noe(rec.kn), noe(rec.kd), rec.fe, rec.fh, rec.r0, rec.rl, rec.rm, rec.fa, rec.nq, noe(rec.cs))}\n`;
+        s += ` ${cols(
+          i + 1,
+          noe(rec.kh),
+          noe(rec.kl),
+          noe(rec.km),
+          noe(rec.kn),
+          noe(rec.kd),
+          rec.fe,
+          rec.fh,
+          rec.r0,
+          rec.rl,
+          rec.rm,
+          rec.fa,
+          rec.nq,
+          noe(rec.cs),
+        )}\n`;
       });
 
       output(path, s);
@@ -705,16 +790,12 @@ const SoilFiles = () => {
     createSoilFiles(files);
   }; // getSoilFiles
 
-  const files = {};
-
   const dispatch = useDispatch();
-  const xl = useSelector(get.xl);
-  const site = useSelector(get.site);
 
   getSoilFiles();
 
   useEffect(() => {
-    console.log('ok');
+    // console.log('ok');
     dispatch(set.soilfiles(files));
   });
 
@@ -739,33 +820,31 @@ const SoilFiles2 = () => {
     const s2 = rep(files[file]);
 
     if (s2 && s1 !== s2) {
-      console.log('_________________');
-      console.log(`%c${file}`, 'text-decoration: underline; font-weight: bold; color: brown;');
+      // console.log('_________________');
+      // console.log(`%c${file}`, 'text-decoration: underline; font-weight: bold; color: brown;');
       const c = rep(comps[file]).split(/[\n\r]/);
       const f = rep(files[file]).split(/[\n\r]/);
 
-      c.forEach((c, i) => {
-        if (rep(c) !== rep(f[i])) {
-          for (let j = 0; j < c.length; j++) {
-            if (c[j] !== f[i][j]) {
-              console.log(' ', c.slice(j - 10, j + 10), ':', f[i].slice(j - 10, j + 10));
+      c.forEach((cc, i) => {
+        if (rep(cc) !== rep(f[i])) {
+          for (let j = 0; j < cc.length; j++) {
+            if (cc[j] !== f[i][j]) {
+              // console.log(' ', c.slice(j - 10, j + 10), ':', f[i].slice(j - 10, j + 10));
               j += 9;
             }
           }
         }
       });
-      console.log('_________________');
+      // console.log('_________________');
     }
 
     return rep(s1) === rep(s2);
   }; // match
 
-  const files = useSelector(get.soilfiles);
-  const site = useSelector(get.site);
-
   return (
-    <div tabIndex={1}>
+    <div>
       <button
+        type="button"
         onClick={() => {
           document.querySelectorAll('details').forEach((obj) => { obj.open = false; });
         }}
@@ -774,6 +853,7 @@ const SoilFiles2 = () => {
       </button>
 
       <button
+        type="button"
         onClick={() => {
           document.querySelectorAll('details').forEach((obj) => { obj.open = true; });
         }}
@@ -782,6 +862,7 @@ const SoilFiles2 = () => {
       </button>
 
       <button
+        type="button"
         onClick={() => {
           if (Object.keys(files).length) {
             const zip = new JSZip();
@@ -828,17 +909,19 @@ const SoilFiles2 = () => {
 
 const Worksheet = () => {
   const dispatch = useDispatch();
-  const xl = useSelector(get.xl);
   const data = useSelector(get.data);
   const button = useSelector(get.worksheetName);
 
   return (
     <div className="Worksheet">
       <div
+        role="button"
+        tabIndex="0"
+        onKeyDown={() => null}
         onClick={(e) => {
-          const button = e.target;
-          if (button.tagName === 'BUTTON') {
-            const text = button.textContent;
+          const bbutton = e.target;
+          if (bbutton.tagName === 'BUTTON') {
+            const text = bbutton.textContent;
             dispatch(set.worksheetName(text));
             if (text !== 'Output') {
               dispatch(set.worksheet(xl[text]));
@@ -849,6 +932,7 @@ const Worksheet = () => {
         {
           ['Output', ...Object.keys(xl)].map((key) => (
             <button
+              type="button"
               key={key}
               className={key === button ? 'selected' : ''}
             >

@@ -17,7 +17,7 @@ const Advanced = () => {
   const lign = useSelector(get.lign);
   const lwc = useSelector(get.lwc);
   const biomass = useSelector(get.biomass);
-  const unit = useSelector(get.unit);
+  // const unit = useSelector(get.unit);
   const InorganicN = useSelector(get.InorganicN);
   const gotModel = useSelector(get.gotModel);
   const model = useSelector(get.model);
@@ -68,7 +68,7 @@ const Advanced = () => {
       date = new Date(killDate);
       date.setHours(0, 0, 0, 0);
       let total = 0;
-      model.s[parmm].forEach((d, i) => {
+      model.s[parmm].forEach((d) => {
         const value = +(d / factor).toFixed(2);
         total += +value;
         if (hourly || date.getHours() === 23) {
