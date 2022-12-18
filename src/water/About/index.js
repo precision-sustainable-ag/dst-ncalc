@@ -1,3 +1,4 @@
+import React from 'react';
 import { Link } from 'react-router-dom';
 
 const About = () => (
@@ -24,8 +25,9 @@ const About = () => (
     </p>
     <p>
       The N calculator is adapted from the original CERES-N (N subroutine of the Crop Environment REsource Synthesis) sub-model.
-      Data from controlled laboratory experiments and on-farm cover crop decomposition studies across diverse environments were used in its development.
-      Depending on residue placement, the calculator uses soil moisture and soil temperature (for incorporated residues) or residue water potential and air temperature (for surface residues) to adjust decomposition rates.
+      Data from controlled laboratory experiments and on-farm cover crop decomposition studies across diverse environments were used in its
+      development. Depending on residue placement, the calculator uses soil moisture and soil temperature (for incorporated residues) or
+      residue water potentialand air temperature (for surface residues) to adjust decomposition rates.
     </p>
 
     <h2>Input data requirements:</h2>
@@ -34,7 +36,7 @@ const About = () => (
     </p>
     <ul>
       <li>
-        Local soil properties (organic matter and bulk density) from the NRCS' Soil Survey Geographic database (
+        Local soil properties (organic matter and bulk density) from the NRCS`&apos;`s Soil Survey Geographic database (
         <a target="_blank" rel="noreferrer" href="https://ssurgo.covercrop-data.org/">SSURGO</a>
         ),
       </li>
@@ -64,7 +66,10 @@ const About = () => (
       <li>Cover crop water content at termination.</li>
     </ul>
 
-    <p>If these data are unavailable, the program will estimate cover crop residue chemistry based on N concentrations and will use a default value for cover crop water content at termination.</p>
+    <p>
+      If these data are unavailable, the program will estimate cover crop residue chemistry based on N concentrations
+      and will use a default value for cover crop water content at termination.
+    </p>
 
     <p>
       <strong><em>CC-NCALC uses real-time weather data and five year historic averages for days where data are not yet available.</em></strong>

@@ -1,8 +1,9 @@
+/* eslint-disable import/prefer-default-export */
 // ____________________________________________________________________________________________________________________________________
 // emulate C# DataTable
 const dataTable = (data, columns) => {
   if (!data[0]) {
-    data = Array(data.length).fill().map((e) => Array(columns.length).fill(0));
+    data = Array(data.length).fill().map(() => Array(columns.length).fill(0));
   }
 
   data.forEach((row, i) => {
@@ -11,7 +12,7 @@ const dataTable = (data, columns) => {
       get(target, key) {
         if (key === 'splice') { // https://stackoverflow.com/a/54136394/3903374
           const origMethod = target.splice;
-          return function (...args) {
+          return function temp(...args) {
             origMethod.apply(target, args);
           };
         }
@@ -19,9 +20,9 @@ const dataTable = (data, columns) => {
           return target[key];
         }
         const idx = columns.indexOf(key);
-        if (idx === -1) {
-          console.error(`Error: ${key}\n${columns}`);
-        }
+        // if (idx === -1) {
+        //   console.error(`Error: ${key}\n${columns}`);
+        // }
         return target[idx];
       },
       set(target, key, value) {
@@ -29,9 +30,9 @@ const dataTable = (data, columns) => {
           target[key] = value;
         } else {
           const idx = columns.indexOf(key);
-          if (idx === -1) {
-            console.error(`Error: ${key}\n${columns}`);
-          }
+          // if (idx === -1) {
+          //   console.error(`Error: ${key}\n${columns}`);
+          // }
           target[idx] = value;
         }
         return true; // prevent "'set' on proxy: trap returned falsish for property ..."

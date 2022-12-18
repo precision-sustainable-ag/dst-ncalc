@@ -1,4 +1,4 @@
-import { useEffect } from 'react';
+import React, { useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { useDispatch, useSelector } from 'react-redux';
 
@@ -21,7 +21,7 @@ const Soil = () => {
     return <>Querying SSURGO database &hellip;</>;
   }
 
-  console.log(SSURGO);
+  // console.log(SSURGO);
 
   const depth = {};
   SSURGO.forEach((data) => {
@@ -43,7 +43,8 @@ const Soil = () => {
         ? (
           <>
             <p className="note">
-              The data below was pulled from NRCS' Soil Survey Geographic database (SSURGO) based on your field's latitude/longitude coordinates.
+              The data below was pulled from NRCS`&apos;`s Soil Survey Geographic database (SSURGO) based
+              on your field`&apos;`s latitude/longitude coordinates.
             </p>
             {/*
             <p className="note">
@@ -102,7 +103,7 @@ const Soil = () => {
         </thead>
         <tbody>
           {
-            Object.keys(depth).sort((a, b) => parseInt(a) - parseInt(b)).map((d) => (
+            Object.keys(depth).sort((a, b) => parseInt(a, 10) - parseInt(b, 10)).map((d) => (
               <tr key={d}>
                 <td>{d}</td>
                 <td>{depth[d].sand}</td>

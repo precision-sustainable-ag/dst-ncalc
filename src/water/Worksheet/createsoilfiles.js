@@ -1,3 +1,8 @@
+/* eslint-disable camelcase */
+/* eslint-disable no-nested-ternary */
+/* eslint-disable no-plusplus */
+/* eslint-disable max-len */
+/* eslint-disable no-alert */
 import { dataTable } from './utilities';
 import { rosetta } from '../../store/Store';
 
@@ -8,7 +13,7 @@ const soilFile = 'meadir_run_01.dat'; // TODO
 const createSoilFiles = (files) => {
   const fs = { // TODO
     writeFileSync: (path, s) => {
-      console.log(path);
+      // console.log(path);
       files[path] = s;
     },
   };
@@ -59,7 +64,7 @@ const createSoilFiles = (files) => {
   const CaclYNodes = (IntervalRatio, Length, StartPoint, FirstInterval, Direction) => {
     let CalculatedLength = FirstInterval; // keeps track of the summed length of the segments to compare with the planned length (Length)
     const Segment = [];
-    let dNumberOfNodes = 1 - Length / FirstInterval * (1 - IntervalRatio);
+    let dNumberOfNodes = 1 - (Length / FirstInterval) * (1 - IntervalRatio);
     dNumberOfNodes = Math.log(dNumberOfNodes) / Math.log(IntervalRatio) + 1;
     const NumberOfNodes = Math.round(dNumberOfNodes);
 
@@ -114,7 +119,7 @@ const createSoilFiles = (files) => {
     const StartPoint = 0;
     const Segment = [];
 
-    let dNumberOfNodes = 1 - Length / FirstInterval * (1 - IntervalRatio);
+    let dNumberOfNodes = 1 - (Length / FirstInterval) * (1 - IntervalRatio);
     dNumberOfNodes = Math.log(dNumberOfNodes) / Math.log(IntervalRatio) + 1;
     const NumberOfNodes = Math.round(dNumberOfNodes);
 
@@ -205,7 +210,7 @@ const createSoilFiles = (files) => {
       Dr.NodeArea = NodeArea[Node];
 
       if (y <= PlantingDepth * 2.0 && x <= xRootExtent) {
-        const root2 = 1.0 / (4 * time) * (x * x / difx + y * y / dify);
+        const root2 = (1.0 / (4 * time)) * (x * (x / difx) + (y * y) / dify);
 
         const root1 = M / (4.0 * 3.1415 * time * Math.sqrt(difx * dify));
 
@@ -239,7 +244,7 @@ const createSoilFiles = (files) => {
   // ____________________________________________________________________________________________________________________________________
   // Writes the grid file by taking items from the original file (template) and copying to the new file.
   // The grid data with the new material numbers come from the datatable.
-  const WriteGridFile = (dsGrid, NewGridFile, OldGridFile, MatNum, BottomBC, GasBCTop, GasBCBottom) => {
+  const WriteGridFile = (dsGrid, NewGridFile, OldGridFile, MatNum) => {
     const OutNode = dsGrid[0];
     const OutElem = dsGrid[1];
     const data = readFile(OldGridFile);
@@ -353,7 +358,7 @@ const createSoilFiles = (files) => {
 
     // calculate total number of y nodes
     let YnodeCount = 0;
-    YSegment.forEach((Seg) => YnodeCount += Seg.length);
+    YSegment.forEach((Seg) => { YnodeCount += Seg.length; });
 
     s.push(` ${xSegment.length} 1   1  ${xSegment.length * YnodeCount}   ${(xSegment.length - 1) * (YnodeCount - 1)}  0  ${BottomBC}   ${GasBCTop}   ${GasBCBottom}`);
     s.push('x(j): ');
@@ -369,34 +374,35 @@ const createSoilFiles = (files) => {
   const grid_bnd = () => {
     const format = (parms, formats) => {
       let row = '';
-      formats.split(',').map((s) => s.trim()).forEach((format) => {
-        if (/\d+x/i.test(format)) {
-          row += ' '.repeat(parseInt(format));
-        } else if (/\d*i\d/i.test(format)) {
-          if (format[0] === 'i') {
-            format = `1${format}`;
+      formats.split(',').map((s) => s.trim()).forEach((fmt) => {
+        if (/\d+x/i.test(fmt)) {
+          row += ' '.repeat(parseInt(fmt, 10));
+        } else if (/\d*i\d/i.test(fmt)) {
+          if (fmt[0] === 'i') {
+            fmt = `1${fmt}`;
           }
-          const [n, w] = format.match(/\d+/g);
+          const [n, w] = fmt.match(/\d+/g);
 
           for (let i = 0; i < n; i++) {
             row += (parms.shift().toString() || '0').padStart(w);
           }
-        } else if (/\d*f\d*/i.test(format)) {
-          if (format[0] === 'f') {
-            format = `1${format}`;
+        } else if (/\d*f\d*/i.test(fmt)) {
+          if (fmt[0] === 'f') {
+            fmt = `1${fmt}`;
           }
-          const [n, w, d] = format.match(/\d+/g);
+          const [n, w, d] = fmt.match(/\d+/g);
           for (let i = 0; i < n; i++) {
             row += (+(parms.shift() || 0)).toFixed(+d).padStart(+w);
           }
-        } else if (format[0] === '\'') {
-          row += format.replace(/'/g, '');
+        } else if (fmt[0] === '\'') {
+          row += fmt.replace(/'/g, '');
         } else {
-          console.error('UNKNOWN FORMAT:', format);
+          // console.error('UNKNOWN FORMAT:', fmt);
           process.exit();
         }
       });
 
+      // eslint-disable-next-line no-use-before-define
       s.push(row);
     }; // format
 
@@ -555,7 +561,7 @@ const createSoilFiles = (files) => {
   for (let i = 1; i < MatNum - 1; i++) {
     dtLayers[i].Y = ProfileDepth - dtLayers[i].Depth;
     dtLayers[i].Y_Mid = (dtLayers[i - 1].Y - dtLayers[i].Y) / 2.0;
-    dtLayers[i].Y_Mid = dtLayers[i].Y_Mid + dtLayers[i].Y;
+    dtLayers[i].Y_Mid += dtLayers[i].Y;
   }
 
   // Now calculate slopes of changes in properties from layer to layer so we can interpolate
@@ -601,13 +607,13 @@ const createSoilFiles = (files) => {
 
     // need to store segment 1 and 2
     if (MatNum > 1) {
-      dtLayers.slice(1).forEach((Layer) => {
-        const upper = lower;
-        lower = ProfileDepth - Layer[0]; // the first item in the layer string is the depth
-        const mid = (upper - lower) / 2.0;
-        const Segment1 = CaclYNodes(InternalIntervalRatio, mid, upper, FirstInternalInterval, 1).slice(0, -1);
-        const Segment2 = CaclYNodes(SurfaceIntervalRatio, mid, lower, FirstInternalInterval, -1).sort((a, b) => b - a).slice(0, -1);
-        MasterSegment.push(Segment1, Segment2);
+      dtLayers.slice(1).forEach((lyr) => {
+        const upr = lower;
+        lower = ProfileDepth - lyr[0]; // the first item in the layer string is the depth
+        const middle = (upr - lower) / 2.0;
+        const SegmentOne = CaclYNodes(InternalIntervalRatio, middle, upr, FirstInternalInterval, 1).slice(0, -1);
+        const SegmentTwo = CaclYNodes(SurfaceIntervalRatio, middle, lower, FirstInternalInterval, -1).sort((a, b) => b - a).slice(0, -1);
+        MasterSegment.push(SegmentOne, SegmentTwo);
       });
     }
 
@@ -654,16 +660,17 @@ const createSoilFiles = (files) => {
       }
 
       // select the rows falling within the ranges of depth for that layer
-      const myRow = dtNodal.filter(expression);
+      const myRows = dtNodal.filter(expression);
 
       // standard method to loop within a DataTable
-      myRow.forEach((Row) => Row.MatNum = i + 1);
+      myRows.forEach((Row) => { Row.MatNum = i + 1; });
     });
 
     dtElem4Grid.forEach((Row) => {
       const NodeBL = Row.BL;
-      const myRow = dtNodal.filter((row) => row.Node === NodeBL);
-      Row.MatNum = myRow[0][3];
+      const theRow = dtNodal.filter((row) => row.Node === NodeBL);
+      // eslint-disable-next-line prefer-destructuring
+      Row.MatNum = theRow[0][3];
     });
 
     WriteGridFile(dsGrid, `${GridFileRoot}.grd`, 'grid_bnd', MatNum, BottomBC, GasBCTop, GasBCBottom);
@@ -706,32 +713,32 @@ const createSoilFiles = (files) => {
       if (i === MatNum - 2) {
         // in the last case we need to catch the bottom of the last layer as well.
         // This will be filtered out if Y> is used
-        expression = (row) => row.Y <= dtLayers[i].Y_Mid && row.Y >= dtLayers[i + 1].Y_Mid;
+        expression = (r) => r.Y <= dtLayers[i].Y_Mid && r.Y >= dtLayers[i + 1].Y_Mid;
       } else {
-        expression = (row) => row.Y <= dtLayers[i].Y_Mid && row.Y > dtLayers[i + 1].Y_Mid;
+        expression = (r) => r.Y <= dtLayers[i].Y_Mid && r.Y > dtLayers[i + 1].Y_Mid;
       }
 
-      const myRow = dtNodal.filter(expression);
+      const myRows = dtNodal.filter(expression);
 
-      myRow.forEach((row) => {
-        const dy = row.Y - dtLayers[i].Y_Mid;
+      myRows.forEach((r) => {
+        const dy = r.Y - dtLayers[i].Y_Mid;
         // calculate Nh and Ch here. Need OM and BD.
-        row.NO3 = dtLayers[i].NO3 + dtLayers[i].NO3_Slope * dy;
-        row.Tmpr = dtLayers[i].Tmpr + dtLayers[i].Tmpr_Slope * dy;
-        row.CO2 = dtLayers[i].CO2 + dtLayers[i].CO2_Slope * dy;
-        row.O2 = dtLayers[i].O2 + dtLayers[i].O2_Slope * dy;
-        row.NH4 = dtLayers[i].NH4 + dtLayers[i].NH4_Slope * dy;
+        r.NO3 = dtLayers[i].NO3 + dtLayers[i].NO3_Slope * dy;
+        r.Tmpr = dtLayers[i].Tmpr + dtLayers[i].Tmpr_Slope * dy;
+        r.CO2 = dtLayers[i].CO2 + dtLayers[i].CO2_Slope * dy;
+        r.O2 = dtLayers[i].O2 + dtLayers[i].O2_Slope * dy;
+        r.NH4 = dtLayers[i].NH4 + dtLayers[i].NH4_Slope * dy;
         const TempCalc = (dtLayers[i].BD + dtLayers[i].BD_Slope * dy) * 1.0e6
                          * (dtLayers[i].OM + dtLayers[i].OM_Slope * dy);
-        row.Ch = TempCalc * PERCENT_C;
-        row.Nh = TempCalc * PERCENT_N;
+        r.Ch = TempCalc * PERCENT_C;
+        r.Nh = TempCalc * PERCENT_N;
       });
 
-      dtLayers.forEach((row, i) => {
+      dtLayers.forEach((rowLine, ix) => {
         // we use MatNum here to select corresponding rows from each table
-        const myRow = dtNodal.filter((row) => row.MatNum === i + 1);
-        myRow.forEach((mrow) => {
-          mrow.hNew = row.hNew;
+        const myRowL = dtNodal.filter((r) => r.MatNum === ix + 1);
+        myRowL.forEach((mrow) => {
+          mrow.hNew = rowLine.hNew;
         });
       });
     });

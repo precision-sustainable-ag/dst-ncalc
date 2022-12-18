@@ -17,7 +17,7 @@ const Soil = () => {
           <>
             <p className="note">
               The data below was pulled from NRCS`&apos;`s Soil Survey
-              Geographic database (SSURGO) based on your field's latitude/longitude coordinates.
+              Geographic database (SSURGO) based on your field`&apos;`s latitude/longitude coordinates.
             </p>
             <p className="note">
               You can adjust them if you have lab results.
