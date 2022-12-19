@@ -1,5 +1,5 @@
-@import url('https://fonts.googleapis.com/css?family=IBM+Plex+Sans');
-@import url('https://fonts.googleapis.com/icon?family=Material+Icons');
+@import url("https://fonts.googleapis.com/css?family=IBM+Plex+Sans");
+@import url("https://fonts.googleapis.com/icon?family=Material+Icons");
 
 body {
   background: #eee;
@@ -11,7 +11,6 @@ body {
 
 #root {
   max-width: 1200px;
-  min-width: 800px;
   min-height: 800px;
   margin: auto;
   background: white;
@@ -37,23 +36,25 @@ h3 {
 
 table {
   border: 1px solid black;
-  border-spacing: 0; 
+  border-spacing: 0;
   empty-cells: show;
 }
 
-td, th {
+td,
+th {
   padding: 0.2em 0.5em;
   border-right: 1px solid #ddd;
   border-bottom: 1px solid #bbb;
   vertical-align: top;
 }
 
-#lat, #lon {
-	width: 5em;
+#lat,
+#lon {
+  width: 5em;
 }
 
 .hidden {
-	display: none;
+  display: none;
 }
 
 table.coverCrop {
@@ -114,6 +115,7 @@ nav img {
   padding: 2rem 3rem;
   position: relative;
   min-height: 850px;
+  max-width: 100vw;
 }
 
 .fullwidth {
@@ -131,8 +133,10 @@ nav img {
   font-size: 1rem;
 }
 
-.link, .bn button, button.bn {
-  background: #6B9333;
+.link,
+.bn button,
+button.bn {
+  background: #6b9333;
   box-shadow: 0px 2px 2px rgba(160, 160, 160, 0.3);
   border-radius: 2rem;
   color: white;
@@ -143,7 +147,9 @@ nav img {
   text-align: center;
 }
 
-.home .link, .home button, .about button {
+.home .link,
+.home button,
+.about button {
   display: inline-block;
   width: 12rem !important;
 }
@@ -161,7 +167,7 @@ div.bn {
 }
 
 .inputs {
-  color: #4F6B14;
+  color: #4f6b14;
   font-size: 110%;
 }
 
@@ -198,7 +204,7 @@ input[name="residue"] {
 
 a {
   font-weight: bold;
-  color: #385E1B;
+  color: #385e1b;
   text-decoration: none;
 }
 
@@ -228,8 +234,9 @@ a:hover {
   padding: 0.5em;
 }
 
-.output button.selected, .mockup button.selected {
-  background: #8EB644;
+.output button.selected,
+.mockup button.selected {
+  background: #8eb644;
 }
 
 .mockup button {
@@ -298,7 +305,7 @@ input::-webkit-inner-spin-button {
   cursor: pointer;
 }
 
-[contenteditable=true]:empty:before{
+[contenteditable="true"]:empty:before {
   content: attr(placeholder);
   pointer-events: none;
   font-style: italic;
@@ -341,4 +348,72 @@ button.feedback {
   right: 8px;
   top: 3px;
   width: 7rem;
+}
+
+.menu-icon {
+  visibility: hidden;
+}
+
+.menu-modal {
+  width: 200px;
+  height: 100%;
+  background-color: #333;
+  position: absolute;
+  right: 0;
+  top: 0;
+  z-index: 999;
+}
+
+.close-icon {
+  top: 1rem;
+  right: 2rem;
+  position: absolute;
+  color: #fff;
+}
+
+/*
+sm	640px
+md	768px
+lg	1024px
+xl	1280px
+2xl	1536px
+*/
+
+@media screen and (max-width: 640px) {
+  .home-button-container {
+    display: flex;
+    justify-content: center;
+    flex-direction: column;
+    align-items: center;
+    gap: 10px;
+    margin-left: 3em;
+  }
+}
+
+@media screen and (max-width: 768px) {
+  .nav {
+    display: none;
+  }
+  button.feedback {
+    display: none;
+  }
+
+  #Privacy {
+    display: none;
+  }
+  .home {
+    margin-top: 50px;
+  }
+  .nav-menu-div {
+  display: flex;
+  justify-content: flex-end;
+  align-items: flex-start;
+  }
+  .menu-icon {
+    visibility: visible;
+    top: 1rem;
+    right: 2rem;
+    position: absolute;
+  
+  }
 }
