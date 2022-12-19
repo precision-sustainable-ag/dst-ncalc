@@ -1,3 +1,4 @@
+import { useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { Route, NavLink, Routes, useNavigate } from "react-router-dom";
 
@@ -60,6 +61,7 @@ const Init = screens.init;
 const App = () => {
   const dispatch = useDispatch();
   const navigate = useNavigate();
+  const [navModalOpen, setNavModalOpen] = useState(false);
 
   useSelector(get.screen); // force render
 
@@ -108,10 +110,20 @@ const App = () => {
               );
             })}
         </nav>
-        <MenuIcon className="menu-icon" fontSize="large" />
-        {/* <div className="menu-modal">
-          <CloseIcon className="close-icon" fontSize="large" />
-        </div> */}
+        <MenuIcon
+          className="menu-icon"
+          fontSize="large"
+          onClick={() => setNavModalOpen(true)}
+        />
+        {navModalOpen && (
+          <div className="menu-modal">
+            <CloseIcon
+              className="close-icon"
+              fontSize="large"
+              onClick={() => setNavModalOpen(false)}
+            />
+          </div>
+        )}
       </div>
 
       <Routes>
