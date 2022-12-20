@@ -81,7 +81,6 @@ const Init = () => {
   }, [dispatch]);
 
   const loadField = (fieldVal) => {
-    console.log('localStorage', localStorage);
     if (fieldVal === 'Example: Grass') {
       navigate('location');
       dispatch(set.edited(true));
@@ -202,7 +201,7 @@ const Init = () => {
       }
 
       {
-        (!PSA && Object.keys(localStorage).length)
+        (!PSA)
         && (
           <select
             className="fields"
