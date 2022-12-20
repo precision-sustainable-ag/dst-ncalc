@@ -1,7 +1,7 @@
-/* eslint-disable no-use-before-define */
+/* eslint-disable no-shadow */
+/* eslint-disable max-len */
 /* eslint-disable no-alert */
-/* eslint-disable camelcase */
-/* eslint-disable import/no-unresolved */
+/* eslint-disable no-use-before-define */
 import React, { useEffect } from 'react';
 import { useSelector, useDispatch } from 'react-redux';
 import JSZip from 'jszip';
@@ -37,22 +37,22 @@ const ExcelDateToJSDate = (serial) => { // https://stackoverflow.com/a/65472305/
   }
   // Deal with time zone
   const step = new Date().getTimezoneOffset() <= 0 ? 25567 + 2 : 25567 + 1;
-  const utc_days = Math.floor(serial - step);
-  const utc_value = utc_days * 86400;
-  const date_info = new Date(utc_value * 1000);
+  const utcDays = Math.floor(serial - step);
+  const utcValue = utcDays * 86400;
+  const dateInfo = new Date(utcValue * 1000);
 
-  const fractional_day = serial - Math.floor(serial) + 0.0000001;
+  const fractionalDay = serial - Math.floor(serial) + 0.0000001;
 
-  let total_seconds = Math.floor(86400 * fractional_day);
+  let totalSeconds = Math.floor(86400 * fractionalDay);
 
-  const seconds = total_seconds % 60;
+  const seconds = totalSeconds % 60;
 
-  total_seconds -= seconds;
+  totalSeconds -= seconds;
 
-  const hours = Math.floor(total_seconds / (60 * 60));
-  const minutes = Math.floor(total_seconds / 60) % 60;
+  const hours = Math.floor(totalSeconds / (60 * 60));
+  const minutes = Math.floor(totalSeconds / 60) % 60;
 
-  return new Date(date_info.getFullYear(), date_info.getMonth(), date_info.getDate(), hours, minutes, seconds);
+  return new Date(dateInfo.getFullYear(), dateInfo.getMonth(), dateInfo.getDate(), hours, minutes, seconds);
 }; // ExcelDateToJSDate
 
 const dateFormat = (date) => {
@@ -69,20 +69,18 @@ const dateFormat = (date) => {
 
 const WorksheetData = () => {
   const data = useSelector(get.worksheet);
-  // console.log(data);
   const site = useSelector(get.site);
-  // console.log(site);
 
   if (!data.length) {
     return null;
   }
 
-  const ccols = Object.keys(data[0]);
+  const cols = Object.keys(data[0]);
 
   data.forEach((row) => { // first row may be missing data
     Object.keys(row).forEach((col) => {
-      if (!ccols.includes(col)) {
-        ccols.push(col);
+      if (!cols.includes(col)) {
+        cols.push(col);
       }
     });
   });
@@ -92,7 +90,7 @@ const WorksheetData = () => {
       <table>
         <thead>
           <tr>
-            {ccols.map((key) => <th key={key}>{key}</th>)}
+            {cols.map((key) => <th key={key}>{key}</th>)}
           </tr>
         </thead>
         <tbody>
@@ -100,7 +98,7 @@ const WorksheetData = () => {
             data.map((row, i) => (
               <tr key={i} className={JSON.stringify(row).includes(site) ? 'selected' : ''}>
                 {
-                  ccols.map((key) => (
+                  cols.map((key) => (
                     <td key={key}>
                       {
                         Number.isFinite(row[key]) ? +(+row[key]).toFixed(5) : row[key]
@@ -117,53 +115,12 @@ const WorksheetData = () => {
   );
 }; // WorksheetData
 
-const files = useSelector(get.soilfiles);
-const site = useSelector(get.site);
-const xl = useSelector(get.xl);
-
 const SoilFiles = () => {
   const getSoilFiles = () => {
     let soilFile;
     let climateID;
 
-    const dbRecord = (table, id) => {
-      let key;
-      if (table === 'Soil') {
-        key = 'soilfile';
-      } else if (table === 'GridRatio') {
-        key = 'soilfile';
-      } else if (table === 'Climate') {
-        key = 'climateid';
-      } else if (table === 'Weather') {
-        key = 'climateid';
-      } else if (table === 'Variety') {
-        key = 'hybrid';
-      } else {
-        key = 'id';
-      }
-
-      const data = xl[table];
-
-      if (!data) alert(table);
-      const recs = data.filter((d) => (d[key] || '').toLowerCase().trim() === id.toLowerCase().trim());
-
-      if (!recs.length) {
-        alert(`Unknown: ${table} ${id}`);
-      } else if (recs.length > 1) {
-        return recs;
-      } else {
-        return new Proxy(recs[0], {
-          // eslint-disable-next-line no-shadow
-          get(target, key) {
-            return key in target ? target[key] : target[key.toLowerCase()];
-          },
-        });
-      }
-      return null;
-    }; // dbRecord
-
     const max = (table, id, col) => Math.max(...dbRecord(table, id).map((d) => +d[col])); // max
-
     const noe = (n, round = 16) => (+n).toFixed(round).replace(/0+$/, '').replace(/\.$/, '');
 
     const dbRecords = (table, id) => {
@@ -190,6 +147,39 @@ const SoilFiles = () => {
 
       return recs;
     }; // dbRecords
+
+    const dbRecord = (table, id) => {
+      let key;
+      if (table === 'Soil') {
+        key = 'soilfile';
+      } else if (table === 'GridRatio') {
+        key = 'soilfile';
+      } else if (table === 'Climate') {
+        key = 'climateid';
+      } else if (table === 'Weather') {
+        key = 'climateid';
+      } else if (table === 'Variety') {
+        key = 'hybrid';
+      } else {
+        key = 'id';
+      }
+      const data = xl[table];
+      if (!data) alert(table);
+      const recs = data.filter((d) => (d[key] || '').toLowerCase().trim() === id.toLowerCase().trim());
+
+      if (!recs.length) {
+        alert(`Unknown: ${table} ${id}`);
+      } else if (recs.length > 1) {
+        return recs;
+      } else {
+        return new Proxy(recs[0], {
+          get(target, k) {
+            return k in target ? target[k] : target[k.toLowerCase()];
+          },
+        });
+      }
+      return null;
+    }; // dbRecord
 
     const output = (path, s) => {
       // console.log('output', path);
@@ -270,6 +260,8 @@ const SoilFiles = () => {
       const textureCl = [];
 
       soilRecs.forEach(() => {
+        // const texture = '/loam /clay  /silt';
+        // const slashes = texture.split('/');
         textureCl.push('clay'); // TODO
       });
 
@@ -350,15 +342,15 @@ const SoilFiles = () => {
           *** Script for management practices fertilizer, residue and tillage
           [N Fertilizer]
           ****Script for chemical application module  *******mg/cm2= kg/ha* 0.01*rwsp*eomult*100
-          Number of Fertilizer applications (max=25) mappl is in total mg N applied to 
-          grid (1 kg/ha = 1 mg/m2/width of application) application divided by width of grid in cm is kg ha-1
+          Number of Fertilizer applications (max=25) mappl is in total mg N applied to grid (1 kg/ha = 1 mg/m2/width 
+          of application) application divided by width of grid in cm is kg ha-1
            ${fertRecs.length}
           mAppl is manure, lAppl is litter. Apply as mg/cm2 of slab same units as N
           tAppl(i)  AmtAppl(i) depth(i) lAppl_C(i) lAppl_N(i)  mAppl_C(i) mAppl_N(i)  (repeat these 3 lines for the number of fertilizer applications)
         `);
 
         // fert data are in the rs record set
-        const factor = (0.01 * maxX) / 100; // m2 of slab
+        const factor = 0.01 * (maxX / 100); // m2 of slab
 
         fertRecs.forEach((rec) => {
           // area of slab m2/slab x kg/ha x 1 ha/10000 m2 *1e6 mg/kg = mg/slab
@@ -495,42 +487,15 @@ const SoilFiles = () => {
         Surface water Boundary Code  surface and bottom Gas boundary codes
         for the  (water boundary code for bottom layer (for all bottom nodes) 1 constant -2 seepage face,  7 drainage
         ${cols(gridRec.BottomBC, gridRec.GasBCTop, gridRec.GasBCBottom)}
-         Bottom depth Init Type  OM (%/100)   no3(ppm)       NH4         hNew       Tmpr     CO2     O2    Sand     
-         Silt    Clay     BD     TH33     TH1500  thr ths tha th  Alfa    n   Ks  Kk  thk
-         cm         w/m              Frac      ppm          ppm           cm         0C     ppm   ppm  ----  
-         fraction---     g/cm3    cm3/cm3   cm3/cm3
+         Bottom depth Init Type  OM (%/100)   no3(ppm)       NH4         hNew       Tmpr     CO2     O2    Sand     Silt    Clay     BD     TH33     TH1500  thr ths tha th  Alfa    n   Ks  Kk  thk
+         cm         w/m              Frac      ppm          ppm           cm         0C     ppm   ppm  ----  fraction---     g/cm3    cm3/cm3   cm3/cm3
       `);
 
       // now add soil properties
       const soilRecs = dbRecords('Soil', soilFile);
 
       soilRecs.forEach((rec) => {
-        s += ` ${cols(
-          rec['bottom depth'],
-          rec['init type'],
-          noe(rec['om (%/100)'], 5),
-          noe(rec['no3 (ppm)'], 5),
-          rec.nh4,
-          rec.hnew,
-          rec.tmpr,
-          rec['co2(ppm)'],
-          rec['o2(ppm)'],
-          rec.sand / 100,
-          rec.silt / 100,
-          rec.clay / 100,
-          rec.bd,
-          rec.th33,
-          rec.th1500,
-          rec.thr,
-          rec.ths,
-          rec.tha,
-          rec.th,
-          rec.alfa,
-          rec.n,
-          rec.ks,
-          rec.kk,
-          rec.thk,
-        )}\n`;
+        s += ` ${cols(rec['bottom depth'], rec['init type'], noe(rec['om (%/100)'], 5), noe(rec['no3 (ppm)'], 5), rec.nh4, rec.hnew, rec.tmpr, rec['co2(ppm)'], rec['o2(ppm)'], rec.sand / 100, rec.silt / 100, rec.clay / 100, rec.bd, rec.th33, rec.th1500, rec.thr, rec.ths, rec.tha, rec.th, rec.alfa, rec.n, rec.ks, rec.kk, rec.thk)}\n`;
       });
 
       output(path, s);
@@ -571,15 +536,7 @@ const SoilFiles = () => {
         Corn growth simulation for  ${descRec.Hybrid}   variety 
          Juvenile   Daylength   StayGreen  LA_min  Rmax_LTAR              Rmax_LTIR                Phyllochrons from
          leaves     Sensitive               Leaf tip appearance   Leaf tip initiation       TassellInit
-        ${cols(
-    varietyRec.JuvenileLeaves,
-    varietyRec.DaylengthSensitive,
-    varietyRec.StayGreen,
-    varietyRec.LM_min,
-    varietyRec.Rmax_LTAR,
-    varietyRec.Rmax_LTIR,
-    varietyRec.PhyllFrmTassel,
-  )}
+        ${cols(varietyRec.JuvenileLeaves, varietyRec.DaylengthSensitive, varietyRec.StayGreen, varietyRec.LM_min, varietyRec.Rmax_LTAR, varietyRec.Rmax_LTIR, varietyRec.PhyllFrmTassel)}
         [SoilRoot]
         *** WATER UPTAKE PARAMETER INFORMATION **************************
          RRRM       RRRY    RVRL
@@ -665,15 +622,7 @@ const SoilFiles = () => {
         Latitude Longitude
         ${cols(climateRec.Latitude, climateRec.Longitude)}
         ^Daily Bulb T(1) ^ Daily Wind(2) ^RainIntensity(3) ^Daily Conc^(4) ,Furrow(5) ^Rel_humid(6) ^CO2(7)
-        ${cols(
-    climateRec.DailyBulb,
-    climateRec.DailyWind,
-    climateRec.RainIntensity,
-    climateRec.DailyConc,
-    climateRec.Furrow,
-    climateRec.RelHumid,
-    climateRec.DailyCO2,
-  )}
+        ${cols(climateRec.DailyBulb, climateRec.DailyWind, climateRec.RainIntensity, climateRec.DailyConc, climateRec.Furrow, climateRec.RelHumid, climateRec.DailyCO2)}
         Parameters for changing of units: BSOLAR BTEMP ATEMP ERAIN BWIND BIR
          BSOLAR is 1e6/3600 to go from j m-2 h-1 to wm-2
         ${cols(climateRec.Bsolar, climateRec.Btemp, climateRec.Atemp, climateRec.Erain, climateRec.BWind, climateRec.BIR)}
@@ -689,7 +638,7 @@ const SoilFiles = () => {
       // const path = descRec.NitrogenFile;
       const path = 'agmip.nit';
       const soilRecs = dbRecord('Soil', soilFile);
-      const maxX = dbRecord('Init', site)['RowSpacing(cm)'] / ((2 / 100) * 2);
+      const maxX = dbRecord('Init', site)['RowSpacing(cm)'] / 2 / (100 * 2);
 
       let s = ` ${unindent(0, `
         *** SoilNit parameters for: ${site}***
@@ -699,22 +648,7 @@ const SoilFiles = () => {
           m      kh     kL       km       kn        kd             fe   fh    r0   rL    rm   fa    nq   cs\n`)}`;
 
       soilRecs.forEach((rec, i) => {
-        s += ` ${cols(
-          i + 1,
-          noe(rec.kh),
-          noe(rec.kl),
-          noe(rec.km),
-          noe(rec.kn),
-          noe(rec.kd),
-          rec.fe,
-          rec.fh,
-          rec.r0,
-          rec.rl,
-          rec.rm,
-          rec.fa,
-          rec.nq,
-          noe(rec.cs),
-        )}\n`;
+        s += ` ${cols(i + 1, noe(rec.kh), noe(rec.kl), noe(rec.km), noe(rec.kn), noe(rec.kd), rec.fe, rec.fh, rec.r0, rec.rl, rec.rm, rec.fa, rec.nq, noe(rec.cs))}\n`;
       });
 
       output(path, s);
@@ -790,7 +724,11 @@ const SoilFiles = () => {
     createSoilFiles(files);
   }; // getSoilFiles
 
+  const files = {};
+
   const dispatch = useDispatch();
+  const xl = useSelector(get.xl);
+  const site = useSelector(get.site);
 
   getSoilFiles();
 
@@ -840,6 +778,9 @@ const SoilFiles2 = () => {
 
     return rep(s1) === rep(s2);
   }; // match
+
+  const files = useSelector(get.soilfiles);
+  const site = useSelector(get.site);
 
   return (
     <div>
@@ -909,6 +850,7 @@ const SoilFiles2 = () => {
 
 const Worksheet = () => {
   const dispatch = useDispatch();
+  const xl = useSelector(get.xl);
   const data = useSelector(get.data);
   const button = useSelector(get.worksheetName);
 
@@ -919,9 +861,9 @@ const Worksheet = () => {
         tabIndex="0"
         onKeyDown={() => null}
         onClick={(e) => {
-          const bbutton = e.target;
-          if (bbutton.tagName === 'BUTTON') {
-            const text = bbutton.textContent;
+          const b = e.target;
+          if (b.tagName === 'BUTTON') {
+            const text = b.textContent;
             dispatch(set.worksheetName(text));
             if (text !== 'Output') {
               dispatch(set.worksheet(xl[text]));
