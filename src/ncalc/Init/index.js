@@ -136,7 +136,6 @@ const Init = () => {
             dispatch(set[key](inputs[key]));
           }
         } catch (e) {
-          // eslint-disable-next-line no-console
           console.log(key, e.message);
         }
       });
@@ -212,15 +211,15 @@ const Init = () => {
             <option>Example: Grass</option>
             <option>Example: Legume</option>
             {
-              Object.keys(localStorage).length && (
+              Object.keys(localStorage).filter((v) => !v.includes('mapbox.eventData')).length && (
                 <>
                   <option>Clear previous runs</option>
                   <option disabled>____________________</option>
                 </>
               )
             }
-            {
-              Object.keys(localStorage).sort().map((fld, idx) => (
+            { // additional field names in example dropdown
+              Object.keys(localStorage).sort().filter((v) => !v.includes('mapbox.eventData')).map((fld, idx) => (
                 <option key={idx} checked={fld === field}>{fld}</option> // eslint-disable-line react/no-unknown-property
               ))
             }

@@ -51,7 +51,6 @@ const Input = ({
   immediate,
   ...props
 }) => {
-  // console.log(`Render: Input ${id}`);
   const dispatch = useDispatch();
 
   let obj = id;
@@ -78,7 +77,6 @@ const Input = ({
   const [v2, setv2] = useState(value || sel2);
 
   const [changed, setChanged] = useState(false);
-
   const isArray = Array.isArray(sel2) && !props.multiple; // TODO
 
   if (!type && /\$/.test(id)) {
@@ -135,8 +133,7 @@ const Input = ({
 
   const update = useCallback(
     (e, newValue) => {
-      // eslint-disable-next-line
-      if (newValue == value && sel2 !== undefined) return; // == in case numeric
+      if (newValue === value && sel2 !== undefined) return; // == in case numeric
 
       setChanged(true);
 
@@ -148,23 +145,18 @@ const Input = ({
         }
       }
 
-      let s = set;
-      id.split('.').forEach((k) => {
-        s = s[k];
-      });
-
+      const fieldSetter = set[id];
       if (type === 'percent') {
         newValue /= 100;
       }
 
       if (isArray) {
         if (sel2[index] !== newValue) {
-          dispatch(s({ index, value: newValue }));
+          dispatch(fieldSetter({ index, value: newValue }));
         }
       } else if (sel2 !== newValue) {
-        dispatch(s(newValue));
+        dispatch(fieldSetter(newValue));
       }
-
       if (onChange) {
         onChange(e, newValue);
       }
