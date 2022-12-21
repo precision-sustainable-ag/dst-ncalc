@@ -41,25 +41,23 @@ const Section = ({ title, section }) => {
   );
 }; // Section
 
-const Inputs = () => {
-  (
-    <div className="Inputs">
-      <h1>Inputs</h1>
-      <table>
-        <Section section="Biology" />
-        <Section section="Climate" />
-        <Section section="Fertilization" />
-        <Section section="GridRatio" />
-        <Section section="Irrigation" />
-        <Section section="Soil" />
-      </table>
+const Inputs = () => (
+  <div className="Inputs">
+    <h1>Inputs</h1>
+    <table>
+      <Section section="Biology" />
+      <Section section="Climate" />
+      <Section section="Fertilization" />
+      <Section section="GridRatio" />
+      <Section section="Irrigation" />
+      <Section section="Soil" />
+    </table>
 
-      <div className="bn">
-        <Link className="link" to="/soil">BACK</Link>
-        <Link className="link" to="/worksheet">NEXT</Link>
-      </div>
+    <div className="bn">
+      <Link className="link" to="/soil">BACK</Link>
+      <Link className="link" to="/worksheet">NEXT</Link>
     </div>
-  );
-}; // Inputs
+  </div>
+); // Inputs
 
 export default Inputs;

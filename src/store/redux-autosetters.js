@@ -1,3 +1,5 @@
+/* eslint-disable no-alert */
+/* eslint-disable no-shadow */
 import { configureStore, createAction, createReducer } from '@reduxjs/toolkit';
 import axios from 'axios';
 
@@ -26,7 +28,7 @@ export const createStore = (initialState, { afterChange = {}, reducers = {} }) =
   });
 
   const builders = (builder) => {
-    const recurse = (obj, setIn, getIn, parents = []) => {
+    const recurse = (obj, set, get, parents = []) => {
       if (!obj) { // TODO dst-econ
         // console.log(set);
         return;
@@ -37,15 +39,13 @@ export const createStore = (initialState, { afterChange = {}, reducers = {} }) =
         const fullkey = parents.length ? `${parents.join('.')}.${key}` : key;
         allkeys[fullkey] = true;
 
-        getIn[key] = (state) => {
+        get[key] = (state) => {
           let st = state;
-
-          Object.keys(parents).forEach((k) => {
-            st = st[k];
-          });
+          // eslint-disable-next-line no-restricted-syntax
+          for (const k of parents) st = st[k];
 
           if (!st) {
-            alert(`Unknown: ${fullkey}`); // eslint-disable-line no-alert
+            alert(`Unknown: ${fullkey}`);
           }
           return st[key];
         };
@@ -64,12 +64,13 @@ export const createStore = (initialState, { afterChange = {}, reducers = {} }) =
           obj[key] = funcs[fullkey](initialState);
         }
 
-        setIn[key] = createAction(fullkey);
+        set[key] = createAction(fullkey);
 
         builder
-          .addCase(setIn[key], (state, action) => {
+          .addCase(set[key], (state, action) => {
             let st = state;
-            for (const k of parents) st = st[k]; // eslint-disable-line no-restricted-syntax
+            // eslint-disable-next-line no-restricted-syntax
+            for (const k of parents) st = st[k];
 
             if (isArray && Number.isFinite(action.payload.index)) {
               const { index, value } = action.payload;
@@ -85,22 +86,23 @@ export const createStore = (initialState, { afterChange = {}, reducers = {} }) =
               }
             }
 
+            // TODO:  Is the first of these needed?
             processMethods(state, key);
             processMethods(state, fullkey);
 
             if (afterChange[fullkey]) {
               const func = afterChange[fullkey].toString();
               // eslint-disable-next-line no-restricted-syntax
-              for (const keyval in allkeys) {
-                if (func.match(new RegExp(`${keyval.replace(/[.$]/g, (c) => `\\${c}`)}`))) {
-                  processMethods(state, keyval);
+              for (const key in allkeys) {
+                if (func.match(new RegExp(`${key.replace(/[.$]/g, (c) => `\\${c}`)}`))) {
+                  processMethods(state, key);
                 }
               }
             }
           });
 
         if (isObject) {
-          recurse(obj[key], setIn[key], getIn[key], [...parents, key]);
+          recurse(obj[key], set[key], get[key], [...parents, key]);
         }
       });
     }; // recurse

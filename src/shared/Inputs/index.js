@@ -131,38 +131,39 @@ const Input = ({
     setValue(vvalue);
   }; // change
 
-  const update = useCallback(
-    (e, newValue) => {
-      if (newValue === value && sel2 !== undefined) return; // == in case numeric
+  const update = useCallback((e, newValue) => {
+    if (newValue === value && sel2 !== undefined) return; // == in case numeric
 
-      setChanged(true);
+    setChanged(true);
 
-      if (/dollar|number|percent/.test(type)) {
-        if (newValue === '') {
-          newValue = undefined;
-        } else {
-          newValue = +newValue;
-        }
+    if (/dollar|number|percent/.test(type)) {
+      if (newValue === '') {
+        newValue = undefined;
+      } else {
+        newValue = +newValue;
       }
+    }
 
-      const fieldSetter = set[id];
-      if (type === 'percent') {
-        newValue /= 100;
-      }
+    let s = set;
+    // eslint-disable-next-line arrow-parens, no-return-assign
+    id.split('.').forEach(k => s = s[k]);
 
-      if (isArray) {
-        if (sel2[index] !== newValue) {
-          dispatch(fieldSetter({ index, value: newValue }));
-        }
-      } else if (sel2 !== newValue) {
-        dispatch(fieldSetter(newValue));
+    if (type === 'percent') {
+      newValue /= 100;
+    }
+
+    if (isArray) {
+      if (sel2[index] !== newValue) {
+        dispatch(s({ index, value: newValue }));
       }
-      if (onChange) {
-        onChange(e, newValue);
-      }
-    },
-    [onChange, value, dispatch, id, index, isArray, sel2, type],
-  ); // update
+    } else if (sel2 !== newValue) {
+      dispatch(s(newValue));
+    }
+
+    if (onChange) {
+      onChange(e, newValue);
+    }
+  }, [onChange, value, dispatch, id, index, isArray, sel2, type]); // update
 
   value = value !== undefined ? value : val;
 
