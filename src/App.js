@@ -122,6 +122,40 @@ const App = () => {
               fontSize="large"
               onClick={() => setNavModalOpen(false)}
             />
+            <div className="menu-modal-div">
+              {Object.keys(screens)
+                .filter((scr) => screens[scr].showInMenu !== false)
+                .map((scr) => {
+                  return (
+                    <NavLink
+                      key={scr}
+                      className={scr.toLowerCase()}
+                      onClick={() => {
+                        setNavModalOpen(false);
+                        dispatch(set.screen(scr));
+                      }}
+                      style={({ isActive }) => {
+                        return {
+                          color: "#fff",
+                          fontSize: "1.1rem",
+                        };
+                      }}
+                      to={"/" + scr.toLowerCase()}
+                    >
+                      {screens[scr].desc || scr}
+                    </NavLink>
+                  );
+                })}
+              <button
+                onClick={() => {
+                  setNavModalOpen(false);
+                  navigate("feedback");
+                }}
+              >
+                FEEDBACK
+              </button>
+              <Init />
+            </div>
           </div>
         )}
       </div>

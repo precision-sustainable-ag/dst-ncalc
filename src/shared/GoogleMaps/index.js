@@ -111,121 +111,138 @@ const Map = ({field=false, autoFocus, inputs=true, id='GoogleMap', mapOptions={}
     }, [location, inputValue, fetch]);
   
     return (
-      <>
-        {
-          inputs && (
-            <Input
-              id="location"
-              getOptionLabel={(option) => (typeof option === 'string' ? option : option.description)}
-              options={options}
-              autoComplete
-              includeInputInList
-              filterSelectedOptions
-      
-              onChange={(_, newValue) => {geocode(newValue);}}
-      
-              onInputChange={(_, newInputValue) => {
-                setInputValue(newInputValue);
-              }}
-      
-              renderInput={(params) => {
-                return (
-                  <>
-                    <TextField
-                      {...params}
-                      autoFocus={autoFocus}
-                      label="Find your Location"
-                      style={{width: field ? '50%' : '100%', float: field ? 'left' : ''}}
-                    />
-                  </>
-                )
-              }}
-  
-              renderOption={(props, option) => {
-                let matches = [];
-                let parts = [];
-                if (option.structured_formatting) {
-                  matches = option.structured_formatting.main_text_matched_substrings;
-        
-                  parts = parse(
-                    option.structured_formatting.main_text,
-                    matches.map((match) => [match.offset, match.offset + match.length]),
-                  );
-                }
-        
-                return (
-                  <Grid container spacing={1} alignItems="center" {...props}>
-                    <Grid item>
-                      <LocationOnIcon />
-                    </Grid>
-                    <Grid item xs>
-                      {parts.map((part, index) => (
-                        <span key={index} style={{fontWeight: part.highlight ? 700 : 400}}>
-                          {part.text}
-                        </span>
-                      ))}
-        
-                      <Typography variant="body2" color="textSecondary">
-                        {option.structured_formatting ? option.structured_formatting.secondary_text : ''}
-                      </Typography>
-                    </Grid>
-                  </Grid>
+      <div className="location-input-div">
+        {inputs && (
+          <Input
+            id="location"
+            getOptionLabel={(option) =>
+              typeof option === "string" ? option : option.description
+            }
+            options={options}
+            autoComplete
+            includeInputInList
+            filterSelectedOptions
+            onChange={(_, newValue) => {
+              geocode(newValue);
+            }}
+            onInputChange={(_, newInputValue) => {
+              setInputValue(newInputValue);
+            }}
+            renderInput={(params) => {
+              return (
+                <>
+                  <TextField
+                    {...params}
+                    autoFocus={autoFocus}
+                    label="Find your Location"
+                    style={{
+                      // width: field ? "50%" : "100%",
+                      // float: field ? "left" : "",
+                      width: "100%",
+                    }}
+                  />
+                </>
+              );
+            }}
+            renderOption={(props, option) => {
+              let matches = [];
+              let parts = [];
+              if (option.structured_formatting) {
+                matches =
+                  option.structured_formatting.main_text_matched_substrings;
+
+                parts = parse(
+                  option.structured_formatting.main_text,
+                  matches.map((match) => [
+                    match.offset,
+                    match.offset + match.length,
+                  ])
                 );
-              }}
-            />
-          )
-        }
-        
-        {
-          field &&
-          <>
+              }
+
+              return (
+                <Grid container spacing={1} alignItems="center" {...props}>
+                  <Grid item>
+                    <LocationOnIcon />
+                  </Grid>
+                  <Grid item xs>
+                    {parts.map((part, index) => (
+                      <span
+                        key={index}
+                        style={{ fontWeight: part.highlight ? 700 : 400 }}
+                      >
+                        {part.text}
+                      </span>
+                    ))}
+
+                    <Typography variant="body2" color="textSecondary">
+                      {option.structured_formatting
+                        ? option.structured_formatting.secondary_text
+                        : ""}
+                    </Typography>
+                  </Grid>
+                </Grid>
+              );
+            }}
+          />
+        )}
+
+        {field && (
+          <div style={{ display: "flex" }}>
             <Input
+              //width: 'calc(50% - 2em)',
               label="Name your Field"
               id="field"
               autoComplete="off"
-              style={{width: 'calc(50% - 2em)', height: '3rem'}}
-              
+              style={{ width: "100%", height: "3rem" }}
             />
             <Help className="moveLeft">
               <p>
-                This input is optional.  If you enter a field name, you'll be able to rerun the model on this computer without re-entering your data.
+                This input is optional. If you enter a field name, you'll be
+                able to rerun the model on this computer without re-entering
+                your data.
               </p>
-              <p>
-                Notes:
-              </p>
+              <p>Notes:</p>
               <ul>
-                <li>If you have multiple fields, you'll be able to select them from a drop-down menu in the upper-right.</li>
-                <li>Your information is stored on your computer only.  It will not be uploaded to a server.</li>
-                <li>If you clear your browser's cache, you'll need to re-enter your data the next time you run the program.</li>
+                <li>
+                  If you have multiple fields, you'll be able to select them
+                  from a drop-down menu in the upper-right.
+                </li>
+                <li>
+                  Your information is stored on your computer only. It will not
+                  be uploaded to a server.
+                </li>
+                <li>
+                  If you clear your browser's cache, you'll need to re-enter
+                  your data the next time you run the program.
+                </li>
               </ul>
             </Help>
-          </>
-        }
-  
-        {
-          inputs && (
-            <div id="coordinates">
-              If you know your exact coordinates, you can enter them here:
-              <div>
-                <Input
-                  id="lat"
-                  value={lat}
-                  label="Latitude"
-                  type="number"
-                  sx={{margin: 1}}
-                />
-                <Input
-                  id="lon"
-                  value={lon}
-                  label="Longitude"
-                  type="number"
-                  sx={{margin: 1}}
-                />
-              </div>
+          </div>
+        )}
+
+        {inputs && (
+          <div id="coordinates">
+            <p>If you know your exact coordinates, you can enter them here:</p>
+            <div>
+              <Input
+                id="lat"
+                value={lat}
+                label="Latitude"
+                type="number"
+                sx={{ margin: 1 }}
+              />
+              <Input
+                id="lon"
+                value={lon}
+                label="Longitude"
+                type="number"
+                sx={{ margin: 1 }}
+              />
             </div>
-          )
-        }
-      </>
+          </div>
+        )}
+      </div>
     );
   } // GoogleMaps
   
