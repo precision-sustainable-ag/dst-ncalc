@@ -1,3 +1,4 @@
+/* eslint-disable no-console */
 /* eslint-disable import/prefer-default-export */
 // ____________________________________________________________________________________________________________________________________
 // emulate C# DataTable
@@ -20,9 +21,9 @@ const dataTable = (data, columns) => {
           return target[key];
         }
         const idx = columns.indexOf(key);
-        // if (idx === -1) {
-        //   console.error(`Error: ${key}\n${columns}`);
-        // }
+        if (idx === -1) {
+          console.error(`Error: ${key}\n${columns}`);
+        }
         return target[idx];
       },
       set(target, key, value) {
@@ -30,9 +31,9 @@ const dataTable = (data, columns) => {
           target[key] = value;
         } else {
           const idx = columns.indexOf(key);
-          // if (idx === -1) {
-          //   console.error(`Error: ${key}\n${columns}`);
-          // }
+          if (idx === -1) {
+            console.error(`Error: ${key}\n${columns}`);
+          }
           target[idx] = value;
         }
         return true; // prevent "'set' on proxy: trap returned falsish for property ..."
