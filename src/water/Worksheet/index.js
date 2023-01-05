@@ -1,3 +1,6 @@
+/* eslint-disable jsx-a11y/tabindex-no-positive */
+/* eslint-disable jsx-a11y/no-noninteractive-tabindex */
+/* eslint-disable no-console */
 /* eslint-disable no-shadow */
 /* eslint-disable max-len */
 /* eslint-disable no-alert */
@@ -86,7 +89,7 @@ const WorksheetData = () => {
   });
 
   return (
-    <div className="data">
+    <div className="data" tabIndex={1}>
       <table>
         <thead>
           <tr>
@@ -182,7 +185,7 @@ const SoilFiles = () => {
     }; // dbRecord
 
     const output = (path, s) => {
-      // console.log('output', path);
+      console.log('output', path);
       const spaces = ' '.repeat(s.match(/ +/)[0].length);
       const re = new RegExp(`^${spaces}`, 'mg');
 
@@ -339,15 +342,14 @@ const SoilFiles = () => {
       let s = '';
       if (fertRecs.length) {
         s += unindent(0, `
-          *** Script for management practices fertilizer, residue and tillage
-          [N Fertilizer]
-          ****Script for chemical application module  *******mg/cm2= kg/ha* 0.01*rwsp*eomult*100
-          Number of Fertilizer applications (max=25) mappl is in total mg N applied to grid (1 kg/ha = 1 mg/m2/width 
-          of application) application divided by width of grid in cm is kg ha-1
-           ${fertRecs.length}
-          mAppl is manure, lAppl is litter. Apply as mg/cm2 of slab same units as N
-          tAppl(i)  AmtAppl(i) depth(i) lAppl_C(i) lAppl_N(i)  mAppl_C(i) mAppl_N(i)  (repeat these 3 lines for the number of fertilizer applications)
-        `);
+        *** Script for management practices fertilizer, residue and tillage
+        [N Fertilizer]
+        ****Script for chemical application module  *******mg/cm2= kg/ha* 0.01*rwsp*eomult*100
+        Number of Fertilizer applications (max=25) mappl is in total mg N applied to grid (1 kg/ha = 1 mg/m2/width of application) application divided by width of grid in cm is kg ha-1
+         ${fertRecs.length}
+        mAppl is manure, lAppl is litter. Apply as mg/cm2 of slab same units as N
+        tAppl(i)  AmtAppl(i) depth(i) lAppl_C(i) lAppl_N(i)  mAppl_C(i) mAppl_N(i)  (repeat these 3 lines for the number of fertilizer applications)
+      `);
 
         // fert data are in the rs record set
         const factor = 0.01 * (maxX / 100); // m2 of slab
@@ -733,7 +735,7 @@ const SoilFiles = () => {
   getSoilFiles();
 
   useEffect(() => {
-    // console.log('ok');
+    console.log('ok');
     dispatch(set.soilfiles(files));
   });
 
@@ -758,8 +760,8 @@ const SoilFiles2 = () => {
     const s2 = rep(files[file]);
 
     if (s2 && s1 !== s2) {
-      // console.log('_________________');
-      // console.log(`%c${file}`, 'text-decoration: underline; font-weight: bold; color: brown;');
+      console.log('_________________');
+      console.log(`%c${file}`, 'text-decoration: underline; font-weight: bold; color: brown;');
       const c = rep(comps[file]).split(/[\n\r]/);
       const f = rep(files[file]).split(/[\n\r]/);
 
@@ -767,7 +769,7 @@ const SoilFiles2 = () => {
         if (rep(cc) !== rep(f[i])) {
           for (let j = 0; j < cc.length; j++) {
             if (cc[j] !== f[i][j]) {
-              // console.log(' ', c.slice(j - 10, j + 10), ':', f[i].slice(j - 10, j + 10));
+              console.log(' ', c.slice(j - 10, j + 10), ':', f[i].slice(j - 10, j + 10));
               j += 9;
             }
           }
@@ -783,7 +785,7 @@ const SoilFiles2 = () => {
   const site = useSelector(get.site);
 
   return (
-    <div>
+    <div tabIndex={1}>
       <button
         type="button"
         onClick={() => {

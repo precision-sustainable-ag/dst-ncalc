@@ -1,3 +1,4 @@
+/* eslint-disable no-console */
 /* eslint-disable camelcase */
 /* eslint-disable no-nested-ternary */
 /* eslint-disable no-plusplus */
@@ -13,7 +14,7 @@ const soilFile = 'meadir_run_01.dat'; // TODO
 const createSoilFiles = (files) => {
   const fs = { // TODO
     writeFileSync: (path, s) => {
-      // console.log(path);
+      console.log(path);
       files[path] = s;
     },
   };
@@ -397,7 +398,7 @@ const createSoilFiles = (files) => {
         } else if (fmt[0] === '\'') {
           row += fmt.replace(/'/g, '');
         } else {
-          // console.error('UNKNOWN FORMAT:', fmt);
+          console.error('UNKNOWN FORMAT:', fmt);
           process.exit();
         }
       });
@@ -503,7 +504,9 @@ const createSoilFiles = (files) => {
   const [RowSpacing] = data[3];
   const [PlantingDepth, xRootExtent, rootweightperslab] = data[5];
   const [BottomBC, GasBCTop, GasBCBottom] = data[8];
-  // console.log({SurfaceIntervalRatio, FirstSurfaceInterval, InternalIntervalRatio, FirstInternalInterval, RowSpacing, PlantingDepth, xRootExtent, rootweightperslab, BottomBC, GasBCTop, GasBCBottom});
+  console.log({
+    SurfaceIntervalRatio, FirstSurfaceInterval, InternalIntervalRatio, FirstInternalInterval, RowSpacing, PlantingDepth, xRootExtent, rootweightperslab, BottomBC, GasBCTop, GasBCBottom,
+  });
 
   const dtLayers = dataTable(data.slice(11), [
     'Depth',
@@ -753,7 +756,7 @@ const createSoilFiles = (files) => {
     const SoilFile = soilFile.replace('.soi', '.dat'); // arg('/SN') ? arg('/SN') + '.dat' : '';
     CreateSoilFile(dtLayers, SoilFile);
 
-    // console.time('Rosetta time');
+    console.time('Rosetta time');
     const soildata = readFile(SoilFile).slice(1);
 
     rosetta(soildata);
