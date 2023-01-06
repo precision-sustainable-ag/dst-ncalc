@@ -772,9 +772,11 @@ const Output = () => {
     <>
       <div id="Output" className="mockup">
         {labModel}
-        <CSVLink data={csv} className="download">
-          Download
-        </CSVLink>
+        <div className="csv_download_div">
+          <CSVLink data={csv} className="download">
+            Download
+          </CSVLink>
+        </div>
 
         <div style={{ display: "none" }}>
           Mockup: &nbsp;
@@ -904,9 +906,30 @@ const Output = () => {
               </tr>
             </tbody>
           </table>
+          <div className="bn">
+            <Link className="link" to={"/cashcrop"}>
+              BACK
+            </Link>
+            <Link className="link" to={"/advanced"}>
+              ADVANCED
+            </Link>
+            <Link className="link" to={"/feedback"}>
+              FEEDBACK
+            </Link>
+          </div>
         </div>
         <div className="output-table-div-mobile">
-          <div style={{ fontSize: "1rem" }}>
+          <div
+            style={{
+              fontSize: "1rem",
+              width: "100vw",
+              justifyContent: "flex-start",
+              display: "flex",
+              flexDirection: "column",
+              padding: "0px 30px",
+              color: "#6A9333",
+            }}
+          >
             <div>
               <u>Field name</u> : ({field})<p></p>
             </div>
@@ -986,18 +1009,13 @@ const Output = () => {
 
             {mockup === 1 && summary}
           </div>
-          {/* <div
-            style={{
-              width: "100vw",
-              height: "100px",
-              backgroundColor: "#ff0000",
-            }}
-          >
-            hello
-          </div> */}
           <div
             className="bn"
-            style={{ display: "flex", flexDirection: "column", gap: "10px" }}
+            style={{
+              display: "grid",
+              gap: "10px",
+              gridTemplateColumns: "1fr 1fr",
+            }}
           >
             <Link className="link" to={"/cashcrop"}>
               BACK
@@ -1008,6 +1026,11 @@ const Output = () => {
             <Link className="link" to={"/feedback"}>
               FEEDBACK
             </Link>
+            <div className="link">
+              <CSVLink data={csv} style={{ color: "#fff" }}>
+                DOWNLOAD
+              </CSVLink>
+            </div>
           </div>
         </div>
       </div>

@@ -1,11 +1,11 @@
-import React from 'react';
-import Highcharts from 'highcharts';
-import HighchartsReact from 'highcharts-react-official';
-import {useSelector} from 'react-redux';
-import {get, missingData} from '../../store/Store';
-import {Link, useNavigate} from 'react-router-dom';
+import React from "react";
+import Highcharts from "highcharts";
+import HighchartsReact from "highcharts-react-official";
+import { useSelector } from "react-redux";
+import { get, missingData } from "../../store/Store";
+import { Link, useNavigate } from "react-router-dom";
 
-import './styles.scss';
+import "./styles.scss";
 
 const Advanced = () => {
   // const factor = unit === 'lb/ac' ? 1.12085 : 1;
@@ -28,11 +28,22 @@ const Advanced = () => {
 
   const scr = missingData();
   if (scr) {
-    setTimeout(() => navigate('../' + scr), 1);
-    return '';
+    setTimeout(() => navigate("../" + scr), 1);
+    return "";
   }
 
-  if (!gotModel || !model || !biomass || !N || !carb || !cell || !lign || !lwc || !BD || !InorganicN) {
+  if (
+    !gotModel ||
+    !model ||
+    !biomass ||
+    !N ||
+    !carb ||
+    !cell ||
+    !lign ||
+    !lwc ||
+    !BD ||
+    !InorganicN
+  ) {
     return (
       <div className="loading">
         <p>Loading Output</p>
@@ -47,29 +58,29 @@ const Advanced = () => {
   const factor = 1;
 
   const minDate = new Date(killDate);
-  minDate.setHours(0,0,0,0);
+  minDate.setHours(0, 0, 0, 0);
 
   Highcharts.setOptions({
     chart: {
-      animation: false
+      animation: false,
     },
     lang: {
-      numericSymbols: null
-    }    
+      numericSymbols: null,
+    },
   });
 
   const hourly = false;
 
-  const Chart = ({parm}) => {
+  const Chart = ({ parm }) => {
     let date;
     const stacked = /Carb/.test(parm); // Array.isArray(parm);
     const series = [];
-    const colors = ['#6b9333', 'blue', 'brown'];
-// alert(`<div style={{color: ${colors[0]}}}>Rainfall (mm)</div><div style={{color: ${colors[1]}}}}>Air temperature (&deg;C)</div>`);
+    const colors = ["#6b9333", "blue", "brown"];
+    // alert(`<div style={{color: ${colors[0]}}}>Rainfall (mm)</div><div style={{color: ${colors[1]}}}}>Air temperature (&deg;C)</div>`);
     [parm].flat().forEach((parm, i) => {
       const cdata = [];
       date = new Date(killDate);
-      date.setHours(0,0,0,0);
+      date.setHours(0, 0, 0, 0);
       let total = 0;
       model.s[parm].forEach((d, i) => {
         const value = +(d / factor).toFixed(2);
@@ -87,7 +98,11 @@ const Advanced = () => {
           } else {
             cdata.push({
               x: +date,
-              y: hourly ? +value : parm === 'Rain' ? +(total.toFixed(2)) : +((total / 24).toFixed(2)),
+              y: hourly
+                ? +value
+                : parm === "Rain"
+                ? +total.toFixed(2)
+                : +(total / 24).toFixed(2),
               // marker: {
               //   enabled: (i / 24 === nweeks * 7) ||
               //           (i === a.length - 1 && nweeks * 7 * 24 >= a.length)
@@ -96,113 +111,132 @@ const Advanced = () => {
           }
           total = 0;
         }
-        date.setHours(date.getHours() + 1)
+        date.setHours(date.getHours() + 1);
       });
       series.push({
-        name: {
-          Carb: 'Carbohydrates',
-          Cell: 'Holo-cellulose',
-          Lign: 'Lignin',
-          CarbN: 'Carbohydrates',
-          CellN: 'Holo-cellulose',
-          LigninN: 'Lignin',
-          Rain: 'Rainfall',
-          Temp: 'Air temperature',
-          RH: 'Relative humidity',
-          CNRF: 'C:N ratio factor',
-          RMTFAC: 'Residue moisture-temperature reduction factor',
-          ContactFactor: 'Residue contact factor',
-          LitterMPa: 'Litter water potential',
-          Air_MPa: 'Air water potential',
-        }[parm] || parm,
-        type: stacked         ? 'area' : 
-              parm === 'Rain' ? 'column' : 
-                                'line',
+        name:
+          {
+            Carb: "Carbohydrates",
+            Cell: "Holo-cellulose",
+            Lign: "Lignin",
+            CarbN: "Carbohydrates",
+            CellN: "Holo-cellulose",
+            LigninN: "Lignin",
+            Rain: "Rainfall",
+            Temp: "Air temperature",
+            RH: "Relative humidity",
+            CNRF: "C:N ratio factor",
+            RMTFAC: "Residue moisture-temperature reduction factor",
+            ContactFactor: "Residue contact factor",
+            LitterMPa: "Litter water potential",
+            Air_MPa: "Air water potential",
+          }[parm] || parm,
+        type: stacked ? "area" : parm === "Rain" ? "column" : "line",
         yAxis: /(RH)/.test(parm) ? 1 : 0,
         data: cdata,
         color: colors[i],
-        showInLegend: true || /(Carb|Cell|Lign|Rain|Temp|RH|CNRF|RMTFAC|ContactFactor)/.test(parm),
+        showInLegend:
+          true ||
+          /(Carb|Cell|Lign|Rain|Temp|RH|CNRF|RMTFAC|ContactFactor)/.test(parm),
       });
-    })
+    });
 
     const options = {
       chart: {
         height: 300,
-        width: 500,
+        width: window.innerWidth > 500 ? 500 : window.innerWidth - 5,
       },
       plotOptions: {
         series: {
           animation: false,
-          turboThreshold: 100000
+          turboThreshold: 100000,
         },
         area: {
-          stacking: 'normal',
-          lineColor: '#666666',
+          stacking: "normal",
+          lineColor: "#666666",
           lineWidth: 1,
           marker: {
             lineWidth: 1,
-            lineColor: '#666666'
-          }          
-        }
+            lineColor: "#666666",
+          },
+        },
       },
       tooltip: {
         shared: true,
         useHTML: true,
-        zformatter: function() {
+        zformatter: function () {
           const week = Math.floor((this.x - minDate) / (24 * 3600 * 1000) / 7);
-  
-          return this.points.reduce((s, point) => (
-            s + '<strong>' + point.series.name + ': ' + point.y.toFixed(0) + ' ' + unit + '<br/></strong>'
-          ), `<small>${Highcharts.dateFormat('%b %e, %Y', new Date(this.x))}</small><br/>Week ${week}<br/>`);
-        }
+
+          return this.points.reduce(
+            (s, point) =>
+              s +
+              "<strong>" +
+              point.series.name +
+              ": " +
+              point.y.toFixed(0) +
+              " " +
+              unit +
+              "<br/></strong>",
+            `<small>${Highcharts.dateFormat(
+              "%b %e, %Y",
+              new Date(this.x)
+            )}</small><br/>Week ${week}<br/>`
+          );
+        },
       },
       title: {
         text: {
-          'Carb,Cell,Lign'      : 'Fresh Organic Matter',
-          'CarbN,CellN,LigninN' : 'Fresh Organic Nitrogen',
-          'zRain,Temp,RH'  : 'Weather',
-          'zRMTFAC,CNRF,ContactFactor' : ' ',
+          "Carb,Cell,Lign": "Fresh Organic Matter",
+          "CarbN,CellN,LigninN": "Fresh Organic Nitrogen",
+          "zRain,Temp,RH": "Weather",
+          "zRMTFAC,CNRF,ContactFactor": " ",
         }[parm],
         style: {
           color: colors[0],
           padding: 0,
-          margin: 0
-        }
+          margin: 0,
+        },
       },
       zsubtitle: {
         text: {
-          RH      : ``,
-          Rain    : `mm`,
-          Temp    : `&deg;C`,
-          FOM     : `kg/ha`,
-          FON     : `kg N/ha`,
-          'Carb,Cell,Lign' : `kg/ha`,
-          'CarbN,CellN,LigninN' : `kg/ha`,
+          RH: ``,
+          Rain: `mm`,
+          Temp: `&deg;C`,
+          FOM: `kg/ha`,
+          FON: `kg N/ha`,
+          "Carb,Cell,Lign": `kg/ha`,
+          "CarbN,CellN,LigninN": `kg/ha`,
         }[parm],
         style: {
-          fontSize: '10pt',
+          fontSize: "10pt",
           padding: 0,
-          margin: 0
-        }
+          margin: 0,
+        },
       },
       series: series,
       xAxis: [
         {
-          type: 'datetime',
-          title: '',
+          type: "datetime",
+          title: "",
           crosshair: {
-            color: 'green',
-            dashStyle: 'dash'
+            color: "green",
+            dashStyle: "dash",
           },
           labels: {
-            formatter: function() {
-              const weeks = Math.round((this.value - minDate) / (24 * 3600 * 1000) / 7);
-              return Highcharts.dateFormat('%b %e', new Date(this.value)) + '<br/>' +
-                     weeks + ' weeks';
+            formatter: function () {
+              const weeks = Math.round(
+                (this.value - minDate) / (24 * 3600 * 1000) / 7
+              );
+              return (
+                Highcharts.dateFormat("%b %e", new Date(this.value)) +
+                "<br/>" +
+                weeks +
+                " weeks"
+              );
             },
             style: {
-              fontSize: '13px'
-            }
+              fontSize: "13px",
+            },
           },
           /*
           plotLines: [{
@@ -221,80 +255,87 @@ const Advanced = () => {
       yAxis: [
         {
           title: {
-            text: /Rain/.test(parm) ? `<div style="color: ${colors[0]}">Rainfall (mm)</div><br><div style="color: ${colors[1]}">Air temperature (&deg;C)</div>` : 
-                  /Carb/.test(parm) ? 'kg/ha' :
-                  /LitterMPa|Air_MPa/.test(parm) ? 'MPa' :
-                  '',
+            text: /Rain/.test(parm)
+              ? `<div style="color: ${colors[0]}">Rainfall (mm)</div><br><div style="color: ${colors[1]}">Air temperature (&deg;C)</div>`
+              : /Carb/.test(parm)
+              ? "kg/ha"
+              : /LitterMPa|Air_MPa/.test(parm)
+              ? "MPa"
+              : "",
             style: {
-              fontWeight: 'bold'
-            }
+              fontWeight: "bold",
+            },
           },
           zmin: 0,
           endOnTick: false,
           minorTicks: true,
           lineWidth: 3,
         },
-        { // Secondary yAxis
+        {
+          // Secondary yAxis
           gridLineWidth: 0,
           title: {
-            text: /RH/.test(parm) ? 'Relative humidity (%)' : '',
+            text: /RH/.test(parm) ? "Relative humidity (%)" : "",
             style: {
               color: colors[2],
-              fontWeight: 'bold',
-            }
+              fontWeight: "bold",
+            },
           },
           zlabels: {
-            format: '{value} mm',
+            format: "{value} mm",
             style: {
-              color: Highcharts.getOptions().colors[0]
-            }
+              color: Highcharts.getOptions().colors[0],
+            },
           },
-          opposite: true
-        }
+          opposite: true,
+        },
       ],
     };
 
     return (
       <div className="advanced parent">
-        <HighchartsReact highcharts={Highcharts} options={options}/>
+        <HighchartsReact highcharts={Highcharts} options={options} />
       </div>
-    )
-  }
-  
+    );
+  };
+
   return (
     <div id="Advanced">
-      <div style={{display: 'inline-block'}}>
-        <h3>Residue mass related variables</h3>
-        <Chart parm={['Carb', 'Cell', 'Lign']} />
+      <div style={{ marginBottom: "50px" }}>
+        <div style={{ display: "inline-block" }}>
+          <h3>Residue mass related variables</h3>
+          <Chart parm={["Carb", "Cell", "Lign"]} />
+        </div>
+
+        <div style={{ display: "inline-block" }}>
+          <h3>Residue N related variables</h3>
+          <Chart parm={["CarbN", "CellN", "LigninN"]} />
+        </div>
+
+        <div style={{ display: "inline-block" }}>
+          <h3>Decay rate adjustment factors</h3>
+          <Chart parm={["RMTFAC", "CNRF", "ContactFactor"]} />
+        </div>
+
+        <div style={{ display: "inline-block" }}>
+          <h3>Residue environment</h3>
+          <Chart parm={["LitterMPa"]} />
+        </div>
+
+        <h3>Weather information</h3>
+        {[["Rain", "Temp", "RH"], "Air_MPa"].map((parm) => (
+          <Chart key={parm} parm={parm} />
+        ))}
       </div>
 
-      <div style={{display: 'inline-block'}}>
-        <h3>Residue N related variables</h3>
-        <Chart parm={['CarbN', 'CellN', 'LigninN']} />
-      </div>
-
-      <div style={{display: 'inline-block'}}>
-        <h3>Decay rate adjustment factors</h3>
-        <Chart parm={['RMTFAC', 'CNRF', 'ContactFactor']} />
-      </div>
-
-      <div style={{display: 'inline-block'}}>
-        <h3>Residue environment</h3>
-        <Chart parm={['LitterMPa']} />
-      </div>
-
-      <h3>Weather information</h3>
-      {
-        [['Rain', 'Temp', 'RH'], 'Air_MPa']
-          .map(parm => <Chart key={parm} parm={parm} />)
-      }
-
-      <div className="bn">
-        <Link className="link" to={'/output'}>BACK</Link>
+      <div style={{ paddingBottom: "50px" }}>
+        <Link className="link" to={"/output"}>
+          BACK
+        </Link>
       </div>
     </div>
-  )
-} // Advanced
+  );
+}; // Advanced
 
 Advanced.showInMenu = false;
 

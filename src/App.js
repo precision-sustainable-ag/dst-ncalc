@@ -80,7 +80,7 @@ const App = () => {
       id="Main"
     >
       <Help />
-      <Init />
+      <Init desktop={true} />
       {screens.feedback && (
         <button className="feedback" onClick={() => navigate("feedback")}>
           FEEDBACK
@@ -146,15 +146,20 @@ const App = () => {
                     </NavLink>
                   );
                 })}
-              <button
-                onClick={() => {
-                  setNavModalOpen(false);
-                  navigate("feedback");
-                }}
-              >
-                FEEDBACK
-              </button>
-              <Init />
+              {screens.feedback && (
+                <button
+                  className="feedback-mobile"
+                  onClick={() => {
+                    setNavModalOpen(false);
+                    navigate("feedback");
+                  }}
+                >
+                  FEEDBACK
+                </button>
+              )}
+              <div>
+                <Init desktop={false} setNavModalOpen={setNavModalOpen} />
+              </div>
             </div>
           </div>
         )}

@@ -339,6 +339,7 @@ input::-webkit-inner-spin-button {
   transform: scale(1.1);
 }
 
+button.feedback-mobile,
 button.feedback {
   position: absolute;
   font-size: 0.7rem;
@@ -407,6 +408,9 @@ button.feedback {
 .output-table-div {
   padding-bottom: 150px;
   padding-top: 20px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
 }
 
 .output-table-div-mobile {
@@ -453,6 +457,24 @@ xl	1280px
     display: none;
   }
 
+  button.feedback-mobile {
+    position: relative;
+    font-size: 0.7rem;
+    font-weight: bold;
+    padding: 0.2rem 0.5rem;
+    color: rgb(25, 118, 210);
+    border: 1px solid rgb(25, 118, 210);
+    border-radius: 5px;
+    background: #eee;
+    right: 0px;
+    top: 0px;
+    width: 7rem;
+  }
+
+  .csv_download_div {
+    display: none;
+  }
+
   #Privacy {
     display: none;
   }
@@ -490,7 +512,11 @@ xl	1280px
     align-items: center;
     flex-direction: column;
     gap: 30px;
+    background-color: #fff;
+  }
 
+  .inputs {
+    padding: 0px 20px;
   }
 }
 
@@ -498,52 +524,16 @@ xl	1280px
   .map-div {
     padding-bottom: 650px;
   }
-  /* .soil-div {
-    padding-bottom: 150px;
-  } */
 }
 
-@media screen and (min-width: 641px) and (max-width: 768px) {
+@media screen and (min-width: 641px) and (max-width: 1024px) {
   .map-div {
     padding-bottom: 500px;
   }
-  /* .soil-div {
-    padding-bottom: 150px;
-  } */
 }
 
-@media screen and (min-width: 769px) and (max-width: 1024px) {
-  .map-div {
-    padding-bottom: 500px;
-  }
-  /* .soil-div {
-    padding-bottom: 150px;
-  } */
-}
-
-@media screen and (min-width: 1025px) and (max-width: 1280px) {
+@media screen and (min-width: 1025px) {
   .map-div {
     padding-bottom: 400px;
   }
-  /* .soil-div {
-    padding-bottom: 150px;
-  } */
-}
-
-@media screen and (min-width: 1281px) and (max-width: 1535px) {
-  .map-div {
-    padding-bottom: 400px;
-  }
-  /* .soil-div {
-    padding-bottom: 150px;
-  } */
-}
-
-@media screen and (min-width: 1536px) {
-  .map-div {
-    padding-bottom: 400px;
-  }
-  /* .soil-div {
-    padding-bottom: 150px;
-  } */
 }

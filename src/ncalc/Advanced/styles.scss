@@ -3,6 +3,14 @@
   background: #eee;
   text-align: center;
   padding: 1rem;
+
+  @media screen and (max-width: 768px) {
+    position: absolute;
+    top: 100px;
+    right: 0px;
+    left: 0px;
+    padding: 0px;
+  }
 }
 
 .advanced {
@@ -10,5 +18,8 @@
   margin: 0 0.5rem;
   border: 1px solid #aaa;
   position: relative;
-}
 
+  @media screen and (max-width: 768px) {
+    margin: 0px;
+  }
+}
