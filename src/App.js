@@ -80,7 +80,7 @@ const App = () => {
       id="Main"
     >
       <Help />
-      <Init desktop={true} />
+      <Init desktop={true} setNavModalOpen={setNavModalOpen} />
       {screens.feedback && (
         <button className="feedback" onClick={() => navigate("feedback")}>
           FEEDBACK
