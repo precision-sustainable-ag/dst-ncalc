@@ -77,7 +77,7 @@
     "devDependencies": {
         "ansi-regex": "^6.0.1",
         "browserslist": "^4.21.4",
-        "eslint": "^8.30.0",
+        "eslint": "^8.31.0",
         "eslint-config-airbnb": "^19.0.4",
         "eslint-plugin-import": "^2.26.0",
         "eslint-plugin-jsx-a11y": "^6.6.1",
