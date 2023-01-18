@@ -15,12 +15,13 @@ const MapComp = () => {
   const dispatch = useDispatch();
   const lat = useSelector(get.lat);
   const lon = useSelector(get.lon);
+  const mapAddress = useSelector(get.mapAddress);
   const mapZoom = useSelector(get.mapZoom);
   const mapPolygon = useSelector(get.mapPolygon);
   const [features, setFeatures] = useState(mapPolygon);
   const [drawEvent, setDrawEvent] = useState({});
   // const [removedShapes, setRemovedShapes] = useState(new Set());
-
+  // mapAddress
   useEffect(() => {
     if (drawEvent.mode === 'delete') {
       removedShapes = removedShapes.add(drawEvent.e.features[0].id);
@@ -37,6 +38,7 @@ const MapComp = () => {
     dispatch(set.mapType('satellite'));
     if (address.latitude) dispatch(set.lat(address.latitude));
     if (address.longitude) dispatch(set.lon(address.longitude));
+    if (address.address) dispatch(set.mapAddress(address.address));
   }, [address, dispatch]);
 
   useEffect(() => {
@@ -53,6 +55,7 @@ const MapComp = () => {
         initFeatures={mapPolygon}
         initWidth="100%"
         initHeight="400px"
+        initAddress={mapAddress?.address}
         initLon={lon}
         initLat={lat}
         initStartZoom={mapZoom}

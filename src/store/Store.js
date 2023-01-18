@@ -24,6 +24,7 @@ const initialState = {
   email: '',
   feedback: '',
   screen: '',
+  mapAddress: '',
   PSA: window.location.toString().includes('PSA'),
   field: query('field', ''),
   targetN: '150',
