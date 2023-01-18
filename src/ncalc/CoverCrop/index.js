@@ -1,45 +1,53 @@
-import {useDispatch, useSelector} from 'react-redux';
-import {Link} from 'react-router-dom';
-import {Radio, RadioGroup, FormControlLabel} from '@mui/material';
+import React from 'react';
+import { useDispatch, useSelector } from 'react-redux';
+import { Link } from 'react-router-dom';
+import { Radio, RadioGroup, FormControlLabel } from '@mui/material';
 
-import {get, set} from '../../store/Store';
-import {Input} from '../../shared/Inputs';
+import { get, set } from '../../store/Store';
+import Input from '../../shared/Inputs';
 import Myslider from '../../shared/Slider';
-import {Help} from '../../shared/Help';
+import Help from '../../shared/Help';
 
 const CoverCrops = () => {
   const species = useSelector(get.species);
   return (
     <Input
       multiple
-
       id="coverCrop"
       autoFocus
       groupBy={
-        (option) => species.Brassica.includes(option)  ? 'Brassica' :
-                    species.Broadleaf.includes(option) ? 'Broadleaf' :
-                    species.Grass.includes(option)     ? 'Grass' :
-                    species.Legume.includes(option)    ? 'Legume' :
-                                                         'ERROR'
+        (option) => {
+          let out;
+          if (species.Brassica.includes(option)) {
+            out = 'Brassica';
+          } else if (species.Broadleaf.includes(option)) {
+            out = 'Broadleaf';
+          } else if (species.Grass.includes(option)) {
+            out = 'Grass';
+          } else if (species.Legume.includes(option)) {
+            out = 'Legume';
+          } else {
+            out = 'ERROR';
+          }
+          return out;
+        }
       }
-
       options={[
         ...species.Grass,
         ...species.Legume,
         ...species.Brassica,
         ...species.Broadleaf,
       ]}
-
       placeholder="Select one or more cover crops"
     />
   );
-} // CoverCrops
+}; // CoverCrops
 
 const CoverCrop1 = () => {
   const dispatch = useDispatch();
   const maxBiomass = useSelector(get.maxBiomass);
   const coverCrop = useSelector(get.coverCrop);
-  const max = coverCrop.length ? coverCrop.map(s => maxBiomass[s]).sort((a, b) => b - a)[0] || 15000 : 15000;
+  const max = coverCrop.length ? coverCrop.map((s) => maxBiomass[s]).sort((a, b) => b - a)[0] || 15000 : 15000;
   const freshMax = max * 4 || 30000;
   const biomass = useSelector(get.biomass);
   const unit = useSelector(get.unit);
@@ -48,6 +56,15 @@ const CoverCrop1 = () => {
 
   if (!species.Grass) {
     return '';
+  }
+
+  let warningText;
+  if (coverCrop.length > 1) {
+    warningText = ' for these particular species';
+  } else if (coverCrop.length) {
+    warningText = ' for this particular species';
+  } else {
+    warningText = '';
   }
 
   return (
@@ -60,19 +77,23 @@ const CoverCrop1 = () => {
         <p>Cover Crop Termination Date:</p>
         <Input type="date" id="killDate" />
 
-        <p/>
+        <p />
         <div>
           Dry Biomass
           <Help>
             <p>The amount of cover crop biomass on a dry weight basis.</p>
-            <p>For details on cover crop biomass sampling and taking a representative sub-sample for quality analysis, please refer to <a tabIndex="-1" target="_blank" rel="noreferrer" href="https://extension.uga.edu/publications/detail.html?number=C1077">here</a>.</p>
+            <p>
+              For details on cover crop biomass sampling and taking a representative sub-sample for quality analysis, please refer to
+              <a tabIndex="-1" target="_blank" rel="noreferrer" href="https://extension.uga.edu/publications/detail.html?number=C1077">here</a>
+              .
+            </p>
           </Help>
           :
 
-          <RadioGroup row aria-label="position" name="position" style={{display: 'inline-block', marginLeft: '1em'}}>
+          <RadioGroup row aria-label="position" name="position" style={{ display: 'inline-block', marginLeft: '1em' }}>
             <FormControlLabel
               value="lb/ac"
-              control={<Radio id="unit" checked={unit === 'lb/ac'}/>}
+              control={<Radio id="unit" checked={unit === 'lb/ac'} />}
               onChange={() => dispatch(set.unit('lb/ac'))}
               label="lb/ac"
             />
@@ -90,20 +111,28 @@ const CoverCrop1 = () => {
           min={0}
           max={max}
         />
-        
-        {+biomass > +max &&
+
+        {+biomass > +max
+          && (
           <p className="warning">
-            This biomass seems too high{coverCrop.length > 1 ? ' for these particular species' : coverCrop.length ? ' for this particular species' : ''}.<br/>
+            This biomass seems too high
+            {warningText}
+            .
+            <br />
             Please make sure the biomass entered is on a dry matter basis.
           </p>
-        }
+          )}
 
-        <br/>
+        <br />
         <div>
           Fresh Biomass
           <Help>
             <p>The amount of cover crop biomass on a wet weight basis.</p>
-            <p>For details on cover crop biomass sampling and taking a representative sub-sample for quality analysis, please refer to <a tabIndex="-1" target="_blank" rel="noreferrer" href="https://extension.uga.edu/publications/detail.html?number=C1077">here</a>.</p>
+            <p>
+              For details on cover crop biomass sampling and taking a representative sub-sample for quality analysis, please refer to
+              <a tabIndex="-1" target="_blank" rel="noreferrer" href="https://extension.uga.edu/publications/detail.html?number=C1077">here</a>
+              .
+            </p>
           </Help>
         </div>
 
@@ -112,15 +141,19 @@ const CoverCrop1 = () => {
           min={0}
           max={freshMax}
         />
-        
-        {+freshBiomass > +freshMax &&
+
+        {+freshBiomass > +freshMax
+          && (
           <p className="warning">
-            This biomass seems too high{coverCrop.length > 1 ? ' for these particular species' : coverCrop.length ? ' for this particular species' : ''}.<br/>
+            This biomass seems too high
+            {warningText}
+            .
+            <br />
             Please make sure the biomass entered is on a fresh matter basis.
           </p>
-        }
+          )}
 
-        <div style={{marginTop: "2rem"}}>
+        <div style={{ marginTop: '2rem' }}>
           Cover Crop Water Content at Termination (g water/g dry biomass)
           <Help>
             <p>Use the following calculation to adjust default values:</p>
@@ -135,14 +168,14 @@ const CoverCrop1 = () => {
           step={0.1}
         />
       </div>
-  
+
       <div className="bn">
-        <Link className="link" to={'/soil'}       >BACK</Link>
-        <Link className="link" to={'/covercrop2'} >NEXT</Link>
+        <Link className="link" to="/soil">BACK</Link>
+        <Link className="link" to="/covercrop2">NEXT</Link>
       </div>
     </>
-  )
-} // CoverCrop1
+  );
+}; // CoverCrop1
 
 const CoverCrop2 = () => {
   const N = useSelector(get.N);
@@ -164,21 +197,24 @@ const CoverCrop2 = () => {
           max={6}
           step={0.1}
         />
-        <p/>
-        <hr/>
+        <p />
+        <hr />
         {N ? <p className="note">Adjust default values below based on lab results.</p> : ''}
-        <p/>
+        <p />
         <div>
           Carbohydrates (%)
           <Help>
-            <p>Non-structural labile carbohydrate concentration based on lab results. This represents the most readily decomposable C constituents in plant materials.</p>
+            <p>
+              Non-structural labile carbohydrate concentration based on lab results. This represents the most
+              readily decomposable C constituents in plant materials.
+            </p>
             <p>The default value is based on the nitrogen concentration.</p>
             <p>If you have the raw data from near infra-red reflectance spectroscopy (NIRS) analysis, use the following equation:</p>
             <p>carbohydrates (%) = % crude protein (CP) + % fat + % non-fibrous carbohydrates (NFC)</p>
           </Help>
           :
         </div>
-        <p/>
+        <p />
         <Myslider
           id="carb"
           min={20}
@@ -186,18 +222,21 @@ const CoverCrop2 = () => {
           step={0.1}
         />
 
-        <p/>
+        <p />
         <div>
           Holo-cellulose (%)
           <Help>
-            <p>Structural holo-cellulose (i.e., both cellulose and hemi-cellulose) concentration based on lab results. This represents the moderately decomposable C constituents in plant materials.</p>
+            <p>
+              Structural holo-cellulose (i.e., both cellulose and hemi-cellulose) concentration
+              based on lab results. This represents the moderately decomposable C constituents in plant materials.
+            </p>
             <p>The default value is based on the nitrogen concentration.</p>
             <p>If you have the raw data from near infra-red reflectance spectroscopy (NIRS) analysis, use the following equation:</p>
             <p>holo-cellulose (%) = % neutral detergent fiber (NDF) – (% lignin + % ash)</p>
           </Help>
           :
         </div>
-        <p/>
+        <p />
         <Myslider
           id="cell"
           min={20}
@@ -205,7 +244,7 @@ const CoverCrop2 = () => {
           step={0.1}
         />
 
-        <p/>
+        <p />
         <div>
           Lignin (%)
           <Help>
@@ -214,7 +253,7 @@ const CoverCrop2 = () => {
           </Help>
           :
         </div>
-        <p/>
+        <p />
         <Myslider
           id="lign"
           min={1}
@@ -222,14 +261,14 @@ const CoverCrop2 = () => {
           step={0.1}
         />
       </div>
-  
+
       <div className="bn">
-        <Link className="link" to={'/covercrop'}>BACK</Link>
-        <Link className="link" to={'/cashcrop'} >NEXT</Link>
+        <Link className="link" to="/covercrop">BACK</Link>
+        <Link className="link" to="/cashcrop">NEXT</Link>
       </div>
     </>
-  )
-} // CoverCrop2
+  );
+}; // CoverCrop2
 
 CoverCrop1.desc = 'Cover Crop';
 CoverCrop2.showInMenu = false;
@@ -237,4 +276,4 @@ CoverCrop2.showInMenu = false;
 export {
   CoverCrop1,
   CoverCrop2,
-}
+};

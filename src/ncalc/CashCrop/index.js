@@ -1,11 +1,12 @@
-import {useSelector} from 'react-redux';
-import {Link} from 'react-router-dom';
+import React from 'react';
+import { useSelector } from 'react-redux';
+import { Link } from 'react-router-dom';
 
-import {get} from '../../store/Store';
+import { get } from '../../store/Store';
 
 import Myslider from '../../shared/Slider';
-import {Input} from '../../shared/Inputs';
-import {Help} from '../../shared/Help';
+import Input from '../../shared/Inputs';
+import Help from '../../shared/Help';
 
 const CashCrops = () => {
   const crops = [
@@ -186,9 +187,9 @@ const CashCrops = () => {
     'Wildlife Plots - Chufa',
     'Wildlife Plots - Temporary Winter Grazing',
     'Wine Grapes',
-    'Zoysia Lawn'
+    'Zoysia Lawn',
   ];
-/*
+  /*
   const PiedNRate = {
     'Asparagus' : 55,
     'Bahia Grass Pasture' : 125,
@@ -296,20 +297,12 @@ const CashCrops = () => {
   return (
     <Input
       id="cashCrop"
-
       options={crops}
-
       autoFocus
-
-      // onChange={(event, newValue) => {
-      //   dispatch(set.targetN(PiedNRate[newValue] || 0));
-      //   dispatch(set.cashCrop(newValue));
-      // }}
-
       placeholder="Start typing your crop, then select from the list"
     />
   );
-} // CashCrops
+}; // CashCrops
 
 const CashCrop = () => {
   const unit = useSelector(get.unit);
@@ -325,7 +318,8 @@ const CashCrop = () => {
         <p>Cash Crop Planting Date:</p>
         <Input type="date" id="plantingDate" />
 
-        {cashCrop === 'Corn' &&
+        {cashCrop === 'Corn'
+          && (
           <>
             <p>Yield Goal (bu/ac):</p>
             <Myslider
@@ -334,10 +328,12 @@ const CashCrop = () => {
               max={300}
             />
           </>
-        }
+          )}
 
         <p>
-          What is your Target Nitrogen Fertilizer Rate? ({unit}):
+          What is your Target Nitrogen Fertilizer Rate? (
+          {unit}
+          ):
           <Help>
             Please specify the target N rate for your region.
           </Help>
@@ -349,15 +345,15 @@ const CashCrop = () => {
           max={300}
         />
       </div>
-  
+
       <div className="bn">
-        <Link className="link" to={'/covercrop2'} >BACK</Link>
-        <Link className="link" to={'/output'}     >NEXT</Link>
+        <Link className="link" to="/covercrop2">BACK</Link>
+        <Link className="link" to="/output">NEXT</Link>
       </div>
     </>
-  )
-} // CashCrop
-  
+  );
+}; // CashCrop
+
 CashCrop.desc = 'Cash Crop';
 
 export default CashCrop;

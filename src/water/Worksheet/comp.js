@@ -1,3 +1,6 @@
+/* eslint-disable no-tabs */
+/* eslint-disable max-len */
+/* eslint-disable import/prefer-default-export */
 /* eslint-disable no-useless-escape */
 
 export const comp = `
