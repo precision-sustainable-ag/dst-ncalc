@@ -27,23 +27,25 @@ const Myslider = ({
       />
       &nbsp;&nbsp;&nbsp;&nbsp;
       <span>
-        <span className="tiny">{min}</span>
-        <Slider
-          value={Number.isFinite(val) ? +(+val).toFixed(step === 1 ? 0 : 1) : 0}
-          onChange={(_, newValue) => {
-            if (onInput) {
-              onInput();
-            }
-            dispatch(set[id](+newValue));
-          }}
-          aria-labelledby="input-slider"
-          min={min}
-          max={max}
-          step={step}
-          valueLabelDisplay={val <= max ? 'off' : 'off'}
-          tabIndex={-1}
-        />
-        <span className="tiny">{max}</span>
+        <div style={{ display: 'flex', gap: '10px' }}>
+          <span className="tiny">{min}</span>
+          <Slider
+            value={Number.isFinite(val) ? +(+val).toFixed(step === 1 ? 0 : 1) : 0}
+            onChange={(_, newValue) => {
+              if (onInput) {
+                onInput();
+              }
+              dispatch(set[id](+newValue));
+            }}
+            aria-labelledby="input-slider"
+            min={min}
+            max={max}
+            step={step}
+            valueLabelDisplay={val <= max ? 'off' : 'off'}
+            tabIndex={-1}
+          />
+          <span className="tiny">{max}</span>
+        </div>
       </span>
     </div>
   );

@@ -1,6 +1,8 @@
 /* eslint-disable no-console */
-import React from 'react';
+import React, { useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
+import MenuIcon from '@mui/icons-material/Menu';
+import CloseIcon from '@mui/icons-material/Close';
 import {
   Route, NavLink, Routes, useNavigate,
 } from 'react-router-dom';
@@ -63,6 +65,7 @@ const Init = screens.init;
 const App = () => {
   const dispatch = useDispatch();
   const navigate = useNavigate();
+  const [navModalOpen, setNavModalOpen] = useState(false);
 
   useSelector(get.screen); // force render
 
@@ -81,7 +84,7 @@ const App = () => {
       id="Main"
     >
       <Help />
-      <Init />
+      <Init desktop setNavModalOpen={setNavModalOpen} />
       {
         screens.feedback && (
           <button
@@ -95,26 +98,78 @@ const App = () => {
       }
 
       <img alt="logo" src="PSALogo.png" id="PSALogo" />
-
-      <nav>
-        {
-          Object.keys(screens)
-            .filter((scr) => screens[scr].showInMenu !== false)
-            .map((scr) => (
-              <NavLink
-                key={scr}
-                className={scr.toLowerCase()}
-                onClick={() => dispatch(set.screen(scr))}
-                style={({ isActive }) => ({
-                  color: isActive ? '#385E1B' : '',
-                })}
-                to={`/${scr.toLowerCase()}`}
-              >
-                {screens[scr].desc || scr}
-              </NavLink>
-            ))
-        }
-      </nav>
+      <div className="nav-menu-div">
+        <nav className="nav">
+          {
+            Object.keys(screens)
+              .filter((scr) => screens[scr].showInMenu !== false)
+              .map((scr) => (
+                <NavLink
+                  key={scr}
+                  className={scr.toLowerCase()}
+                  onClick={() => dispatch(set.screen(scr))}
+                  style={({ isActive }) => ({
+                    color: isActive ? '#385E1B' : '',
+                  })}
+                  to={`/${scr.toLowerCase()}`}
+                >
+                  {screens[scr].desc || scr}
+                </NavLink>
+              ))
+          }
+        </nav>
+        <MenuIcon
+          className="menu-icon"
+          fontSize="large"
+          onClick={() => setNavModalOpen(true)}
+        />
+        {navModalOpen && (
+          <div className="menu-modal">
+            <CloseIcon
+              className="close-icon"
+              fontSize="large"
+              onClick={() => setNavModalOpen(false)}
+            />
+            <div className="menu-modal-div">
+              {
+              Object.keys(screens)
+                .filter((scr) => screens[scr].showInMenu !== false)
+                .map((scr) => (
+                  <NavLink
+                    key={scr}
+                    className={scr.toLowerCase()}
+                    onClick={() => {
+                      dispatch(set.screen(scr));
+                      setNavModalOpen(false);
+                    }}
+                    style={({ isActive }) => ({
+                      color: isActive ? '#385E1B' : '#fff',
+                    })}
+                    to={`/${scr.toLowerCase()}`}
+                  >
+                    {screens[scr].desc || scr}
+                  </NavLink>
+                ))
+              }
+              {screens.feedback && (
+                <button
+                  type="button"
+                  className="feedback-mobile"
+                  onClick={() => {
+                    setNavModalOpen(false);
+                    navigate('feedback');
+                  }}
+                >
+                  FEEDBACK
+                </button>
+              )}
+              <div>
+                <Init desktop={false} setNavModalOpen={setNavModalOpen} />
+              </div>
+            </div>
+          </div>
+        )}
+      </div>
 
       <Routes>
         {

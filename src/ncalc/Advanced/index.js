@@ -141,7 +141,7 @@ const Advanced = () => {
     const options = {
       chart: {
         height: 300,
-        width: 500,
+        width: window.innerWidth > 500 ? 500 : window.innerWidth - 5,
       },
       plotOptions: {
         series: {
@@ -261,33 +261,35 @@ const Advanced = () => {
 
   return (
     <div id="Advanced">
-      <div style={{ display: 'inline-block' }}>
-        <h3>Residue mass related variables</h3>
-        <Chart parm={['Carb', 'Cell', 'Lign']} />
+      <div style={{ marginBottom: '50px' }}>
+        <div style={{ display: 'inline-block' }}>
+          <h3>Residue mass related variables</h3>
+          <Chart parm={['Carb', 'Cell', 'Lign']} />
+        </div>
+
+        <div style={{ display: 'inline-block' }}>
+          <h3>Residue N related variables</h3>
+          <Chart parm={['CarbN', 'CellN', 'LigninN']} />
+        </div>
+
+        <div style={{ display: 'inline-block' }}>
+          <h3>Decay rate adjustment factors</h3>
+          <Chart parm={['RMTFAC', 'CNRF', 'ContactFactor']} />
+        </div>
+
+        <div style={{ display: 'inline-block' }}>
+          <h3>Residue environment</h3>
+          <Chart parm={['LitterMPa']} />
+        </div>
+
+        <h3>Weather information</h3>
+        {
+          [['Rain', 'Temp', 'RH'], 'Air_MPa']
+            .map((parm) => <Chart key={parm} parm={parm} />)
+        }
       </div>
 
-      <div style={{ display: 'inline-block' }}>
-        <h3>Residue N related variables</h3>
-        <Chart parm={['CarbN', 'CellN', 'LigninN']} />
-      </div>
-
-      <div style={{ display: 'inline-block' }}>
-        <h3>Decay rate adjustment factors</h3>
-        <Chart parm={['RMTFAC', 'CNRF', 'ContactFactor']} />
-      </div>
-
-      <div style={{ display: 'inline-block' }}>
-        <h3>Residue environment</h3>
-        <Chart parm={['LitterMPa']} />
-      </div>
-
-      <h3>Weather information</h3>
-      {
-        [['Rain', 'Temp', 'RH'], 'Air_MPa']
-          .map((parm) => <Chart key={parm} parm={parm} />)
-      }
-
-      <div className="bn">
+      <div style={{ paddingBottom: '50px' }}>
         <Link className="link" to="/output">BACK</Link>
       </div>
     </div>

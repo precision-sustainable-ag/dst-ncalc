@@ -3,8 +3,10 @@
   top: 50%;
   left: 50%;
   transform: translate(-50%, -50%);
-  max-width: 40vw;
+  max-width: 70vw;
   background: white;
   border: 2px solid #000;
   padding: 1rem;
+  max-height: 60vh;
+  overflow-y: scroll;
 }
