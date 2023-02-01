@@ -309,48 +309,56 @@ const CashCrop = () => {
   const cashCrop = useSelector(get.cashCrop);
 
   return (
-    <>
-      <h1>Tell us about your Cash Crop</h1>
-      <div className="inputs">
-        <p>Cash Crop:</p>
-        <CashCrops />
+    <div
+      style={{
+        justifyContent: 'center',
+        display: 'flex',
+        alignItems: 'center',
+      }}
+    >
+      <div style={{ marginBottom: '150px' }}>
+        <h1>Tell us about your Cash Crop</h1>
+        <div className="inputs">
+          <p>Cash Crop:</p>
+          <CashCrops />
 
-        <p>Cash Crop Planting Date:</p>
-        <Input type="date" id="plantingDate" />
+          <p>Cash Crop Planting Date:</p>
+          <Input type="date" id="plantingDate" />
 
-        {cashCrop === 'Corn'
-          && (
-          <>
-            <p>Yield Goal (bu/ac):</p>
-            <Myslider
-              id="yield"
-              min={0}
-              max={300}
-            />
-          </>
-          )}
+          {cashCrop === 'Corn'
+            && (
+            <>
+              <p>Yield Goal (bu/ac):</p>
+              <Myslider
+                id="yield"
+                min={0}
+                max={300}
+              />
+            </>
+            )}
 
-        <p>
-          What is your Target Nitrogen Fertilizer Rate? (
-          {unit}
-          ):
-          <Help>
-            Please specify the target N rate for your region.
-          </Help>
-        </p>
+          <p>
+            What is your Target Nitrogen Fertilizer Rate? (
+            {unit}
+            ):
+            <Help>
+              Please specify the target N rate for your region.
+            </Help>
+          </p>
 
-        <Myslider
-          id="targetN"
-          min={0}
-          max={300}
-        />
+          <Myslider
+            id="targetN"
+            min={0}
+            max={300}
+          />
+        </div>
       </div>
 
       <div className="bn">
         <Link className="link" to="/covercrop2">BACK</Link>
         <Link className="link" to="/output">NEXT</Link>
       </div>
-    </>
+    </div>
   );
 }; // CashCrop
 

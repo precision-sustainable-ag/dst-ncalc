@@ -48,16 +48,32 @@ const Location = () => (
         </Help>
       </div>
     </div>
-    <div className="map">
-      <Map />
-    </div>
-    <div className="bn">
-      <Link className="link" to="/home">
-        BACK
-      </Link>
-      <Link className="link" to="/soil">
-        NEXT
-      </Link>
+    <div
+      style={{
+        justifyContent: 'center',
+        display: 'flex',
+        flexDirection: 'column',
+        alignItems: 'center',
+      }}
+    >
+      <div className="map">
+        <Map />
+      </div>
+      <div
+        style={{
+          justifyContent: 'space-evenly',
+          display: 'flex',
+          alignItems: 'center',
+          width: '100%',
+        }}
+      >
+        <Link className="link" to="/home">
+          BACK
+        </Link>
+        <Link className="link" to="/soil">
+          NEXT
+        </Link>
+      </div>
     </div>
   </div>
 ); // Location

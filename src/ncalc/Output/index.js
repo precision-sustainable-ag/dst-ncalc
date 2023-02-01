@@ -669,10 +669,12 @@ const Output = () => {
   );
 
   return (
-    <>
+    <div>
       <div id="Output" className="mockup">
         {labModel}
-        <CSVLink data={csv} className="download">Download</CSVLink>
+        <div className="csv_download_div">
+          <CSVLink data={csv} className="download">Download</CSVLink>
+        </div>
 
         <div style={{ display: 'none' }}>
           Mockup: &nbsp;
@@ -692,141 +694,310 @@ const Output = () => {
           </button>
         </div>
 
-        <table style={{ width: '100%' }}>
-          <tbody>
-            <tr>
-              <td>
-                <div>
-                  <div className="inputs">
-                    <table
-                      className="coverCropSummary"
-                      style={{ width: '100%', textAlign: 'center', borderBottom: '1px solid #888' }}
-                    >
-                      <tbody>
-                        <tr>
-                          <td>
-                            <u>Field name</u>
-                            <br />
-                            (
-                            <strong>{field}</strong>
-                            )
-                            <p />
-                            <u>Species</u>
-                            <br />
-                            (
-                            <strong>
-                              {coverCrop.map((crop, i, a) => (
-                                <span key={crop}>
-                                  {crop}
-                                  {i < a.length - 1 ? <br /> : ''}
-                                </span>
-                              ))}
-                            </strong>
-                            )
-                            <p />
-                            <u>Termination Date</u>
-                            <br />
-                            (
-                            <strong>{moment(killDate).format('MMM D, yyyy')}</strong>
-                            )
-                            <p />
-                            <u>Dry Biomass</u>
-                            <br />
-                            (
-                            <strong>
-                              {(+biomass).toFixed(0)}
-                              {' '}
-                              {unit}
-                            </strong>
-                            )
-                          </td>
-                          <td>
-                            <u>Residue N Content</u>
-                            <br />
-                            (
-                            <strong>
-                              {((biomass * N) / 100).toFixed(0)}
-                              {' '}
-                              {unit}
-                            </strong>
-                            )
-                            <p />
-                            <u>Carbohydrates</u>
-                            <br />
-                            (
-                            <strong>
-                              {carb.toFixed(0)}
-                              {' '}
-                              %
-                            </strong>
-                            )
-                            <p />
-                            <u>Holo-cellulose</u>
-                            <br />
-                            (
-                            <strong>
-                              {cell.toFixed(0)}
-                              {' '}
-                              %
-                            </strong>
-                            )
-                            <p />
-                            <u>Lignin</u>
-                            <br />
-                            (
-                            <strong>
-                              {lign.toFixed(0)}
-                              {' '}
-                              %
-                            </strong>
-                            )
-                          </td>
-                        </tr>
-                      </tbody>
-                    </table>
+        <div className="output-table-div">
+          <table style={{ width: '100%' }}>
+            <tbody>
+              <tr>
+                <td>
+                  <div>
+                    <div className="inputs">
+                      <table
+                        className="coverCropSummary"
+                        style={{ width: '100%', textAlign: 'center', borderBottom: '1px solid #888' }}
+                      >
+                        <tbody>
+                          <tr>
+                            <td>
+                              <u>Field name</u>
+                              <br />
+                              (
+                              <strong>{field}</strong>
+                              )
+                              <p />
+                              <u>Species</u>
+                              <br />
+                              (
+                              <strong>
+                                {coverCrop.map((crop, i, a) => (
+                                  <span key={crop}>
+                                    {crop}
+                                    {i < a.length - 1 ? <br /> : ''}
+                                  </span>
+                                ))}
+                              </strong>
+                              )
+                              <p />
+                              <u>Termination Date</u>
+                              <br />
+                              (
+                              <strong>{moment(killDate).format('MMM D, yyyy')}</strong>
+                              )
+                              <p />
+                              <u>Dry Biomass</u>
+                              <br />
+                              (
+                              <strong>
+                                {(+biomass).toFixed(0)}
+                                {' '}
+                                {unit}
+                              </strong>
+                              )
+                            </td>
+                            <td>
+                              <u>Residue N Content</u>
+                              <br />
+                              (
+                              <strong>
+                                {((biomass * N) / 100).toFixed(0)}
+                                {' '}
+                                {unit}
+                              </strong>
+                              )
+                              <p />
+                              <u>Carbohydrates</u>
+                              <br />
+                              (
+                              <strong>
+                                {carb.toFixed(0)}
+                                {' '}
+                                %
+                              </strong>
+                              )
+                              <p />
+                              <u>Holo-cellulose</u>
+                              <br />
+                              (
+                              <strong>
+                                {cell.toFixed(0)}
+                                {' '}
+                                %
+                              </strong>
+                              )
+                              <p />
+                              <u>Lignin</u>
+                              <br />
+                              (
+                              <strong>
+                                {lign.toFixed(0)}
+                                {' '}
+                                %
+                              </strong>
+                              )
+                            </td>
+                          </tr>
+                        </tbody>
+                      </table>
+                    </div>
                   </div>
-                </div>
 
-                <HighchartsReact highcharts={Highcharts} options={NGraph} className="hidden" />
-                {(outputN === 1 && targetN < surfaceNPredict) && <div className="footnote">* Your cover crop is supplying all of your needs.</div>}
-                <HighchartsReact highcharts={Highcharts} options={residueGraph} />
-              </td>
-              <td>
-                <div className="output center" style={{ marginBottom: '1em' }}>
-                  <button
-                    type="button"
-                    className={outputN === 1 ? 'selected' : ''}
-                    onClick={() => dispatch(set.outputN(1))}
-                  >
-                    N RELEASED
-                  </button>
+                  <HighchartsReact highcharts={Highcharts} options={NGraph} className="hidden" />
+                  {(outputN === 1 && targetN < surfaceNPredict) && <div className="footnote">* Your cover crop is supplying all of your needs.</div>}
+                  <HighchartsReact highcharts={Highcharts} options={residueGraph} />
+                </td>
+                <td>
+                  <div className="output center" style={{ marginBottom: '1em' }}>
+                    <button
+                      type="button"
+                      className={outputN === 1 ? 'selected' : ''}
+                      onClick={() => dispatch(set.outputN(1))}
+                    >
+                      N RELEASED
+                    </button>
 
-                  <button
-                    type="button"
-                    className={outputN === 2 ? 'selected' : ''}
-                    onClick={() => dispatch(set.outputN(2))}
-                  >
-                    RESIDUE REMAINING
-                  </button>
-                </div>
+                    <button
+                      type="button"
+                      className={outputN === 2 ? 'selected' : ''}
+                      onClick={() => dispatch(set.outputN(2))}
+                    >
+                      RESIDUE REMAINING
+                    </button>
+                  </div>
 
-                {mockup === 2 && summary}
+                  {mockup === 2 && summary}
 
-                <HighchartsReact highcharts={Highcharts} options={options} />
+                  <HighchartsReact highcharts={Highcharts} options={options} />
 
-                {mockup === 1 && summary}
-              </td>
-            </tr>
-          </tbody>
-        </table>
+                  {mockup === 1 && summary}
+                </td>
+              </tr>
+            </tbody>
+          </table>
+          <div className="bn">
+            <Link className="link" to="/cashcrop">BACK</Link>
+            <Link className="link" to="/advanced">ADVANCED</Link>
+            <Link className="link" to="/feedback">FEEDBACK</Link>
+          </div>
+        </div>
+        <div className="output-table-div-mobile">
+          <div
+            style={{
+              fontSize: '1rem',
+              width: '100vw',
+              justifyContent: 'flex-start',
+              display: 'flex',
+              flexDirection: 'column',
+              padding: '0px 30px',
+              color: '#6A9333',
+            }}
+          >
+            <div>
+              <u>Field name</u>
+              :
+              (
+              {field}
+              )
+              <p />
+            </div>
+            <div>
+              <u>Species</u>
+              :
+              (
+              {coverCrop.map((crop, i, a) => (
+                <span key={crop}>
+                  {crop}
+                  {i < a.length - 1 ? <br /> : ''}
+                </span>
+              ))}
+              )
+              <p />
+            </div>
+            <div>
+              <u>Termination Date</u>
+              :
+              (
+              <strong>{moment(killDate).format('MMM D, yyyy')}</strong>
+              )
+              <p />
+            </div>
+            <div>
+              <u>Dry Biomass</u>
+              :
+              (
+              <strong>
+                {(+biomass).toFixed(0)}
+                {unit}
+              </strong>
+              {' '}
+              )
+              <p />
+            </div>
+            <div>
+              <u>Residue N Content</u>
+              :
+              (
+              <strong>
+                {((biomass * N) / 100).toFixed(0)}
+                {unit}
+              </strong>
+              )
+              <p />
+            </div>
+            <div>
+              <u>Carbohydrates</u>
+              :
+              (
+              <strong>
+                {carb.toFixed(0)}
+                %
+              </strong>
+              )
+              <p />
+            </div>
+            <div>
+              <u>Holo-cellulose</u>
+              :
+              (
+              <strong>
+                {cell.toFixed(0)}
+                %
+              </strong>
+              )
+              <p />
+            </div>
+            <div>
+              <u>Lignin</u>
+              :
+              (
+              <strong>
+                {lign.toFixed(0)}
+                %
+              </strong>
+              )
+            </div>
+          </div>
+          <div style={{ width: '100vw', overflow: 'scroll' }}>
+            <HighchartsReact
+              highcharts={Highcharts}
+              options={NGraph}
+              className="hidden"
+            />
+            {outputN === 1 && targetN < surfaceNPredict && (
+              <div className="footnote">
+                * Your cover crop is supplying all of your needs.
+              </div>
+            )}
+            <HighchartsReact highcharts={Highcharts} options={residueGraph} />
+          </div>
+          <div style={{ marginBottom: '250px' }}>
+            <div className="output center" style={{ marginBottom: '1em' }}>
+              <button
+                type="button"
+                className={outputN === 1 ? 'selected' : ''}
+                onClick={() => dispatch(set.outputN(1))}
+              >
+                N RELEASED
+              </button>
+
+              <button
+                type="button"
+                className={outputN === 2 ? 'selected' : ''}
+                onClick={() => dispatch(set.outputN(2))}
+              >
+                RESIDUE REMAINING
+              </button>
+            </div>
+
+            {mockup === 2 && summary}
+
+            <HighchartsReact highcharts={Highcharts} options={options} />
+
+            {mockup === 1 && summary}
+          </div>
+          <div
+            className="bn"
+            style={{
+              display: 'grid',
+              gap: '10px',
+              gridTemplateColumns: '1fr 1fr',
+            }}
+          >
+            <Link
+              className="link"
+              to="/cashcrop"
+            >
+              BACK
+            </Link>
+            <Link
+              className="link"
+              to="/advanced"
+            >
+              ADVANCED
+            </Link>
+            <Link
+              className="link"
+              to="/feedback"
+            >
+              FEEDBACK
+            </Link>
+            <div className="link">
+              <CSVLink data={csv} style={{ color: '#fff' }}>
+                DOWNLOAD
+              </CSVLink>
+            </div>
+          </div>
+        </div>
       </div>
-
-      <div className="bn">
-        <Link className="link" to="/cashcrop">BACK</Link>
-        <Link className="link" to="/advanced">ADVANCED</Link>
-        <Link className="link" to="/feedback">FEEDBACK</Link>
-      </div>
-    </>
+    </div>
   );
 }; // Output
 

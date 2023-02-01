@@ -28,7 +28,7 @@ const Home = () => {
           residue persistence, as well as the amount and timing of nitrogen availability.
         </p>
 
-        <div>
+        <div className="home-button-container">
           <Link className="link about" to="/about">ABOUT</Link>
           <Link className="link location" to="/location">GET STARTED</Link>
         </div>

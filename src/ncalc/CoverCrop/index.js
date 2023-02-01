@@ -68,112 +68,120 @@ const CoverCrop1 = () => {
   }
 
   return (
-    <>
-      <h1>Tell us about your Cover Crop</h1>
-      <div className="inputs">
-        <p>Cover Crop Species:</p>
-        <CoverCrops />
+    <div
+      style={{
+        justifyContent: 'center',
+        display: 'flex',
+        alignItems: 'center',
+      }}
+    >
+      <div className="cover-crop-div">
+        <h1>Tell us about your Cover Crop</h1>
+        <div className="inputs">
+          <p>Cover Crop Species:</p>
+          <CoverCrops />
 
-        <p>Cover Crop Termination Date:</p>
-        <Input type="date" id="killDate" />
+          <p>Cover Crop Termination Date:</p>
+          <Input type="date" id="killDate" />
 
-        <p />
-        <div>
-          Dry Biomass
-          <Help>
-            <p>The amount of cover crop biomass on a dry weight basis.</p>
-            <p>
-              For details on cover crop biomass sampling and taking a representative sub-sample for quality analysis, please refer to
-              <a tabIndex="-1" target="_blank" rel="noreferrer" href="https://extension.uga.edu/publications/detail.html?number=C1077">here</a>
+          <p />
+          <div>
+            Dry Biomass
+            <Help>
+              <p>The amount of cover crop biomass on a dry weight basis.</p>
+              <p>
+                For details on cover crop biomass sampling and taking a representative sub-sample for quality analysis, please refer to
+                <a tabIndex="-1" target="_blank" rel="noreferrer" href="https://extension.uga.edu/publications/detail.html?number=C1077">here</a>
+                .
+              </p>
+            </Help>
+            :
+
+            <RadioGroup row aria-label="position" name="position" style={{ display: 'inline-block', marginLeft: '1em' }}>
+              <FormControlLabel
+                value="lb/ac"
+                control={<Radio id="unit" checked={unit === 'lb/ac'} />}
+                onChange={() => dispatch(set.unit('lb/ac'))}
+                label="lb/ac"
+              />
+              <FormControlLabel
+                value="kg/ha"
+                control={<Radio id="unit" checked={unit === 'kg/ha'} />}
+                onChange={() => dispatch(set.unit('kg/ha'))}
+                label="kg/ha"
+              />
+            </RadioGroup>
+          </div>
+
+          <Myslider
+            id="biomass"
+            min={0}
+            max={max}
+          />
+
+          {+biomass > +max
+            && (
+            <p className="warning">
+              This biomass seems too high
+              {warningText}
               .
+              <br />
+              Please make sure the biomass entered is on a dry matter basis.
             </p>
-          </Help>
-          :
+            )}
 
-          <RadioGroup row aria-label="position" name="position" style={{ display: 'inline-block', marginLeft: '1em' }}>
-            <FormControlLabel
-              value="lb/ac"
-              control={<Radio id="unit" checked={unit === 'lb/ac'} />}
-              onChange={() => dispatch(set.unit('lb/ac'))}
-              label="lb/ac"
-            />
-            <FormControlLabel
-              value="kg/ha"
-              control={<Radio id="unit" checked={unit === 'kg/ha'} />}
-              onChange={() => dispatch(set.unit('kg/ha'))}
-              label="kg/ha"
-            />
-          </RadioGroup>
-        </div>
+          <br />
+          <div>
+            Fresh Biomass
+            <Help>
+              <p>The amount of cover crop biomass on a wet weight basis.</p>
+              <p>
+                For details on cover crop biomass sampling and taking a representative sub-sample for quality analysis, please refer to
+                <a tabIndex="-1" target="_blank" rel="noreferrer" href="https://extension.uga.edu/publications/detail.html?number=C1077">here</a>
+                .
+              </p>
+            </Help>
+          </div>
 
-        <Myslider
-          id="biomass"
-          min={0}
-          max={max}
-        />
+          <Myslider
+            id="freshBiomass"
+            min={0}
+            max={freshMax}
+          />
 
-        {+biomass > +max
-          && (
-          <p className="warning">
-            This biomass seems too high
-            {warningText}
-            .
-            <br />
-            Please make sure the biomass entered is on a dry matter basis.
-          </p>
-          )}
-
-        <br />
-        <div>
-          Fresh Biomass
-          <Help>
-            <p>The amount of cover crop biomass on a wet weight basis.</p>
-            <p>
-              For details on cover crop biomass sampling and taking a representative sub-sample for quality analysis, please refer to
-              <a tabIndex="-1" target="_blank" rel="noreferrer" href="https://extension.uga.edu/publications/detail.html?number=C1077">here</a>
+          {+freshBiomass > +freshMax
+            && (
+            <p className="warning">
+              This biomass seems too high
+              {warningText}
               .
+              <br />
+              Please make sure the biomass entered is on a fresh matter basis.
             </p>
-          </Help>
+            )}
+
+          <div style={{ marginTop: '2rem' }}>
+            Cover Crop Water Content at Termination (g water/g dry biomass)
+            <Help>
+              <p>Use the following calculation to adjust default values:</p>
+              <p>Cover Crop Water Content = (Total fresh weight - Total dry weight)/(Total dry weight)</p>
+            </Help>
+            :
+          </div>
+          <Myslider
+            id="lwc"
+            min={0}
+            max={10}
+            step={0.1}
+          />
         </div>
 
-        <Myslider
-          id="freshBiomass"
-          min={0}
-          max={freshMax}
-        />
-
-        {+freshBiomass > +freshMax
-          && (
-          <p className="warning">
-            This biomass seems too high
-            {warningText}
-            .
-            <br />
-            Please make sure the biomass entered is on a fresh matter basis.
-          </p>
-          )}
-
-        <div style={{ marginTop: '2rem' }}>
-          Cover Crop Water Content at Termination (g water/g dry biomass)
-          <Help>
-            <p>Use the following calculation to adjust default values:</p>
-            <p>Cover Crop Water Content = (Total fresh weight - Total dry weight)/(Total dry weight)</p>
-          </Help>
-          :
+        <div className="bn">
+          <Link className="link" to="/soil">BACK</Link>
+          <Link className="link" to="/covercrop2">NEXT</Link>
         </div>
-        <Myslider
-          id="lwc"
-          min={0}
-          max={10}
-          step={0.1}
-        />
       </div>
-
-      <div className="bn">
-        <Link className="link" to="/soil">BACK</Link>
-        <Link className="link" to="/covercrop2">NEXT</Link>
-      </div>
-    </>
+    </div>
   );
 }; // CoverCrop1
 
@@ -181,92 +189,99 @@ const CoverCrop2 = () => {
   const N = useSelector(get.N);
 
   return (
-    <>
-      <h1>Tell us about your Cover Crop Quality</h1>
-      <div className="inputs">
-        <p>
-          Nitrogen (%)
-          <Help>
-            Cover crop nitrogen concentration based on lab results.
-          </Help>
-          :
-        </p>
-        <Myslider
-          id="N"
-          min={0}
-          max={6}
-          step={0.1}
-        />
-        <p />
-        <hr />
-        {N ? <p className="note">Adjust default values below based on lab results.</p> : ''}
-        <p />
-        <div>
-          Carbohydrates (%)
-          <Help>
-            <p>
-              Non-structural labile carbohydrate concentration based on lab results. This represents the most
-              readily decomposable C constituents in plant materials.
-            </p>
-            <p>The default value is based on the nitrogen concentration.</p>
-            <p>If you have the raw data from near infra-red reflectance spectroscopy (NIRS) analysis, use the following equation:</p>
-            <p>carbohydrates (%) = % crude protein (CP) + % fat + % non-fibrous carbohydrates (NFC)</p>
-          </Help>
-          :
-        </div>
-        <p />
-        <Myslider
-          id="carb"
-          min={20}
-          max={70}
-          step={0.1}
-        />
+    <div
+      style={{
+        justifyContent: 'center',
+        display: 'flex',
+        alignItems: 'center',
+      }}
+    >
+      <div className="cover-crop-div">
+        <h1>Tell us about your Cover Crop Quality</h1>
+        <div className="inputs">
+          <p>
+            Nitrogen (%)
+            <Help>
+              Cover crop nitrogen concentration based on lab results.
+            </Help>
+            :
+          </p>
+          <Myslider
+            id="N"
+            min={0}
+            max={6}
+            step={0.1}
+          />
+          <p />
+          <hr />
+          {N ? <p className="note">Adjust default values below based on lab results.</p> : ''}
+          <p />
+          <div>
+            Carbohydrates (%)
+            <Help>
+              <p>
+                Non-structural labile carbohydrate concentration based on lab results. This represents the most
+                readily decomposable C constituents in plant materials.
+              </p>
+              <p>The default value is based on the nitrogen concentration.</p>
+              <p>If you have the raw data from near infra-red reflectance spectroscopy (NIRS) analysis, use the following equation:</p>
+              <p>carbohydrates (%) = % crude protein (CP) + % fat + % non-fibrous carbohydrates (NFC)</p>
+            </Help>
+            :
+          </div>
+          <p />
+          <Myslider
+            id="carb"
+            min={20}
+            max={70}
+            step={0.1}
+          />
 
-        <p />
-        <div>
-          Holo-cellulose (%)
-          <Help>
-            <p>
-              Structural holo-cellulose (i.e., both cellulose and hemi-cellulose) concentration
-              based on lab results. This represents the moderately decomposable C constituents in plant materials.
-            </p>
-            <p>The default value is based on the nitrogen concentration.</p>
-            <p>If you have the raw data from near infra-red reflectance spectroscopy (NIRS) analysis, use the following equation:</p>
-            <p>holo-cellulose (%) = % neutral detergent fiber (NDF) – (% lignin + % ash)</p>
-          </Help>
-          :
-        </div>
-        <p />
-        <Myslider
-          id="cell"
-          min={20}
-          max={70}
-          step={0.1}
-        />
+          <p />
+          <div>
+            Holo-cellulose (%)
+            <Help>
+              <p>
+                Structural holo-cellulose (i.e., both cellulose and hemi-cellulose) concentration
+                based on lab results. This represents the moderately decomposable C constituents in plant materials.
+              </p>
+              <p>The default value is based on the nitrogen concentration.</p>
+              <p>If you have the raw data from near infra-red reflectance spectroscopy (NIRS) analysis, use the following equation:</p>
+              <p>holo-cellulose (%) = % neutral detergent fiber (NDF) – (% lignin + % ash)</p>
+            </Help>
+            :
+          </div>
+          <p />
+          <Myslider
+            id="cell"
+            min={20}
+            max={70}
+            step={0.1}
+          />
 
-        <p />
-        <div>
-          Lignin (%)
-          <Help>
-            <p>Structural lignin concentration based on lab results. This represents the most recalcitrant C constituents in plant materials.</p>
-            <p>The default value is based on the nitrogen concentration.</p>
-          </Help>
-          :
+          <p />
+          <div>
+            Lignin (%)
+            <Help>
+              <p>Structural lignin concentration based on lab results. This represents the most recalcitrant C constituents in plant materials.</p>
+              <p>The default value is based on the nitrogen concentration.</p>
+            </Help>
+            :
+          </div>
+          <p />
+          <Myslider
+            id="lign"
+            min={1}
+            max={10}
+            step={0.1}
+          />
         </div>
-        <p />
-        <Myslider
-          id="lign"
-          min={1}
-          max={10}
-          step={0.1}
-        />
       </div>
-
       <div className="bn">
         <Link className="link" to="/covercrop">BACK</Link>
         <Link className="link" to="/cashcrop">NEXT</Link>
       </div>
-    </>
+    </div>
   );
 }; // CoverCrop2
 

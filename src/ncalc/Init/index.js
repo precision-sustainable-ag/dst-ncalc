@@ -10,7 +10,7 @@ import './styles.scss';
 
 const examples = {};
 
-const Init = () => {
+const Init = ({ desktop, setNavModalOpen }) => {
   const dispatch = useDispatch();
   const navigate = useNavigate();
 
@@ -146,6 +146,7 @@ const Init = () => {
 
   const changePSA = (e) => {
     const PSAval = examples[e.target.value];
+    setNavModalOpen(false);
 
     Object.keys(PSAval).forEach((key) => {
       try {
@@ -159,6 +160,7 @@ const Init = () => {
 
   const changeField = (e) => {
     const fieldStr = e.target.value;
+    setNavModalOpen(false);
     if (fieldStr === 'Clear previous runs') {
       // eslint-disable-next-line no-alert
       if (window.confirm('Clear all previous runs?')) {
@@ -171,7 +173,7 @@ const Init = () => {
   }; // changeField
 
   return (
-    <div className="Init">
+    <div className={`Init ${desktop ? 'desktop' : 'mobile'}`}>
       {
         PSA
         && (
