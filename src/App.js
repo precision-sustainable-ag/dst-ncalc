@@ -17,27 +17,17 @@ const screens = {
   init: () => null,
 };
 
-if (/water/i.test(window.location)) {
-  screens.init = require('./water/Init').default;
-  screens.home = require('./water/Home').default;
-  screens.about = require('./water/About').default;
-  screens.location = require('./shared/Location').default;
-  screens.soil = require('./water/Soil').default;
-  screens.inputs = require('./water/Inputs').default;
-  screens.worksheet = require('./water/Worksheet').default;
-} else {
-  screens.init = require('./ncalc/Init').default;
-  screens.home = require('./ncalc/Home').default;
-  screens.about = require('./ncalc/About').default;
-  screens.location = require('./shared/Location').default;
-  screens.soil = require('./ncalc/Soil').default;
-  screens.covercrop = require('./ncalc/CoverCrop').CoverCrop1;
-  screens.covercrop2 = require('./ncalc/CoverCrop').CoverCrop2;
-  screens.cashcrop = require('./ncalc/CashCrop').default;
-  screens.output = require('./ncalc/Output').default;
-  screens.feedback = require('./ncalc/Feedback').default;
-  screens.advanced = require('./ncalc/Advanced').default;
-}
+screens.init = require('./components/Init').default;
+screens.home = require('./components/Home').default;
+screens.about = require('./components/About').default;
+screens.location = require('./shared/Location').default;
+screens.soil = require('./components/Soil').default;
+screens.covercrop = require('./components/CoverCrop').CoverCrop1;
+screens.covercrop2 = require('./components/CoverCrop').CoverCrop2;
+screens.cashcrop = require('./components/CashCrop').default;
+screens.output = require('./components/Output').default;
+screens.feedback = require('./components/Feedback').default;
+screens.advanced = require('./components/Advanced').default;
 
 screens.init.showInMenu = false;
 
@@ -189,7 +179,5 @@ const App = () => {
     </div>
   );
 }; // App
-
-document.title = window.location.toString().includes('water') ? 'Water DST' : 'CC-NCALC';
 
 export default App;

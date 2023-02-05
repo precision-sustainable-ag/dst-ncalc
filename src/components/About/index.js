@@ -37,7 +37,7 @@ const About = () => (
     </p>
     <ul>
       <li>
-        Local soil properties (organic matter and bulk density) from the NRCS`&apos;`s Soil Survey Geographic database (
+        Local soil properties (organic matter and bulk density) from the NRCS&apos;s Soil Survey Geographic database (
         <a target="_blank" rel="noreferrer" href="https://ssurgo.covercrop-data.org/">SSURGO</a>
         ),
       </li>
