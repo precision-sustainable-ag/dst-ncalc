@@ -1,3 +1,4 @@
+/* eslint-disable no-console */
 // // code breaking eslint rules were disabled --- MILAD
 /* eslint-disable no-alert */
 /* eslint-disable camelcase */
@@ -47,15 +48,15 @@ const initialState = {
   mapPolygon: [],
   maxZoom: 20,
   model: {},
-  OM: 3,
-  BD: 1.3,
+  OM: 4,
+  BD: 1.33,
   yield: 150,
   residue: 'surface',
   NContent: '',
   residueC: '',
   outputN: 1,
   SSURGO: {},
-  gotSSURGO: false,
+  gotSSURGO: true,
   gotModel: false,
   cornN: false,
   state: '',
@@ -75,7 +76,7 @@ const initialState = {
   data: '',
 };
 
-const ac = {
+const afterChange = {
   N: (state, { payload }) => {
     if (!state.edited) {
       state.carb = Math.min(100, Math.max(0, (24.7 + 10.5 * payload))).toFixed(0);
@@ -87,8 +88,8 @@ const ac = {
   carb: (state) => { state.gotModel = false; state.edited = true; },
   cell: (state) => { state.gotModel = false; state.edited = true; },
   lign: (state) => { state.gotModel = false; state.edited = true; },
-  lat: (state) => { state.gotModel = false; },
-  lon: (state) => { state.gotModel = false; },
+  lat: (state) => { state.gotModel = false; fetchSSURGO(state); },
+  lon: (state) => { state.gotModel = false; fetchSSURGO(state); },
   lwc: (state) => { state.gotModel = false; },
   killDate: (state) => { state.gotModel = false; },
   plantingDate: (state) => { state.gotModel = false; },
@@ -189,7 +190,7 @@ export const fetchModel = () => {
         fetchCornN(store.getState());
       },
       timer: 'model',
-      delay: 2000,
+      delay: 0,
     });
   }
 }; // fetchModel
@@ -198,14 +199,13 @@ const fetchSSURGO = (state) => {
   const { lat, lon } = state;
 
   state.gotSSURGO = false;
-
   const url = `https://ssurgo.covercrop-data.org/?lat=${lat}&lon=${lon}&component=major`;
 
   api({
     url,
     callback: (data) => {
       if (data.ERROR) {
-        // console.log(`No SSURGO data at ${lat}, ${lon}`);
+        console.log(`No SSURGO data at ${lat}, ${lon}`);
         store.dispatch(set.BD(''));
         store.dispatch(set.OM(''));
       } else {
@@ -217,6 +217,7 @@ const fetchSSURGO = (state) => {
         store.dispatch(set.OM(weightedAverage(data, 'om_r')));
         store.dispatch(set.gotSSURGO(true));
         store.dispatch(set.SSURGO(data));
+        fetchModel(state);
       }
     },
     timer: 'ssurgo',
@@ -248,6 +249,7 @@ const fetchCornN = (state) => {
         store.dispatch(set.errorCorn(true));
       }
     },
+    delay: 0,
   });
 }; // fetchCornN
 
@@ -296,15 +298,9 @@ export const missingData = () => {
   return null;
 }; // missingData
 
-const reducers = {
-  updateLocation: (state, { payload }) => {
-    state = { ...state, ...payload };
-    fetchSSURGO(state);
-    return state;
-  },
-};
+const reducers = {};
 
-export const store = createStore(initialState, { afterChange: ac, reducers });
+export const store = createStore(initialState, { afterChange, reducers });
 
 export const api = ({
   url, options = {}, callback, timer = url, delay = 0,
@@ -314,7 +310,7 @@ export const api = ({
   }
 
   api[timer] = setTimeout(() => {
-    // console.log(url);
+    console.log(url);
     store.dispatch({
       type: 'api',
       payload: {

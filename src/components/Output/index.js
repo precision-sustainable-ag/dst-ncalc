@@ -1,3 +1,4 @@
+/* eslint-disable no-console */
 /* eslint-disable react/no-this-in-sfc */
 /* eslint-disable max-len */
 import React, { useEffect } from 'react';
@@ -50,34 +51,38 @@ const Output = () => {
 
   if (field) {
     if (!/Example: Grass|Example: Legume/.test(field)) {
-      localStorage.setItem(field, JSON.stringify({
-        lat,
-        lon,
-        BD,
-        N,
-        killDate,
-        plantingDate,
-        carb,
-        cell,
-        lign,
-        lwc,
-        biomass,
-        unit,
-        InorganicN,
-        coverCrop,
-        field,
-        gotModel,
-        errorModel,
-        errorCorn,
-        model,
-        mockup,
-        cornN,
-        cashCrop,
-        yield: Yield,
-        outputN,
-        nweeks,
-        targetN,
-      }));
+      try {
+        localStorage.setItem(field, JSON.stringify({
+          lat,
+          lon,
+          BD,
+          N,
+          killDate,
+          plantingDate,
+          carb,
+          cell,
+          lign,
+          lwc,
+          biomass,
+          unit,
+          InorganicN,
+          coverCrop,
+          field,
+          gotModel,
+          errorModel,
+          errorCorn,
+          // model,
+          mockup,
+          // cornN,
+          cashCrop,
+          yield: Yield,
+          outputN,
+          nweeks,
+          targetN,
+        }));
+      } catch (ee) {
+        console.log(ee);
+      }
     }
   }
 

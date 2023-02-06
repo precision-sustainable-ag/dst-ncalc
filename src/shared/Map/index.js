@@ -36,10 +36,14 @@ const MapComp = () => {
 
   useEffect(() => {
     dispatch(set.mapType('satellite'));
-    if (address.latitude) dispatch(set.lat(address.latitude));
-    if (address.longitude) dispatch(set.lon(address.longitude));
+    if (address.latitude && address.latitude !== lat) {
+      dispatch(set.lat(address.latitude));
+    }
+    if (address.longitude && address.longitude !== lon) {
+      dispatch(set.lon(address.longitude));
+    }
     if (address.address) dispatch(set.mapAddress(address.address));
-  }, [address, dispatch]);
+  }, [address.latitude, address.longitude, address.address]);
 
   useEffect(() => {
     if (zoom) dispatch(set.mapZoom(zoom));

@@ -12,7 +12,6 @@ const Soil = () => {
   return (
     <div
       style={{
-        justifyContent: 'center',
         display: 'flex',
         alignItems: 'center',
       }}
