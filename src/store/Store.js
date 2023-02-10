@@ -48,8 +48,8 @@ const initialState = {
   mapPolygon: [],
   maxZoom: 20,
   model: {},
-  OM: 4,
-  BD: 1.33,
+  OM: 3,
+  BD: 1.30,
   yield: 150,
   residue: 'surface',
   NContent: '',
@@ -199,6 +199,7 @@ const fetchSSURGO = (state) => {
   const { lat, lon } = state;
 
   state.gotSSURGO = false;
+  state.gotModel = false;
   const url = `https://ssurgo.covercrop-data.org/?lat=${lat}&lon=${lon}&component=major`;
 
   api({

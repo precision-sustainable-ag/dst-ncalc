@@ -11,7 +11,7 @@ const Myslider = ({
   id, min, max, step = 1, autoFocus, onInput,
 }) => {
   const dispatch = useDispatch();
-  const val = useSelector(get[id]);
+  const val = +useSelector(get[id]);
 
   min = +min;
   max = +max;
@@ -30,7 +30,7 @@ const Myslider = ({
         <div style={{ display: 'flex', gap: '10px' }}>
           <span className="tiny">{min}</span>
           <Slider
-            value={Number.isFinite(val) ? +(+val).toFixed(step === 1 ? 0 : 1) : 0}
+            value={Number.isFinite(val) ? +(val).toFixed(step === 1 ? 0 : 1) : 0}
             onChange={(_, newValue) => {
               if (onInput) {
                 onInput();

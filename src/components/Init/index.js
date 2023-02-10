@@ -16,6 +16,7 @@ const Init = ({ desktop, setNavModalOpen }) => {
 
   const PSA = useSelector(get.PSA);
   const field = useSelector(get.field);
+  const screen = useSelector(get.screen);
 
   useEffect(() => {
     const base = new Airtable({ apiKey: 'keySO0dHQzGVaSZp2' }).base('appOEj4Ag9MgTTrMg');
@@ -161,7 +162,9 @@ const Init = ({ desktop, setNavModalOpen }) => {
   const changeField = (e) => {
     const fieldStr = e.target.value;
     setNavModalOpen(false);
-    if (fieldStr === 'Clear previous runs') {
+    if (fieldStr === 'Download data') {
+      document.querySelector('a.download').click();
+    } else if (fieldStr === 'Clear previous runs') {
       // eslint-disable-next-line no-alert
       if (window.confirm('Clear all previous runs?')) {
         localStorage.clear();
@@ -171,6 +174,9 @@ const Init = ({ desktop, setNavModalOpen }) => {
       loadField(fieldStr);
     }
   }; // changeField
+
+  const myFields = Object.keys(localStorage).sort().filter((v) => !v.includes('mapbox.eventData'));
+  const showUtilities = screen === 'output' || myFields.length;
 
   return (
     <div className={`Init ${desktop ? 'desktop' : 'mobile'}`}>
@@ -209,21 +215,48 @@ const Init = ({ desktop, setNavModalOpen }) => {
             onChange={changeField}
             value={field}
           >
-            <option>examples</option>
-            <option>Example: Grass</option>
-            <option>Example: Legume</option>
             {
-              Object.keys(localStorage).filter((v) => !v.includes('mapbox.eventData')).length && (
+              myFields.length && (
                 <>
-                  <option>Clear previous runs</option>
+                  <optgroup label="My fields">
+                    { // additional field names in example dropdown
+                      myFields.map((fld, idx) => (
+                        <option key={idx} checked={fld === field}>{fld}</option> // eslint-disable-line react/no-unknown-property
+                      ))
+                    }
+                  </optgroup>
                   <option disabled>____________________</option>
                 </>
               )
             }
-            { // additional field names in example dropdown
-              Object.keys(localStorage).sort().filter((v) => !v.includes('mapbox.eventData')).map((fld, idx) => (
-                <option key={idx} checked={fld === field}>{fld}</option> // eslint-disable-line react/no-unknown-property
-              ))
+
+            {
+              !myFields.length && (
+                <option>&nbsp;</option>
+              )
+            }
+
+            <optgroup label="Example data">
+              <option>Example: Grass</option>
+              <option>Example: Legume</option>
+            </optgroup>
+            <option disabled>____________________</option>
+
+            {
+              showUtilities && (
+                <optgroup label="Utilities">
+                  {
+                    screen === 'output' && (
+                      <option>Download data</option>
+                    )
+                  }
+                  {
+                    myFields.length && (
+                      <option>Clear previous runs</option>
+                    )
+                  }
+                </optgroup>
+              )
             }
           </select>
         )
