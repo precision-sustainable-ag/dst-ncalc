@@ -127,7 +127,7 @@ const Init = ({ desktop, setNavModalOpen }) => {
       dispatch(set.yield(150));
       dispatch(set.targetN(100));
     } else {
-      const inputs = JSON.parse(localStorage[field]);
+      const inputs = JSON.parse(localStorage[fieldVal]);
       Object.keys(inputs).forEach((key) => {
         try {
           if (/Date/.test(key)) {
@@ -215,6 +215,7 @@ const Init = ({ desktop, setNavModalOpen }) => {
             onChange={changeField}
             value={field}
           >
+            <option>&nbsp;</option>
             {
               myFields.length && (
                 <>

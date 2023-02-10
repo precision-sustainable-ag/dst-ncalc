@@ -17,9 +17,7 @@ const About = () => (
       Some of the N taken up or fixed by the cover crops becomes available over the cash crop growing season following termination.
       Estimating the rate of N release is challenging.
       The
-      {' '}
       <strong>Cover Crop N Calculator</strong>
-      {' '}
       provides a user-friendly approach to estimate decay of cover crop residues and release of N for offsetting N fertilizer inputs.
       This tool was developed for farmers and agricultural professionals.
     </p>
@@ -37,19 +35,17 @@ const About = () => (
     </p>
     <ul>
       <li>
-        Local soil properties (organic matter and bulk density) from the NRCS&apos;s Soil Survey Geographic database (
-        <a target="_blank" rel="noreferrer" href="https://ssurgo.covercrop-data.org/">SSURGO</a>
-        ),
+        Local soil properties (organic matter and bulk density) from the NRCS&apos;s Soil Survey Geographic database
+        <a target="_blank" rel="noreferrer" href="https://ssurgo.covercrop-data.org/">(SSURGO),</a>
       </li>
       <li>
         Daily soil moisture and soil temperature from
-        <a target="_blank" rel="noreferrer" href="https://docs.clearag.com/documentation/Soil_Conditions/Soil_Conditions/latest">Iteris</a>
-        , and
+        <a target="_blank" rel="noreferrer" href="https://docs.clearag.com/documentation/Soil_Conditions/Soil_Conditions/latest">Iteris,</a>
+        and
       </li>
       <li>
         Hourly weather (air relative humidity, air temperature, and rain) data from a
         <a target="_blank" rel="noreferrer" href="https://weather.covercrop-data.org/">weather API</a>
-        {' '}
         to estimate surface residue environmental conditions.
       </li>
     </ul>
@@ -84,10 +80,8 @@ const About = () => (
       <em>
         For more information about
         <strong>Precision Sustainable Agriculture</strong>
-        {' '}
         projects, please visit
-        <a href="https://precisionsustainableag.org/">https://precisionsustainableag.org/</a>
-        .
+        <a href="https://precisionsustainableag.org/">https://precisionsustainableag.org/.</a>
       </em>
     </p>
   </div>

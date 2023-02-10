@@ -537,3 +537,10 @@ xl	1280px
     padding-bottom: 400px;
   }
 }
+
+p ::before,
+p ::after,
+li ::before,
+li ::after {
+  content: ' ';
+}
