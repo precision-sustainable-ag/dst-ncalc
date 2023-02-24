@@ -1,10 +1,10 @@
 import React from 'react';
-import {createRoot} from 'react-dom/client';
-import {Provider} from 'react-redux';
-import {store} from './store/Store';
-import {HashRouter as Router} from 'react-router-dom';
+import { createRoot } from 'react-dom/client';
+import { Provider } from 'react-redux';
+import { HashRouter as Router } from 'react-router-dom';
+import { store } from './store/Store';
 import App from './App';
-import ScrollToTop from "./scrollToTop";
+import ScrollToTop from './scrollToTop';
 
 import './index.css';
 
@@ -30,5 +30,5 @@ root.render(
       <ScrollToTop />
       <App />
     </Provider>
-  </Router>
+  </Router>,
 );
