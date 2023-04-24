@@ -16,7 +16,7 @@ const Location = () => (
   <div className="locationWrapper">
     <div className="mapHeader">
       <div className="mapHeaderText">
-        <Accordion>
+        <Accordion defaultExpanded>
           <AccordionSummary
             expandIcon={<ExpandMoreIcon />}
             aria-controls="panel1a-content"

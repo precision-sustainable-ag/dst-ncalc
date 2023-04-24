@@ -62,7 +62,7 @@ const Biomass = () => {
     };
     console.log('making task request');
     axios
-      .post('https://api.covercrop-imagery.org/tasks', payload, { headers })
+      .post('https://covercrop-imagery.org/tasks', payload, { headers })
       .then((response) => {
         console.log('response: ', response);
         if (response.status === 200 && response.data) {
@@ -76,7 +76,7 @@ const Biomass = () => {
 
   const fetchTask = () => {
     axios
-      .get(`https://api.covercrop-imagery.org/tasks/${taskId}`)
+      .get(`https://covercrop-imagery.org/tasks/${taskId}`)
       .then((response) => {
         if (response.status === 200 && response.data && response.data.task_status !== 'PENDING') {
           setData(response.data);
@@ -116,7 +116,7 @@ const Biomass = () => {
   return (
     <div className="biomassWrapper">
       <div className="biomassTextWrapper">
-        <Accordion>
+        <Accordion defaultExpanded>
           <AccordionSummary
             expandIcon={<ExpandMoreIcon />}
             aria-controls="panel1a-content"
