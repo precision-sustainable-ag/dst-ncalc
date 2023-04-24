@@ -3,8 +3,14 @@ import React, { useEffect, useState } from 'react';
 import { useSelector, useDispatch } from 'react-redux';
 import dayjs from 'dayjs';
 import axios from 'axios';
+import * as turf from '@turf/turf';
 import Typography from '@mui/material/Typography';
 import Accordion from '@mui/material/Accordion';
+import Dialog from '@mui/material/Dialog';
+import DialogActions from '@mui/material/DialogActions';
+import DialogContent from '@mui/material/DialogContent';
+import DialogContentText from '@mui/material/DialogContentText';
+import DialogTitle from '@mui/material/DialogTitle';
 import AccordionSummary from '@mui/material/AccordionSummary';
 import AccordionDetails from '@mui/material/AccordionDetails';
 import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
@@ -24,6 +30,7 @@ let interval;
 
 const Biomass = () => {
   const [loading, setLoading] = useState(false);
+  const [errorArea, setErrorArea] = useState(false);
   const [data, setData] = useState(null);
   const [taskId, setTaskId] = useState(null);
   const [taskIsDone, setTaskIsDone] = useState(false);
@@ -43,35 +50,49 @@ const Biomass = () => {
     console.log('biomassTaskResults ', biomassTaskResults);
   }, [biomassTaskResults]);
 
+  useEffect(() => {
+    console.log('errorArea ', errorArea);
+  }, [errorArea]);
+
   const handleButton = () => {
     const now = dayjs();
+    let area;
     // reverse order of vertices
-    const revertedCoords = [...mapPolygon[0].geometry.coordinates[0]].reverse();
-    const payload = {
-      maxCloudCover: 5,
-      startDate: biomassPlantDate,
-      endDate: now.format('YYYY-MM-DD'),
-      geometry: {
-        type: 'Polygon',
-        coordinates: [revertedCoords],
-      },
-    };
-    setLoading(true);
-    const headers = {
-      'Content-Type': 'application/json',
-    };
-    console.log('making task request');
-    axios
-      .post('https://covercrop-imagery.org/tasks', payload, { headers })
-      .then((response) => {
-        console.log('response: ', response);
-        if (response.status === 200 && response.data) {
-          setTaskId(response.data.task_id);
-        }
-      })
-      .catch((error) => {
-        console.log(error);
-      });
+    if (mapPolygon.length > 0) {
+      area = 0.000247105 * turf.area(turf.polygon(mapPolygon[0].geometry.coordinates));
+      console.log('area', area);
+    }
+
+    if (area > 1000) {
+      setErrorArea(true);
+    } else {
+      const revertedCoords = [...mapPolygon[0].geometry.coordinates[0]].reverse();
+      const payload = {
+        maxCloudCover: 5,
+        startDate: biomassPlantDate,
+        endDate: now.format('YYYY-MM-DD'),
+        geometry: {
+          type: 'Polygon',
+          coordinates: [revertedCoords],
+        },
+      };
+      setLoading(true);
+      const headers = {
+        'Content-Type': 'application/json',
+      };
+      console.log('making task request');
+      axios
+        .post('https://covercrop-imagery.org/tasks', payload, { headers })
+        .then((response) => {
+          console.log('response: ', response);
+          if (response.status === 200 && response.data) {
+            setTaskId(response.data.task_id);
+          }
+        })
+        .catch((error) => {
+          console.log(error);
+        });
+    }
   };
 
   const fetchTask = () => {
@@ -83,10 +104,9 @@ const Biomass = () => {
           setTaskIsDone(true);
           clearInterval(interval);
           setLoading(false);
-          const randomIntFromInterval = (min, max) => {
-            return Math.floor(Math.random() * (max - min + 1) + min);
-          };
-
+          const randomIntFromInterval = (min, max) =>
+            // eslint-disable-next-line implicit-arrow-linebreak
+            Math.floor(Math.random() * (max - min + 1) + min);
           const rndInt = randomIntFromInterval(1200, 1400);
           dispatch(set.biomassTotalValue(rndInt));
         }
@@ -116,6 +136,34 @@ const Biomass = () => {
   return (
     <div className="biomassWrapper">
       <div className="biomassTextWrapper">
+        {errorArea && (
+          <Dialog
+            open={errorArea}
+            onClose={() => {
+              setErrorArea(false);
+            }}
+            aria-labelledby="alert-dialog-title"
+            aria-describedby="alert-dialog-description"
+          >
+            <DialogTitle id="alert-dialog-title">Large Area Warning!</DialogTitle>
+            <DialogContent>
+              <DialogContentText id="alert-dialog-description">
+                The area selected is too large to calculate. Please select a smaller region under
+                1000 Acres.
+              </DialogContentText>
+            </DialogContent>
+            <DialogActions>
+              <Button
+                onClick={() => {
+                  setErrorArea(false);
+                }}
+                autoFocus
+              >
+                close
+              </Button>
+            </DialogActions>
+          </Dialog>
+        )}
         <Accordion defaultExpanded>
           <AccordionSummary
             expandIcon={<ExpandMoreIcon />}
@@ -157,7 +205,7 @@ const Biomass = () => {
               <div className="biomassButton">
                 <Button
                   variant="outlined"
-                  color="success"
+                  color={errorArea ? 'warning' : 'success'}
                   disabled={mapPolygon.length !== 1 || loading}
                   onClick={handleButton}
                 >
