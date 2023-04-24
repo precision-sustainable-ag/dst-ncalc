@@ -15,12 +15,22 @@ const MapComp = () => {
   const dispatch = useDispatch();
   const lat = useSelector(get.lat);
   const lon = useSelector(get.lon);
+  const biomassTaskResults = useSelector(get.biomassTaskResults);
   const mapAddress = useSelector(get.mapAddress);
   const mapZoom = useSelector(get.mapZoom);
   const mapPolygon = useSelector(get.mapPolygon);
   const [features, setFeatures] = useState(mapPolygon);
   const [drawEvent, setDrawEvent] = useState({});
-  // const [removedShapes, setRemovedShapes] = useState(new Set());
+  const [initRasterArray, setInitRasterArray] = useState([]);
+
+  // useEffect(() => {
+  //   if (biomassTaskResults && biomassTaskResults.task_result) {
+  //     const val = JSON.parse(biomassTaskResults.task_result.replace(/\bNaN\b/g, 'null'));
+  //     console.log('val', val);
+  //     setInitRasterArray(val.data_array[0]);
+  //   }
+  // }, [biomassTaskResults]);
+
   // mapAddress
   useEffect(() => {
     if (drawEvent.mode === 'delete') {
@@ -56,6 +66,7 @@ const MapComp = () => {
         setFeatures={setFeatures}
         setZoom={setZoom}
         onDraw={setDrawEvent}
+        initRasterArray={initRasterArray}
         initFeatures={mapPolygon}
         initWidth="100%"
         initHeight="400px"
