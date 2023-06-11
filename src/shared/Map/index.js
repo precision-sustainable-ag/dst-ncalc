@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
-import { Map } from '@psa/dst.ui.map';
+// eslint-disable-next-line import/no-extraneous-dependencies
+import { NcalcMap } from '@psa/dst.ui.ncalc-map';
 import { useSelector, useDispatch } from 'react-redux';
 import mapboxgl from 'mapbox-gl';
 import { get, set } from '../../store/Store';
@@ -23,13 +24,14 @@ const MapComp = () => {
   const [drawEvent, setDrawEvent] = useState({});
   const [initRasterArray, setInitRasterArray] = useState([]);
 
-  // useEffect(() => {
-  //   if (biomassTaskResults && biomassTaskResults.task_result) {
-  //     const val = JSON.parse(biomassTaskResults.task_result.replace(/\bNaN\b/g, 'null'));
-  //     console.log('val', val);
-  //     setInitRasterArray(val.data_array[0]);
-  //   }
-  // }, [biomassTaskResults]);
+  useEffect(() => {
+    if (biomassTaskResults && biomassTaskResults.task_result) {
+      const val = JSON.parse(biomassTaskResults.task_result.replace(/\bNaN\b/g, 'null'));
+      // eslint-disable-next-line no-console
+      console.log('val', val);
+      setInitRasterArray(val.data_array[0]);
+    }
+  }, [biomassTaskResults]);
 
   // mapAddress
   useEffect(() => {
@@ -61,7 +63,7 @@ const MapComp = () => {
 
   return (
     <div className="map">
-      <Map
+      <NcalcMap
         setAddress={setAddress}
         setFeatures={setFeatures}
         setZoom={setZoom}

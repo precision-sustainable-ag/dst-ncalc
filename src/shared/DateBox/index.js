@@ -1,3 +1,4 @@
+/* eslint-disable no-alert */
 /* eslint-disable import/no-extraneous-dependencies */
 import React from 'react';
 import dayjs from 'dayjs';
@@ -22,7 +23,7 @@ const DateBox = () => {
       alert('the start plant date can not be in future');
     } else {
       dispatch(set.biomassPlantDate(newValue.format('YYYY-MM-DD')));
-      console.log(diff);
+      // console.log(diff);
     }
   };
 

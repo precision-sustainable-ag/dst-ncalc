@@ -42,16 +42,16 @@ const Biomass = () => {
   const dispatch = useDispatch();
 
   useEffect(() => {
-    console.log('data ', data);
+    // console.log('data ', data);
     dispatch(set.biomassTaskResults(data));
   }, [data]);
 
   useEffect(() => {
-    console.log('biomassTaskResults ', biomassTaskResults);
+    // console.log('biomassTaskResults ', biomassTaskResults);
   }, [biomassTaskResults]);
 
   useEffect(() => {
-    console.log('errorArea ', errorArea);
+    // console.log('errorArea ', errorArea);
   }, [errorArea]);
 
   const handleButton = () => {
@@ -60,7 +60,7 @@ const Biomass = () => {
     // reverse order of vertices
     if (mapPolygon.length > 0) {
       area = 0.000247105 * turf.area(turf.polygon(mapPolygon[0].geometry.coordinates));
-      console.log('area', area);
+      // console.log('area', area);
     }
 
     if (area > 1000) {
@@ -80,17 +80,17 @@ const Biomass = () => {
       const headers = {
         'Content-Type': 'application/json',
       };
-      console.log('making task request');
+      // console.log('making task request');
       axios
         .post('https://covercrop-imagery.org/tasks', payload, { headers })
         .then((response) => {
-          console.log('response: ', response);
+          // console.log('response: ', response);
           if (response.status === 200 && response.data) {
             setTaskId(response.data.task_id);
           }
         })
-        .catch((error) => {
-          console.log(error);
+        .catch(() => {
+          // console.log(error);
         });
     }
   };
@@ -111,8 +111,8 @@ const Biomass = () => {
           dispatch(set.biomassTotalValue(rndInt));
         }
       })
-      .catch((error) => {
-        console.log(error);
+      .catch(() => {
+        // console.log(error);
         setTaskIsDone(true);
         setLoading(false);
         clearInterval(interval);
