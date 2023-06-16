@@ -6,9 +6,11 @@
 /* eslint-disable no-use-before-define */
 
 import moment from 'moment';
+import dayjs from 'dayjs';
 import { createStore, set } from './redux-autosetters';
 
 const params = new URLSearchParams(window.location.search);
+const now = dayjs();
 
 const query = (parm, def) => {
   if (parm === 'covercrop' && params.get('covercrop')) {
@@ -47,8 +49,8 @@ const initialState = {
   mapType: 'hybrid',
   mapPolygon: [],
   biomassCropType: 'Wheat',
-  biomassPlantDate: '2022-10-01',
-  biomassTerminationDate: '',
+  biomassPlantDate: now.subtract(1, 'year').startOf('month').month(9).format('YYYY-MM-DD'),
+  biomassTerminationDate: now.startOf('month').month(5).format('YYYY-MM-DD'),
   biomassTaskResults: null,
   biomassTotalValue: null,
   maxZoom: 20,

@@ -5,8 +5,12 @@ import { useSelector, useDispatch } from 'react-redux';
 import mapboxgl from 'mapbox-gl';
 import { get, set } from '../../store/Store';
 import './styles.scss';
+// import sampleBiomassData from './response.json';
 // eslint-disable-next-line import/no-webpack-loader-syntax, import/no-unresolved
 mapboxgl.workerClass = require('worker-loader!mapbox-gl/dist/mapbox-gl-csp-worker').default;
+
+// const val = JSON.parse(sampleBiomassData.task_result.replace(/\bNaN\b/g, 'null'));
+// const initRaster = { data_array: val.data_array[0], bbox: val.bbox };
 
 let removedShapes = new Set();
 
@@ -25,11 +29,15 @@ const MapComp = () => {
   const [initRasterArray, setInitRasterArray] = useState([]);
 
   useEffect(() => {
-    if (biomassTaskResults && biomassTaskResults.task_result) {
-      const val = JSON.parse(biomassTaskResults.task_result.replace(/\bNaN\b/g, 'null'));
+    console.log('biomassTaskResults', biomassTaskResults);
+    if (biomassTaskResults && biomassTaskResults.task_result && Object.keys(biomassTaskResults.task_result).length > 0) {
+      console.log('biomassTaskResults.task_result', biomassTaskResults.task_result);
+      const values = JSON.parse(biomassTaskResults.task_result.replace(/\bNaN\b/g, 'null'));
+      // const val = JSON.parse(biomassTaskResults.task_result);
       // eslint-disable-next-line no-console
-      console.log('val', val);
-      setInitRasterArray(val.data_array[0]);
+      const rasterArray = { data_array: values.data_array, bbox: values.bbox };
+      console.log('rasterArray', rasterArray);
+      setInitRasterArray(rasterArray);
     }
   }, [biomassTaskResults]);
 
@@ -61,18 +69,22 @@ const MapComp = () => {
     if (zoom) dispatch(set.mapZoom(zoom));
   }, [zoom]);
 
+  // console.log('sampleBiomassData', sampleBiomassData);
+  // console.log('data_array', sampleBiomassData.data_array[0].length);
+
   return (
     <div className="map">
       <NcalcMap
         setAddress={setAddress}
         setFeatures={setFeatures}
         setZoom={setZoom}
+        setMap={() => { }}
         onDraw={setDrawEvent}
-        initRasterArray={initRasterArray}
+        initRasterObject={initRasterArray}
         initFeatures={mapPolygon}
         initWidth="100%"
-        initHeight="400px"
-        initAddress={mapAddress?.address}
+        initHeight="450px"
+        initAddress={mapAddress}
         initLon={lon}
         initLat={lat}
         initStartZoom={mapZoom}
@@ -87,6 +99,12 @@ const MapComp = () => {
         hasFullScreen
         hasMarkerPopup
         hasMarkerMovable
+        scrollZoom
+        dragRotate
+        dragPan
+        keyboard
+        doubleClickZoom={false}
+        touchZoomRotate
       />
     </div>
   );

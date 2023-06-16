@@ -2,18 +2,16 @@
 /* eslint-disable import/no-extraneous-dependencies */
 import React from 'react';
 import dayjs from 'dayjs';
-import { useSelector, useDispatch } from 'react-redux';
+import { useDispatch } from 'react-redux';
 import { DatePicker } from '@mui/x-date-pickers/DatePicker';
 import { LocalizationProvider } from '@mui/x-date-pickers';
 import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
-import { get, set } from '../../store/Store';
 
 import './styles.scss';
 
-const DateBox = () => {
-  const biomassPlantDate = useSelector(get.biomassPlantDate);
+const DateBox = ({ date, dateSetter }) => {
+  // const biomassPlantDate = useSelector(get.biomassPlantDate);
   const dispatch = useDispatch();
-
   const handleDataChange = (newValue) => {
     const now = dayjs();
     const diff = now.diff(newValue, 'month', true);
@@ -22,8 +20,7 @@ const DateBox = () => {
     } else if (diff < 0) {
       alert('the start plant date can not be in future');
     } else {
-      dispatch(set.biomassPlantDate(newValue.format('YYYY-MM-DD')));
-      // console.log(diff);
+      dispatch(dateSetter(newValue.format('YYYY-MM-DD')));
     }
   };
 
@@ -31,8 +28,8 @@ const DateBox = () => {
     <LocalizationProvider dateAdapter={AdapterDayjs}>
       <DatePicker
         label="Controlled picker"
-        defaultValue={dayjs(biomassPlantDate)}
-        value={dayjs(biomassPlantDate)}
+        defaultValue={dayjs(date)}
+        value={dayjs(date)}
         onChange={handleDataChange}
       />
     </LocalizationProvider>

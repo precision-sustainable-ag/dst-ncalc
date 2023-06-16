@@ -1,7 +1,6 @@
 /* eslint-disable import/no-extraneous-dependencies */
 import React, { useEffect, useState } from 'react';
 import { useSelector, useDispatch } from 'react-redux';
-import dayjs from 'dayjs';
 import axios from 'axios';
 import * as turf from '@turf/turf';
 import Typography from '@mui/material/Typography';
@@ -28,6 +27,33 @@ import './styles.scss';
 
 let interval;
 
+function arrayMean(ary) {
+  const index = {};
+  let i;
+  let label;
+  let value;
+  const result = [[], []];
+
+  for (i = 0; i < ary[0].length; i++) {
+    label = ary[0][i];
+    value = ary[1][i];
+    if (!(label in index)) {
+      index[label] = { sum: 0, occur: 0 };
+    }
+    index[label].sum += value;
+    index[label].occur += 1;
+  }
+  // eslint-disable-next-line no-restricted-syntax
+  for (i in index) {
+    // eslint-disable-next-line no-prototype-builtins
+    if (index.hasOwnProperty(i)) {
+      result[0].push(parseInt(i, 10));
+      result[1].push(index[i].occur > 0 ? index[i].sum / index[i].occur : 0);
+    }
+  }
+  return result;
+}
+
 const Biomass = () => {
   const [loading, setLoading] = useState(false);
   const [errorArea, setErrorArea] = useState(false);
@@ -37,6 +63,7 @@ const Biomass = () => {
   const crop = useSelector(get.biomassCropType);
   const mapPolygon = useSelector(get.mapPolygon);
   const biomassPlantDate = useSelector(get.biomassPlantDate);
+  const biomassTerminationDate = useSelector(get.biomassTerminationDate);
   const biomassTaskResults = useSelector(get.biomassTaskResults);
   const biomassTotalValue = useSelector(get.biomassTotalValue);
   const dispatch = useDispatch();
@@ -55,7 +82,6 @@ const Biomass = () => {
   }, [errorArea]);
 
   const handleButton = () => {
-    const now = dayjs();
     let area;
     // reverse order of vertices
     if (mapPolygon.length > 0) {
@@ -70,12 +96,13 @@ const Biomass = () => {
       const payload = {
         maxCloudCover: 5,
         startDate: biomassPlantDate,
-        endDate: now.format('YYYY-MM-DD'),
+        endDate: biomassTerminationDate,
         geometry: {
           type: 'Polygon',
           coordinates: [revertedCoords],
         },
       };
+      console.log('payload ', payload);
       setLoading(true);
       const headers = {
         'Content-Type': 'application/json',
@@ -104,11 +131,9 @@ const Biomass = () => {
           setTaskIsDone(true);
           clearInterval(interval);
           setLoading(false);
-          const randomIntFromInterval = (min, max) =>
-            // eslint-disable-next-line implicit-arrow-linebreak
-            Math.floor(Math.random() * (max - min + 1) + min);
-          const rndInt = randomIntFromInterval(1200, 1400);
-          dispatch(set.biomassTotalValue(rndInt));
+          const biomassAVG = arrayMean(data.data_array);
+          console.log('biomassAVG ', biomassAVG);
+          dispatch(set.biomassTotalValue(biomassAVG));
         }
       })
       .catch(() => {
@@ -132,7 +157,6 @@ const Biomass = () => {
   const handleChange = (event) => {
     dispatch(set.biomassCropType(event.target.value));
   };
-
   return (
     <div className="biomassWrapper">
       <div className="biomassTextWrapper">
@@ -200,7 +224,11 @@ const Biomass = () => {
               </div>
               <div className="biomassDate">
                 <div className="biomassItemText">Planting Start Date</div>
-                <DateBox />
+                <DateBox date={biomassPlantDate} dateSetter={set.biomassPlantDate} />
+              </div>
+              <div className="biomassDate">
+                <div className="biomassItemText">Planting Termination Date</div>
+                <DateBox date={biomassTerminationDate} dateSetter={set.biomassTerminationDate} />
               </div>
               <div className="biomassButton">
                 <Button
@@ -218,7 +246,7 @@ const Biomass = () => {
                 )}
               </div>
               <div className="biomassResults">
-                <div className="biomassItemText">Biomass Value</div>
+                <div className="biomassItemText">Average Biomass</div>
                 {biomassTotalValue && (
                   <Box sx={{ border: 1 }}>
                     <div>{biomassTotalValue}</div>
