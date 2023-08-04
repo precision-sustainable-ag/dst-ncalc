@@ -11,12 +11,12 @@ resources:
 variables:
 
   # Container registry service connection established during pipeline creation
-  dockerRegistryServiceConnection: 'a5c02066-39be-412e-b127-7117d51b31de'
+  dockerRegistryServiceConnection: '0b508590-c901-46aa-b571-873a72a49a1e'
   imageRepository: 'dstncalc'
   containerRegistry: 'containerregistry4pd7i.azurecr.io'
   dockerfilePath: '**/Dockerfile'
   tag: '$(Build.BuildId)'
-  imagePullSecret: 'containerregistry4pd7i1264f451-auth'
+  imagePullSecret: 'containerregistry4pd7i8454df05-auth'
 
   # Agent VM image name
   vmImageName: 'ubuntu-latest'
@@ -61,7 +61,7 @@ stages:
     displayName: Deploy
     pool:
       vmImage: $(vmImageName)
-    environment: 'precisionsustainableagdstncalc-1658.production'
+    environment: 'precisionsustainableagdstncalc-4199.production'
     strategy:
       runOnce:
         deploy:
@@ -91,7 +91,7 @@ stages:
     pool:
       vmImage: $(vmImageName)
 
-    environment: 'precisionsustainableagdstncalc-1658.$(k8sNamespaceForPR)'
+    environment: 'precisionsustainableagdstncalc-4199.$(k8sNamespaceForPR)'
     strategy:
       runOnce:
         deploy:
