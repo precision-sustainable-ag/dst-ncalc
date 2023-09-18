@@ -1,16 +1,23 @@
 import React, { useState, useEffect } from 'react';
 // eslint-disable-next-line import/no-extraneous-dependencies
-import { NcalcMap } from '@psa/dst.ui.ncalc-map';
+// import { NcalcMap } from '@psa/dst.ui.ncalc-map';
 import { useSelector, useDispatch } from 'react-redux';
 import mapboxgl from 'mapbox-gl';
 import { get, set } from '../../store/Store';
 import './styles.scss';
-// import sampleBiomassData from './response.json';
+import { NcalcMap } from './mock/ncalc-map';
+// import sampleBiomassData from './mock/response_2.json';
+// import sampleBiomassData from './mock/response_1682931266838.json';
 // eslint-disable-next-line import/no-webpack-loader-syntax, import/no-unresolved
 mapboxgl.workerClass = require('worker-loader!mapbox-gl/dist/mapbox-gl-csp-worker').default;
 
+// console.log('sampleBiomassData', sampleBiomassData);
+
 // const val = JSON.parse(sampleBiomassData.task_result.replace(/\bNaN\b/g, 'null'));
-// const initRaster = { data_array: val.data_array[0], bbox: val.bbox };
+// // console.log('sampleBiomassData.task_result', sampleBiomassData);
+// console.log('val', val);
+// const initRaster = { data_array: val.data_array, bbox: val.bbox };
+// console.log('initRaster', initRaster);
 
 let removedShapes = new Set();
 
@@ -26,20 +33,6 @@ const MapComp = () => {
   const mapPolygon = useSelector(get.mapPolygon);
   const [features, setFeatures] = useState(mapPolygon);
   const [drawEvent, setDrawEvent] = useState({});
-  const [initRasterArray, setInitRasterArray] = useState([]);
-
-  useEffect(() => {
-    console.log('biomassTaskResults', biomassTaskResults);
-    if (biomassTaskResults && biomassTaskResults.task_result && Object.keys(biomassTaskResults.task_result).length > 0) {
-      console.log('biomassTaskResults.task_result', biomassTaskResults.task_result);
-      const values = JSON.parse(biomassTaskResults.task_result.replace(/\bNaN\b/g, 'null'));
-      // const val = JSON.parse(biomassTaskResults.task_result);
-      // eslint-disable-next-line no-console
-      const rasterArray = { data_array: values.data_array, bbox: values.bbox };
-      console.log('rasterArray', rasterArray);
-      setInitRasterArray(rasterArray);
-    }
-  }, [biomassTaskResults]);
 
   // mapAddress
   useEffect(() => {
@@ -80,13 +73,16 @@ const MapComp = () => {
         setZoom={setZoom}
         setMap={() => { }}
         onDraw={setDrawEvent}
-        initRasterObject={initRasterArray}
+        initRasterObject={biomassTaskResults}
+        // initRasterObject={sampleBiomassData}
         initFeatures={mapPolygon}
         initWidth="100%"
         initHeight="450px"
         initAddress={mapAddress}
-        initLon={lon}
-        initLat={lat}
+        initLon={-76.9144}
+        initLat={39.0208}
+        // initLon={-101.6504}
+        // initLat={41.05208}
         initStartZoom={mapZoom}
         initMinZoom={5}
         initMaxZoom={16}

@@ -27,32 +27,7 @@ import './styles.scss';
 
 let interval;
 
-function arrayMean(ary) {
-  const index = {};
-  let i;
-  let label;
-  let value;
-  const result = [[], []];
-
-  for (i = 0; i < ary[0].length; i++) {
-    label = ary[0][i];
-    value = ary[1][i];
-    if (!(label in index)) {
-      index[label] = { sum: 0, occur: 0 };
-    }
-    index[label].sum += value;
-    index[label].occur += 1;
-  }
-  // eslint-disable-next-line no-restricted-syntax
-  for (i in index) {
-    // eslint-disable-next-line no-prototype-builtins
-    if (index.hasOwnProperty(i)) {
-      result[0].push(parseInt(i, 10));
-      result[1].push(index[i].occur > 0 ? index[i].sum / index[i].occur : 0);
-    }
-  }
-  return result;
-}
+const arrayAverage = (arr) => arr.reduce((p, c) => p + c, 0) / arr.length;
 
 const Biomass = () => {
   const [loading, setLoading] = useState(false);
@@ -64,25 +39,28 @@ const Biomass = () => {
   const mapPolygon = useSelector(get.mapPolygon);
   const biomassPlantDate = useSelector(get.biomassPlantDate);
   const biomassTerminationDate = useSelector(get.biomassTerminationDate);
-  const biomassTaskResults = useSelector(get.biomassTaskResults);
+  // const biomassTaskResults = useSelector(get.biomassTaskResults);
   const biomassTotalValue = useSelector(get.biomassTotalValue);
   const dispatch = useDispatch();
 
   useEffect(() => {
-    // console.log('data ', data);
-    dispatch(set.biomassTaskResults(data));
+    if (data && data.task_result) {
+      const values = JSON.parse(data.task_result.replace(/\bNaN\b/g, 'null'));
+      // eslint-disable-next-line no-console
+      const rasterObject = { data_array: values.data_array, bbox: values.bbox };
+      const flattenedBiomass = rasterObject.data_array.flat(1).filter((el) => el !== 0);
+      const biomassAVG = arrayAverage(flattenedBiomass);
+      dispatch(set.biomassTotalValue(Math.round(biomassAVG, 0)));
+      dispatch(set.biomassTaskResults(rasterObject));
+    }
   }, [data]);
 
-  useEffect(() => {
-    // console.log('biomassTaskResults ', biomassTaskResults);
-  }, [biomassTaskResults]);
-
-  useEffect(() => {
-    // console.log('errorArea ', errorArea);
-  }, [errorArea]);
-
   const handleButton = () => {
+    dispatch(set.biomassTaskResults({}));
+    setTaskIsDone(false);
+    setData(null);
     let area;
+    area = 0;
     // reverse order of vertices
     if (mapPolygon.length > 0) {
       area = 0.000247105 * turf.area(turf.polygon(mapPolygon[0].geometry.coordinates));
@@ -102,7 +80,6 @@ const Biomass = () => {
           coordinates: [revertedCoords],
         },
       };
-      console.log('payload ', payload);
       setLoading(true);
       const headers = {
         'Content-Type': 'application/json',
@@ -126,14 +103,11 @@ const Biomass = () => {
     axios
       .get(`https://covercrop-imagery.org/tasks/${taskId}`)
       .then((response) => {
-        if (response.status === 200 && response.data && response.data.task_status !== 'PENDING') {
+        if (response.data.task_status === 'SUCCESS') {
           setData(response.data);
           setTaskIsDone(true);
           clearInterval(interval);
           setLoading(false);
-          const biomassAVG = arrayMean(data.data_array);
-          console.log('biomassAVG ', biomassAVG);
-          dispatch(set.biomassTotalValue(biomassAVG));
         }
       })
       .catch(() => {
@@ -145,7 +119,6 @@ const Biomass = () => {
   };
 
   useEffect(() => {
-    setTaskIsDone(false);
     if (taskId && !data && !taskIsDone) {
       interval = setInterval(fetchTask, 1000);
     }
@@ -249,7 +222,11 @@ const Biomass = () => {
                 <div className="biomassItemText">Average Biomass</div>
                 {biomassTotalValue && (
                   <Box sx={{ border: 1 }}>
-                    <div>{biomassTotalValue}</div>
+                    <div>
+                      {biomassTotalValue}
+                      &nbsp;
+                      Kg/Ha
+                    </div>
                   </Box>
                 )}
               </div>
