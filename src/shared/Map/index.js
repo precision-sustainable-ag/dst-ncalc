@@ -6,18 +6,8 @@ import mapboxgl from 'mapbox-gl';
 import { get, set } from '../../store/Store';
 import './styles.scss';
 import { NcalcMap } from './mock/ncalc-map';
-// import sampleBiomassData from './mock/response_2.json';
-// import sampleBiomassData from './mock/response_1682931266838.json';
 // eslint-disable-next-line import/no-webpack-loader-syntax, import/no-unresolved
 mapboxgl.workerClass = require('worker-loader!mapbox-gl/dist/mapbox-gl-csp-worker').default;
-
-// console.log('sampleBiomassData', sampleBiomassData);
-
-// const val = JSON.parse(sampleBiomassData.task_result.replace(/\bNaN\b/g, 'null'));
-// // console.log('sampleBiomassData.task_result', sampleBiomassData);
-// console.log('val', val);
-// const initRaster = { data_array: val.data_array, bbox: val.bbox };
-// console.log('initRaster', initRaster);
 
 let removedShapes = new Set();
 
@@ -62,9 +52,6 @@ const MapComp = () => {
     if (zoom) dispatch(set.mapZoom(zoom));
   }, [zoom]);
 
-  // console.log('sampleBiomassData', sampleBiomassData);
-  // console.log('data_array', sampleBiomassData.data_array[0].length);
-
   return (
     <div className="map">
       <NcalcMap
@@ -74,7 +61,6 @@ const MapComp = () => {
         setMap={() => { }}
         onDraw={setDrawEvent}
         initRasterObject={biomassTaskResults}
-        // initRasterObject={sampleBiomassData}
         initFeatures={mapPolygon}
         initWidth="100%"
         initHeight="450px"

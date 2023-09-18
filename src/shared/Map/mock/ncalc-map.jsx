@@ -9,16 +9,18 @@ import turf from "turf";
 import chroma from "chroma-js";
 import { geocodeReverse, coordinatesGeocoder } from "./helpers";
 import { Slider, Box, Tooltip, Typography } from '@mui/material';
+import RasterTools from './raster-tools';
 
 import styles from "./map.module.scss";
 import "./mapbox-gl.css";
 import "./mapbox-gl-draw.css";
 import "./mapbox-gl-geocoder.css";
+import InfoBox from "./info-box";
 
 const MAPBOX_TOKEN =
   "pk.eyJ1IjoibWlsYWRueXUiLCJhIjoiY2xhNmhkZDVwMWxqODN4bWhkYXFnNjRrMCJ9.VWy3AxJ3ULhYNw8nmVdMew";
 mapboxgl.accessToken = MAPBOX_TOKEN;
-const NR_COLOR_STEPS = 4;
+const NR_COLOR_STEPS = 10;
 
 const transpose = m => m[0].map((x, i) => m.map(x => x[i]))
 
@@ -109,9 +111,6 @@ const NcalcMap = ({
   const geocoderRef = useRef();
 
 
-  const handleOpacityChange = (e, value) => {
-    map.current && map.current.setPaintProperty("biomassPolygons", "fill-opacity", value / 100);
-  }
   //// GEOCODER CONTROL
   const Geocoder = new MapboxGeocoder({
     placeholder: initAddress || "Search Your Address ...",
@@ -165,8 +164,10 @@ const NcalcMap = ({
       }
 
       // setting up color legend
-      var ex = { data_array: [[10, 300], [600, 300], [0, 200]] }
-      const flattenedBiomass = ex.data_array.flat(1).filter((el) => el !== 0);
+      let flattenedBiomass = [];
+      if (initRasterObject && initRasterObject.data_array) {
+        flattenedBiomass = initRasterObject.data_array.flat(1).filter((el) => el !== 0);
+      }
       console.log('ex', flattenedBiomass)
       console.log('ex', Math.min(...flattenedBiomass), Math.max(...flattenedBiomass))
       var colorSteps = chroma.scale(['#e71d36', '#086375'])
@@ -174,6 +175,8 @@ const NcalcMap = ({
       var colorValues = [];
       const biomassMax = Math.max(...flattenedBiomass)
       const biomassMin = Math.min(...flattenedBiomass)
+      console.log('biomassMin', biomassMin)
+      console.log('biomassMax', biomassMax)
       const step = (biomassMax - biomassMin) / (NR_COLOR_STEPS - 1);
       for (var i = biomassMin; i <= biomassMax; i = i + step) {
         colorValues.push(Math.round(i, 0));
@@ -181,6 +184,7 @@ const NcalcMap = ({
       var rasterColors = colorValues.map(function (e, i) {
         return [e, colorSteps[i]];
       });
+      console.log('rasterColors', rasterColors)
       setRasterColorSteps(rasterColors);
 
       // storing pixel polygons in mapbox source
@@ -484,7 +488,7 @@ const NcalcMap = ({
         type: "fill",
         source: "biomassPolygons",
         paint: {
-          "fill-opacity": 0.9,
+          "fill-opacity": 0.5,
           "fill-color": {
             property: "value",
             stops: stops,
@@ -651,50 +655,10 @@ const NcalcMap = ({
         style={{ width: initWidth, height: initHeight }}
       />
       {hasCoordBar && cursorLoc.longitude && (
-        <div className={styles.infobar}>
-          <Box>
-            <Typography variant="body2" gutterBottom>
-              {cursorLoc.latitude}, {cursorLoc.longitude}
-            </Typography>
-          </Box>
-        </div>
+        <InfoBox cursorLoc={cursorLoc}/>
       )}
       {polygons && polygons.features.length > 0 && (
-        <div className={styles.rastertools}>
-          <div className={styles.rasterlegend}>
-            <Tooltip title="legend">
-              <Box>
-                {stops.map((stop, i) => {
-                  return (
-                    <div key={i} className={styles.rasterlegenditem}>
-                      <div className={styles.rasterlegendcolor} style={{ backgroundColor: stop[1] }}></div>
-                      <div className={styles.rasterlegendvalue}>{stop[0]}</div>
-                    </div>
-                  )
-                })}
-              </Box>
-            </Tooltip>
-          </div>
-          <div className={styles.opacityslider}>
-            <Tooltip title="opacity">
-              <Box sx={{ height: 100 }}>
-                <Slider
-                  sx={{
-                    '& input[type="range"]': {
-                      WebkitAppearance: 'slider-vertical',
-                    },
-                  }}
-                  size="small"
-                  orientation="vertical"
-                  defaultValue={50}
-                  aria-label="Biomass Opacity"
-                  valueLabelDisplay="auto"
-                  onChange={handleOpacityChange}
-                />
-              </Box>
-            </Tooltip>
-          </div>
-        </div>
+        <RasterTools map={map} colorStops={stops} />
       )}
     </div>
   );
