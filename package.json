@@ -16,7 +16,7 @@
         "@mui/material": "^5.11.0",
         "@mui/system": "^5.11.0",
         "@mui/x-date-pickers": "^6.0.4",
-        "@psa/dst.ui.ncalc-map": "^0.0.10",
+        "@psa/dst.ui.ncalc-map": "^0.0.13",
         "@reduxjs/toolkit": "^1.9.1",
         "@testing-library/jest-dom": "^5.16.5",
         "@testing-library/react": "^13.4.0",

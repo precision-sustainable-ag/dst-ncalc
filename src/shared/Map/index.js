@@ -1,11 +1,11 @@
 import React, { useState, useEffect } from 'react';
-// eslint-disable-next-line import/no-extraneous-dependencies
-// import { NcalcMap } from '@psa/dst.ui.ncalc-map';
-import { useSelector, useDispatch } from 'react-redux';
 import mapboxgl from 'mapbox-gl';
+import { useSelector, useDispatch } from 'react-redux';
+import { NcalcMap } from '@psa/dst.ui.ncalc-map';
+// import { NcalcMap } from './mock/ncalc-map';
 import { get, set } from '../../store/Store';
+
 import './styles.scss';
-import { NcalcMap } from './mock/ncalc-map';
 // eslint-disable-next-line import/no-webpack-loader-syntax, import/no-unresolved
 mapboxgl.workerClass = require('worker-loader!mapbox-gl/dist/mapbox-gl-csp-worker').default;
 
@@ -67,8 +67,6 @@ const MapComp = () => {
         initAddress={mapAddress}
         initLon={-76.9144}
         initLat={39.0208}
-        // initLon={-101.6504}
-        // initLat={41.05208}
         initStartZoom={mapZoom}
         initMinZoom={5}
         initMaxZoom={16}
