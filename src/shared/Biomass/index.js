@@ -67,7 +67,7 @@ const Biomass = () => {
       // console.log('area', area);
     }
 
-    if (area > 3000) {
+    if (area > 10000) {
       setErrorArea(true);
       dispatch(set.mapPolygon([]));
     } else {
@@ -147,7 +147,7 @@ const Biomass = () => {
             <DialogContent>
               <DialogContentText id="alert-dialog-description">
                 The area selected is too large to calculate. Please select a smaller region under
-                3000 Acres. Either delete the current polygon and draw a new one or adjust the vertices of the current polygon.
+                10000 Acres. Please delete the current polygon and draw a new one.
               </DialogContentText>
             </DialogContent>
             <DialogActions>
