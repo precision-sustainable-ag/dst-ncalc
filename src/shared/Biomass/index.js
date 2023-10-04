@@ -35,6 +35,7 @@ const Biomass = () => {
   const [data, setData] = useState(null);
   const [taskId, setTaskId] = useState(null);
   const [taskIsDone, setTaskIsDone] = useState(false);
+  const [taskIsFailed, setTaskIsFailed] = useState(false);
   const crop = useSelector(get.biomassCropType);
   const mapPolygon = useSelector(get.mapPolygon);
   const biomassPlantDate = useSelector(get.biomassPlantDate);
@@ -109,6 +110,11 @@ const Biomass = () => {
           setTaskIsDone(true);
           clearInterval(interval);
           setLoading(false);
+        } else if (response.data.task_status === 'FAILURE') {
+          setTaskIsDone(true);
+          clearInterval(interval);
+          setLoading(false);
+          setTaskIsFailed(true);
         }
       })
       .catch(() => {
@@ -162,6 +168,33 @@ const Biomass = () => {
             </DialogActions>
           </Dialog>
         )}
+        {taskIsFailed && (
+          <Dialog
+            open={taskIsFailed}
+            onClose={() => {
+              setTaskIsFailed(false);
+            }}
+            aria-labelledby="alert-dialog-title"
+            aria-describedby="alert-dialog-description"
+          >
+            <DialogTitle id="alert-dialog-title">Server Failed</DialogTitle>
+            <DialogContent>
+              <DialogContentText id="alert-dialog-description">
+                Task failed to complete. Please try again.
+              </DialogContentText>
+            </DialogContent>
+            <DialogActions>
+              <Button
+                onClick={() => {
+                  setTaskIsFailed(false);
+                }}
+                autoFocus
+              >
+                close
+              </Button>
+            </DialogActions>
+          </Dialog>
+        )}
         <Accordion defaultExpanded>
           <AccordionSummary
             expandIcon={<ExpandMoreIcon />}
@@ -185,6 +218,7 @@ const Biomass = () => {
                     <InputLabel id="demo-simple-select-label">Crop</InputLabel>
                     <Select
                       labelId="demo-simple-select-label"
+                      label="Crop"
                       id="demo-simple-select"
                       value={crop}
                       onChange={handleChange}

@@ -27,7 +27,7 @@ const DateBox = ({ date, dateSetter }) => {
   return (
     <LocalizationProvider dateAdapter={AdapterDayjs}>
       <DatePicker
-        label="Controlled picker"
+        label="Date Selector"
         defaultValue={dayjs(date)}
         value={dayjs(date)}
         onChange={handleDataChange}
