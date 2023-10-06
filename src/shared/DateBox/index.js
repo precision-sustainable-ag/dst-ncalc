@@ -16,9 +16,9 @@ const DateBox = ({ date, dateSetter }) => {
     const now = dayjs();
     const diff = now.diff(newValue, 'month', true);
     if (diff > 12) {
-      alert('the start plant date can not be older than a year');
+      alert('the date can not be older than a year');
     } else if (diff < 0) {
-      alert('the start plant date can not be in future');
+      alert('the date can not be in future');
     } else {
       dispatch(dateSetter(newValue.format('YYYY-MM-DD')));
     }
