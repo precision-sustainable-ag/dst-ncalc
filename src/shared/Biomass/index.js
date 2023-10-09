@@ -118,7 +118,6 @@ const Biomass = () => {
         }
       })
       .catch(() => {
-        // console.log(error);
         setTaskIsDone(true);
         setLoading(false);
         clearInterval(interval);
@@ -230,14 +229,7 @@ const Biomass = () => {
                   </FormControl>
                 </Box>
               </div>
-              <div className="biomassDate">
-                <div className="biomassItemText">Planting Start Date</div>
-                <DateBox date={biomassPlantDate} dateSetter={set.biomassPlantDate} />
-              </div>
-              <div className="biomassDate">
-                <div className="biomassItemText">Planting Termination Date</div>
-                <DateBox date={biomassTerminationDate} dateSetter={set.biomassTerminationDate} />
-              </div>
+              <DateBox />
               <div className="biomassButton">
                 <Button
                   variant="outlined"

@@ -49,7 +49,7 @@ const initialState = {
   mapType: 'hybrid',
   mapPolygon: [],
   biomassCropType: 'Wheat',
-  biomassPlantDate: now.subtract(1, 'year').startOf('month').month(12).format('YYYY-MM-DD'),
+  biomassPlantDate: now.subtract(1, 'year').startOf('month').month(11).format('YYYY-MM-DD'),
   biomassTerminationDate: now.startOf('month').month(4).format('YYYY-MM-DD'),
   biomassTaskResults: null,
   biomassTotalValue: null,
@@ -331,3 +331,4 @@ export const api = ({
 }; // api
 
 export { set, get } from './redux-autosetters';
+export { initialState };
