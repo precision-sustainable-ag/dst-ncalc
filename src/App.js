@@ -1,17 +1,43 @@
 /* eslint-disable no-console */
 import React, { useState } from 'react';
-import { useDispatch, useSelector } from 'react-redux';
-import MenuIcon from '@mui/icons-material/Menu';
-import CloseIcon from '@mui/icons-material/Close';
 import {
-  Route, NavLink, Routes, useNavigate,
+  // useDispatch,
+  useSelector,
+} from 'react-redux';
+import {
+  Route, Routes, useNavigate,
 } from 'react-router-dom';
 
-import { get, set } from './store/Store';
-import Help from './shared/Help';
-
-import './App.css';
+import './App.scss';
 import 'react-datepicker/dist/react-datepicker.css';
+import {
+  Box,
+  ToggleButton,
+  ToggleButtonGroup,
+  Stack,
+  styled,
+  Button,
+} from '@mui/material';
+
+import { get } from './store/Store';
+
+const NavBarButton = styled(ToggleButton)({
+  color: '#fff',
+  fontSize: '24px',
+  margin: '0 1.5rem',
+  backgroundColor: 'transparent',
+  padding: '0 1rem',
+  fontWeight: 'bold',
+  borderRadius: '10px',
+  '&.Mui-selected, &.Mui-selected:hover': {
+    fontSize: '24px',
+    color: '#fff',
+    fontWeight: 'bolder',
+    borderBottom: '2px solid #fff',
+  },
+});
+
+// import Help from './shared/Help';
 
 const screens = {
   init: () => null,
@@ -53,129 +79,83 @@ console.warn = (msg, ...subst) => {
 const Init = screens.init;
 
 const App = () => {
-  const dispatch = useDispatch();
+  // const dispatch = useDispatch();
   const navigate = useNavigate();
+  // eslint-disable-next-line no-unused-vars
   const [navModalOpen, setNavModalOpen] = useState(false);
+  const [navBarActive, setNavBarActive] = useState('');
+  // const [value, setValue] = useState(0);
 
   useSelector(get.screen); // force render
 
   const path = window.location.toString().split('/').pop().toLowerCase() || 'home';
   const Screen = screens[path] || screens.home;
 
+  const handleNavBarChange = (event, newValue) => {
+    if (newValue) {
+      setNavBarActive(newValue);
+    }
+  };
+
+  console.log('screens', screens);
   return (
-    <div
-      tabIndex="0"
-      role="button"
-      onKeyDown={(e) => {
-        if (e.key === 'Escape') {
-          dispatch(set.privacy(false));
-        }
-      }}
-      id="Main"
-    >
-      <Help />
-      <Init desktop setNavModalOpen={setNavModalOpen} />
-      {
-        screens.feedback && (
-          <button
-            className="feedback"
-            type="button"
-            onClick={() => navigate('feedback')}
-          >
-            FEEDBACK
-          </button>
-        )
-      }
-
-      <img alt="logo" src="PSALogo.png" id="PSALogo" />
-      <div className="nav-menu-div">
-        <nav className="nav">
-          {
-            Object.keys(screens)
-              .filter((scr) => screens[scr].showInMenu !== false)
-              .map((scr) => (
-                <NavLink
-                  key={scr}
-                  className={scr.toLowerCase()}
-                  onClick={() => dispatch(set.screen(scr))}
-                  style={({ isActive }) => ({
-                    color: isActive ? '#385E1B' : '',
-                  })}
-                  to={`/${scr.toLowerCase()}`}
-                >
-                  {screens[scr].desc || scr}
-                </NavLink>
-              ))
-          }
-        </nav>
-        <MenuIcon
-          className="menu-icon"
-          fontSize="large"
-          onClick={() => setNavModalOpen(true)}
-        />
-        {navModalOpen && (
-          <div className="menu-modal">
-            <CloseIcon
-              className="close-icon"
-              fontSize="large"
-              onClick={() => setNavModalOpen(false)}
-            />
-            <div className="menu-modal-div">
+    <div id="Main">
+      <Stack spacing={2} direction="column">
+        <Stack spacing={2} direction="row" justifyContent="space-around" alignItems="center" style={{ height: '100px' }}>
+          <img src="PSALogo.png" alt="logo" style={{ borderRadius: '10px', minHeight: '90%' }} />
+          <Box sx={{ minWidth: '50%' }}>
+            <ToggleButtonGroup
+              disableElevation
+              variant="text"
+              value={navBarActive}
+              onChange={handleNavBarChange}
+              exclusive
+              aria-label="Disabled elevation buttons"
+            >
               {
-              Object.keys(screens)
-                .filter((scr) => screens[scr].showInMenu !== false)
-                .map((scr) => (
-                  <NavLink
-                    key={scr}
-                    className={scr.toLowerCase()}
-                    onClick={() => {
-                      dispatch(set.screen(scr));
-                      setNavModalOpen(false);
-                    }}
-                    style={({ isActive }) => ({
-                      color: isActive ? '#385E1B' : '#fff',
-                    })}
-                    to={`/${scr.toLowerCase()}`}
-                  >
-                    {screens[scr].desc || scr}
-                  </NavLink>
-                ))
+                Object.keys(screens)
+                  .filter((scr) => screens[scr].showInMenu !== false)
+                  .map((scr) => (
+                    <NavBarButton disableRipple value={scr} key={scr}>{scr}</NavBarButton>
+                  ))
               }
-              {screens.feedback && (
-                <button
-                  type="button"
-                  className="feedback-mobile"
-                  onClick={() => {
-                    setNavModalOpen(false);
-                    navigate('feedback');
-                  }}
-                >
-                  FEEDBACK
-                </button>
-              )}
-              <div>
-                <Init desktop={false} setNavModalOpen={setNavModalOpen} />
-              </div>
-            </div>
-          </div>
-        )}
-      </div>
-
-      <Routes>
-        {
-          Object.keys(screens).map((scr) => (
+            </ToggleButtonGroup>
+          </Box>
+          <Stack sx={{ minHeight: '50%', alignItems: 'center' }}>
+            {screens.feedback && (
+              <Button
+                color="secondary"
+                variant="contained"
+                sx={{ margin: '1rem' }}
+                onClick={() => {
+                  setNavModalOpen(false);
+                  navigate('feedback');
+                }}
+              >
+                FEEDBACK
+              </Button>
+            )}
+            <Init desktop setNavModalOpen={setNavModalOpen} />
+          </Stack>
+        </Stack>
+        <Box sx={{ display: 'flex', justifyContent: 'center' }}>
+          <Routes>
+            {
+              Object.keys(screens).map((scr) => (
+                <Route
+                  key={scr}
+                  path={scr.toLowerCase()}
+                  element={<Screen />}
+                />
+              ))
+            }
             <Route
-              key={scr}
-              path={scr.toLowerCase()}
+              path=""
               element={<Screen />}
             />
-          ))
-        }
-        <Route
-          path=""
-          element={<Screen />}
-        />
-      </Routes>
+          </Routes>
+        </Box>
+      </Stack>
     </div>
   );
 }; // App

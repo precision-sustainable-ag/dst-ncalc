@@ -81,6 +81,7 @@ const initialState = {
   site: '',
   sites: [],
   data: '',
+  biomassCalcMode: 'sampled', // 'sampled' or 'satellite'
 };
 
 const afterChange = {

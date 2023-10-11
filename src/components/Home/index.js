@@ -1,11 +1,16 @@
-import { useDispatch, useSelector } from 'react-redux';
-import { Link } from 'react-router-dom';
 import React, { useEffect } from 'react';
+import { useDispatch, useSelector } from 'react-redux';
+// import { Link } from 'react-router-dom';
+import {
+  Box, Button, Card, Stack, ToggleButton, ToggleButtonGroup, Typography,
+} from '@mui/material';
+
 import { get, set } from '../../store/Store';
 
 const Home = () => {
   const dispatch = useDispatch();
-  const privacy = useSelector(get.privacy);
+  // const privacy = useSelector(get.privacy);
+  const biomassCalcMode = useSelector(get.biomassCalcMode);
 
   useEffect(() => {
     if (window.location.toString().includes('PSA')) {
@@ -13,57 +18,64 @@ const Home = () => {
     }
   }, [dispatch]);
 
-  const className = privacy ? 'home background' : 'home';
+  const handleChange = (event, newValue) => {
+    dispatch(set.biomassCalcMode(newValue));
+  };
+
+  // const className = privacy ? 'home background' : 'home';
 
   return (
-    <>
-      <div
-        className={className}
-      >
-        <p>Welcome to the</p>
-        <h1>Cover Crop Nitrogen Calculator (CC-NCALC)</h1>
-
-        <p>
-          This calculator aids farmers with decision support regarding cover crop
-          residue persistence, as well as the amount and timing of nitrogen availability.
-        </p>
-
-        <div className="home-button-container">
-          <Link className="link about" to="/about">ABOUT</Link>
-          <Link className="link location" to="/location">GET STARTED</Link>
-        </div>
-
-        <img className="crops fullwidth" src="background.png" alt="" />
-      </div>
-
-      <div>
-        <button
-          type="button"
-          id="Privacy"
-          className="bn"
-          onClick={() => dispatch(set.privacy(!privacy))}
-        >
-          Your privacy
-        </button>
-        {
-          privacy
-          && (
-          <div id="PrivacyPolicy">
-            <button
-              type="button"
-              className="close"
-              onClick={() => dispatch(set.privacy(false))}
-            >
-              x
-            </button>
-            <p>Your information is stored on your computer only.  It will not be uploaded to a server.</p>
-            <p>If you enter a fieldname, you can select it from the upper-right drop down list the next time you run the program.</p>
-            <p>If you clear your browser&apos;s cache, you&apos;ll need to re-enter your data the next time you run the program.</p>
-          </div>
-          )
-        }
-      </div>
-    </>
+    <Card
+      maxwidth="lg"
+      sx={{
+        margin: 7,
+        padding: 5,
+        boxShadow: 5,
+        borderRadius: 5,
+        opacity: 0.9,
+      }}
+    >
+      <Stack spacing={5} direction="column">
+        {/* <Box>
+          <Typography variant="h4"> Welcome to the</Typography>
+        </Box> */}
+        <Box>
+          <Typography variant="h3">Welcome to the Cover Crop Nitrogen Calculator (CC-NCALC)</Typography>
+        </Box>
+        <Box>
+          <Typography variant="h6">
+            This calculator aids farmers with decision support regarding
+            cover crop residue persistence, as well as the amount and timing of nitrogen availability.
+          </Typography>
+        </Box>
+      </Stack>
+      <Box sx={{ height: 80 }} />
+      <Stack spacing={2} direction="column">
+        <Stack justifyContent="space-around" alignItems="center" direction="row">
+          <Typography variant="h5"> Please select biomass calculation method </Typography>
+          <ToggleButtonGroup
+            color="primary"
+            value={biomassCalcMode}
+            exclusive
+            onChange={handleChange}
+            aria-label="biomassCalcMode"
+          >
+            <ToggleButton sx={{ fontSize: '20px', border: '2px solid black' }} value="sampled">User Sampled</ToggleButton>
+            {/* <Box sx={{ padding: '20px'}} /> */}
+            <ToggleButton sx={{ fontSize: '20px', border: '2px solid black' }} value="satellite">Satellite</ToggleButton>
+          </ToggleButtonGroup>
+        </Stack>
+      </Stack>
+      <Box sx={{ height: 100 }} />
+      <Stack spacing={2} direction="row" justifyContent="space-around">
+        <Button sx={{ fontSize: '24px', fontWeight: 900 }} variant="contained" color="success">
+          About
+        </Button>
+        <Button sx={{ fontSize: '24px', fontWeight: 900 }} variant="contained" color="success">
+          Get Started
+        </Button>
+      </Stack>
+    </Card>
   );
 }; // Home
 
