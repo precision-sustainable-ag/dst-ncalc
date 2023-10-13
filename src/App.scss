@@ -3,6 +3,8 @@
 
 body {
   background: #eee;
+  max-height: 100%;
+  max-width: 100%;
 }
 
 * {
@@ -10,8 +12,9 @@ body {
 }
 
 #root {
-  max-width: 90vw;
-  min-height: 800px;
+  // max-width: 90vw;
+  // min-height: 800px;
+  background-color: #7b3294;
   margin: auto;
   background: white;
   border: 1px solid #aaa;
@@ -113,12 +116,11 @@ nav img {
 
 #Main {
   margin: 0;
-  padding: 1rem 0rem;
+  padding: 1rem 2rem;
   position: relative;
-  min-height: 100vh;
+  max-height: 100vh;
   max-width: 100vw;
   background-image: url('../public/background.png');
-  // background-repeat: no-repeat;
   background-size: cover;
 }
 

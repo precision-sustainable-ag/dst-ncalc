@@ -28,19 +28,16 @@ const Home = () => {
     <Card
       maxwidth="lg"
       sx={{
-        margin: 7,
-        padding: 5,
+        margin: '5% 10% 0% 10%',
+        padding: '5%',
         boxShadow: 5,
         borderRadius: 5,
         opacity: 0.9,
       }}
     >
-      <Stack spacing={5} direction="column">
-        {/* <Box>
-          <Typography variant="h4"> Welcome to the</Typography>
-        </Box> */}
+      <Stack spacing={2} direction="column">
         <Box>
-          <Typography variant="h3">Welcome to the Cover Crop Nitrogen Calculator (CC-NCALC)</Typography>
+          <Typography variant="h4">Welcome to the Cover Crop Nitrogen Calculator (CC-NCALC)</Typography>
         </Box>
         <Box>
           <Typography variant="h6">
@@ -49,7 +46,7 @@ const Home = () => {
           </Typography>
         </Box>
       </Stack>
-      <Box sx={{ height: 80 }} />
+      <Box sx={{ height: 60 }} />
       <Stack spacing={2} direction="column">
         <Stack justifyContent="space-around" alignItems="center" direction="row">
           <Typography variant="h5"> Please select biomass calculation method </Typography>
@@ -61,16 +58,15 @@ const Home = () => {
             aria-label="biomassCalcMode"
           >
             <ToggleButton sx={{ fontSize: '20px', border: '2px solid black' }} value="sampled">User Sampled</ToggleButton>
-            {/* <Box sx={{ padding: '20px'}} /> */}
             <ToggleButton sx={{ fontSize: '20px', border: '2px solid black' }} value="satellite">Satellite</ToggleButton>
           </ToggleButtonGroup>
         </Stack>
       </Stack>
       <Box sx={{ height: 100 }} />
       <Stack spacing={2} direction="row" justifyContent="space-around">
-        <Button sx={{ fontSize: '24px', fontWeight: 900 }} variant="contained" color="success">
+        {/* <Button sx={{ fontSize: '24px', fontWeight: 900 }} variant="contained" color="success">
           About
-        </Button>
+        </Button> */}
         <Button sx={{ fontSize: '24px', fontWeight: 900 }} variant="contained" color="success">
           Get Started
         </Button>

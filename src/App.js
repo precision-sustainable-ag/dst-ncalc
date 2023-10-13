@@ -24,11 +24,10 @@ import { get } from './store/Store';
 const NavBarButton = styled(ToggleButton)({
   color: '#fff',
   fontSize: '24px',
-  margin: '0 1.5rem',
+  // margin: '0 1.5rem',
   backgroundColor: 'transparent',
-  padding: '0 1rem',
+  // padding: '0 1rem',
   fontWeight: 'bold',
-  borderRadius: '10px',
   '&.Mui-selected, &.Mui-selected:hover': {
     fontSize: '24px',
     color: '#fff',
@@ -36,6 +35,49 @@ const NavBarButton = styled(ToggleButton)({
     borderBottom: '2px solid #fff',
   },
 });
+
+const NavBar = styled(Box)(({ theme }) => ({
+  // borderRadius: '10px',
+  width: 'auto',
+  display: 'flex',
+  flexDirection: 'row',
+  // [theme.breakpoints.down('lg')]: {
+  //   width: '40%',
+  // },
+  // [theme.breakpoints.down('md')]: {
+  //   width: '30%',
+  // },
+  // [theme.breakpoints.down('sm')]: {
+  //   width: 'none',
+  // },
+}));
+
+const NavBarLeft = styled(Box)(({ theme }) => ({
+  borderRadius: '10px',
+  height: '90%',
+  [theme.breakpoints.down('lg')]: {
+    width: '10%',
+  },
+  [theme.breakpoints.down('md')]: {
+    width: '10%',
+  },
+  [theme.breakpoints.down('sm')]: {
+    width: '10%',
+  },
+}));
+
+const NavBarRight = styled(Box)(({ theme }) => ({
+  minWidth: '20%',
+  [theme.breakpoints.down('md')]: {
+    display: 'none',
+  },
+}));
+
+const NavBarMiddle = styled(Box)(({ theme }) => ({
+  [theme.breakpoints.down('sm')]: {
+    display: 'none',
+  },
+}));
 
 // import Help from './shared/Help';
 
@@ -101,9 +143,14 @@ const App = () => {
   return (
     <div id="Main">
       <Stack spacing={2} direction="column">
-        <Stack spacing={2} direction="row" justifyContent="space-around" alignItems="center" style={{ height: '100px' }}>
-          <img src="PSALogo.png" alt="logo" style={{ borderRadius: '10px', minHeight: '90%' }} />
-          <Box sx={{ minWidth: '50%' }}>
+        <NavBar>
+          {/* <Stack spacing={2} direction="row"> */}
+          <NavBarLeft
+            component="img"
+            alt="psa logo"
+            src="PSALogo.png"
+          />
+          <NavBarMiddle>
             <ToggleButtonGroup
               disableElevation
               variant="text"
@@ -120,24 +167,38 @@ const App = () => {
                   ))
               }
             </ToggleButtonGroup>
-          </Box>
-          <Stack sx={{ minHeight: '50%', alignItems: 'center' }}>
-            {screens.feedback && (
-              <Button
-                color="secondary"
-                variant="contained"
-                sx={{ margin: '1rem' }}
-                onClick={() => {
-                  setNavModalOpen(false);
-                  navigate('feedback');
-                }}
-              >
-                FEEDBACK
-              </Button>
-            )}
-            <Init desktop setNavModalOpen={setNavModalOpen} />
-          </Stack>
-        </Stack>
+          </NavBarMiddle>
+          <NavBarRight>
+            <Stack sx={{ minHeight: '50%', alignItems: 'center' }}>
+              {screens.feedback && (
+                <Button
+                  variant="contained"
+                  sx={{ margin: '0.2rem' }}
+                  onClick={() => {
+                    setNavModalOpen(false);
+                    navigate('feedback');
+                  }}
+                >
+                  About
+                </Button>
+              )}
+              {screens.feedback && (
+                <Button
+                  variant="contained"
+                  sx={{ margin: '0.1rem 0 0.3rem 0' }}
+                  onClick={() => {
+                    setNavModalOpen(false);
+                    navigate('feedback');
+                  }}
+                >
+                  FEEDBACK
+                </Button>
+              )}
+              <Init desktop setNavModalOpen={setNavModalOpen} />
+            </Stack>
+          </NavBarRight>
+          {/* </Stack> */}
+        </NavBar>
         <Box sx={{ display: 'flex', justifyContent: 'center' }}>
           <Routes>
             {
@@ -156,7 +217,7 @@ const App = () => {
           </Routes>
         </Box>
       </Stack>
-    </div>
+    </div >
   );
 }; // App
 
