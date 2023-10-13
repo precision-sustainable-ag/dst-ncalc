@@ -14,31 +14,50 @@ import {
   Box,
   ToggleButton,
   ToggleButtonGroup,
+  Button,
   Stack,
   styled,
-  Button,
 } from '@mui/material';
 
 import { get } from './store/Store';
 
-const NavBarButton = styled(ToggleButton)({
-  color: '#fff',
-  fontSize: '24px',
-  // margin: '0 1.5rem',
-  backgroundColor: 'transparent',
-  // padding: '0 1rem',
-  fontWeight: 'bold',
-  '&.Mui-selected, &.Mui-selected:hover': {
-    fontSize: '24px',
-    color: '#fff',
-    fontWeight: 'bolder',
-    borderBottom: '2px solid #fff',
-  },
-});
+const NavBarButton = styled(Button)(({ theme }) => ({
+  // borderRadius: '10px',
+  // fontSize: '24px',
+  // margin: '5px',
+  // // height: '100%',
+  // [theme.breakpoints.down('lg')]: {
+  //   fontSize: '20px',
+  //   margin: '4px',
+  // },
+  // [theme.breakpoints.down('md')]: {
+  //   fontSize: '16px',
+  //   margin: '3px',
+  // },
+  // [theme.breakpoints.down('sm')]: {
+  //   fontSize: '14px',
+  //   margin: '2px',
+  // },
+}));
+
+// const NavBarButton = styled(ToggleButton)({
+//   color: '#fff',
+//   fontSize: '24px',
+//   // margin: '0 1.5rem',
+//   backgroundColor: 'transparent',
+//   // padding: '0 1rem',
+//   fontWeight: 'bold',
+//   '&.Mui-selected, &.Mui-selected:hover': {
+//     fontSize: '24px',
+//     color: '#fff',
+//     fontWeight: 'bolder',
+//     borderBottom: '2px solid #fff',
+//   },
+// });
 
 const NavBar = styled(Box)(({ theme }) => ({
   // borderRadius: '10px',
-  width: 'auto',
+  // width: '100%',
   display: 'flex',
   flexDirection: 'row',
   // [theme.breakpoints.down('lg')]: {
@@ -74,6 +93,10 @@ const NavBarRight = styled(Box)(({ theme }) => ({
 }));
 
 const NavBarMiddle = styled(Box)(({ theme }) => ({
+  display: 'flex',
+  // flexWrap: 'wrap',
+  width: '100%',
+  justifyContent: 'space-around',
   [theme.breakpoints.down('sm')]: {
     display: 'none',
   },
@@ -151,22 +174,22 @@ const App = () => {
             src="PSALogo.png"
           />
           <NavBarMiddle>
-            <ToggleButtonGroup
+            {/* <ToggleButtonGroup
               disableElevation
               variant="text"
               value={navBarActive}
               onChange={handleNavBarChange}
               exclusive
               aria-label="Disabled elevation buttons"
-            >
-              {
-                Object.keys(screens)
-                  .filter((scr) => screens[scr].showInMenu !== false)
-                  .map((scr) => (
-                    <NavBarButton disableRipple value={scr} key={scr}>{scr}</NavBarButton>
-                  ))
-              }
-            </ToggleButtonGroup>
+            > */}
+            {
+              Object.keys(screens)
+                .filter((scr) => screens[scr].showInMenu !== false)
+                .map((scr) => (
+                  <NavBarButton disableRipple value={scr} key={scr}>{scr}</NavBarButton>
+                ))
+            }
+            {/* </ToggleButtonGroup> */}
           </NavBarMiddle>
           <NavBarRight>
             <Stack sx={{ minHeight: '50%', alignItems: 'center' }}>
