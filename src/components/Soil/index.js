@@ -15,6 +15,9 @@ const Soil = () => {
         justifyContent: 'center',
         display: 'flex',
         alignItems: 'center',
+        backgroundColor: '#fff',
+        padding: '1rem',
+        borderRadius: '1rem',
       }}
     >
       <div className="soil-div">

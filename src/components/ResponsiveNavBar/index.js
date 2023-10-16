@@ -1,5 +1,8 @@
-import React, { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import React, { useEffect, useState } from 'react';
+import { useDispatch, useSelector } from 'react-redux';
+import {
+  Route, NavLink, Routes, useNavigate,
+} from 'react-router-dom';
 import AppBar from '@mui/material/AppBar';
 import Box from '@mui/material/Box';
 import Toolbar from '@mui/material/Toolbar';
@@ -7,23 +10,43 @@ import IconButton from '@mui/material/IconButton';
 import Typography from '@mui/material/Typography';
 import Menu from '@mui/material/Menu';
 import MenuIcon from '@mui/icons-material/Menu';
-import Avatar from '@mui/material/Avatar';
 import Button from '@mui/material/Button';
 import Tooltip from '@mui/material/Tooltip';
 import MenuItem from '@mui/material/MenuItem';
 import Stack from '@mui/material/Stack';
 import MoreVertIcon from '@mui/icons-material/MoreVert';
-import { styled } from '@mui/material';
+import { Modal, styled } from '@mui/material';
 import Init from '../Init';
+import { get, set } from '../../store/Store';
 
-const NavBarButtonText = styled(Button)(({ theme }) => ({
+const NavBarButtonText1 = styled(Button)(({ theme, isactive }) => ({
   color: 'white',
+  border: isactive === 'true' ? '2px solid white' : 'none',
   fontWeight: 'bold',
   display: 'block',
   '&.MuiButton-root': {
     '&:hover': {
       backgroundColor: '#fff',
       color: '#3c52b2',
+      textDecoration: 'none',
+    },
+  },
+  margin: '0 1rem',
+  [theme.breakpoints.up('lg')]: {
+    margin: '0 2rem',
+  },
+}));
+
+const NavBarButtonText2 = styled(Button)(({ theme, isactive }) => ({
+  color: isactive === 'true' ? '#3c52b2' : 'black',
+  border: isactive === 'true' ? '1px solid black' : 'none',
+  fontWeight: isactive === 'true' ? 'bolder' : 'bold',
+  display: 'block',
+  '&.MuiButton-root': {
+    '&:hover': {
+      backgroundColor: '#fff',
+      color: '#3c52b2',
+      textDecoration: 'none',
     },
   },
   margin: '0 1rem',
@@ -35,8 +58,11 @@ const NavBarButtonText = styled(Button)(({ theme }) => ({
 const ResponsiveNavBar = ({ screens }) => {
   const [anchorElNav, setAnchorElNav] = useState(null);
   const [anchorElUser, setAnchorElUser] = useState(null);
+  const [activeMenu, setActiveMenu] = useState('home');
   const [navModalOpen, setNavModalOpen] = useState(false);
+
   const navigate = useNavigate();
+  const dispatch = useDispatch();
 
   const handleOpenNavMenu = (event) => {
     setAnchorElNav(event.currentTarget);
@@ -45,7 +71,9 @@ const ResponsiveNavBar = ({ screens }) => {
     setAnchorElUser(event.currentTarget);
   };
 
-  const handleCloseNavMenu = () => {
+  const handleClickNavMenu = (scr) => {
+    dispatch(set.screen(scr));
+    setActiveMenu(scr);
     setAnchorElNav(null);
   };
 
@@ -53,8 +81,13 @@ const ResponsiveNavBar = ({ screens }) => {
     setAnchorElUser(null);
   };
 
+  // useSelector(get.screen); // force render
+  useEffect(() => {
+    navigate(`/${activeMenu}`);
+  }, [activeMenu]);
+
   return (
-    <AppBar position="static" elevation={0} sx={{ backgroundColor: 'transparent' }}>
+    <AppBar position="static" elevation={0} sx={{ backgroundColor: 'transparent', marginBottom: '3rem' }}>
       <Stack direction="row" justifyContent="space-around" flexGrow={2}>
         <Toolbar disableGutters>
           {/* Menu Button Box */}
@@ -73,8 +106,17 @@ const ResponsiveNavBar = ({ screens }) => {
             />
           </Box>
         </Toolbar>
+        {/* Menu vertical list */}
         <Toolbar disableGutters sx={{ display: { xs: 'flex', md: 'none' } }}>
-          <Box sx={{ flexGrow: 1, display: { xs: 'flex', md: 'none' } }}>
+          <Box
+            sx={{
+              flexGrow: 1,
+              display: { xs: 'flex', md: 'none' },
+              backgroundColor: 'white',
+              color: 'black',
+              borderRadius: '2rem',
+            }}
+          >
             <IconButton
               size="large"
               aria-label="account of current user"
@@ -98,22 +140,27 @@ const ResponsiveNavBar = ({ screens }) => {
                 horizontal: 'left',
               }}
               open={Boolean(anchorElNav)}
-              onClose={handleCloseNavMenu}
+              onClose={handleClickNavMenu}
               sx={{
-                display: { xs: 'block', md: 'none' }
+                display: { xs: 'block', md: 'none' },
               }}
             >
               {Object.keys(screens)
                 .filter((scr) => screens[scr].showInMenu !== false)
                 .map((scr) => (
-                  <MenuItem
-                    key={scr}
-                    onClick={handleCloseNavMenu}
+                  <NavLink
+                    key={`${scr}-navlink`}
+                    to={`/${scr.toLowerCase()}`}
+                    style={{ textDecoration: 'none' }}
                   >
-                    <Button sx={{ color: 'black', fontWeight: 'bolder' }}>
-                      {scr}
-                    </Button>
-                  </MenuItem>
+                    <NavBarButtonText2
+                      key={`${scr}-navlink-text-str`}
+                      onClick={() => handleClickNavMenu(scr)}
+                      isactive={activeMenu === scr ? 'true' : 'false'}
+                    >
+                      {screens[scr].desc.replace(/\s/g, '') || scr.replace(/\s/g, '')}
+                    </NavBarButtonText2>
+                  </NavLink>
                 ))}
             </Menu>
           </Box>
@@ -136,16 +183,23 @@ const ResponsiveNavBar = ({ screens }) => {
         </Toolbar>
         <Toolbar disableGutters sx={{ display: { xs: 'none', md: 'flex' } }}>
           {/* Menu horizontal list */}
-          <Box sx={{ flexGrow: 1, display: { xs: 'none', md: 'flex' } }}>
+          <Box sx={{ flexGrow: 1, display: { xs: 'none', md: 'flex' }, color: 'white' }}>
             {Object.keys(screens)
               .filter((scr) => screens[scr].showInMenu !== false)
               .map((scr) => (
-                <NavBarButtonText
-                  key={scr}
-                  onClick={handleCloseNavMenu}
+                <NavLink
+                  key={`${scr}-navlink`}
+                  to={`/${scr.toLowerCase()}`}
+                  style={{ textDecoration: 'none' }}
                 >
-                  {scr}
-                </NavBarButtonText>
+                  <NavBarButtonText1
+                    key={`${scr}-navlink-text-str`}
+                    onClick={() => handleClickNavMenu(scr)}
+                    isactive={activeMenu === scr ? 'true' : 'false'}
+                  >
+                    {screens[scr].desc || scr}
+                  </NavBarButtonText1>
+                </NavLink>
               ))}
           </Box>
         </Toolbar>
@@ -153,7 +207,14 @@ const ResponsiveNavBar = ({ screens }) => {
           {/* Examples Avatar */}
           <Box sx={{ flexGrow: 0 }}>
             <Tooltip title="Open settings">
-              <IconButton onClick={handleOpenUserMenu} sx={{ p: '0.3rem', backgroundColor: 'white' }}>
+              <IconButton
+                onClick={handleOpenUserMenu}
+                sx={{
+                  p: '0.7rem',
+                  color: 'black',
+                  backgroundColor: 'white',
+                }}
+              >
                 <MoreVertIcon />
               </IconButton>
             </Tooltip>
@@ -186,10 +247,16 @@ const ResponsiveNavBar = ({ screens }) => {
                 key="feedback"
                 onClick={() => {
                   setNavModalOpen(false);
-                  navigate('feedback');
+                  setActiveMenu('feedback');
                 }}
               >
+                {/* <NavLink
+                  key="feedback-navlink"
+                  to="/feedback"
+                  style={{ textDecoration: 'none' }}
+                > */}
                 <Typography textAlign="center">Feedback</Typography>
+                {/* </NavLink> */}
               </MenuItem>
               <MenuItem
                 key="examples"
@@ -200,6 +267,23 @@ const ResponsiveNavBar = ({ screens }) => {
           </Box>
         </Toolbar>
       </Stack>
+      {/* {activeMenu === 'feedback' && (
+        <Modal
+          open={navModalOpen}
+          onClose={() => { setNavModalOpen(false); }}
+          aria-labelledby="modal-modal-title"
+          aria-describedby="modal-modal-description"
+        >
+          <Box>
+            <Typography id="modal-modal-title" variant="h6" component="h2">
+              Text in a modal
+            </Typography>
+            <Typography id="modal-modal-description" sx={{ mt: 2 }}>
+              Duis mollis, est non commodo luctus, nisi erat porttitor ligula.
+            </Typography>
+          </Box>
+        </Modal>
+      )} */}
     </AppBar>
   );
 };

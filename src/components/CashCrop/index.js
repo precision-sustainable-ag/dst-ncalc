@@ -314,6 +314,9 @@ const CashCrop = () => {
         justifyContent: 'center',
         display: 'flex',
         alignItems: 'center',
+        backgroundColor: '#fff',
+        padding: '1rem',
+        borderRadius: '1rem',
       }}
     >
       <div style={{ marginBottom: '150px' }}>
