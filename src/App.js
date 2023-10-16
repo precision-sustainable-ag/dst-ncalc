@@ -4,103 +4,14 @@ import {
   // useDispatch,
   useSelector,
 } from 'react-redux';
-import {
-  Route, Routes, useNavigate,
-} from 'react-router-dom';
+
+import ResponsiveNavBar from './components/ResponsiveNavBar';
+import Body from './components/Body';
 
 import './App.scss';
 import 'react-datepicker/dist/react-datepicker.css';
-import {
-  Box,
-  ToggleButton,
-  ToggleButtonGroup,
-  Button,
-  Stack,
-  styled,
-} from '@mui/material';
 
 import { get } from './store/Store';
-
-const NavBarButton = styled(Button)(({ theme }) => ({
-  // borderRadius: '10px',
-  // fontSize: '24px',
-  // margin: '5px',
-  // // height: '100%',
-  // [theme.breakpoints.down('lg')]: {
-  //   fontSize: '20px',
-  //   margin: '4px',
-  // },
-  // [theme.breakpoints.down('md')]: {
-  //   fontSize: '16px',
-  //   margin: '3px',
-  // },
-  // [theme.breakpoints.down('sm')]: {
-  //   fontSize: '14px',
-  //   margin: '2px',
-  // },
-}));
-
-// const NavBarButton = styled(ToggleButton)({
-//   color: '#fff',
-//   fontSize: '24px',
-//   // margin: '0 1.5rem',
-//   backgroundColor: 'transparent',
-//   // padding: '0 1rem',
-//   fontWeight: 'bold',
-//   '&.Mui-selected, &.Mui-selected:hover': {
-//     fontSize: '24px',
-//     color: '#fff',
-//     fontWeight: 'bolder',
-//     borderBottom: '2px solid #fff',
-//   },
-// });
-
-const NavBar = styled(Box)(({ theme }) => ({
-  // borderRadius: '10px',
-  // width: '100%',
-  display: 'flex',
-  flexDirection: 'row',
-  // [theme.breakpoints.down('lg')]: {
-  //   width: '40%',
-  // },
-  // [theme.breakpoints.down('md')]: {
-  //   width: '30%',
-  // },
-  // [theme.breakpoints.down('sm')]: {
-  //   width: 'none',
-  // },
-}));
-
-const NavBarLeft = styled(Box)(({ theme }) => ({
-  borderRadius: '10px',
-  height: '90%',
-  [theme.breakpoints.down('lg')]: {
-    width: '10%',
-  },
-  [theme.breakpoints.down('md')]: {
-    width: '10%',
-  },
-  [theme.breakpoints.down('sm')]: {
-    width: '10%',
-  },
-}));
-
-const NavBarRight = styled(Box)(({ theme }) => ({
-  minWidth: '20%',
-  [theme.breakpoints.down('md')]: {
-    display: 'none',
-  },
-}));
-
-const NavBarMiddle = styled(Box)(({ theme }) => ({
-  display: 'flex',
-  // flexWrap: 'wrap',
-  width: '100%',
-  justifyContent: 'space-around',
-  [theme.breakpoints.down('sm')]: {
-    display: 'none',
-  },
-}));
 
 // import Help from './shared/Help';
 
@@ -141,106 +52,29 @@ console.warn = (msg, ...subst) => {
   }
 };
 
-const Init = screens.init;
+// const Init = screens.init;
 
 const App = () => {
   // const dispatch = useDispatch();
-  const navigate = useNavigate();
+  // const navigate = useNavigate();
   // eslint-disable-next-line no-unused-vars
-  const [navModalOpen, setNavModalOpen] = useState(false);
-  const [navBarActive, setNavBarActive] = useState('');
+  // const [navModalOpen, setNavModalOpen] = useState(false);
+  // const [navBarActive, setNavBarActive] = useState('');
   // const [value, setValue] = useState(0);
 
   useSelector(get.screen); // force render
 
-  const path = window.location.toString().split('/').pop().toLowerCase() || 'home';
-  const Screen = screens[path] || screens.home;
+  // const handleNavBarChange = (event, newValue) => {
+  //   if (newValue) {
+  //     setNavBarActive(newValue);
+  //   }
+  // };
 
-  const handleNavBarChange = (event, newValue) => {
-    if (newValue) {
-      setNavBarActive(newValue);
-    }
-  };
-
-  console.log('screens', screens);
   return (
     <div id="Main">
-      <Stack spacing={2} direction="column">
-        <NavBar>
-          {/* <Stack spacing={2} direction="row"> */}
-          <NavBarLeft
-            component="img"
-            alt="psa logo"
-            src="PSALogo.png"
-          />
-          <NavBarMiddle>
-            {/* <ToggleButtonGroup
-              disableElevation
-              variant="text"
-              value={navBarActive}
-              onChange={handleNavBarChange}
-              exclusive
-              aria-label="Disabled elevation buttons"
-            > */}
-            {
-              Object.keys(screens)
-                .filter((scr) => screens[scr].showInMenu !== false)
-                .map((scr) => (
-                  <NavBarButton disableRipple value={scr} key={scr}>{scr}</NavBarButton>
-                ))
-            }
-            {/* </ToggleButtonGroup> */}
-          </NavBarMiddle>
-          <NavBarRight>
-            <Stack sx={{ minHeight: '50%', alignItems: 'center' }}>
-              {screens.feedback && (
-                <Button
-                  variant="contained"
-                  sx={{ margin: '0.2rem' }}
-                  onClick={() => {
-                    setNavModalOpen(false);
-                    navigate('feedback');
-                  }}
-                >
-                  About
-                </Button>
-              )}
-              {screens.feedback && (
-                <Button
-                  variant="contained"
-                  sx={{ margin: '0.1rem 0 0.3rem 0' }}
-                  onClick={() => {
-                    setNavModalOpen(false);
-                    navigate('feedback');
-                  }}
-                >
-                  FEEDBACK
-                </Button>
-              )}
-              <Init desktop setNavModalOpen={setNavModalOpen} />
-            </Stack>
-          </NavBarRight>
-          {/* </Stack> */}
-        </NavBar>
-        <Box sx={{ display: 'flex', justifyContent: 'center' }}>
-          <Routes>
-            {
-              Object.keys(screens).map((scr) => (
-                <Route
-                  key={scr}
-                  path={scr.toLowerCase()}
-                  element={<Screen />}
-                />
-              ))
-            }
-            <Route
-              path=""
-              element={<Screen />}
-            />
-          </Routes>
-        </Box>
-      </Stack>
-    </div >
+      <ResponsiveNavBar screens={screens} />
+      <Body screens={screens} />
+    </div>
   );
 }; // App
 
