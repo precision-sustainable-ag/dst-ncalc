@@ -12,6 +12,7 @@ import Button from '@mui/material/Button';
 import Tooltip from '@mui/material/Tooltip';
 import MenuItem from '@mui/material/MenuItem';
 import Stack from '@mui/material/Stack';
+import MoreVertIcon from '@mui/icons-material/MoreVert';
 import { styled } from '@mui/material';
 import Init from '../Init';
 
@@ -65,9 +66,9 @@ const ResponsiveNavBar = ({ screens }) => {
                 backgroundColor: 'white',
                 mr: 2,
                 borderRadius: '0.5rem',
-                padding: '0.2rem',
+                padding: '0.1rem 0.4rem',
                 height: '100%',
-                filter: 'invert(1)',
+                // filter: 'invert(1)',
               }}
             />
           </Box>
@@ -126,9 +127,9 @@ const ResponsiveNavBar = ({ screens }) => {
                 backgroundColor: 'white',
                 mr: 2,
                 borderRadius: '0.5rem',
-                padding: '0.2rem',
+                padding: '0.1rem 0.4rem',
                 height: '100%',
-                filter: 'invert(1)',
+                // filter: 'invert(1)',
               }}
             />
           </Box>
@@ -149,11 +150,11 @@ const ResponsiveNavBar = ({ screens }) => {
           </Box>
         </Toolbar>
         <Toolbar disableGutters>
-          {/* User Avatar */}
+          {/* Examples Avatar */}
           <Box sx={{ flexGrow: 0 }}>
             <Tooltip title="Open settings">
-              <IconButton onClick={handleOpenUserMenu} sx={{ p: 0 }}>
-                <Avatar alt="Remy Sharp" src="/static/images/avatar/2.jpg" />
+              <IconButton onClick={handleOpenUserMenu} sx={{ p: '0.3rem', backgroundColor: 'white' }}>
+                <MoreVertIcon />
               </IconButton>
             </Tooltip>
             <Menu
