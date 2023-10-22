@@ -55,13 +55,25 @@ const NavBarButtonText2 = styled(Button)(({ theme, isactive }) => ({
   },
 }));
 
+const feedbackStyle = {
+  position: 'absolute',
+  top: '50%',
+  left: '50%',
+  transform: 'translate(-50%, -50%)',
+  width: 400,
+  bgcolor: 'background.paper',
+  border: '2px solid #000',
+  boxShadow: 24,
+  p: 4,
+};
+
 const ResponsiveNavBar = ({ screens }) => {
   const [anchorElNav, setAnchorElNav] = useState(null);
   const [anchorElUser, setAnchorElUser] = useState(null);
   const [activeMenu, setActiveMenu] = useState('home');
   const [navModalOpen, setNavModalOpen] = useState(false);
 
-  const navigate = useNavigate();
+  // const navigate = useNavigate();
   const dispatch = useDispatch();
 
   const handleOpenNavMenu = (event) => {
@@ -81,10 +93,10 @@ const ResponsiveNavBar = ({ screens }) => {
     setAnchorElUser(null);
   };
 
-  // useSelector(get.screen); // force render
-  useEffect(() => {
-    navigate(`/${activeMenu}`);
-  }, [activeMenu]);
+  // // useSelector(get.screen); // force render
+  // useEffect(() => {
+  //   navigate(`/${activeMenu}`);
+  // }, [activeMenu]);
 
   return (
     <AppBar position="static" elevation={0} sx={{ backgroundColor: 'transparent', marginBottom: '3rem' }}>
@@ -237,8 +249,7 @@ const ResponsiveNavBar = ({ screens }) => {
               <MenuItem
                 key="about"
                 onClick={() => {
-                  setNavModalOpen(false);
-                  navigate('about');
+                  dispatch(set.openAboutModal(true));
                 }}
               >
                 <Typography textAlign="center">About</Typography>
@@ -246,17 +257,10 @@ const ResponsiveNavBar = ({ screens }) => {
               <MenuItem
                 key="feedback"
                 onClick={() => {
-                  setNavModalOpen(false);
-                  setActiveMenu('feedback');
+                  dispatch(set.openFeedbackModal(true));
                 }}
               >
-                {/* <NavLink
-                  key="feedback-navlink"
-                  to="/feedback"
-                  style={{ textDecoration: 'none' }}
-                > */}
                 <Typography textAlign="center">Feedback</Typography>
-                {/* </NavLink> */}
               </MenuItem>
               <MenuItem
                 key="examples"
@@ -267,23 +271,6 @@ const ResponsiveNavBar = ({ screens }) => {
           </Box>
         </Toolbar>
       </Stack>
-      {/* {activeMenu === 'feedback' && (
-        <Modal
-          open={navModalOpen}
-          onClose={() => { setNavModalOpen(false); }}
-          aria-labelledby="modal-modal-title"
-          aria-describedby="modal-modal-description"
-        >
-          <Box>
-            <Typography id="modal-modal-title" variant="h6" component="h2">
-              Text in a modal
-            </Typography>
-            <Typography id="modal-modal-description" sx={{ mt: 2 }}>
-              Duis mollis, est non commodo luctus, nisi erat porttitor ligula.
-            </Typography>
-          </Box>
-        </Modal>
-      )} */}
     </AppBar>
   );
 };

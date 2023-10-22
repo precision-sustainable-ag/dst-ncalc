@@ -1,5 +1,5 @@
 /* eslint-disable no-console */
-import React, { useState } from 'react';
+import React from 'react';
 import {
   // useDispatch,
   useSelector,
@@ -10,9 +10,9 @@ import Body from './components/Body';
 
 import './App.scss';
 import 'react-datepicker/dist/react-datepicker.css';
-import About from './components/About';
 
 import { get } from './store/Store';
+import Feedback from './components/Feedback';
 import { Box, Modal, Typography } from '@mui/material';
 
 // import Help from './shared/Help';
@@ -57,7 +57,6 @@ console.warn = (msg, ...subst) => {
 // const Init = screens.init;
 
 const App = () => {
-  const [navModalOpen, setNavModalOpen] = useState(true);
   // const dispatch = useDispatch();
   // const navigate = useNavigate();
   // eslint-disable-next-line no-unused-vars

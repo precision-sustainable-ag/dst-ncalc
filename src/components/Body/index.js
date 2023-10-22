@@ -6,6 +6,9 @@ import {
   Box,
 } from '@mui/material';
 
+import Feedback from '../Feedback';
+import About from '../About';
+
 export default function index({ screens }) {
   const path = window.location.toString().split('/').pop().toLowerCase() || 'home';
   const Screen = screens[path] || screens.home;
@@ -27,6 +30,8 @@ export default function index({ screens }) {
           element={<Screen />}
         />
       </Routes>
+      <Feedback />
+      <About />
     </Box>
   );
 }

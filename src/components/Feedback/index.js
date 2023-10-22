@@ -1,6 +1,6 @@
 /* eslint-disable no-alert */
 import React from 'react';
-import { Button } from '@mui/material';
+import { Button, Modal } from '@mui/material';
 import { useSelector, useDispatch } from 'react-redux';
 import Input from '../../shared/Inputs';
 import { get, set } from '../../store/Store';
@@ -33,6 +33,9 @@ const Feedback = () => {
   const feedback = useSelector(get.feedback);
   const name = useSelector(get.name);
   const email = useSelector(get.email);
+
+  const openFeedbackModal = useSelector(get.openFeedbackModal);
+  const handleCloseModal = () => dispatch(set.openFeedbackModal(false));
 
   const submit = (e) => {
     if (!feedback.trim()) {
@@ -96,52 +99,64 @@ __________________________________
   }; // submit
 
   return (
-    <div className="feedback">
-      <h2>CC-NCALC Feedback</h2>
-      <br />
-
-      <p>
-        Please provide any comments or suggestions that will help us improve the tool.
+    <Modal
+      open={openFeedbackModal}
+      onClose={handleCloseModal}
+      aria-labelledby="modal-modal-title"
+      aria-describedby="modal-modal-description"
+      style={{
+        display: 'flex',
+        alignItems: 'center',
+        justifyContent: 'center',
+      }}
+    >
+      <div className="feedback">
+        <h2>CC-NCALC Feedback</h2>
         <br />
-        Include any difficulties you may have encountered while running the program.
-        <br />
-        <br />
-      </p>
 
-      <p>
-        Note that your inputs will be sent to us along with your feedback, in order to help us troubleshoot.
-        Please delete any personal information that you do not wish to share with us.
-        <span style={{ display: 'none' }}>You can attach a screenshot of your feedback below.</span>
-      </p>
+        <p>
+          Please provide any comments or suggestions that will help us improve the tool.
+          <br />
+          Include any difficulties you may have encountered while running the program.
+          <br />
+          <br />
+        </p>
 
-      <div
-        id="Feedback"
-        contentEditable
-        placeholder="Enter comments here"
-        // eslint-disable-next-line react/no-danger
-        dangerouslySetInnerHTML={{ __html: feedback }}
-        onBlur={(e) => dispatch(set.feedback(e.currentTarget.innerText.replace(/[\n\r]/g, '<br>')))}
-      />
+        <p>
+          Note that your inputs will be sent to us along with your feedback, in order to help us troubleshoot.
+          Please delete any personal information that you do not wish to share with us.
+          <span style={{ display: 'none' }}>You can attach a screenshot of your feedback below.</span>
+        </p>
 
-      <div>
-        <p>Name</p>
-        <Input id="name" />
+        <div
+          id="Feedback"
+          contentEditable
+          placeholder="Enter comments here"
+          // eslint-disable-next-line react/no-danger
+          dangerouslySetInnerHTML={{ __html: feedback }}
+          onBlur={(e) => dispatch(set.feedback(e.currentTarget.innerText.replace(/[\n\r]/g, '<br>')))}
+        />
 
-        <p>Email</p>
-        <Input type="email" id="email" />
-
-        <br />
-        <br />
         <div>
-          <Button
-            variant="contained"
-            onClick={(e) => submit(e)}
-          >
-            Submit
-          </Button>
+          <p>Name</p>
+          <Input id="name" />
+
+          <p>Email</p>
+          <Input type="email" id="email" />
+
+          <br />
+          <br />
+          <div>
+            <Button
+              variant="contained"
+              onClick={(e) => submit(e)}
+            >
+              Submit
+            </Button>
+          </div>
         </div>
       </div>
-    </div>
+    </Modal>
   );
 }; // Feedback
 
