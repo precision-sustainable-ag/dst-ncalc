@@ -9,6 +9,7 @@ import Paper from '@mui/material/Paper';
 import Typography from '@mui/material/Typography';
 import LensIcon from '@mui/icons-material/Lens';
 import { ThemeProvider, createTheme } from '@mui/material/styles';
+import CancelPresentationIcon from '@mui/icons-material/CancelPresentation';
 import { get, set } from '../../store/Store';
 
 const theme = createTheme({
@@ -16,13 +17,13 @@ const theme = createTheme({
     allVariants: {
       fontFamily: 'IBM Plex Sans',
       textTransform: 'none',
-      // fontSize: 16,
+      fontSize: '1rem',
     },
   },
 });
 
 const BullettedText = ({ children }) => (
-  <ListItem sx={{ m: 0, p: 0, paddingBottom: '0.2rem' }}>
+  <ListItem sx={{ m: 0, p: 0, paddingBottom: '0.2rem', paddingLeft: '1rem' }}>
     <ListItemIcon sx={{ minWidth: '1rem' }}>
       <LensIcon sx={{ fontSize: '0.5rem' }} />
     </ListItemIcon>
@@ -54,13 +55,31 @@ const About = () => {
         <ThemeProvider theme={theme}>
           <Box
             sx={{
-              padding: '3rem 2rem',
+              padding: '2rem 2rem',
               maxHeight: '90vh',
               overflow: 'auto',
               fontFamily: 'monospace !important',
             }}
           >
-            <Typography sx={{ paddingBottom: '1rem' }} id="modal-modal-title" variant="h5" component="h2">
+            <Box
+              sx={{
+                position: 'absolute',
+                top: '5%',
+                right: 0,
+                display: 'flex',
+                flexDirection: 'row',
+                minWidth: '100%',
+                justifyContent: 'flex-end',
+                maxHeight: 'auto',
+                p: 0,
+                m: 0,
+              }}
+            >
+              <Button size="small" onClick={handleCloseModal}>
+                <CancelPresentationIcon sx={{ fontSize: '2rem' }} />
+              </Button>
+            </Box>
+            <Typography sx={{ paddingBottom: '1rem', fontSize: '1.2rem', fontWeight: 700 }} id="modal-modal-title" variant="h5" component="h2">
               CC-NCALC estimates:
             </Typography>
             <List sx={{ p: 0 }}>
@@ -85,7 +104,7 @@ const About = () => {
                 </Typography>
               </BullettedText>
             </List>
-            <Typography sx={{ paddingY: '1rem' }} id="modal-modal-title" variant="h5" component="h2">
+            <Typography sx={{ paddingY: '1rem', fontSize: '1.2rem', fontWeight: 700 }} id="modal-modal-title" variant="h5" component="h2">
               Background:
             </Typography>
             <Typography id="modal-modal-title" variant="body1" component="h2">
@@ -103,7 +122,7 @@ const About = () => {
               Depending on residue placement, the calculator uses soil moisture and soil temperature (for incorporated residues) or residue water
               potential and air temperature (for surface residues) to adjust decomposition rates.
             </Typography>
-            <Typography sx={{ paddingY: '1rem' }} id="modal-modal-title" variant="h5" component="h2">
+            <Typography sx={{ paddingY: '1rem', fontSize: '1.2rem', fontWeight: 700 }} id="modal-modal-title" variant="h5" component="h2">
               Input data requirements:
             </Typography>
             <Typography sx={{ paddingBottom: '0.7rem' }} id="modal-modal-title" variant="body1" component="h2">

@@ -49,7 +49,7 @@ const Home = () => {
       <Box sx={{ height: 60 }} />
       <Stack spacing={2} direction="column">
         <Stack justifyContent="space-around" alignItems="center" sx={{ flexDirection: { sm: 'column', md: 'row' } }}>
-          <Typography variant="h6"> Please select biomass calculation method </Typography>
+          <Typography variant="h6"> Select biomass calculation method </Typography>
           <ToggleButtonGroup
             color="primary"
             value={biomassCalcMode}
