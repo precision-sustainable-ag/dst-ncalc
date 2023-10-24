@@ -385,7 +385,7 @@ const Output = () => {
             color: '#008837',
           },
         },
-        min: 0,
+        min: Math.min(0, ...surfaceData.map((s) => s.y)),
         endOnTick: false,
         minorTicks: true,
         lineWidth: 3,
@@ -624,7 +624,8 @@ const Output = () => {
     ],
   }; // residueGraph
 
-  const cols = ['FOM', 'Carb', 'Cell', 'Lign', 'FON', 'CarbN', 'CellN', 'LigninN', 'RMTFAC', 'CNRF', 'ContactFactor', 'Rain', 'Temp', 'RH', 'Air_MPa', 'LitterMPa'];
+  // const cols = ['FOM', 'Carb', 'Cell', 'Lign', 'FON', 'CarbN', 'CellN', 'LigninN', 'RMTFAC', 'CNRF', 'ContactFactor', 'Rain', 'Temp', 'RH', 'Air_MPa', 'LitterMPa', 'MinNfromFOM'];
+  const cols = Object.keys(model.s).sort();
 
   const csv = `Date,${cols}\n${dates.map((dt, i) => `${dt},${cols.map((col) => model.s[col][i])}`).join('\n')}`;
 
