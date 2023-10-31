@@ -1,9 +1,10 @@
 /* eslint-disable no-console */
-import React from 'react';
+import React, { useEffect } from 'react';
 import {
   // useDispatch,
   useSelector,
 } from 'react-redux';
+import { useLocation } from 'react-router-dom';
 
 import ResponsiveNavBar from './components/ResponsiveNavBar';
 import Body from './components/Body';
@@ -12,8 +13,7 @@ import './App.scss';
 import 'react-datepicker/dist/react-datepicker.css';
 
 import { get } from './store/Store';
-import Feedback from './components/Feedback';
-import { Box, Modal, Typography } from '@mui/material';
+import clip from './background_horizontal.mp4';
 
 // import Help from './shared/Help';
 
@@ -58,7 +58,7 @@ console.warn = (msg, ...subst) => {
 
 const App = () => {
   // const dispatch = useDispatch();
-  // const navigate = useNavigate();
+  const location = useLocation();
   // eslint-disable-next-line no-unused-vars
   // const [navModalOpen, setNavModalOpen] = useState(false);
   // const [navBarActive, setNavBarActive] = useState('');
@@ -66,14 +66,26 @@ const App = () => {
 
   useSelector(get.screen); // force render
 
-  // const handleNavBarChange = (event, newValue) => {
-  //   if (newValue) {
-  //     setNavBarActive(newValue);
-  //   }
-  // };
+  useEffect(() => {
+    const elem = document.querySelector('#video');
+    if (elem) {
+      elem.playbackRate = 0.7;
+    }
+  }, []);
+
+  console.log('location', location);
 
   return (
     <div id="Main">
+      {location ? (location.pathname === '/' || location.pathname === '/home')
+        && (
+          <div id="background-video">
+            <video id="video" autoPlay muted loop>
+              <source src={clip} type="video/mp4" />
+            </video>
+          </div>
+        ) : null}
+      {/* <div className="background-poster" /> */}
       <ResponsiveNavBar screens={screens} />
       <Body screens={screens} />
     </div>

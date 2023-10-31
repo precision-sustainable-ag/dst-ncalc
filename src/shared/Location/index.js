@@ -1,10 +1,11 @@
 import React from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import Typography from '@mui/material/Typography';
 import Accordion from '@mui/material/Accordion';
 import AccordionSummary from '@mui/material/AccordionSummary';
 import AccordionDetails from '@mui/material/AccordionDetails';
 import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
+import { Box, Button, Paper } from '@mui/material';
 import Map from '../Map';
 import Input from '../Inputs';
 import Biomass from '../Biomass';
@@ -12,10 +13,12 @@ import Help from '../Help';
 
 import './styles.scss';
 
-const Location = () => (
-  <div className="locationWrapper">
-    <div className="mapHeader">
-      <div className="mapHeaderText">
+const Location = () => {
+  const navigate = useNavigate();
+
+  return (
+    <Box sx={{ width: { xs: '95%', sm: '90%', lg: '70%' } }}>
+      <Box sx={{ marginBottom: '2rem' }}>
         <Accordion defaultExpanded>
           <AccordionSummary
             expandIcon={<ExpandMoreIcon />}
@@ -63,40 +66,42 @@ const Location = () => (
             </div>
           </AccordionDetails>
         </Accordion>
-      </div>
-
-      <div>
+      </Box>
+      <Paper mt={0}>
         <Biomass />
-      </div>
-    </div>
-    <div
-      style={{
-        justifyContent: 'center',
+      </Paper>
+      <Box sx={{ margin: '2rem 0rem' }}>
+        <Paper sx={{ padding: '1rem' }}>
+          <Map />
+        </Paper>
+      </Box>
+      <Box sx={{
+        justifyContent: 'space-around',
+        alignItems: 'space-between',
+        width: '100%',
         display: 'flex',
-        flexDirection: 'column',
-        alignItems: 'center',
+        flexDirection: 'row',
       }}
-    >
-      <div className="map">
-        <Map />
-      </div>
-      <div
-        style={{
-          justifyContent: 'space-evenly',
-          display: 'flex',
-          alignItems: 'center',
-          width: '100%',
-        }}
       >
-        <Link className="link" to="/home">
+        <Button
+          sx={{ borderRadius: '1rem', fontSize: '22px', fontWeight: 900 }}
+          onClick={() => navigate('/home')}
+          variant="contained"
+          color="success"
+        >
           BACK
-        </Link>
-        <Link className="link" to="/soil">
+        </Button>
+        <Button
+          sx={{ borderRadius: '1rem', fontSize: '22px', fontWeight: 900 }}
+          onClick={() => navigate('/soil')}
+          variant="contained"
+          color="success"
+        >
           NEXT
-        </Link>
-      </div>
-    </div>
-  </div>
-); // Location
+        </Button>
+      </Box>
+    </Box>
+  );
+}; // Location
 
 export default Location;

@@ -6,6 +6,7 @@ import { NcalcMap } from '@psa/dst.ui.ncalc-map';
 import { get, set } from '../../store/Store';
 
 import './styles.scss';
+import { Paper } from '@mui/material';
 // eslint-disable-next-line import/no-webpack-loader-syntax, import/no-unresolved
 mapboxgl.workerClass = require('worker-loader!mapbox-gl/dist/mapbox-gl-csp-worker').default;
 
@@ -53,7 +54,7 @@ const MapComp = () => {
   }, [zoom]);
 
   return (
-    <div className="map">
+    <Paper>
       <NcalcMap
         setAddress={setAddress}
         setFeatures={setFeatures}
@@ -86,7 +87,7 @@ const MapComp = () => {
         doubleClickZoom={false}
         touchZoomRotate
       />
-    </div>
+    </Paper>
   );
 };
 

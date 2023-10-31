@@ -4,7 +4,7 @@ import { useDispatch, useSelector } from 'react-redux';
 import {
   Box, Button, Card, Stack, ToggleButton, ToggleButtonGroup, Typography,
 } from '@mui/material';
-
+import { Link, useNavigate } from 'react-router-dom';
 import { get, set } from '../../store/Store';
 
 const Home = () => {
@@ -22,6 +22,7 @@ const Home = () => {
     dispatch(set.biomassCalcMode(newValue));
   };
 
+  const navigate = useNavigate();
   // const className = privacy ? 'home background' : 'home';
 
   return (
@@ -88,7 +89,13 @@ const Home = () => {
         {/* <Button sx={{ fontSize: '24px', fontWeight: 900 }} variant="contained" color="success">
           About
         </Button> */}
-        <Button sx={{ fontSize: '24px', fontWeight: 900 }} variant="contained" color="success">
+
+        <Button
+          sx={{ fontSize: '24px', fontWeight: 900 }}
+          onClick={() => navigate('/location')}
+          variant="contained"
+          color="success"
+        >
           Get Started
         </Button>
       </Stack>

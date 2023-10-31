@@ -1,7 +1,7 @@
 import React from 'react';
 import { useDispatch, useSelector } from 'react-redux';
-import { Link } from 'react-router-dom';
-import { Radio, RadioGroup, FormControlLabel } from '@mui/material';
+import { useNavigate } from 'react-router-dom';
+import { Radio, RadioGroup, FormControlLabel, Button, Box, Typography } from '@mui/material';
 
 import { get, set } from '../../store/Store';
 import Input from '../../shared/Inputs';
@@ -53,6 +53,7 @@ const CoverCrop1 = () => {
   const unit = useSelector(get.unit);
   const freshBiomass = useSelector(get.freshBiomass);
   const species = useSelector(get.species);
+  const navigate = useNavigate();
 
   if (!species.Grass) {
     return '';
@@ -68,7 +69,7 @@ const CoverCrop1 = () => {
   }
 
   return (
-    <div
+    <Box
       style={{
         justifyContent: 'center',
         display: 'flex',
@@ -78,9 +79,18 @@ const CoverCrop1 = () => {
         borderRadius: '1rem',
       }}
     >
-      <div className="cover-crop-div">
-        <h1>Tell us about your Cover Crop</h1>
-        <div className="inputs">
+      <Box
+        style={{
+          display: 'flex',
+          flexDirection: 'column',
+          alignItems: 'center',
+          backgroundColor: '#fff',
+          padding: '1rem',
+          borderRadius: '1rem',
+        }}
+      >
+        <Typography variant="h4">Tell us about your Cover Crop</Typography>
+        <Box className="inputs">
           <p>Cover Crop Species:</p>
           <CoverCrops />
 
@@ -88,7 +98,7 @@ const CoverCrop1 = () => {
           <Input type="date" id="killDate" />
 
           <p />
-          <div>
+          <Box>
             Dry Biomass
             <Help>
               <p>The amount of cover crop biomass on a dry weight basis.</p>
@@ -114,7 +124,7 @@ const CoverCrop1 = () => {
                 label="kg/ha"
               />
             </RadioGroup>
-          </div>
+          </Box>
 
           <Myslider
             id="biomass"
@@ -124,13 +134,13 @@ const CoverCrop1 = () => {
 
           {+biomass > +max
             && (
-            <p className="warning">
-              This biomass seems too high
-              {warningText}
-              .
-              <br />
-              Please make sure the biomass entered is on a dry matter basis.
-            </p>
+              <p className="warning">
+                This biomass seems too high
+                {warningText}
+                .
+                <br />
+                Please make sure the biomass entered is on a dry matter basis.
+              </p>
             )}
 
           <br />
@@ -154,13 +164,13 @@ const CoverCrop1 = () => {
 
           {+freshBiomass > +freshMax
             && (
-            <p className="warning">
-              This biomass seems too high
-              {warningText}
-              .
-              <br />
-              Please make sure the biomass entered is on a fresh matter basis.
-            </p>
+              <p className="warning">
+                This biomass seems too high
+                {warningText}
+                .
+                <br />
+                Please make sure the biomass entered is on a fresh matter basis.
+              </p>
             )}
 
           <div style={{ marginTop: '2rem' }}>
@@ -177,19 +187,42 @@ const CoverCrop1 = () => {
             max={10}
             step={0.1}
           />
-        </div>
+        </Box>
 
-        <div className="bn">
-          <Link className="link" to="/soil">BACK</Link>
-          <Link className="link" to="/covercrop2">NEXT</Link>
-        </div>
-      </div>
-    </div>
+        <Box sx={{
+          justifyContent: 'space-around',
+          alignItems: 'space-between',
+          width: '100%',
+          display: 'flex',
+          flexDirection: 'row',
+          marginTop: '4rem',
+        }}
+        >
+          <Button
+            sx={{ borderRadius: '1rem', fontSize: '22px', fontWeight: 900 }}
+            onClick={() => navigate('/location')}
+            variant="contained"
+            color="success"
+          >
+            BACK
+          </Button>
+          <Button
+            sx={{ borderRadius: '1rem', fontSize: '22px', fontWeight: 900 }}
+            onClick={() => navigate('/covercrop')}
+            variant="contained"
+            color="success"
+          >
+            NEXT
+          </Button>
+        </Box>
+      </Box>
+    </Box>
   );
 }; // CoverCrop1
 
 const CoverCrop2 = () => {
   const N = useSelector(get.N);
+  const navigate = useNavigate();
 
   return (
     <div
@@ -280,10 +313,31 @@ const CoverCrop2 = () => {
           />
         </div>
       </div>
-      <div className="bn">
-        <Link className="link" to="/covercrop">BACK</Link>
-        <Link className="link" to="/cashcrop">NEXT</Link>
-      </div>
+      <Box sx={{
+        justifyContent: 'space-around',
+        alignItems: 'space-between',
+        width: '100%',
+        display: 'flex',
+        flexDirection: 'row',
+      }}
+      >
+        <Button
+          sx={{ borderRadius: '1rem', fontSize: '22px', fontWeight: 900 }}
+          onClick={() => navigate('/covercrop')}
+          variant="contained"
+          color="success"
+        >
+          BACK
+        </Button>
+        <Button
+          sx={{ borderRadius: '1rem', fontSize: '22px', fontWeight: 900 }}
+          onClick={() => navigate('/cashcrop')}
+          variant="contained"
+          color="success"
+        >
+          NEXT
+        </Button>
+      </Box>
     </div>
   );
 }; // CoverCrop2
