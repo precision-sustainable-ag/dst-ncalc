@@ -13,8 +13,9 @@ import { Link, useNavigate } from 'react-router-dom';
 import {
   get, set, fetchModel, missingData,
 } from '../../store/Store';
-
+import Map from '../../shared/Map';
 import './styles.scss';
+import { Box, Button, Paper } from '@mui/material';
 
 const params = new URLSearchParams(window.location.search);
 
@@ -234,7 +235,7 @@ const Output = () => {
           radius: 5,
           fillColor: '#008837',
           enabled: (Math.round(i / 24) === nweeks * 7)
-                   || (i === a.length - 1 && nweeks * 7 * 24 >= a.length),
+            || (i === a.length - 1 && nweeks * 7 * 24 >= a.length),
         },
       });
     }
@@ -254,7 +255,7 @@ const Output = () => {
           radius: 5,
           fillColor: '#008837',
           enabled: (i / 24 === nweeks * 7)
-                    || (i === a.length - 1 && nweeks * 7 * 24 >= a.length),
+            || (i === a.length - 1 && nweeks * 7 * 24 >= a.length),
         },
       });
       date.setDate(date.getDate() + 1);
@@ -442,8 +443,7 @@ const Output = () => {
         labels: {
           formatter() {
             const weeks = Math.round((this.value - minDate) / (24 * 3600 * 1000) / 7);
-            return `${Highcharts.dateFormat('%b %e', new Date(this.value))}<br/>${
-              weeks} weeks`;
+            return `${Highcharts.dateFormat('%b %e', new Date(this.value))}<br/>${weeks} weeks`;
           },
           style: {
             fontSize: '13px',
@@ -659,13 +659,13 @@ const Output = () => {
         {
           doIncorporated
           && (
-          <li>
-            {Math.round(incorporatedData[Math.min(nweeks * 7, incorporatedData.length - 1)].y)}
-            {' '}
-            {unit}
-            {' '}
-            for incorporated residues.
-          </li>
+            <li>
+              {Math.round(incorporatedData[Math.min(nweeks * 7, incorporatedData.length - 1)].y)}
+              {' '}
+              {unit}
+              {' '}
+              for incorporated residues.
+            </li>
           )
         }
 
@@ -699,7 +699,7 @@ const Output = () => {
           </button>
         </div>
 
-        <div className="output-table-div">
+        <div className="output-table-div" style={{ paddingBottom: '1rem' }}>
           <table style={{ width: '100%' }}>
             <tbody>
               <tr>
@@ -827,12 +827,42 @@ const Output = () => {
               </tr>
             </tbody>
           </table>
-          <div className="bn">
-            <Link className="link" to="/cashcrop">BACK</Link>
-            <Link className="link" to="/advanced">ADVANCED</Link>
-            <Link className="link" to="/feedback">FEEDBACK</Link>
-          </div>
         </div>
+        <Box mb={8} sx={{ margin: '2rem 0rem' }}>
+          <Paper sx={{ padding: '1rem' }}>
+            <Map />
+          </Paper>
+        </Box>
+        {/* <div className="bn">
+          <Link className="link" to="/cashcrop">BACK</Link>
+          <Link className="link" to="/advanced">ADVANCED</Link>
+          <Link className="link" to="/feedback">FEEDBACK</Link>
+        </div> */}
+        <Box sx={{
+          justifyContent: 'space-around',
+          alignItems: 'space-between',
+          width: '100%',
+          display: 'flex',
+          flexDirection: 'row',
+        }}
+        >
+          <Button
+            sx={{ borderRadius: '1rem', fontSize: '22px', fontWeight: 900 }}
+            onClick={() => navigate('/home')}
+            variant="contained"
+            color="success"
+          >
+            BACK
+          </Button>
+          <Button
+            sx={{ borderRadius: '1rem', fontSize: '22px', fontWeight: 900 }}
+            onClick={() => navigate('/soil')}
+            variant="contained"
+            color="success"
+          >
+            NEXT
+          </Button>
+        </Box>
         <div className="output-table-div-mobile">
           <div
             style={{

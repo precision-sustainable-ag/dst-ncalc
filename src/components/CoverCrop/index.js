@@ -1,12 +1,13 @@
 import React from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { useNavigate } from 'react-router-dom';
-import { Radio, RadioGroup, FormControlLabel, Button, Box, Typography, styled } from '@mui/material';
+import { Radio, RadioGroup, FormControlLabel, Button, Box, Typography, styled, Paper } from '@mui/material';
 
 import { get, set } from '../../store/Store';
 import Input from '../../shared/Inputs';
 import Myslider from '../../shared/Slider';
 import Help from '../../shared/Help';
+import Biomass from '../../shared/Biomass';
 
 const CustomInputText = styled(Typography)({
   fontSize: '1.2rem',
@@ -62,6 +63,7 @@ const CoverCrop1 = () => {
   const freshBiomass = useSelector(get.freshBiomass);
   const species = useSelector(get.species);
   const navigate = useNavigate();
+  const isSatelliteMode = useSelector(get.biomassCalcMode) === 'satellite';
 
   if (!species.Grass) {
     return '';
@@ -111,99 +113,111 @@ const CoverCrop1 = () => {
           <CustomInputText>Cover Crop Species:</CustomInputText>
           <CoverCrops />
 
-          <CustomInputText>Cover Crop Termination Date:</CustomInputText>
-          <Input type="date" id="killDate" />
+          {
+            isSatelliteMode ? (
+              <Paper mt={0}>
+                <Biomass />
+              </Paper>
+            ) : (
+              <>
+                <CustomInputText>Cover Crop Termination Date:</CustomInputText>
+                <Input type="date" id="killDate" />
+              </>
+            )
+          }
+          {isSatelliteMode ? '' : (
+            <>
+              <Box mt={2} sx={{ display: 'flex', flexDirection: 'row', alignItems: 'center' }}>
+                <CustomInputText>Dry Biomass </CustomInputText>
+                <Help>
+                  <p>The amount of cover crop biomass on a dry weight basis.</p>
+                  <p>
+                    For details on cover crop biomass sampling and taking a representative sub-sample for quality analysis, please refer to
+                    <a tabIndex="-1" target="_blank" rel="noreferrer" href="https://extension.uga.edu/publications/detail.html?number=C1077">here</a>
+                    .
+                  </p>
+                </Help>
+                :
 
-          <p />
-          <Box mt={2} sx={{ display: 'flex', flexDirection: 'row', alignItems: 'center' }}>
-            <CustomInputText>Dry Biomass </CustomInputText>
-            <Help>
-              <p>The amount of cover crop biomass on a dry weight basis.</p>
-              <p>
-                For details on cover crop biomass sampling and taking a representative sub-sample for quality analysis, please refer to
-                <a tabIndex="-1" target="_blank" rel="noreferrer" href="https://extension.uga.edu/publications/detail.html?number=C1077">here</a>
-                .
-              </p>
-            </Help>
-            :
+                <RadioGroup row aria-label="position" name="position" style={{ display: 'inline-block', marginLeft: '1em' }}>
+                  <FormControlLabel
+                    value="lb/ac"
+                    control={<Radio id="unit" checked={unit === 'lb/ac'} />}
+                    onChange={() => dispatch(set.unit('lb/ac'))}
+                    label="lb/ac"
+                  />
+                  <FormControlLabel
+                    value="kg/ha"
+                    control={<Radio id="unit" checked={unit === 'kg/ha'} />}
+                    onChange={() => dispatch(set.unit('kg/ha'))}
+                    label="kg/ha"
+                  />
+                </RadioGroup>
+              </Box>
 
-            <RadioGroup row aria-label="position" name="position" style={{ display: 'inline-block', marginLeft: '1em' }}>
-              <FormControlLabel
-                value="lb/ac"
-                control={<Radio id="unit" checked={unit === 'lb/ac'} />}
-                onChange={() => dispatch(set.unit('lb/ac'))}
-                label="lb/ac"
+              <Myslider
+                id="biomass"
+                min={0}
+                max={max}
               />
-              <FormControlLabel
-                value="kg/ha"
-                control={<Radio id="unit" checked={unit === 'kg/ha'} />}
-                onChange={() => dispatch(set.unit('kg/ha'))}
-                label="kg/ha"
+
+              {+biomass > +max
+                && (
+                  <p className="warning">
+                    This biomass seems too high
+                    {warningText}
+                    .
+                    <br />
+                    Please make sure the biomass entered is on a dry matter basis.
+                  </p>
+                )}
+
+              <br />
+              <Box mt={2} sx={{ display: 'flex', flexDirection: 'row', alignItems: 'center' }}>
+                <CustomInputText>Fresh Biomass </CustomInputText>
+                <Help>
+                  <p>The amount of cover crop biomass on a wet weight basis.</p>
+                  <p>
+                    For details on cover crop biomass sampling and taking a representative sub-sample for quality analysis, please refer to
+                    <a tabIndex="-1" target="_blank" rel="noreferrer" href="https://extension.uga.edu/publications/detail.html?number=C1077">here</a>
+                    .
+                  </p>
+                </Help>
+              </Box>
+
+              <Myslider
+                id="freshBiomass"
+                min={0}
+                max={freshMax}
               />
-            </RadioGroup>
-          </Box>
 
-          <Myslider
-            id="biomass"
-            min={0}
-            max={max}
-          />
+              {+freshBiomass > +freshMax
+                && (
+                  <p className="warning">
+                    This biomass seems too high
+                    {warningText}
+                    .
+                    <br />
+                    Please make sure the biomass entered is on a fresh matter basis.
+                  </p>
+                )}
 
-          {+biomass > +max
-            && (
-              <p className="warning">
-                This biomass seems too high
-                {warningText}
-                .
-                <br />
-                Please make sure the biomass entered is on a dry matter basis.
-              </p>
-            )}
-
-          <br />
-          <Box mt={2} sx={{ display: 'flex', flexDirection: 'row', alignItems: 'center' }}>
-            <CustomInputText>Fresh Biomass </CustomInputText>
-            <Help>
-              <p>The amount of cover crop biomass on a wet weight basis.</p>
-              <p>
-                For details on cover crop biomass sampling and taking a representative sub-sample for quality analysis, please refer to
-                <a tabIndex="-1" target="_blank" rel="noreferrer" href="https://extension.uga.edu/publications/detail.html?number=C1077">here</a>
-                .
-              </p>
-            </Help>
-          </Box>
-
-          <Myslider
-            id="freshBiomass"
-            min={0}
-            max={freshMax}
-          />
-
-          {+freshBiomass > +freshMax
-            && (
-              <p className="warning">
-                This biomass seems too high
-                {warningText}
-                .
-                <br />
-                Please make sure the biomass entered is on a fresh matter basis.
-              </p>
-            )}
-
-          <Box mt={6} sx={{ display: 'flex', flexDirection: 'row', alignItems: 'center' }}>
-            <CustomInputText>Cover Crop Water Content at Termination (g water/g dry biomass)</CustomInputText>
-            <Help>
-              <p>Use the following calculation to adjust default values:</p>
-              <p>Cover Crop Water Content = (Total fresh weight - Total dry weight)/(Total dry weight)</p>
-            </Help>
-            :
-          </Box>
-          <Myslider
-            id="lwc"
-            min={0}
-            max={10}
-            step={0.1}
-          />
+              <Box mt={6} sx={{ display: 'flex', flexDirection: 'row', alignItems: 'center' }}>
+                <CustomInputText>Cover Crop Water Content at Termination (g water/g dry biomass)</CustomInputText>
+                <Help>
+                  <p>Use the following calculation to adjust default values:</p>
+                  <p>Cover Crop Water Content = (Total fresh weight - Total dry weight)/(Total dry weight)</p>
+                </Help>
+                :
+              </Box>
+              <Myslider
+                id="lwc"
+                min={0}
+                max={10}
+                step={0.1}
+              />
+            </>
+          )}
         </Box>
         <Box
           sx={{

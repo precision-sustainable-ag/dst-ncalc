@@ -72,13 +72,6 @@ const Location = () => {
           </AccordionDetails>
         </Accordion>
       </Box>
-      {
-        isSatelliteMode && (
-          <Paper mt={0}>
-            <Biomass />
-          </Paper>
-        )
-      }
       <Box sx={{ margin: '2rem 0rem' }}>
         <Paper sx={{ padding: '1rem' }}>
           <Map />
