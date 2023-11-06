@@ -22,9 +22,16 @@ const Soil = () => {
         padding: '1rem',
         borderRadius: '1rem',
         flexDirection: 'column',
+        width: {
+          xs: '100%',
+          sm: '90%',
+          md: '80%',
+          lg: '70%',
+          xl: '60%',
+        },
       }}
     >
-      <Box p={3} mb={3}>
+      <Box p={3} pb={0}>
         <Typography variant="h4">Tell us about your Soil</Typography>
         {gotSSURGO
           ? (
@@ -80,13 +87,15 @@ const Soil = () => {
           </Box>
         </Box>
       </Box>
-      <Box sx={{
-        justifyContent: 'space-around',
-        alignItems: 'space-between',
-        width: '100%',
-        display: 'flex',
-        flexDirection: 'row',
-      }}
+      <Box
+        sx={{
+          justifyContent: 'space-around',
+          alignItems: 'space-between',
+          width: '100%',
+          display: 'flex',
+          flexDirection: 'row',
+        }}
+        mt={6}
       >
         <Button
           sx={{ borderRadius: '1rem', fontSize: '22px', fontWeight: 900 }}

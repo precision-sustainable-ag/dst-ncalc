@@ -1,12 +1,20 @@
 import React from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { useNavigate } from 'react-router-dom';
-import { Radio, RadioGroup, FormControlLabel, Button, Box, Typography } from '@mui/material';
+import { Radio, RadioGroup, FormControlLabel, Button, Box, Typography, styled } from '@mui/material';
 
 import { get, set } from '../../store/Store';
 import Input from '../../shared/Inputs';
 import Myslider from '../../shared/Slider';
 import Help from '../../shared/Help';
+
+const CustomInputText = styled(Typography)({
+  fontSize: '1.2rem',
+  fontWeight: 400,
+  color: '#4f6b14',
+  marginTop: '1.3rem',
+  marginBottom: '0.2rem',
+});
 
 const CoverCrops = () => {
   const species = useSelector(get.species);
@@ -70,13 +78,21 @@ const CoverCrop1 = () => {
 
   return (
     <Box
-      style={{
+      sx={{
         justifyContent: 'center',
         display: 'flex',
         alignItems: 'center',
         backgroundColor: '#fff',
         padding: '1rem',
         borderRadius: '1rem',
+        flexDirection: 'column',
+        width: {
+          xs: '100%',
+          sm: '90%',
+          md: '80%',
+          lg: '70%',
+          xl: '60%',
+        },
       }}
     >
       <Box
@@ -87,19 +103,20 @@ const CoverCrop1 = () => {
           backgroundColor: '#fff',
           padding: '1rem',
           borderRadius: '1rem',
+          width: '100%',
         }}
       >
         <Typography variant="h4">Tell us about your Cover Crop</Typography>
-        <Box className="inputs">
-          <p>Cover Crop Species:</p>
+        <Box mt={2}>
+          <CustomInputText>Cover Crop Species:</CustomInputText>
           <CoverCrops />
 
-          <p>Cover Crop Termination Date:</p>
+          <CustomInputText>Cover Crop Termination Date:</CustomInputText>
           <Input type="date" id="killDate" />
 
           <p />
-          <Box>
-            Dry Biomass
+          <Box mt={2} sx={{ display: 'flex', flexDirection: 'row', alignItems: 'center' }}>
+            <CustomInputText>Dry Biomass </CustomInputText>
             <Help>
               <p>The amount of cover crop biomass on a dry weight basis.</p>
               <p>
@@ -144,8 +161,8 @@ const CoverCrop1 = () => {
             )}
 
           <br />
-          <div>
-            Fresh Biomass
+          <Box mt={2} sx={{ display: 'flex', flexDirection: 'row', alignItems: 'center' }}>
+            <CustomInputText>Fresh Biomass </CustomInputText>
             <Help>
               <p>The amount of cover crop biomass on a wet weight basis.</p>
               <p>
@@ -154,7 +171,7 @@ const CoverCrop1 = () => {
                 .
               </p>
             </Help>
-          </div>
+          </Box>
 
           <Myslider
             id="freshBiomass"
@@ -173,14 +190,14 @@ const CoverCrop1 = () => {
               </p>
             )}
 
-          <div style={{ marginTop: '2rem' }}>
-            Cover Crop Water Content at Termination (g water/g dry biomass)
+          <Box mt={6} sx={{ display: 'flex', flexDirection: 'row', alignItems: 'center' }}>
+            <CustomInputText>Cover Crop Water Content at Termination (g water/g dry biomass)</CustomInputText>
             <Help>
               <p>Use the following calculation to adjust default values:</p>
               <p>Cover Crop Water Content = (Total fresh weight - Total dry weight)/(Total dry weight)</p>
             </Help>
             :
-          </div>
+          </Box>
           <Myslider
             id="lwc"
             min={0}
@@ -188,19 +205,19 @@ const CoverCrop1 = () => {
             step={0.1}
           />
         </Box>
-
-        <Box sx={{
-          justifyContent: 'space-around',
-          alignItems: 'space-between',
-          width: '100%',
-          display: 'flex',
-          flexDirection: 'row',
-          marginTop: '4rem',
-        }}
+        <Box
+          sx={{
+            justifyContent: 'space-around',
+            alignItems: 'space-between',
+            width: '100%',
+            display: 'flex',
+            flexDirection: 'row',
+          }}
+          mt={6}
         >
           <Button
             sx={{ borderRadius: '1rem', fontSize: '22px', fontWeight: 900 }}
-            onClick={() => navigate('/location')}
+            onClick={() => navigate('/soil')}
             variant="contained"
             color="success"
           >
@@ -208,7 +225,7 @@ const CoverCrop1 = () => {
           </Button>
           <Button
             sx={{ borderRadius: '1rem', fontSize: '22px', fontWeight: 900 }}
-            onClick={() => navigate('/covercrop')}
+            onClick={() => navigate('/covercrop2')}
             variant="contained"
             color="success"
           >
@@ -225,35 +242,54 @@ const CoverCrop2 = () => {
   const navigate = useNavigate();
 
   return (
-    <div
-      style={{
+    <Box
+      sx={{
         justifyContent: 'center',
         display: 'flex',
         alignItems: 'center',
+        backgroundColor: '#fff',
+        padding: '1rem',
+        borderRadius: '1rem',
+        flexDirection: 'column',
+        width: {
+          xs: '100%',
+          sm: '90%',
+          md: '80%',
+          lg: '70%',
+          xl: '60%',
+        },
       }}
     >
-      <div className="cover-crop-div">
-        <h1>Tell us about your Cover Crop Quality</h1>
-        <div className="inputs">
-          <p>
-            Nitrogen (%)
+      <Box
+        style={{
+          display: 'flex',
+          flexDirection: 'column',
+          alignItems: 'center',
+          backgroundColor: '#fff',
+          padding: '1rem',
+          borderRadius: '1rem',
+          width: '100%',
+        }}
+      >
+        <Typography variant="h4">Tell us about your Cover Crop Quality</Typography>
+
+        <Box sx={{ width: '90%' }}>
+          <Box mt={2} sx={{ display: 'flex', flexDirection: 'row', alignItems: 'center' }}>
+            <CustomInputText>Nitrogen (%)</CustomInputText>
             <Help>
               Cover crop nitrogen concentration based on lab results.
             </Help>
             :
-          </p>
+          </Box>
           <Myslider
             id="N"
             min={0}
             max={6}
             step={0.1}
           />
-          <p />
-          <hr />
           {N ? <p className="note">Adjust default values below based on lab results.</p> : ''}
-          <p />
-          <div>
-            Carbohydrates (%)
+          <Box mt={2} sx={{ display: 'flex', flexDirection: 'row', alignItems: 'center' }}>
+            <CustomInputText>Carbohydrates (%)</CustomInputText>
             <Help>
               <p>
                 Non-structural labile carbohydrate concentration based on lab results. This represents the most
@@ -264,18 +300,15 @@ const CoverCrop2 = () => {
               <p>carbohydrates (%) = % crude protein (CP) + % fat + % non-fibrous carbohydrates (NFC)</p>
             </Help>
             :
-          </div>
-          <p />
+          </Box>
           <Myslider
             id="carb"
             min={20}
             max={70}
             step={0.1}
           />
-
-          <p />
-          <div>
-            Holo-cellulose (%)
+          <Box mt={2} sx={{ display: 'flex', flexDirection: 'row', alignItems: 'center' }}>
+            <CustomInputText>Holo-cellulose (%)</CustomInputText>
             <Help>
               <p>
                 Structural holo-cellulose (i.e., both cellulose and hemi-cellulose) concentration
@@ -286,59 +319,57 @@ const CoverCrop2 = () => {
               <p>holo-cellulose (%) = % neutral detergent fiber (NDF) – (% lignin + % ash)</p>
             </Help>
             :
-          </div>
-          <p />
+          </Box>
           <Myslider
             id="cell"
             min={20}
             max={70}
             step={0.1}
           />
-
-          <p />
-          <div>
-            Lignin (%)
+          <Box mt={2} sx={{ display: 'flex', flexDirection: 'row', alignItems: 'center' }}>
+            <CustomInputText>Lignin (%)</CustomInputText>
             <Help>
               <p>Structural lignin concentration based on lab results. This represents the most recalcitrant C constituents in plant materials.</p>
               <p>The default value is based on the nitrogen concentration.</p>
             </Help>
             :
-          </div>
-          <p />
+          </Box>
           <Myslider
             id="lign"
             min={1}
             max={10}
             step={0.1}
           />
-        </div>
-      </div>
-      <Box sx={{
-        justifyContent: 'space-around',
-        alignItems: 'space-between',
-        width: '100%',
-        display: 'flex',
-        flexDirection: 'row',
-      }}
-      >
-        <Button
-          sx={{ borderRadius: '1rem', fontSize: '22px', fontWeight: 900 }}
-          onClick={() => navigate('/covercrop')}
-          variant="contained"
-          color="success"
+        </Box>
+        <Box
+          sx={{
+            justifyContent: 'space-around',
+            alignItems: 'space-between',
+            width: '100%',
+            display: 'flex',
+            flexDirection: 'row',
+          }}
+          mt={6}
         >
-          BACK
-        </Button>
-        <Button
-          sx={{ borderRadius: '1rem', fontSize: '22px', fontWeight: 900 }}
-          onClick={() => navigate('/cashcrop')}
-          variant="contained"
-          color="success"
-        >
-          NEXT
-        </Button>
+          <Button
+            sx={{ borderRadius: '1rem', fontSize: '22px', fontWeight: 900 }}
+            onClick={() => navigate('/covercrop')}
+            variant="contained"
+            color="success"
+          >
+            BACK
+          </Button>
+          <Button
+            sx={{ borderRadius: '1rem', fontSize: '22px', fontWeight: 900 }}
+            onClick={() => navigate('/cashcrop')}
+            variant="contained"
+            color="success"
+          >
+            NEXT
+          </Button>
+        </Box>
       </Box>
-    </div>
+    </Box>
   );
 }; // CoverCrop2
 

@@ -1,20 +1,25 @@
 import React from 'react';
-import { Link, useNavigate } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
 import Typography from '@mui/material/Typography';
 import Accordion from '@mui/material/Accordion';
 import AccordionSummary from '@mui/material/AccordionSummary';
 import AccordionDetails from '@mui/material/AccordionDetails';
 import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
 import { Box, Button, Paper } from '@mui/material';
+import { useSelector } from 'react-redux';
 import Map from '../Map';
 import Input from '../Inputs';
 import Biomass from '../Biomass';
 import Help from '../Help';
+import {
+  get,
+} from '../../store/Store';
 
 import './styles.scss';
 
 const Location = () => {
   const navigate = useNavigate();
+  const isSatelliteMode = useSelector(get.biomassCalcMode) === 'satellite';
 
   return (
     <Box sx={{ width: { xs: '95%', sm: '90%', lg: '70%' } }}>
@@ -67,9 +72,13 @@ const Location = () => {
           </AccordionDetails>
         </Accordion>
       </Box>
-      <Paper mt={0}>
-        <Biomass />
-      </Paper>
+      {
+        isSatelliteMode && (
+          <Paper mt={0}>
+            <Biomass />
+          </Paper>
+        )
+      }
       <Box sx={{ margin: '2rem 0rem' }}>
         <Paper sx={{ padding: '1rem' }}>
           <Map />

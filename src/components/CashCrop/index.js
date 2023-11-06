@@ -1,12 +1,21 @@
 import React from 'react';
 import { useSelector } from 'react-redux';
-import { Link } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
 
 import { get } from '../../store/Store';
 
 import Myslider from '../../shared/Slider';
 import Input from '../../shared/Inputs';
 import Help from '../../shared/Help';
+import { Box, Button, Typography, styled } from '@mui/material';
+
+const CustomInputText = styled(Typography)({
+  fontSize: '1.2rem',
+  fontWeight: 400,
+  color: '#4f6b14',
+  marginTop: '1.3rem',
+  marginBottom: '0.2rem',
+});
 
 const CashCrops = () => {
   const crops = [
@@ -307,61 +316,104 @@ const CashCrops = () => {
 const CashCrop = () => {
   const unit = useSelector(get.unit);
   const cashCrop = useSelector(get.cashCrop);
+  const navigate = useNavigate();
 
   return (
-    <div
-      style={{
+    <Box
+      sx={{
         justifyContent: 'center',
         display: 'flex',
         alignItems: 'center',
         backgroundColor: '#fff',
         padding: '1rem',
         borderRadius: '1rem',
+        flexDirection: 'column',
+        width: {
+          xs: '100%',
+          sm: '90%',
+          md: '80%',
+          lg: '70%',
+          xl: '60%',
+        },
       }}
     >
-      <div style={{ marginBottom: '150px' }}>
-        <h1>Tell us about your Cash Crop</h1>
-        <div className="inputs">
-          <p>Cash Crop:</p>
+      <Box
+        style={{
+          display: 'flex',
+          flexDirection: 'column',
+          alignItems: 'center',
+          backgroundColor: '#fff',
+          padding: '1rem',
+          borderRadius: '1rem',
+          width: '100%',
+        }}
+      >
+        <Typography variant="h4">Tell us about your Cash Crop</Typography>
+        <Box mt={2}>
+          <CustomInputText>Cash Crop: </CustomInputText>
           <CashCrops />
 
-          <p>Cash Crop Planting Date:</p>
+          <CustomInputText>Cash Crop Planting Date: </CustomInputText>
           <Input type="date" id="plantingDate" />
 
           {cashCrop === 'Corn'
             && (
-            <>
-              <p>Yield Goal (bu/ac):</p>
-              <Myslider
-                id="yield"
-                min={0}
-                max={300}
-              />
-            </>
+              <Box mt={2}>
+                <CustomInputText>Yield Goal (bu/ac):</CustomInputText>
+                <Myslider
+                  id="yield"
+                  min={0}
+                  max={300}
+                />
+              </Box>
             )}
 
-          <p>
-            What is your Target Nitrogen Fertilizer Rate? (
-            {unit}
-            ):
+          <Box mt={2} sx={{ display: 'flex', flexDirection: 'row', alignItems: 'center' }}>
+            <CustomInputText>
+              What is your Target Nitrogen Fertilizer Rate? (
+              {unit}
+              ):
+            </CustomInputText>
             <Help>
               Please specify the target N rate for your region.
             </Help>
-          </p>
+          </Box>
 
           <Myslider
             id="targetN"
             min={0}
             max={300}
           />
-        </div>
-      </div>
-
-      <div className="bn">
-        <Link className="link" to="/covercrop2">BACK</Link>
-        <Link className="link" to="/output">NEXT</Link>
-      </div>
-    </div>
+          <Box
+            sx={{
+              justifyContent: 'space-around',
+              alignItems: 'space-between',
+              width: '100%',
+              display: 'flex',
+              flexDirection: 'row',
+            }}
+            mt={6}
+          >
+            <Button
+              sx={{ borderRadius: '1rem', fontSize: '22px', fontWeight: 900 }}
+              onClick={() => navigate('/covercrop')}
+              variant="contained"
+              color="success"
+            >
+              BACK
+            </Button>
+            <Button
+              sx={{ borderRadius: '1rem', fontSize: '22px', fontWeight: 900 }}
+              onClick={() => navigate('/output')}
+              variant="contained"
+              color="success"
+            >
+              NEXT
+            </Button>
+          </Box>
+        </Box>
+      </Box>
+    </Box>
   );
 }; // CashCrop
 

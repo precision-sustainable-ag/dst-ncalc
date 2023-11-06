@@ -4,7 +4,7 @@ import { useDispatch, useSelector } from 'react-redux';
 import {
   Box, Button, Card, Stack, ToggleButton, ToggleButtonGroup, Typography,
 } from '@mui/material';
-import { Link, useNavigate } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
 import { get, set } from '../../store/Store';
 
 const Home = () => {
