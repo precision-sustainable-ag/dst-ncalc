@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import {
-  Route, NavLink, Routes, useNavigate,
+  Route, NavLink, Routes, useNavigate, useLocation,
 } from 'react-router-dom';
 import AppBar from '@mui/material/AppBar';
 import Box from '@mui/material/Box';
@@ -73,7 +73,7 @@ const ResponsiveNavBar = ({ screens }) => {
   const [activeMenu, setActiveMenu] = useState('home');
   const [navModalOpen, setNavModalOpen] = useState(false);
 
-  // const navigate = useNavigate();
+  const location = useLocation();
   const dispatch = useDispatch();
 
   const handleOpenNavMenu = (event) => {
@@ -94,9 +94,9 @@ const ResponsiveNavBar = ({ screens }) => {
   };
 
   // // useSelector(get.screen); // force render
-  // useEffect(() => {
-  //   navigate(`/${activeMenu}`);
-  // }, [activeMenu]);
+  useEffect(() => {
+    setActiveMenu(location.pathname.replace('/', '').replace('2', ''));
+  }, [location]);
 
   return (
     <AppBar position="static" elevation={0} sx={{ backgroundColor: 'transparent', marginBottom: '3rem' }}>

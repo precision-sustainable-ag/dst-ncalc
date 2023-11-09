@@ -6,20 +6,20 @@ import AccordionSummary from '@mui/material/AccordionSummary';
 import AccordionDetails from '@mui/material/AccordionDetails';
 import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
 import { Box, Button, Paper } from '@mui/material';
-import { useSelector } from 'react-redux';
+// import { useSelector } from 'react-redux';
 import Map from '../Map';
 import Input from '../Inputs';
-import Biomass from '../Biomass';
+// import Biomass from '../Biomass';
 import Help from '../Help';
-import {
-  get,
-} from '../../store/Store';
+// import {
+//   get,
+// } from '../../store/Store';
 
 import './styles.scss';
 
 const Location = () => {
   const navigate = useNavigate();
-  const isSatelliteMode = useSelector(get.biomassCalcMode) === 'satellite';
+  // const isSatelliteMode = useSelector(get.biomassCalcMode) === 'satellite';
 
   return (
     <Box sx={{ width: { xs: '95%', sm: '90%', lg: '70%' } }}>

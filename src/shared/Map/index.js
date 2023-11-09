@@ -2,11 +2,11 @@ import React, { useState, useEffect } from 'react';
 import mapboxgl from 'mapbox-gl';
 import { useSelector, useDispatch } from 'react-redux';
 import { NcalcMap } from '@psa/dst.ui.ncalc-map';
+import { Paper } from '@mui/material';
 // import { NcalcMap } from './mock/ncalc-map';
 import { get, set } from '../../store/Store';
 
 import './styles.scss';
-import { Paper } from '@mui/material';
 // eslint-disable-next-line import/no-webpack-loader-syntax, import/no-unresolved
 mapboxgl.workerClass = require('worker-loader!mapbox-gl/dist/mapbox-gl-csp-worker').default;
 
