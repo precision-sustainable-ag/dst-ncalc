@@ -16,10 +16,6 @@ import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
 import Box from '@mui/material/Box';
 import Button from '@mui/material/Button';
 import LinearProgress from '@mui/material/LinearProgress';
-import InputLabel from '@mui/material/InputLabel';
-import MenuItem from '@mui/material/MenuItem';
-import FormControl from '@mui/material/FormControl';
-import Select from '@mui/material/Select';
 import DateBox from '../DateBox';
 import { get, set } from '../../store/Store';
 
@@ -36,11 +32,9 @@ const Biomass = () => {
   const [taskId, setTaskId] = useState(null);
   const [taskIsDone, setTaskIsDone] = useState(false);
   const [taskIsFailed, setTaskIsFailed] = useState(false);
-  const crop = useSelector(get.biomassCropType);
   const mapPolygon = useSelector(get.mapPolygon);
   const biomassPlantDate = useSelector(get.biomassPlantDate);
   const biomassTerminationDate = useSelector(get.biomassTerminationDate);
-  // const biomassTaskResults = useSelector(get.biomassTaskResults);
   const biomassTotalValue = useSelector(get.biomassTotalValue);
   const dispatch = useDispatch();
 
@@ -55,6 +49,17 @@ const Biomass = () => {
       dispatch(set.biomassTaskResults(rasterObject));
     }
   }, [data]);
+
+  useEffect(() => {
+    dispatch(set.plantingDate(biomassPlantDate));
+    dispatch(set.killDate(biomassTerminationDate));
+  }, [biomassPlantDate, biomassTerminationDate]);
+
+  useEffect(() => {
+    if (biomassTotalValue) {
+      dispatch(set.biomass(biomassTotalValue));
+    }
+  }, [biomassTotalValue]);
 
   const handleButton = () => {
     dispatch(set.biomassTaskResults({}));
@@ -206,29 +211,10 @@ const Biomass = () => {
           </AccordionSummary>
           <AccordionDetails>
             <Typography variant="h8" gutterBottom>
-              Specify your field&apos;s boundary on the map using the drawing tool and input your
+              Having already specified your field&apos;s boundary on the map using the drawing tool, input your
               planting date and crop type in the boxes below.
             </Typography>
             <div className="biomassControlWrapper">
-              <div className="biomassDate">
-                <div className="biomassItemText">Type of Crop</div>
-                <Box sx={{ minWidth: 120 }}>
-                  <FormControl fullWidth>
-                    <InputLabel id="demo-simple-select-label">Crop</InputLabel>
-                    <Select
-                      labelId="demo-simple-select-label"
-                      label="Crop"
-                      id="demo-simple-select"
-                      value={crop}
-                      onChange={handleChange}
-                    >
-                      <MenuItem value="Wheat">Wheat</MenuItem>
-                      <MenuItem value="Bean">Bean</MenuItem>
-                      <MenuItem value="Grass">Grass</MenuItem>
-                    </Select>
-                  </FormControl>
-                </Box>
-              </div>
               <DateBox />
               <div className="biomassButton">
                 <Button
@@ -246,7 +232,7 @@ const Biomass = () => {
                 )}
               </div>
               <div className="biomassResults">
-                <div className="biomassItemText">Average Biomass</div>
+                <div className="biomassItemText">Average Dry Biomass</div>
                 {biomassTotalValue && (
                   <Box sx={{ border: 1 }}>
                     <div>

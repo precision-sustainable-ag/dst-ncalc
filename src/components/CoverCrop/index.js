@@ -62,6 +62,7 @@ const CoverCrop1 = () => {
   const unit = useSelector(get.unit);
   const freshBiomass = useSelector(get.freshBiomass);
   const species = useSelector(get.species);
+  const biomassTotalValue = useSelector(get.biomassTotalValue);
   const navigate = useNavigate();
   const isSatelliteMode = useSelector(get.biomassCalcMode) === 'satellite';
 
@@ -242,6 +243,8 @@ const CoverCrop1 = () => {
             onClick={() => navigate('/covercrop2')}
             variant="contained"
             color="success"
+            // eslint-disable-next-line no-unneeded-ternary
+            disabled={biomassTotalValue ? false : true}
           >
             NEXT
           </Button>

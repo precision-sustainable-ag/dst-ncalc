@@ -2,7 +2,7 @@
 import React from 'react';
 import { useSelector } from 'react-redux';
 import { useNavigate } from 'react-router-dom';
-import { Box, Button, Typography } from '@mui/material';
+import { Box, Button, Stack, Typography } from '@mui/material';
 
 import { get } from '../../store/Store';
 import Myslider from '../../shared/Slider';
@@ -456,8 +456,10 @@ const Soil = () => {
   const ssurgo = useSelector(get.SSURGO);
   const navigate = useNavigate();
   const isSatelliteMode = useSelector(get.biomassCalcMode) === 'satellite';
+
   console.log('gotSSURGO', gotSSURGO);
   console.log('ssurgo', ssurgo);
+
   return (
     <Box
       sx={{
@@ -487,6 +489,45 @@ const Soil = () => {
                   This model will use the NRCS&apos;s Soil Survey
                   Geographic database (SSURGO) soil data from your field to estimate cover crop decompostition
                 </Typography>
+                <Stack direction="row" spacing={6}>
+                  <Stack direction="column" spacing={3}>
+                    <Stack direction="row" spacing={1}>
+                      <Typography variant="h6" my={2}>
+                        Organic Matter (%):
+                      </Typography>
+                    </Stack>
+                    <Stack direction="row" spacing={1}>
+                      <Typography variant="h6" my={2}>
+                        Bulk Density (g/cm
+                        <sup>3</sup>
+                        ):
+                      </Typography>
+                    </Stack>
+                    <Stack direction="row" spacing={1}>
+                      <Typography variant="h6" my={2}>
+                        Soil Inorganic N (ppm or mg/kg):
+                      </Typography>
+                    </Stack>
+                  </Stack>
+                  <Stack direction="column" spacing={3}>
+                    <Stack direction="row" spacing={1}>
+                      <Typography variant="h6" my={2}>
+                        {gotSSURGO && Object.keys(ssurgo).length > 0 && ssurgo[0].om_r}
+                      </Typography>
+                    </Stack>
+                    <Stack direction="row" spacing={1}>
+                      <Typography variant="h6" my={2}>
+                        {gotSSURGO && Object.keys(ssurgo).length > 0 && ssurgo[0].dbthirdbar_r}
+                      </Typography>
+                    </Stack>
+                    <Stack direction="row" spacing={1}>
+                      <Typography variant="h6" my={2}>
+                        {gotSSURGO && Object.keys(ssurgo).length > 0 && ssurgo[0].InorganicN}
+                      </Typography>
+                    </Stack>
+                  </Stack>
+                </Stack>
+
               </Box>
             ) : (
               <Box>
@@ -500,7 +541,11 @@ const Soil = () => {
               </Box>
             )
           )
-          : ''}
+          : (
+            <Typography variant="h6" my={6}>
+              LOADING FROM SSURGO SERVER ...
+            </Typography>
+          )}
 
         {!isSatelliteMode && (
           <Box sx={{ color: '#4f6b14' }}>

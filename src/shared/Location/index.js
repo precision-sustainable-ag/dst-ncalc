@@ -5,21 +5,20 @@ import Accordion from '@mui/material/Accordion';
 import AccordionSummary from '@mui/material/AccordionSummary';
 import AccordionDetails from '@mui/material/AccordionDetails';
 import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
-import { Box, Button, Paper } from '@mui/material';
-// import { useSelector } from 'react-redux';
+import { Box, Button, Paper, Stack } from '@mui/material';
 import Map from '../Map';
 import Input from '../Inputs';
-// import Biomass from '../Biomass';
 import Help from '../Help';
-// import {
-//   get,
-// } from '../../store/Store';
+import { useSelector } from 'react-redux';
+import {
+  get,
+} from '../../store/Store';
 
 import './styles.scss';
 
 const Location = () => {
   const navigate = useNavigate();
-  // const isSatelliteMode = useSelector(get.biomassCalcMode) === 'satellite';
+  const isSatelliteMode = useSelector(get.biomassCalcMode) === 'satellite';
 
   return (
     <Box sx={{ width: { xs: '95%', sm: '90%', lg: '70%' } }}>
@@ -35,11 +34,20 @@ const Location = () => {
             </Typography>
           </AccordionSummary>
           <AccordionDetails>
-            <Typography variant="h8" gutterBottom>
-              Enter your address or zip code to determine your field&apos;s location. You can then
-              zoom in and click to pinpoint it on the map. If you know your exact coordinates, you
-              can enter them in search bar separated by comma (ex. 37.7, -80.2 ).
-            </Typography>
+            <Stack>
+              <Typography variant="h8" gutterBottom>
+                Enter your address or zip code to determine your field&apos;s location. You can then
+                zoom in and click to pinpoint it on the map. If you know your exact coordinates, you
+                can enter them in search bar separated by comma (ex. 37.7, -80.2 ).
+              </Typography>
+              {
+                isSatelliteMode && (
+                  <Typography variant="h8" gutterBottom pt={1}>
+                    Specify your field&apos;s boundary on the map using the drawing tool.
+                  </Typography>
+                )
+              }
+            </Stack>
             <div className="inputsContainer">
               <Input
                 label="Name your Field (optional)"
