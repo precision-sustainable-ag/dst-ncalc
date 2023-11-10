@@ -16,6 +16,7 @@ import {
 import Map from '../../shared/Map';
 import './styles.scss';
 import { Box, Button, Paper } from '@mui/material';
+import Biomass from '../../shared/Biomass';
 
 const params = new URLSearchParams(window.location.search);
 
@@ -830,6 +831,7 @@ const Output = () => {
         </div>
         <Box mb={8} sx={{ margin: '2rem 0rem' }}>
           <Paper sx={{ padding: '1rem' }}>
+            <Biomass minified />
             <Map />
           </Paper>
         </Box>

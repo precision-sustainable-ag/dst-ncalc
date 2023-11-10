@@ -25,7 +25,7 @@ let interval;
 
 const arrayAverage = (arr) => arr.reduce((p, c) => p + c, 0) / arr.length;
 
-const Biomass = () => {
+const Biomass = ({ minified = false }) => {
   const [loading, setLoading] = useState(false);
   const [errorArea, setErrorArea] = useState(false);
   const [data, setData] = useState(null);
@@ -215,7 +215,7 @@ const Biomass = () => {
               planting date and crop type in the boxes below.
             </Typography>
             <div className="biomassControlWrapper">
-              <DateBox />
+              <DateBox minified={minified} />
               <div className="biomassButton">
                 <Button
                   variant="outlined"
@@ -231,18 +231,20 @@ const Biomass = () => {
                   </div>
                 )}
               </div>
-              <div className="biomassResults">
-                <div className="biomassItemText">Average Dry Biomass</div>
-                {biomassTotalValue && (
-                  <Box sx={{ border: 1 }}>
-                    <div>
-                      {biomassTotalValue}
-                      &nbsp;
-                      Kg/Ha
-                    </div>
-                  </Box>
-                )}
-              </div>
+              {!minified && (
+                <div className="biomassResults">
+                  <div className="biomassItemText">Average Dry Biomass</div>
+                  {biomassTotalValue && (
+                    <Box sx={{ border: 1 }}>
+                      <div>
+                        {biomassTotalValue}
+                        &nbsp;
+                        Kg/Ha
+                      </div>
+                    </Box>
+                  )}
+                </div>
+              )}
             </div>
           </AccordionDetails>
         </Accordion>

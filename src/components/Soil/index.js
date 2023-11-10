@@ -522,7 +522,7 @@ const Soil = () => {
                     </Stack>
                     <Stack direction="row" spacing={1}>
                       <Typography variant="h6" my={2}>
-                        {gotSSURGO && Object.keys(ssurgo).length > 0 && ssurgo[0].InorganicN}
+                        {gotSSURGO && Object.keys(ssurgo).length > 0 && 10}
                       </Typography>
                     </Stack>
                   </Stack>

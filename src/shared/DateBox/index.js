@@ -9,7 +9,7 @@ import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
 import { get, set } from '../../store/Store';
 import './styles.scss';
 
-const DateBox = () => {
+const DateBox = ({ minified = false }) => {
   /// Local States ///
   const [minPlantingDate, setMinPlantingDate] = useState(null);
   const [maxPlantingDate, setMaxPlantingDate] = useState(null);
@@ -50,7 +50,7 @@ const DateBox = () => {
           />
         </LocalizationProvider>
       </div>
-      <div className="datebox">
+      <div className="datebox" style={{ visible: minified ? 'true' : 'false' }}>
         <div className="biomassItemText">Termination Date</div>
         <LocalizationProvider dateAdapter={AdapterDayjs}>
           <DatePicker

@@ -117,7 +117,7 @@ const CoverCrop1 = () => {
           {
             isSatelliteMode ? (
               <Paper mt={0}>
-                <Biomass />
+                <Biomass minified={false} />
               </Paper>
             ) : (
               <>
