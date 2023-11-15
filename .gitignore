@@ -27,3 +27,4 @@ yarn-error.log*
 pnpm-lock.yaml
 
 /src/shared/Map/mock
+/src/shared/Map/response.json

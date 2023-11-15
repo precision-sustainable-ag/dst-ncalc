@@ -5,7 +5,7 @@ import {
   useSelector,
 } from 'react-redux';
 import { useLocation } from 'react-router-dom';
-
+import { ThemeProvider, createTheme } from '@mui/material/styles';
 import ResponsiveNavBar from './components/ResponsiveNavBar';
 import Body from './components/Body';
 
@@ -56,13 +56,24 @@ console.warn = (msg, ...subst) => {
 
 // const Init = screens.init;
 
+const theme = createTheme({
+  typography: {
+    feedback: {
+      fontFamily: 'IBM Plex Sans',
+      textTransform: 'none',
+      fontSize: '1rem',
+    },
+    about: {
+      fontFamily: 'IBM Plex Sans',
+      textTransform: 'none',
+      fontSize: '1rem',
+    },
+  },
+});
+
 const App = () => {
   // const dispatch = useDispatch();
   const location = useLocation();
-  // eslint-disable-next-line no-unused-vars
-  // const [navModalOpen, setNavModalOpen] = useState(false);
-  // const [navBarActive, setNavBarActive] = useState('');
-  // const [value, setValue] = useState(0);
 
   useSelector(get.screen); // force render
 
@@ -73,22 +84,22 @@ const App = () => {
     }
   }, []);
 
-  console.log('location', location);
-
   return (
-    <div id="Main">
-      {location ? (location.pathname === '/' || location.pathname === '/home')
-        && (
-          <div id="background-video">
-            <video id="video" autoPlay muted loop>
-              <source src={clip} type="video/mp4" />
-            </video>
-          </div>
-        ) : null}
-      {/* <div className="background-poster" /> */}
-      <ResponsiveNavBar screens={screens} />
-      <Body screens={screens} />
-    </div>
+    <ThemeProvider theme={theme}>
+      <div id="Main">
+        {location ? (location.pathname === '/' || location.pathname === '/home')
+          && (
+            <div id="background-video">
+              <video id="video" autoPlay muted loop>
+                <source src={clip} type="video/mp4" />
+              </video>
+            </div>
+          ) : null}
+        {/* <div className="background-poster" /> */}
+        <ResponsiveNavBar screens={screens} />
+        <Body screens={screens} />
+      </div>
+    </ThemeProvider>
   );
 }; // App
 

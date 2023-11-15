@@ -2,8 +2,12 @@
 import React from 'react';
 import { useSelector } from 'react-redux';
 import { useNavigate } from 'react-router-dom';
-import { Box, Button, Stack, Typography } from '@mui/material';
-
+import {
+  Box,
+  Button,
+  Stack,
+  Typography,
+} from '@mui/material';
 import { get } from '../../store/Store';
 import Myslider from '../../shared/Slider';
 import Help from '../../shared/Help';
@@ -456,9 +460,6 @@ const Soil = () => {
   const ssurgo = useSelector(get.SSURGO);
   const navigate = useNavigate();
   const isSatelliteMode = useSelector(get.biomassCalcMode) === 'satellite';
-
-  console.log('gotSSURGO', gotSSURGO);
-  console.log('ssurgo', ssurgo);
 
   return (
     <Box

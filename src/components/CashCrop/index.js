@@ -1,13 +1,16 @@
 import React from 'react';
 import { useSelector } from 'react-redux';
 import { useNavigate } from 'react-router-dom';
-
+import {
+  Box,
+  Button,
+  Typography,
+  styled,
+} from '@mui/material';
 import { get } from '../../store/Store';
-
 import Myslider from '../../shared/Slider';
 import Input from '../../shared/Inputs';
 import Help from '../../shared/Help';
-import { Box, Button, Typography, styled } from '@mui/material';
 
 const CustomInputText = styled(Typography)({
   fontSize: '1.2rem',

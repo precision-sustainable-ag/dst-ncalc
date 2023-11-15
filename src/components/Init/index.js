@@ -1,3 +1,4 @@
+/* eslint-disable jsx-a11y/control-has-associated-label */
 /* eslint-disable no-console */
 import React, { useEffect } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
@@ -215,6 +216,7 @@ const Init = ({ desktop, setNavModalOpen }) => {
             onChange={changeField}
             value={field}
           >
+            {/* eslint-disable-next-line */}
             <option>&nbsp;</option>
             {
               myFields.length && (

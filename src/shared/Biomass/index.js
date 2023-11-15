@@ -70,7 +70,6 @@ const Biomass = ({ minified = false }) => {
     // reverse order of vertices
     if (mapPolygon.length > 0) {
       area = 0.000247105 * turf.area(turf.polygon(mapPolygon[0].geometry.coordinates));
-      // console.log('area', area);
     }
 
     if (area > 10000) {
@@ -91,17 +90,16 @@ const Biomass = ({ minified = false }) => {
       const headers = {
         'Content-Type': 'application/json',
       };
-      // console.log('making task request');
       axios
         .post('https://covercrop-imagery.org/tasks', payload, { headers })
         .then((response) => {
-          // console.log('response: ', response);
           if (response.status === 200 && response.data) {
             setTaskId(response.data.task_id);
           }
         })
-        .catch(() => {
-          // console.log(error);
+        .catch((error) => {
+          // eslint-disable-next-line no-console
+          console.log(error);
         });
     }
   };
@@ -138,9 +136,9 @@ const Biomass = ({ minified = false }) => {
     };
   }, [taskId]);
 
-  const handleChange = (event) => {
-    dispatch(set.biomassCropType(event.target.value));
-  };
+  // const handleChange = (event) => {
+  //   dispatch(set.biomassCropType(event.target.value));
+  // };
   return (
     <div className="biomassWrapper">
       <div className="biomassTextWrapper">

@@ -8,14 +8,13 @@ import moment from 'moment';
 import { CSVLink } from 'react-csv';
 import { useDispatch, useSelector } from 'react-redux';
 import CircularProgress from '@mui/material/CircularProgress';
-
+import { Box, Button, Paper } from '@mui/material';
 import { Link, useNavigate } from 'react-router-dom';
 import {
   get, set, fetchModel, missingData,
 } from '../../store/Store';
 import Map from '../../shared/Map';
 import './styles.scss';
-import { Box, Button, Paper } from '@mui/material';
 import Biomass from '../../shared/Biomass';
 
 const params = new URLSearchParams(window.location.search);
@@ -123,10 +122,6 @@ const Output = () => {
     );
   }
 
-  // console.log({
-  //   gotModel, cornN, model, biomass, N, carb, cell, lign, lwc, BD, InorganicN,
-  // });
-
   if (!gotModel || !cornN) {
     return (
       <>
@@ -154,8 +149,6 @@ const Output = () => {
       // delete model.s[key];
     }
   });
-
-  // console.log(model.s);
 
   const total = +carb + +cell + +lign;
   carb = (carb * 100) / total;

@@ -99,7 +99,7 @@ const Home = () => {
           Get Started
         </Button>
       </Stack>
-    </Card >
+    </Card>
   );
 }; // Home
 

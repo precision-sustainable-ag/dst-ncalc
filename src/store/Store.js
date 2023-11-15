@@ -134,13 +134,10 @@ export const fetchModel = () => {
   const {
     lat, lon, N, OM, BD, unit,
   } = state;
-  // console.log({lat, lon, N, biomass, lwc, carb, cell, lign, OM, BD, InorganicN, unit});
 
   const start = moment(state.killDate).format('yyyy-MM-DD');
   const end = moment(state.plantingDate).add(110, 'days').add(1, 'hour').format('yyyy-MM-DD');
   const validDates = start !== 'Invalid date' && end !== 'Invalid date' && end > start;
-
-  // console.log({ start, end }, state.killDate, validDates);
 
   if (validDates) {
     const pmn = 10;
@@ -194,8 +191,6 @@ export const fetchModel = () => {
 
         store.dispatch(set.model(model));
         store.dispatch(set.gotModel(true));
-        // console.log('model');
-        // console.log(data);
 
         fetchCornN(store.getState());
       },
@@ -216,7 +211,7 @@ const fetchSSURGO = (state) => {
     url,
     callback: (data) => {
       if (data.ERROR) {
-        console.log(`No SSURGO data at ${lat}, ${lon}`);
+        // console.log(`No SSURGO data at ${lat}, ${lon}`);
         store.dispatch(set.BD(''));
         store.dispatch(set.OM(''));
       } else {
@@ -250,13 +245,8 @@ const fetchCornN = (state) => {
     url,
     callback: (data) => {
       if (data instanceof Array) {
-        // console.log('CornN:');
-        // console.log(data);
         store.dispatch(set.cornN(data));
       } else {
-        // console.log('CornN error:');
-        // console.log(url);
-        // console.log(data);
         store.dispatch(set.errorCorn(true));
       }
     },
@@ -321,7 +311,6 @@ export const api = ({
   }
 
   api[timer] = setTimeout(() => {
-    console.log(url);
     store.dispatch({
       type: 'api',
       payload: {

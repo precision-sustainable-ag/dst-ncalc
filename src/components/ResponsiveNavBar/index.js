@@ -1,8 +1,6 @@
 import React, { useEffect, useState } from 'react';
-import { useDispatch, useSelector } from 'react-redux';
-import {
-  Route, NavLink, Routes, useNavigate, useLocation,
-} from 'react-router-dom';
+import { useDispatch } from 'react-redux';
+import { NavLink, useLocation } from 'react-router-dom';
 import AppBar from '@mui/material/AppBar';
 import Box from '@mui/material/Box';
 import Toolbar from '@mui/material/Toolbar';
@@ -15,9 +13,9 @@ import Tooltip from '@mui/material/Tooltip';
 import MenuItem from '@mui/material/MenuItem';
 import Stack from '@mui/material/Stack';
 import MoreVertIcon from '@mui/icons-material/MoreVert';
-import { Modal, styled } from '@mui/material';
+import { styled } from '@mui/material';
 import Init from '../Init';
-import { get, set } from '../../store/Store';
+import { set } from '../../store/Store';
 
 const NavBarButtonText1 = styled(Button)(({ theme, isactive }) => ({
   color: 'white',
@@ -55,22 +53,11 @@ const NavBarButtonText2 = styled(Button)(({ theme, isactive }) => ({
   },
 }));
 
-const feedbackStyle = {
-  position: 'absolute',
-  top: '50%',
-  left: '50%',
-  transform: 'translate(-50%, -50%)',
-  width: 400,
-  bgcolor: 'background.paper',
-  border: '2px solid #000',
-  boxShadow: 24,
-  p: 4,
-};
-
 const ResponsiveNavBar = ({ screens }) => {
   const [anchorElNav, setAnchorElNav] = useState(null);
   const [anchorElUser, setAnchorElUser] = useState(null);
   const [activeMenu, setActiveMenu] = useState('home');
+  // eslint-disable-next-line no-unused-vars
   const [navModalOpen, setNavModalOpen] = useState(false);
 
   const location = useLocation();
