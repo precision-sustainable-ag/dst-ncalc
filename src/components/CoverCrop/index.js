@@ -7,6 +7,7 @@ import {
   FormControlLabel,
   Button,
   Box,
+  Modal,
   Typography,
   styled,
   Paper,
@@ -74,6 +75,10 @@ const CoverCrop1 = () => {
   const biomassTotalValue = useSelector(get.biomassTotalValue);
   const navigate = useNavigate();
   const isSatelliteMode = useSelector(get.biomassCalcMode) === 'satellite';
+  const mapPolygon = useSelector(get.mapPolygon);
+  const [open, setOpen] = React.useState(true);
+
+  // console.log("mapPolygon", mapPolygon);
 
   if (!species.Grass) {
     return '';
@@ -127,6 +132,31 @@ const CoverCrop1 = () => {
             isSatelliteMode ? (
               <Paper mt={2}>
                 <Biomass minified={false} />
+                {mapPolygon.length === 0 && (
+                  <Modal
+                    sx={{
+                      position: 'fixed',
+                      top: '50%',
+                      left: '50%',
+                      width: '80%',
+                      height: '80%',
+                      zIndex: 9999,
+                    }}
+                    open={open}
+                    onClose={() => { setOpen(false); }}
+                    aria-labelledby="modal-modal-title"
+                    aria-describedby="modal-modal-description"
+                  >
+                    <Box>
+                      <Typography id="modal-modal-title" variant="h6" component="h2">
+                        Text in a modal
+                      </Typography>
+                      <Typography id="modal-modal-description" sx={{ mt: 2 }}>
+                        Duis mollis, est non commodo luctus, nisi erat porttitor ligula.
+                      </Typography>
+                    </Box>
+                  </Modal>
+                )}
               </Paper>
             ) : (
               <>
@@ -148,7 +178,6 @@ const CoverCrop1 = () => {
                   </p>
                 </Help>
                 :
-
                 <RadioGroup row aria-label="position" name="position" style={{ display: 'inline-block', marginLeft: '1em' }}>
                   <FormControlLabel
                     value="lb/ac"
