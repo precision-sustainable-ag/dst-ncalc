@@ -119,13 +119,13 @@ const CoverCrop1 = () => {
         }}
       >
         <Typography variant="h4">Tell us about your Cover Crop</Typography>
-        <Box mt={2}>
+        <Box mt={0}>
           <CustomInputText>Cover Crop Species:</CustomInputText>
           <CoverCrops />
 
           {
             isSatelliteMode ? (
-              <Paper mt={0}>
+              <Paper mt={2}>
                 <Biomass minified={false} />
               </Paper>
             ) : (
@@ -182,7 +182,6 @@ const CoverCrop1 = () => {
                   </p>
                 )}
 
-              <br />
               <Box mt={2} sx={{ display: 'flex', flexDirection: 'row', alignItems: 'center' }}>
                 <CustomInputText>Fresh Biomass </CustomInputText>
                 <Help>
@@ -212,7 +211,7 @@ const CoverCrop1 = () => {
                   </p>
                 )}
 
-              <Box mt={6} sx={{ display: 'flex', flexDirection: 'row', alignItems: 'center' }}>
+              <Box mt={2} sx={{ display: 'flex', flexDirection: 'row', alignItems: 'center' }}>
                 <CustomInputText>Cover Crop Water Content at Termination (g water/g dry biomass)</CustomInputText>
                 <Help>
                   <p>Use the following calculation to adjust default values:</p>
