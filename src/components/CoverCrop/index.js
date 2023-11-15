@@ -251,8 +251,8 @@ const CoverCrop1 = () => {
             onClick={() => navigate('/covercrop2')}
             variant="contained"
             color="success"
-            // eslint-disable-next-line no-unneeded-ternary
-            disabled={biomassTotalValue ? false : true}
+            // eslint-disable-next-line react/jsx-props-no-multi-spaces
+            disabled={!isSatelliteMode ? false : (!biomassTotalValue)}
           >
             NEXT
           </Button>
