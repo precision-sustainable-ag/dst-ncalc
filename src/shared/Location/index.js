@@ -88,9 +88,8 @@ const Location = () => {
       <Box sx={{ margin: '2rem 0rem' }}>
         <Paper sx={{ padding: '1rem' }}>
           <Map />
-
           <Box
-            mt={3}
+            mt={2}
             sx={{
               justifyContent: 'space-around',
               alignItems: 'space-between',

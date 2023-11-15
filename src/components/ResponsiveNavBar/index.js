@@ -86,7 +86,15 @@ const ResponsiveNavBar = ({ screens }) => {
   }, [location]);
 
   return (
-    <AppBar position="static" elevation={0} sx={{ backgroundColor: 'transparent', marginBottom: '3rem' }}>
+    <AppBar
+      position="static"
+      elevation={0}
+      sx={{
+        backgroundColor: 'transparent',
+        marginBottom: '3rem',
+        paddingTop: '1rem',
+      }}
+    >
       <Stack direction="row" justifyContent="space-around" flexGrow={2}>
         <Toolbar disableGutters>
           {/* Menu Button Box */}

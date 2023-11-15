@@ -14,6 +14,7 @@ import 'react-datepicker/dist/react-datepicker.css';
 
 import { get } from './store/Store';
 import clip from './background_horizontal.mp4';
+import { Container } from '@mui/material';
 
 // import Help from './shared/Help';
 
@@ -86,7 +87,16 @@ const App = () => {
 
   return (
     <ThemeProvider theme={theme}>
-      <div id="Main">
+      <Container
+        // fixed
+        py={50}
+        sx={{
+          minHeight: '100vh',
+          backgroundImage: `url(${'/background.png'})`,
+          backgroundSize: 'cover',
+          backgroundPosition: 'center',
+        }}
+      >
         {location ? (location.pathname === '/' || location.pathname === '/home')
           && (
             <div id="background-video">
@@ -95,10 +105,9 @@ const App = () => {
               </video>
             </div>
           ) : null}
-        {/* <div className="background-poster" /> */}
         <ResponsiveNavBar screens={screens} />
         <Body screens={screens} />
-      </div>
+      </Container>
     </ThemeProvider>
   );
 }; // App
