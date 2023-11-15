@@ -88,32 +88,35 @@ const Location = () => {
       <Box sx={{ margin: '2rem 0rem' }}>
         <Paper sx={{ padding: '1rem' }}>
           <Map />
+
+          <Box
+            mt={3}
+            sx={{
+              justifyContent: 'space-around',
+              alignItems: 'space-between',
+              width: '100%',
+              display: 'flex',
+              flexDirection: 'row',
+            }}
+          >
+            <Button
+              sx={{ borderRadius: '1rem', fontSize: '22px', fontWeight: 900 }}
+              onClick={() => navigate('/home')}
+              variant="contained"
+              color="success"
+            >
+              BACK
+            </Button>
+            <Button
+              sx={{ borderRadius: '1rem', fontSize: '22px', fontWeight: 900 }}
+              onClick={() => navigate('/soil')}
+              variant="contained"
+              color="success"
+            >
+              NEXT
+            </Button>
+          </Box>
         </Paper>
-      </Box>
-      <Box sx={{
-        justifyContent: 'space-around',
-        alignItems: 'space-between',
-        width: '100%',
-        display: 'flex',
-        flexDirection: 'row',
-      }}
-      >
-        <Button
-          sx={{ borderRadius: '1rem', fontSize: '22px', fontWeight: 900 }}
-          onClick={() => navigate('/home')}
-          variant="contained"
-          color="success"
-        >
-          BACK
-        </Button>
-        <Button
-          sx={{ borderRadius: '1rem', fontSize: '22px', fontWeight: 900 }}
-          onClick={() => navigate('/soil')}
-          variant="contained"
-          color="success"
-        >
-          NEXT
-        </Button>
       </Box>
     </Box>
   );

@@ -64,7 +64,7 @@ const MapComp = () => {
         initRasterObject={biomassTaskResults}
         initFeatures={mapPolygon}
         initWidth="100%"
-        initHeight="450px"
+        initHeight="380px"
         initAddress={mapAddress}
         initLon={-76.9144}
         initLat={39.0208}
