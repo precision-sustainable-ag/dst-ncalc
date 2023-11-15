@@ -6,6 +6,7 @@ import {
 } from 'react-redux';
 import { useLocation } from 'react-router-dom';
 import { ThemeProvider, createTheme } from '@mui/material/styles';
+import { Container } from '@mui/material';
 import ResponsiveNavBar from './components/ResponsiveNavBar';
 import Body from './components/Body';
 
@@ -14,7 +15,6 @@ import 'react-datepicker/dist/react-datepicker.css';
 
 import { get } from './store/Store';
 import clip from './background_horizontal.mp4';
-import { Container } from '@mui/material';
 
 // import Help from './shared/Help';
 
