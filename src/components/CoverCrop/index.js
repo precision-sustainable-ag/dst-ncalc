@@ -180,7 +180,7 @@ const CoverCrop1 = () => {
                           <Button
                             sx={{
                               borderRadius: '1rem',
-                              fontSize: '22px',
+                              fontSize: '18px',
                               fontWeight: 900,
                               marginTop: '2rem',
 
@@ -189,7 +189,7 @@ const CoverCrop1 = () => {
                             variant="outlined"
                             color="warning"
                           >
-                            Location Tab
+                            Go to Location Tab
                           </Button>
                         </Box>
                       </Box>
