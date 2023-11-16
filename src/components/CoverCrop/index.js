@@ -134,27 +134,66 @@ const CoverCrop1 = () => {
                 <Biomass minified={false} />
                 {mapPolygon.length === 0 && (
                   <Modal
-                    sx={{
-                      position: 'fixed',
-                      top: '50%',
-                      left: '50%',
-                      width: '80%',
-                      height: '80%',
-                      zIndex: 9999,
-                    }}
                     open={open}
-                    onClose={() => { setOpen(false); }}
+                    onClose={() => setOpen(false)}
                     aria-labelledby="modal-modal-title"
                     aria-describedby="modal-modal-description"
+                    style={{
+                      display: 'flex',
+                      top: '0%',
+                      left: '10%',
+                      width: '80vw',
+                      alignItems: 'center',
+                      justifyContent: 'center',
+                    }}
                   >
-                    <Box>
-                      <Typography id="modal-modal-title" variant="h6" component="h2">
-                        Text in a modal
-                      </Typography>
-                      <Typography id="modal-modal-description" sx={{ mt: 2 }}>
-                        Duis mollis, est non commodo luctus, nisi erat porttitor ligula.
-                      </Typography>
-                    </Box>
+                    <Paper
+                      sx={{
+                        borderRadius: '2rem',
+                      }}
+                    >
+                      <Box
+                        sx={{
+                          padding: '0rem 2rem',
+                          overflow: 'auto',
+                          fontFamily: 'monospace !important',
+                        }}
+                      >
+                        <Box
+                          sx={{
+                            display: 'flex',
+                            flexDirection: 'column',
+                            minWidth: '100%',
+                            justifyContent: 'center',
+                            alignItems: 'center',
+                            maxHeight: 'auto',
+                            padding: '2rem',
+                            borderRadius: '1rem',
+                          }}
+                        >
+                          <Typography variant="h5">
+                            You haven&apos;t drawn a field on the Location tab yet.
+                          </Typography>
+                          <Typography variant="h5">
+                            Please draw a field on the map to continue.
+                          </Typography>
+                          <Button
+                            sx={{
+                              borderRadius: '1rem',
+                              fontSize: '22px',
+                              fontWeight: 900,
+                              marginTop: '2rem',
+
+                            }}
+                            onClick={() => navigate('/location')}
+                            variant="outlined"
+                            color="warning"
+                          >
+                            Location Tab
+                          </Button>
+                        </Box>
+                      </Box>
+                    </Paper>
                   </Modal>
                 )}
               </Paper>
