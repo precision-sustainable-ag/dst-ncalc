@@ -88,13 +88,13 @@ const App = () => {
   return (
     <ThemeProvider theme={theme}>
       <Container
-        // fixed
         py={50}
         sx={{
           minHeight: '100vh',
-          backgroundImage: `url(${'/background.png'})`,
+          background: 'linear-gradient(to bottom, black, transparent 90%)',
+          backgroundImage: `url(${'/background.jpg'})`,
           backgroundSize: 'cover',
-          backgroundPosition: 'center',
+          backgroundRepeat: 'no-repeat',
         }}
       >
         {location ? (location.pathname === '/' || location.pathname === '/home')

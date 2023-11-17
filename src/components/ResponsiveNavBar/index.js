@@ -95,7 +95,23 @@ const ResponsiveNavBar = ({ screens }) => {
         paddingTop: '1rem',
       }}
     >
-      <Stack direction="row" justifyContent="space-around" flexGrow={2}>
+      <Box
+        sx={{
+          position: 'absolute',
+          top: '0',
+          left: '0',
+          minWidth: '100%',
+          minHeight: '50vh',
+          background: 'linear-gradient(to bottom, #333, transparent 50%)',
+          // backgroundPosition: '0px 0%, 0px 100%, 100% 0%, 100% 100%',
+          backgroundRepeat: 'no-repeat',
+        }}
+      />
+      <Stack
+        direction="row"
+        justifyContent="space-around"
+        flexGrow={2}
+      >
         <Toolbar disableGutters>
           {/* Menu Button Box */}
           <Box sx={{ height: '4rem', display: { xs: 'none', md: 'flex' } }}>
@@ -183,7 +199,6 @@ const ResponsiveNavBar = ({ screens }) => {
                 borderRadius: '0.5rem',
                 padding: '0.1rem 0.4rem',
                 height: '100%',
-                // filter: 'invert(1)',
               }}
             />
           </Box>
@@ -266,6 +281,7 @@ const ResponsiveNavBar = ({ screens }) => {
           </Box>
         </Toolbar>
       </Stack>
+      {/* </Box> */}
     </AppBar>
   );
 };
