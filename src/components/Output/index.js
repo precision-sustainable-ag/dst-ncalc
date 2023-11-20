@@ -8,7 +8,7 @@ import moment from 'moment';
 import { CSVLink } from 'react-csv';
 import { useDispatch, useSelector } from 'react-redux';
 import CircularProgress from '@mui/material/CircularProgress';
-import { Box, Button, Paper } from '@mui/material';
+import { Box, Button, Paper, Typography } from '@mui/material';
 import { Link, useNavigate } from 'react-router-dom';
 import {
   get, set, fetchModel, missingData,
@@ -124,23 +124,43 @@ const Output = () => {
 
   if (!gotModel || !cornN) {
     return (
-      <>
-        <div className="loading">
-          <p>Loading Output</p>
-          <p>Please wait</p>
-          <CircularProgress color="secondary" />
-          &nbsp;&nbsp;
-          <CircularProgress color="success" />
-          &nbsp;&nbsp;
-          <CircularProgress color="inherit" />
-        </div>
-        {/*
-          <ul>
-            <li>Model: {errorModel.toString()}</li>
-            <li>Corn uptake curve: {errorCorn.toString()}</li>
-          </ul>
-        */}
-      </>
+      <Box
+        sx={{
+          margin: '1rem',
+          padding: '1rem',
+          backgroundColor: '#eee',
+          borderRadius: '1rem',
+          border: '2px black solid',
+        }}
+      >
+        <Paper
+          sx={{
+            display: 'flex',
+            flexDirection: 'column',
+            justifyContent: 'center',
+            alignItems: 'center',
+            padding: '1rem',
+          }}
+        >
+          <Typography variant="h4">Loading Output</Typography>
+          <Typography variant="h5">Please wait</Typography>
+          <Box
+            sx={{
+              display: 'flex',
+              flexDirection: 'row',
+              justifyContent: 'center',
+              alignItems: 'center',
+              padding: '2rem',
+            }}
+          >
+            <CircularProgress color="secondary" />
+            &nbsp;&nbsp;
+            <CircularProgress color="success" />
+            &nbsp;&nbsp;
+            <CircularProgress color="inherit" />
+          </Box>
+        </Paper>
+      </Box>
     );
   }
 
