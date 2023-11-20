@@ -1,5 +1,5 @@
 /* eslint-disable no-console */
-import React, { useEffect } from 'react';
+import React from 'react';
 import {
   // useDispatch,
   useSelector,
@@ -9,14 +9,9 @@ import { ThemeProvider, createTheme } from '@mui/material/styles';
 import { Container } from '@mui/material';
 import ResponsiveNavBar from './components/ResponsiveNavBar';
 import Body from './components/Body';
-
 import './App.scss';
 import 'react-datepicker/dist/react-datepicker.css';
-
 import { get } from './store/Store';
-import clip from './background_horizontal.mp4';
-
-// import Help from './shared/Help';
 
 const screens = {
   init: () => null,
@@ -46,10 +41,6 @@ Object.keys(screens).forEach((key) => {
 
 const holdWarn = console.warn;
 console.warn = (msg, ...subst) => {
-  // Deprecation: moment
-  // Autocomplete: useless warning, which has an overcomplicated isOptionEqualTo solution
-  //               https://github.com/mui/material-ui/issues/29727
-
   if (!/Deprecation|Autocomplete/.test(msg)) {
     holdWarn(msg, ...subst);
   }
@@ -73,17 +64,9 @@ const theme = createTheme({
 });
 
 const App = () => {
-  // const dispatch = useDispatch();
-  const location = useLocation();
-
   useSelector(get.screen); // force render
-
-  useEffect(() => {
-    const elem = document.querySelector('#video');
-    if (elem) {
-      elem.playbackRate = 0.7;
-    }
-  }, []);
+  // eslint-disable-next-line no-unused-vars
+  const location = useLocation();
 
   return (
     <ThemeProvider theme={theme}>
@@ -91,20 +74,12 @@ const App = () => {
         py={50}
         sx={{
           minHeight: '100vh',
-          background: 'linear-gradient(to bottom, black, transparent 90%)',
-          backgroundImage: `url(${'/background.jpg'})`,
+          minWidth: '100vw',
+          backgroundImage: `url(${'/background_1.jpg'})`,
           backgroundSize: 'cover',
           backgroundRepeat: 'no-repeat',
         }}
       >
-        {location ? (location.pathname === '/' || location.pathname === '/home')
-          && (
-            <div id="background-video">
-              <video id="video" autoPlay muted loop>
-                <source src={clip} type="video/mp4" />
-              </video>
-            </div>
-          ) : null}
         <ResponsiveNavBar screens={screens} />
         <Body screens={screens} />
       </Container>

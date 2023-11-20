@@ -91,20 +91,28 @@ const ResponsiveNavBar = ({ screens }) => {
       elevation={0}
       sx={{
         backgroundColor: 'transparent',
-        marginBottom: '3rem',
-        paddingTop: '1rem',
+        marginBottom: {
+          xs: '2rem',
+          sm: '3rem',
+          md: '4rem',
+          lg: '5rem',
+        },
+        paddingTop: {
+          xs: '1rem',
+          lg: '2rem',
+        },
       }}
     >
       <Box
         sx={{
-          position: 'absolute',
+          position: 'fixed',
           top: '0',
-          left: '0',
-          minWidth: '100%',
-          minHeight: '50vh',
-          background: 'linear-gradient(to bottom, #333, transparent 50%)',
-          // backgroundPosition: '0px 0%, 0px 100%, 100% 0%, 100% 100%',
+          left: '50%',
+          transform: 'translateX(-50%)',
+          background: 'linear-gradient(to bottom, #333, transparent 80%) ',
+          minHeight: '30vh',
           backgroundRepeat: 'no-repeat',
+          minWidth: '100%',
         }}
       />
       <Stack

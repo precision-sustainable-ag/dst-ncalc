@@ -123,9 +123,13 @@ nav img {
   position: relative;
   height: 100%;
   width: 100%;
-  background-color: #385e1b;
-  // background-image: url('../public/background.png');
-  background-size: cover;
+  // background-color: #385e1b;
+  // background-size: cover;
+}
+
+@keyframes fadeIn {
+  0% { opacity: 0; }
+  100% { opacity: 1; }
 }
 
 #background-video {
@@ -134,7 +138,6 @@ nav img {
   left: 0;
   top: 0;
   padding: none;
-  // z-index: -1;
   object-fit: cover;
   position: fixed; /* optional depending on what you want to do in your app */
 }

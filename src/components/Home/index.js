@@ -2,10 +2,35 @@ import React, { useEffect } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 // import { Link } from 'react-router-dom';
 import {
-  Box, Button, Card, Stack, ToggleButton, ToggleButtonGroup, Typography,
+  Box, Button, Card, Stack, ToggleButton, ToggleButtonGroup, Typography, styled,
 } from '@mui/material';
 import { useNavigate } from 'react-router-dom';
 import { get, set } from '../../store/Store';
+
+const BiomassMethodButton = styled(ToggleButton)(() => ({
+  '&.Mui-selected': {
+    borderRadius: '1rem',
+    boxShadow: 'none',
+    backgroundColor: 'lightblue',
+    color: 'black',
+    '&:hover': {
+      backgroundColor: 'lightblue',
+      color: 'black',
+    },
+  },
+  '&:hover': {
+    backgroundColor: 'lightblue',
+    color: 'black',
+  },
+  border: '3px solid black',
+  borderRadius: '1rem',
+  // fontSize: { xs: '16px', sm: '18px', md: '20px' },
+  fontSize: '16px',
+  fontWeight: 900,
+  padding: '0.5rem',
+  backgroundColor: 'white',
+  color: 'black',
+}));
 
 const Home = () => {
   const dispatch = useDispatch();
@@ -58,29 +83,17 @@ const Home = () => {
             onChange={handleChange}
             aria-label="biomassCalcMode"
           >
-            <ToggleButton
-              sx={{
-                border: '2px solid black',
-                borderRadius: '0.2rem',
-                fontSize: { xs: '14px', sm: '16px', md: '18px' },
-                padding: '0.3rem',
-              }}
+            <BiomassMethodButton
               value="sampled"
             >
               User Sampled
-            </ToggleButton>
-            <Box sx={{ width: 10, borderRight: '2px solid black' }} />
-            <ToggleButton
-              sx={{
-                border: '2px solid black',
-                borderRadius: '0.2rem',
-                fontSize: { xs: '14px', sm: '16px', md: '18px' },
-                padding: '0.3rem',
-              }}
+            </BiomassMethodButton>
+            {/* <Box sx={{ width: 10, borderRight: '2px solid black' }} /> */}
+            <BiomassMethodButton
               value="satellite"
             >
               Satellite
-            </ToggleButton>
+            </BiomassMethodButton>
           </ToggleButtonGroup>
         </Stack>
       </Stack>

@@ -10,6 +10,7 @@ import {
   Button,
   Paper,
   Stack,
+  styled,
 } from '@mui/material';
 import { useSelector } from 'react-redux';
 import Map from '../Map';
@@ -19,7 +20,14 @@ import {
   get,
 } from '../../store/Store';
 
-import './styles.scss';
+const CustomizedAccordion = styled(Accordion)(() => ({
+  '&.MuiPaper-root': {
+    borderRadius: '1rem',
+    boxShadow: 'none',
+  },
+  // padding: '1rem',
+  boxShadow: 'none',
+}));
 
 const Location = () => {
   const navigate = useNavigate();
@@ -27,8 +35,8 @@ const Location = () => {
 
   return (
     <Box sx={{ width: { xs: '95%', sm: '90%', lg: '70%' } }}>
-      <Box sx={{ marginBottom: '2rem' }}>
-        <Accordion defaultExpanded>
+      <Box mb={-2}>
+        <CustomizedAccordion defaultExpanded>
           <AccordionSummary
             expandIcon={<ExpandMoreIcon />}
             aria-controls="panel1a-content"
@@ -39,7 +47,7 @@ const Location = () => {
             </Typography>
           </AccordionSummary>
           <AccordionDetails>
-            <Stack>
+            <Stack mb={1}>
               <Typography variant="h8" gutterBottom>
                 Enter your address or zip code to determine your field&apos;s location. You can then
                 zoom in and click to pinpoint it on the map. If you know your exact coordinates, you
@@ -53,7 +61,7 @@ const Location = () => {
                 )
               }
             </Stack>
-            <div className="inputsContainer">
+            <Box mb={2}>
               <Input
                 label="Name your Field (optional)"
                 id="field"
@@ -81,12 +89,12 @@ const Location = () => {
                   </li>
                 </ul>
               </Help>
-            </div>
+            </Box>
           </AccordionDetails>
-        </Accordion>
+        </CustomizedAccordion>
       </Box>
       <Box sx={{ margin: '2rem 0rem' }}>
-        <Paper sx={{ padding: '1rem' }}>
+        <Paper sx={{ padding: '1rem', borderRadius: '1rem' }}>
           <Map />
           <Box
             mt={2}
