@@ -209,8 +209,7 @@ const Biomass = ({ minified = false }) => {
           </AccordionSummary>
           <AccordionDetails>
             <Typography variant="h8" gutterBottom>
-              Having already specified your field&apos;s boundary on the map using the drawing tool, input your
-              planting date and crop type in the boxes below.
+              You can change your planting date and termination dates below and recalculate the biomass value.
             </Typography>
             <div className="biomassControlWrapper">
               <DateBox minified={minified} />

@@ -54,6 +54,7 @@ const Output = () => {
   const outputN = useSelector(get.outputN);
   const nweeks = useSelector(get.nweeks);
   const targetN = useSelector(get.targetN);
+  const isSatelliteMode = useSelector(get.biomassCalcMode) === 'satellite';
 
   if (field) {
     if (!/Example: Grass|Example: Legume/.test(field)) {
@@ -847,17 +848,15 @@ const Output = () => {
             </tbody>
           </table>
         </div>
-        <Box mb={8} sx={{ margin: '2rem 0rem' }}>
-          <Paper sx={{ padding: '1rem' }}>
-            <Biomass minified />
-            <Map />
-          </Paper>
-        </Box>
-        {/* <div className="bn">
-          <Link className="link" to="/cashcrop">BACK</Link>
-          <Link className="link" to="/advanced">ADVANCED</Link>
-          <Link className="link" to="/feedback">FEEDBACK</Link>
-        </div> */}
+        {isSatelliteMode
+          && (
+            <Box mb={8} sx={{ margin: '2rem 0rem' }}>
+              <Paper sx={{ padding: '1rem' }}>
+                <Biomass minified />
+                <Map />
+              </Paper>
+            </Box>
+          )}
         <Box sx={{
           justifyContent: 'space-around',
           alignItems: 'space-between',
@@ -868,7 +867,7 @@ const Output = () => {
         >
           <Button
             sx={{ borderRadius: '1rem', fontSize: '22px', fontWeight: 900 }}
-            onClick={() => navigate('/home')}
+            onClick={() => navigate('/cashcrop')}
             variant="contained"
             color="success"
           >
@@ -876,11 +875,21 @@ const Output = () => {
           </Button>
           <Button
             sx={{ borderRadius: '1rem', fontSize: '22px', fontWeight: 900 }}
-            onClick={() => navigate('/soil')}
+            onClick={() => navigate('/advanced')}
             variant="contained"
             color="success"
           >
-            NEXT
+            ADVANCED
+          </Button>
+          <Button
+            sx={{ borderRadius: '1rem', fontSize: '22px', fontWeight: 900 }}
+            onClick={() => {
+              dispatch(set.openFeedbackModal(true));
+            }}
+            variant="contained"
+            color="success"
+          >
+            FEEDBACK
           </Button>
         </Box>
         <div className="output-table-div-mobile">
