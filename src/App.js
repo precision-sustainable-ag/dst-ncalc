@@ -75,7 +75,7 @@ const App = () => {
         sx={{
           minHeight: '100vh',
           minWidth: '100vw',
-          backgroundImage: `url(${'/background_1.jpg'})`,
+          backgroundImage: `url(${'/background_0.jpg'})`,
           backgroundSize: 'cover',
           backgroundRepeat: 'no-repeat',
         }}

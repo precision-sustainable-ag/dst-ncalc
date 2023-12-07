@@ -103,18 +103,6 @@ const ResponsiveNavBar = ({ screens }) => {
         },
       }}
     >
-      <Box
-        sx={{
-          position: 'fixed',
-          top: '0',
-          left: '50%',
-          transform: 'translateX(-50%)',
-          background: 'linear-gradient(to bottom, #333, transparent 80%) ',
-          minHeight: '30vh',
-          backgroundRepeat: 'no-repeat',
-          minWidth: '100%',
-        }}
-      />
       <Stack
         direction="row"
         justifyContent="space-around"

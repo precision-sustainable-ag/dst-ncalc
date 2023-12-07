@@ -66,8 +66,8 @@ const MapComp = () => {
         initWidth="100%"
         initHeight="380px"
         initAddress={mapAddress}
-        initLon={-76.9144}
-        initLat={39.0208}
+        initLon={lon}
+        initLat={lat}
         initStartZoom={mapZoom}
         initMinZoom={5}
         initMaxZoom={16}

@@ -44,6 +44,7 @@ const Output = () => {
   const coverCrop = useSelector(get.coverCrop);
   const field = useSelector(get.field);
   const gotModel = useSelector(get.gotModel);
+  // const gotModel = true;
   const errorModel = useSelector(get.errorModel);
   const errorCorn = useSelector(get.errorCorn);
   const model = useSelector(get.model);
@@ -127,6 +128,8 @@ const Output = () => {
       </>
     );
   }
+
+  console.log("gotModel", gotModel, "cornN", cornN);
 
   if (!gotModel || !cornN) {
     return (
