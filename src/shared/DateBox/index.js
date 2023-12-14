@@ -22,9 +22,9 @@ const DateBox = ({ minified = false }) => {
 
   useEffect(() => {
     const now = dayjs();
-    const minPlantingDateObj = now.subtract(12, 'month');
+    const minPlantingDateObj = now.subtract(5, 'year');
     const maxPlantingDateObj = now.subtract(0, 'month');
-    const minTerminationDateObj = dayjs(biomassPlantDate).add(1, 'month');
+    const minTerminationDateObj = dayjs(biomassPlantDate).add(2, 'month');
     const maxTerminationDateObj = dayjs(biomassPlantDate).add(12, 'month');
     setMinPlantingDate(minPlantingDateObj.format('YYYY-MM-DD'));
     setMaxPlantingDate(maxPlantingDateObj.format('YYYY-MM-DD'));

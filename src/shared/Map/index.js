@@ -53,6 +53,9 @@ const MapComp = () => {
     if (zoom) dispatch(set.mapZoom(zoom));
   }, [zoom]);
 
+  console.log('biomassTaskResults', biomassTaskResults);
+  console.log('mapPolygon', mapPolygon);
+
   return (
     <Paper>
       <NcalcMap
