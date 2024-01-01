@@ -103,7 +103,7 @@ const afterChange = {
   lwc: (state) => { state.gotModel = false; },
   // killDate: (state) => { state.gotModel = false; },
   // plantingDate: (state) => { state.gotModel = false; },
-  biomass: (state) => { state.gotModel = false; },
+  // biomass: (state) => { state.gotModel = false; },
   freshBiomass: (state) => { state.gotModel = false; },
   BD: (state) => { state.gotModel = false; },
   OM: (state) => { state.gotModel = false; },
@@ -124,9 +124,10 @@ const weightedAverage = (data, parm, dec = 2) => {
 }; // weightedAverage
 
 export const fetchModel = () => {
+  console.log('fetchModel inside triggered ...');
   const state = store.getState();
-  store.dispatch(set.gotModel(false));
-  store.dispatch(set.errorModel(false));
+  // store.dispatch(set.gotModel(false));
+  // store.dispatch(set.errorModel(false));
 
   let {
     biomass, lwc, carb, cell, lign, InorganicN,
@@ -134,12 +135,20 @@ export const fetchModel = () => {
   const {
     lat, lon, N, OM, BD, unit,
   } = state;
-
+  console.log('state', state);
   const start = moment(state.killDate).format('yyyy-MM-DD');
-  const end = moment(state.plantingDate).add(110, 'days').add(1, 'hour').format('yyyy-MM-DD');
+  const end = moment(state.killDate).add(110, 'days').add(1, 'hour').format('yyyy-MM-DD');
+  // const end = moment(state.plantingDate).add(110, 'days').add(1, 'hour').format('yyyy-MM-DD');
   const validDates = start !== 'Invalid date' && end !== 'Invalid date' && end > start;
+  console.log('plantingDate', state.plantingDate);
+  console.log('killDate', state.killDate);
+  console.log('start', start);
+  console.log('end', end);
+  console.log('validDates', validDates);
 
-  if (validDates) {
+  if (!validDates) {
+    console.log('invalid dates for fetch Model'); // eslint-disable-line no-console
+  } else {
     const pmn = 10;
 
     InorganicN = InorganicN || 10;
@@ -159,12 +168,13 @@ export const fetchModel = () => {
     biomass *= factor;
 
     const url = `https://api.precisionsustainableag.org/cc-ncalc/surface?lat=${lat}&lon=${lon}&start=${start}&end=${end}&n=${N}&biomass=${biomass}&lwc=${lwc}&carb=${carb}&cell=${cell}&lign=${lign}&om=${OM}&bd=${BD}&in=${InorganicN}&pmn=${pmn}`;
-
+    console.log('url', url);
     api({
       url,
       callback: (data) => {
         if (data.name === 'error' || !data.surface) {
           store.dispatch(set.errorModel(true));
+          console.log('error in fetch model', data);
           return;
         }
 
@@ -175,7 +185,7 @@ export const fetchModel = () => {
             modelSurface[key].push(ddata[key]);
           });
         });
-
+        console.log('modelSurface', modelSurface);
         const modelIncorporated = {};
 
         const model = {
@@ -188,9 +198,12 @@ export const fetchModel = () => {
         cols.filter((col) => !model.s[col].length).forEach((col) => {
           model.s[col] = new Array(model.s.Rain.length).fill(model.s[col]);
         });
-
+        console.log('gotModel', store.getState().gotModel);
+        console.log('model', store.getState().model);
+        console.log('store', store);
         store.dispatch(set.model(model));
         store.dispatch(set.gotModel(true));
+        console.log('gotModel', store.getState().gotModel);
 
         fetchCornN(store.getState());
       },
@@ -211,7 +224,7 @@ const fetchSSURGO = (state) => {
     url,
     callback: (data) => {
       if (data.ERROR) {
-        // console.log(`No SSURGO data at ${lat}, ${lon}`);
+        console.log(`No SSURGO data at ${lat}, ${lon}`);
         store.dispatch(set.BD(''));
         store.dispatch(set.OM(''));
       } else {

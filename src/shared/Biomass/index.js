@@ -36,6 +36,7 @@ const Biomass = ({ minified = false }) => {
   const biomassPlantDate = useSelector(get.biomassPlantDate);
   const biomassTerminationDate = useSelector(get.biomassTerminationDate);
   const biomassTotalValue = useSelector(get.biomassTotalValue);
+  const biomassTaskResults = useSelector(get.biomassTaskResults);
   const dispatch = useDispatch();
 
   useEffect(() => {
@@ -43,12 +44,17 @@ const Biomass = ({ minified = false }) => {
       const values = JSON.parse(data.task_result.replace(/\bNaN\b/g, 'null'));
       // eslint-disable-next-line no-console
       const rasterObject = { data_array: values.data_array, bbox: values.bbox };
-      const flattenedBiomass = rasterObject.data_array.flat(1).filter((el) => el !== 0);
-      const biomassAVG = arrayAverage(flattenedBiomass);
-      dispatch(set.biomassTotalValue(Math.round(biomassAVG, 0)));
       dispatch(set.biomassTaskResults(rasterObject));
     }
   }, [data]);
+
+  useEffect(() => {
+    if (biomassTaskResults && biomassTaskResults.data_array) {
+      const flattenedBiomass = biomassTaskResults.data_array.flat(1).filter((el) => el !== 0);
+      const biomassAVG = arrayAverage(flattenedBiomass);
+      dispatch(set.biomassTotalValue(Math.round(biomassAVG, 0)));
+    }
+  }, [biomassTaskResults]);
 
   useEffect(() => {
     dispatch(set.plantingDate(biomassPlantDate));

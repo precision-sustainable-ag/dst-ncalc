@@ -2,19 +2,20 @@
 /* eslint-disable react/no-this-in-sfc */
 /* eslint-disable max-len */
 import React, { useEffect } from 'react';
+import { Link, useNavigate } from 'react-router-dom';
 import Highcharts from 'highcharts';
 import HighchartsReact from 'highcharts-react-official';
 import moment from 'moment';
 import { CSVLink } from 'react-csv';
 import { useDispatch, useSelector } from 'react-redux';
-import CircularProgress from '@mui/material/CircularProgress';
+
 import {
   Box,
   Button,
   Paper,
-  Typography,
 } from '@mui/material';
-import { Link, useNavigate } from 'react-router-dom';
+
+import Loading from '../../shared/Loading';
 import {
   get, set, fetchModel, missingData,
 } from '../../store/Store';
@@ -57,6 +58,8 @@ const Output = () => {
   const targetN = useSelector(get.targetN);
   const isSatelliteMode = useSelector(get.biomassCalcMode) === 'satellite';
 
+  console.log('field: ', field);
+
   if (field) {
     if (!/Example: Grass|Example: Legume/.test(field)) {
       try {
@@ -95,7 +98,10 @@ const Output = () => {
   }
 
   useEffect(() => {
+    console.log('dispatch, gotModel changed');
+    console.log('gotModel fetchModel', gotModel);
     if (!gotModel) {
+      console.log('fetchModel triggered ...');
       fetchModel();
     }
   }, [dispatch, gotModel]);
@@ -129,48 +135,11 @@ const Output = () => {
     );
   }
 
-  console.log("gotModel", gotModel, "cornN", cornN);
+  console.log('gotModel', gotModel, 'cornN', cornN);
 
   if (!gotModel || !cornN) {
-    return (
-      <Box
-        sx={{
-          margin: '1rem',
-          padding: '1rem',
-          backgroundColor: '#eee',
-          borderRadius: '1rem',
-          border: '2px black solid',
-        }}
-      >
-        <Paper
-          sx={{
-            display: 'flex',
-            flexDirection: 'column',
-            justifyContent: 'center',
-            alignItems: 'center',
-            padding: '1rem',
-          }}
-        >
-          <Typography variant="h4">Loading Output</Typography>
-          <Typography variant="h5">Please wait</Typography>
-          <Box
-            sx={{
-              display: 'flex',
-              flexDirection: 'row',
-              justifyContent: 'center',
-              alignItems: 'center',
-              padding: '2rem',
-            }}
-          >
-            <CircularProgress color="secondary" />
-            &nbsp;&nbsp;
-            <CircularProgress color="success" />
-            &nbsp;&nbsp;
-            <CircularProgress color="inherit" />
-          </Box>
-        </Paper>
-      </Box>
-    );
+    console.log('showing loading ....');
+    return <Loading />;
   }
 
   Object.keys(model.s).forEach((key) => {
@@ -295,7 +264,7 @@ const Output = () => {
 
   if (params.get('fy')) {
     const src = `http://aesl.ces.uga.edu/mineralization/client/surface/?fy=${params.get('fy')}&lab=${params.get('lab')}&modeled2=${m2}&modeled4=${m4}&modeled=${mf}`;
-
+    console.log('src', src);
     labModel = <iframe title="N/A" style={{ display: 'none' }} src={src} />;
   }
 
