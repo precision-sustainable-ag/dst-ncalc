@@ -5,21 +5,12 @@
 /* eslint-disable max-len */
 /* eslint-disable no-use-before-define */
 
-import moment from 'moment';
 import dayjs from 'dayjs';
-import { createStore, set } from './redux-autosetters';
+import { createStore } from './redux-autosetters';
+import { query } from '../hooks/helpers';
 
-const params = new URLSearchParams(window.location.search);
+// const params = new URLSearchParams(window.location.search);
 const now = dayjs();
-
-const query = (parm, def) => {
-  if (parm === 'covercrop' && params.get('covercrop')) {
-    return params.get(parm).split(',');
-  } if (/date/.test(parm) && params.get(parm)) {
-    return moment(params.get(parm));
-  }
-  return params.get(parm) || def;
-}; // query
 
 const initialState = {
   focus: '',
@@ -93,179 +84,166 @@ const afterChange = {
       state.cell = Math.min(100, Math.max(0, (69 - 10.2 * payload))).toFixed(0);
       state.lign = 100 - (+state.carb + +state.cell);
     }
-    state.gotModel = false;
+    state.model = null;
   },
-  carb: (state) => { state.gotModel = false; state.edited = true; },
-  cell: (state) => { state.gotModel = false; state.edited = true; },
-  lign: (state) => { state.gotModel = false; state.edited = true; },
-  lat: (state) => { state.gotModel = false; fetchSSURGO(state); },
-  lon: (state) => { state.gotModel = false; fetchSSURGO(state); },
-  lwc: (state) => { state.gotModel = false; },
-  // killDate: (state) => { state.gotModel = false; },
-  // plantingDate: (state) => { state.gotModel = false; },
-  // biomass: (state) => { state.gotModel = false; },
-  freshBiomass: (state) => { state.gotModel = false; },
-  BD: (state) => { state.gotModel = false; },
-  OM: (state) => { state.gotModel = false; },
-  InorganicN: (state) => { state.gotModel = false; },
+  carb: (state) => { state.model = null; state.edited = true; },
+  cell: (state) => { state.model = null; state.edited = true; },
+  lign: (state) => { state.model = null; state.edited = true; },
+  lat: (state) => { state.model = null; },
+  lon: (state) => { state.model = null; },
+  lwc: (state) => { state.model = null; },
+  // killDate: (state) => { state.model = null; },
+  // plantingDate: (state) => { state.model = null; },
+  // biomass: (state) => { state.model = null; },
+  freshBiomass: (state) => { state.model = null; },
+  BD: (state) => { state.model = null; },
+  OM: (state) => { state.model = null; },
+  InorganicN: (state) => { state.model = null; },
 };
 
-const weightedAverage = (data, parm, dec = 2) => {
-  let totpct = 0;
+// export const fetchModel = () => {
+//   console.log('fetchModel inside triggered ...');
+//   const state = store.getState();
+//   // store.dispatch(set.gotModel(false));
+//   // store.dispatch(set.errorModel(false));
 
-  data = data
-    .filter((d) => d[parm])
-    .map((d) => {
-      totpct += +d.comppct_r;
-      return d[parm] * d.comppct_r;
-    });
+//   let {
+//     biomass, lwc, carb, cell, lign, InorganicN,
+//   } = state;
+//   const {
+//     lat, lon, N, OM, BD, unit,
+//   } = state;
+//   console.log('state', state);
+//   const start = moment(state.killDate).format('yyyy-MM-DD');
+//   const end = moment(state.killDate).add(110, 'days').add(1, 'hour').format('yyyy-MM-DD');
+//   // const end = moment(state.plantingDate).add(110, 'days').add(1, 'hour').format('yyyy-MM-DD');
+//   const validDates = start !== 'Invalid date' && end !== 'Invalid date' && end > start;
+//   console.log('plantingDate', state.plantingDate);
+//   console.log('killDate', state.killDate);
+//   console.log('start', start);
+//   console.log('end', end);
+//   console.log('validDates', validDates);
 
-  return (data.reduce((a, b) => +a + +b) / totpct).toFixed(dec);
-}; // weightedAverage
+//   if (!validDates) {
+//     console.log('invalid dates for fetch Model'); // eslint-disable-line no-console
+//   } else {
+//     const pmn = 10;
 
-export const fetchModel = () => {
-  console.log('fetchModel inside triggered ...');
-  const state = store.getState();
-  // store.dispatch(set.gotModel(false));
-  // store.dispatch(set.errorModel(false));
+//     InorganicN = InorganicN || 10;
 
-  let {
-    biomass, lwc, carb, cell, lign, InorganicN,
-  } = state;
-  const {
-    lat, lon, N, OM, BD, unit,
-  } = state;
-  console.log('state', state);
-  const start = moment(state.killDate).format('yyyy-MM-DD');
-  const end = moment(state.killDate).add(110, 'days').add(1, 'hour').format('yyyy-MM-DD');
-  // const end = moment(state.plantingDate).add(110, 'days').add(1, 'hour').format('yyyy-MM-DD');
-  const validDates = start !== 'Invalid date' && end !== 'Invalid date' && end > start;
-  console.log('plantingDate', state.plantingDate);
-  console.log('killDate', state.killDate);
-  console.log('start', start);
-  console.log('end', end);
-  console.log('validDates', validDates);
+//     lwc = lwc || 10;
+//     carb = carb || (24.7 + 10.5 * N);
+//     cell = cell || (69 - 10.2 * N);
+//     lign = lign || (100 - (carb + cell));
 
-  if (!validDates) {
-    console.log('invalid dates for fetch Model'); // eslint-disable-line no-console
-  } else {
-    const pmn = 10;
+//     const total = +carb + +cell + +lign;
+//     carb = (carb * 100) / total;
+//     cell = (cell * 100) / total;
+//     lign = (lign * 100) / total;
 
-    InorganicN = InorganicN || 10;
+//     const factor = unit === 'lb/ac' ? 1.12085 : 1;
 
-    lwc = lwc || 10;
-    carb = carb || (24.7 + 10.5 * N);
-    cell = cell || (69 - 10.2 * N);
-    lign = lign || (100 - (carb + cell));
+//     biomass *= factor;
 
-    const total = +carb + +cell + +lign;
-    carb = (carb * 100) / total;
-    cell = (cell * 100) / total;
-    lign = (lign * 100) / total;
+//     const url = `https://api.precisionsustainableag.org/cc-ncalc/surface?lat=${lat}&lon=${lon}&start=${start}&end=${end}&n=${N}&biomass=${biomass}&lwc=${lwc}&carb=${carb}&cell=${cell}&lign=${lign}&om=${OM}&bd=${BD}&in=${InorganicN}&pmn=${pmn}`;
+//     console.log('url', url);
+//     api({
+//       url,
+//       callback: (data) => {
+//         if (data.name === 'error' || !data.surface) {
+//           store.dispatch(set.errorModel(true));
+//           console.log('error in fetch model', data);
+//           return;
+//         }
 
-    const factor = unit === 'lb/ac' ? 1.12085 : 1;
+//         const modelSurface = {};
+//         data.surface.forEach((ddata) => {
+//           Object.keys(ddata).forEach((key) => {
+//             modelSurface[key] = modelSurface[key] || [];
+//             modelSurface[key].push(ddata[key]);
+//           });
+//         });
+//         console.log('modelSurface', modelSurface);
+//         const modelIncorporated = {};
 
-    biomass *= factor;
+//         const model = {
+//           s: modelSurface,
+//           i: modelIncorporated,
+//         };
 
-    const url = `https://api.precisionsustainableag.org/cc-ncalc/surface?lat=${lat}&lon=${lon}&start=${start}&end=${end}&n=${N}&biomass=${biomass}&lwc=${lwc}&carb=${carb}&cell=${cell}&lign=${lign}&om=${OM}&bd=${BD}&in=${InorganicN}&pmn=${pmn}`;
-    console.log('url', url);
-    api({
-      url,
-      callback: (data) => {
-        if (data.name === 'error' || !data.surface) {
-          store.dispatch(set.errorModel(true));
-          console.log('error in fetch model', data);
-          return;
-        }
+//         const cols = Object.keys(model.s).sort((a, b) => a.toUpperCase().localeCompare(b.toUpperCase()));
 
-        const modelSurface = {};
-        data.surface.forEach((ddata) => {
-          Object.keys(ddata).forEach((key) => {
-            modelSurface[key] = modelSurface[key] || [];
-            modelSurface[key].push(ddata[key]);
-          });
-        });
-        console.log('modelSurface', modelSurface);
-        const modelIncorporated = {};
+//         cols.filter((col) => !model.s[col].length).forEach((col) => {
+//           model.s[col] = new Array(model.s.Rain.length).fill(model.s[col]);
+//         });
+//         console.log('gotModel', store.getState().gotModel);
+//         console.log('model', store.getState().model);
+//         console.log('store', store);
+//         store.dispatch(set.model(model));
+//         store.dispatch(set.gotModel(true));
+//         console.log('gotModel', store.getState().gotModel);
 
-        const model = {
-          s: modelSurface,
-          i: modelIncorporated,
-        };
+//         fetchCornN(store.getState());
+//       },
+//       timer: 'model',
+//       delay: 0,
+//     });
+//   }
+// }; // fetchModel
 
-        const cols = Object.keys(model.s).sort((a, b) => a.toUpperCase().localeCompare(b.toUpperCase()));
+// const fetchSSURGO = (state) => {
+//   const { lat, lon } = state;
 
-        cols.filter((col) => !model.s[col].length).forEach((col) => {
-          model.s[col] = new Array(model.s.Rain.length).fill(model.s[col]);
-        });
-        console.log('gotModel', store.getState().gotModel);
-        console.log('model', store.getState().model);
-        console.log('store', store);
-        store.dispatch(set.model(model));
-        store.dispatch(set.gotModel(true));
-        console.log('gotModel', store.getState().gotModel);
+//   state.gotSSURGO = false;
+//   state.gotModel = false;
+//   const url = `https://ssurgo.covercrop-data.org/?lat=${lat}&lon=${lon}&component=major`;
 
-        fetchCornN(store.getState());
-      },
-      timer: 'model',
-      delay: 0,
-    });
-  }
-}; // fetchModel
+//   api({
+//     url,
+//     callback: (data) => {
+//       if (data.ERROR) {
+//         console.log(`No SSURGO data at ${lat}, ${lon}`);
+//         store.dispatch(set.BD(''));
+//         store.dispatch(set.OM(''));
+//       } else {
+//         data = data.filter((d) => d.desgnmaster !== 'O');
+//         // const minhzdept = Math.min.apply(Math, data.map((d) => d.hzdept_r));
+//         const minhzdept = Math.min(...data.map((d) => d.hzdept_r));
+//         data = data.filter((d) => +d.hzdept_r === +minhzdept);
+//         store.dispatch(set.BD(weightedAverage(data, 'dbthirdbar_r')));
+//         store.dispatch(set.OM(weightedAverage(data, 'om_r')));
+//         store.dispatch(set.gotSSURGO(true));
+//         store.dispatch(set.SSURGO(data));
+//         fetchModel(state);
+//       }
+//     },
+//     timer: 'ssurgo',
+//     delay: 2000,
+//   });
+// }; // fetchSSURGO
 
-const fetchSSURGO = (state) => {
-  const { lat, lon } = state;
+// const fetchCornN = (state) => {
+//   const { lat, lon, plantingDate } = state;
 
-  state.gotSSURGO = false;
-  state.gotModel = false;
-  const url = `https://ssurgo.covercrop-data.org/?lat=${lat}&lon=${lon}&component=major`;
+//   const end = moment(state.plantingDate).add(110, 'days').add(1, 'hour').format('yyyy-MM-DD');
 
-  api({
-    url,
-    callback: (data) => {
-      if (data.ERROR) {
-        console.log(`No SSURGO data at ${lat}, ${lon}`);
-        store.dispatch(set.BD(''));
-        store.dispatch(set.OM(''));
-      } else {
-        data = data.filter((d) => d.desgnmaster !== 'O');
-        // const minhzdept = Math.min.apply(Math, data.map((d) => d.hzdept_r));
-        const minhzdept = Math.min(...data.map((d) => d.hzdept_r));
-        data = data.filter((d) => +d.hzdept_r === +minhzdept);
-        store.dispatch(set.BD(weightedAverage(data, 'dbthirdbar_r')));
-        store.dispatch(set.OM(weightedAverage(data, 'om_r')));
-        store.dispatch(set.gotSSURGO(true));
-        store.dispatch(set.SSURGO(data));
-        fetchModel(state);
-      }
-    },
-    timer: 'ssurgo',
-    delay: 2000,
-  });
-}; // fetchSSURGO
+//   store.dispatch(set.cornN(false));
+//   store.dispatch(set.errorCorn(false));
 
-const fetchCornN = (state) => {
-  const { lat, lon, plantingDate } = state;
+//   const url = `https://weather.covercrop-data.org/hourly?lat=${lat}&lon=${lon}&start=${moment(plantingDate).format('yyyy-MM-DD')}&end=${end}&attributes=air_temperature&options=predicted`;
 
-  const end = moment(state.plantingDate).add(110, 'days').add(1, 'hour').format('yyyy-MM-DD');
-
-  store.dispatch(set.cornN(false));
-  store.dispatch(set.errorCorn(false));
-
-  const url = `https://weather.covercrop-data.org/hourly?lat=${lat}&lon=${lon}&start=${moment(plantingDate).format('yyyy-MM-DD')}&end=${end}&attributes=air_temperature&options=predicted`;
-
-  api({
-    url,
-    callback: (data) => {
-      if (data instanceof Array) {
-        store.dispatch(set.cornN(data));
-      } else {
-        store.dispatch(set.errorCorn(true));
-      }
-    },
-    delay: 0,
-  });
-}; // fetchCornN
+//   api({
+//     url,
+//     callback: (data) => {
+//       if (data instanceof Array) {
+//         store.dispatch(set.cornN(data));
+//       } else {
+//         store.dispatch(set.errorCorn(true));
+//       }
+//     },
+//     delay: 0,
+//   });
+// }; // fetchCornN
 
 export const missingData = () => {
   const state = store.getState();

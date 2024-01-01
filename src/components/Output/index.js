@@ -1,7 +1,7 @@
 /* eslint-disable no-console */
 /* eslint-disable react/no-this-in-sfc */
 /* eslint-disable max-len */
-import React, { useEffect } from 'react';
+import React from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import Highcharts from 'highcharts';
 import HighchartsReact from 'highcharts-react-official';
@@ -15,13 +15,16 @@ import {
   Paper,
 } from '@mui/material';
 
-import Loading from '../../shared/Loading';
+import Loading from './loading';
+import Error from './error';
+
 import {
-  get, set, fetchModel, missingData,
+  get, set, missingData,
 } from '../../store/Store';
 import Map from '../../shared/Map';
 import './styles.scss';
 import Biomass from '../../shared/Biomass';
+import { useFetchModel } from '../../hooks/useFetch';
 
 const params = new URLSearchParams(window.location.search);
 
@@ -97,14 +100,16 @@ const Output = () => {
     }
   }
 
-  useEffect(() => {
-    console.log('dispatch, gotModel changed');
-    console.log('gotModel fetchModel', gotModel);
-    if (!gotModel) {
-      console.log('fetchModel triggered ...');
-      fetchModel();
-    }
-  }, [dispatch, gotModel]);
+  const modelData = useFetchModel();
+
+  // useEffect(() => {
+  //   console.log('dispatch, gotModel changed');
+  //   console.log('gotModel fetchModel', gotModel);
+  //   if (!gotModel) {
+  //     console.log('fetchModel triggered ...');
+  //     useFetchModel();
+  //   }
+  // }, [dispatch, gotModel]);
 
   const scr = missingData();
   if (scr) {
@@ -120,24 +125,12 @@ const Output = () => {
     if (errorCorn) {
       errors.push('Couldn\'t run corn uptake curve.');
     }
-    return (
-      <>
-        <p>
-          Errors:
-        </p>
-        <ul>
-          {errors.map((k) => <li>{k}</li>)}
-        </ul>
-        <p>
-          Please review your inputs and try again.
-        </p>
-      </>
-    );
+    return <Error errors={errors} />;
   }
 
   console.log('gotModel', gotModel, 'cornN', cornN);
 
-  if (!gotModel || !cornN) {
+  if (!modelData || !cornN) {
     console.log('showing loading ....');
     return <Loading />;
   }

@@ -1,10 +1,11 @@
+/* eslint-disable arrow-body-style */
 import React from 'react';
 import Box from '@mui/material/Box';
 import Paper from '@mui/material/Paper';
 import Typography from '@mui/material/Typography';
 import CircularProgress from '@mui/material/CircularProgress';
 
-export default function index() {
+const Loading = () => {
   return (
     <Box
       sx={{
@@ -44,4 +45,6 @@ export default function index() {
       </Paper>
     </Box>
   );
-}
+};
+
+export default Loading;
