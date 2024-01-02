@@ -1,3 +1,4 @@
+/* eslint-disable no-alert */
 import { createStore } from './redux-autosetters';
 import initialState from './inits';
 

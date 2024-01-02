@@ -47,7 +47,7 @@ const initialState = {
   SSURGO: {},
   gotSSURGO: true,
   gotModel: false,
-  cornN: false,
+  cornN: [],
   state: '',
   stateAbbreviation: '',
   unit: 'lb/ac',

@@ -50,7 +50,7 @@ const useFetchCornN = () => {
 const useFetchModel = () => {
   const [startDate, setStartDate] = useState(null);
   const [endDate, setEndDate] = useState(null);
-  const [isDatesValid, setIsDatesValid] = useState(false);
+  const [isDatesValid, setIsDatesValid] = useState(null);
   const [model, setModel] = useState(null);
   const dispatch = useDispatch();
   const lat = useSelector(get.lat);
@@ -69,14 +69,16 @@ const useFetchModel = () => {
   let InorganicN = useSelector(get.InorganicN);
 
   useEffect(() => {
-    setStartDate(moment(killDate).format('yyyy-MM-DD'));
-    setEndDate(moment(killDate).add(110, 'days').add(1, 'hour').format('yyyy-MM-DD'));
-    setIsDatesValid(startDate !== 'Invalid date' && endDate !== 'Invalid date' && endDate > startDate);
+    const start = moment(killDate).add(1, 'hour').format('yyyy-MM-DD');
+    const end = moment(plantingDate).add(110, 'days').add(1, 'hour').format('yyyy-MM-DD');
+    setStartDate(start);
+    setEndDate(end);
+    setIsDatesValid(start !== 'Invalid date' && end !== 'Invalid date' && end > start);
     // const end = moment(plantingDate).add(110, 'days').add(1, 'hour').format('yyyy-MM-DD');
     console.log('plantingDate', plantingDate);
     console.log('killDate', killDate);
-    console.log('startDate', startDate);
-    console.log('endDate', endDate);
+    console.log('startDate', start);
+    console.log('endDate', end);
     console.log('isDatesValid', isDatesValid);
   }, [killDate, plantingDate]);
 
@@ -106,7 +108,8 @@ const useFetchModel = () => {
       const url = `${NCAL_API_URL}?lat=${lat}&lon=${lon}&start=${startDate}&end=${endDate}&n=${N}&biomass=${biomass}&lwc=${lwc}&carb=${carb}&cell=${cell}&lign=${lign}&om=${OM}&bd=${BD}&in=${InorganicN}&pmn=${pmn}`;
       console.log('NCAL_API_URL', url);
       axios
-        .get(url).then((data) => {
+        .get(url).then(({ data }) => {
+          console.log('data', data);
           if (data.name === 'error' || !data.surface) {
             dispatch(set.errorModel(true));
             console.log('error in fetch model', data);
@@ -142,7 +145,7 @@ const useFetchModel = () => {
         })
         .catch((error) => { console.log(error); });
     }
-  }, []);
+  }, [isDatesValid]);
   return model;
 };
 

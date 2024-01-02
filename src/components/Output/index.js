@@ -128,18 +128,18 @@ const Output = () => {
     return <Error errors={errors} />;
   }
 
-  console.log('gotModel', gotModel, 'cornN', cornN);
+  console.log('gotModel', gotModel, 'modelData', modelData, 'cornN', cornN);
 
-  if (!modelData || !cornN) {
+  if (!modelData || !modelData.s) {
     console.log('showing loading ....');
     return <Loading />;
   }
 
-  Object.keys(model.s).forEach((key) => {
-    if (!/^(Temp|MinNfromFOM|FOM|Date|Rain)$/.test(key)) {
-      // delete model.s[key];
-    }
-  });
+  // Object.keys(model.s).forEach((key) => {
+  //   if (!/^(Temp|MinNfromFOM|FOM|Date|Rain)$/.test(key)) {
+  //     // delete model.s[key];
+  //   }
+  // });
 
   const total = +carb + +cell + +lign;
   carb = (carb * 100) / total;
