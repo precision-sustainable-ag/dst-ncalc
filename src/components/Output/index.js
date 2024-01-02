@@ -24,7 +24,7 @@ import {
 import Map from '../../shared/Map';
 import './styles.scss';
 import Biomass from '../../shared/Biomass';
-import { useFetchModel } from '../../hooks/useFetch';
+import { useFetchModel } from '../../hooks/useFetchApi';
 
 const params = new URLSearchParams(window.location.search);
 

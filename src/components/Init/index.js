@@ -1,19 +1,15 @@
 /* eslint-disable jsx-a11y/control-has-associated-label */
 /* eslint-disable no-console */
-import React, { useCallback, useEffect } from 'react';
+import React, { useEffect } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { useNavigate } from 'react-router-dom';
 import Airtable from 'airtable';
 import moment from 'moment';
-// import samplePolygon from '../../../public/sample_polygon.json';
 import { set, get } from '../../store/redux-autosetters';
 import './styles.scss';
+import { useFetchSampleBiomass } from '../../hooks/useFetchStatic';
 
 const examples = {};
-const headers = {
-  'Content-Type': 'application/json',
-  Accept: 'application/json',
-};
 
 const Init = ({ desktop, setNavModalOpen }) => {
   const dispatch = useDispatch();
@@ -23,20 +19,8 @@ const Init = ({ desktop, setNavModalOpen }) => {
   const field = useSelector(get.field);
   const screen = useSelector(get.screen);
 
-  const fetchSampleData = (useCallback(() => {
-    fetch('sample_polygon.json', { headers })
-      .then((response) => response.json())
-      .then((jsonObj) => {
-        dispatch(set.mapPolygon(jsonObj));
-        return null;
-      });
-    fetch('sample_biomass_result.json', { headers })
-      .then((response) => response.json())
-      .then((jsonObj) => {
-        dispatch(set.biomassTaskResults(jsonObj));
-        return null;
-      });
-  }, []));
+  // eslint-disable-next-line no-unused-vars
+  const [samplePolygon, sampleBiomass] = useFetchSampleBiomass();
 
   useEffect(() => {
     const base = new Airtable({ apiKey: 'keySO0dHQzGVaSZp2' }).base('appOEj4Ag9MgTTrMg');
@@ -124,7 +108,6 @@ const Init = ({ desktop, setNavModalOpen }) => {
       dispatch(set.cashCrop('Corn'));
       dispatch(set.yield(150));
       dispatch(set.targetN(150));
-      fetchSampleData();
     } else if (fieldVal === 'Example: Legume') {
       navigate('location');
       dispatch(set.edited(true));
@@ -147,7 +130,6 @@ const Init = ({ desktop, setNavModalOpen }) => {
       dispatch(set.cashCrop('Corn'));
       dispatch(set.yield(150));
       dispatch(set.targetN(100));
-      fetchSampleData();
     } else {
       const inputs = JSON.parse(localStorage[fieldVal]);
       Object.keys(inputs).forEach((key) => {
