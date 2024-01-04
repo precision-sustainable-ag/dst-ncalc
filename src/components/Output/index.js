@@ -27,7 +27,7 @@ import Biomass from '../../shared/Biomass';
 import { useFetchModel } from '../../hooks/useFetchApi';
 
 import model from './model.json';
-import { getGeneralChartOptions, nitrogenChartOptions, residueChartOptions } from './chart';
+import { getGeneralChartOptions, getNitrogenChartOptions, getResidueChartOptions } from './chart';
 
 console.log('modelObj', model);
 const params = new URLSearchParams(window.location.search);
@@ -442,9 +442,32 @@ const Output = () => {
                     </div>
                   </div>
 
-                  <HighchartsReact highcharts={Highcharts} options={nitrogenChartOptions} className="hidden" />
+                  <HighchartsReact
+                    highcharts={Highcharts}
+                    className="hidden"
+                    options={getNitrogenChartOptions({
+                      mockup,
+                      outputN,
+                      unit,
+                      targetN,
+                      doIncorporated,
+                      incorporatedNPredict,
+                      surfaceNPredict,
+                    })}
+                  />
                   {(outputN === 1 && targetN < surfaceNPredict) && <div className="footnote">* Your cover crop is supplying all of your needs.</div>}
-                  <HighchartsReact highcharts={Highcharts} options={residueChartOptions} />
+                  <HighchartsReact
+                    highcharts={Highcharts}
+                    options={getResidueChartOptions({
+                      mockup,
+                      outputN,
+                      unit,
+                      model,
+                      doIncorporated,
+                      incorporatedMin,
+                      surfaceMin,
+                    })}
+                  />
                 </td>
                 <td>
                   <div className="output center" style={{ marginBottom: '1em' }}>
@@ -467,7 +490,22 @@ const Output = () => {
 
                   {mockup === 2 && summary}
 
-                  <HighchartsReact highcharts={Highcharts} options={options} />
+                  <HighchartsReact
+                    highcharts={Highcharts}
+                    options={getGeneralChartOptions({
+                      mockup,
+                      outputN,
+                      doCornN,
+                      unit,
+                      minDate,
+                      NUptake,
+                      surfaceData,
+                      doIncorporated,
+                      incorporatedData,
+                      plantingDate,
+                      maxSurface,
+                    })}
+                  />
 
                   {mockup === 1 && summary}
                 </td>
@@ -619,15 +657,34 @@ const Output = () => {
           <div style={{ width: '100vw', overflow: 'scroll' }}>
             <HighchartsReact
               highcharts={Highcharts}
-              options={nitrogenChartOptions}
               className="hidden"
+              options={getNitrogenChartOptions({
+                mockup,
+                outputN,
+                unit,
+                targetN,
+                doIncorporated,
+                incorporatedNPredict,
+                surfaceNPredict,
+              })}
             />
             {outputN === 1 && targetN < surfaceNPredict && (
               <div className="footnote">
                 * Your cover crop is supplying all of your needs.
               </div>
             )}
-            <HighchartsReact highcharts={Highcharts} options={residueChartOptions} />
+            <HighchartsReact
+              highcharts={Highcharts}
+              options={getResidueChartOptions({
+                mockup,
+                outputN,
+                unit,
+                model,
+                doIncorporated,
+                incorporatedMin,
+                surfaceMin,
+              })}
+            />
           </div>
           <div style={{ marginBottom: '250px' }}>
             <div className="output center" style={{ marginBottom: '1em' }}>
@@ -663,6 +720,7 @@ const Output = () => {
                 doIncorporated,
                 incorporatedData,
                 plantingDate,
+                maxSurface,
               })}
             />
             {mockup === 1 && summary}
