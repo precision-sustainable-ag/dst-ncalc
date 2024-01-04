@@ -27,7 +27,7 @@ import Biomass from '../../shared/Biomass';
 import { useFetchModel } from '../../hooks/useFetchApi';
 
 import model from './model.json';
-import { nitrogenChartOptions, residueChartOptions } from './chart';
+import { getGeneralChartOptions, nitrogenChartOptions, residueChartOptions } from './chart';
 
 console.log('modelObj', model);
 const params = new URLSearchParams(window.location.search);
@@ -253,7 +253,7 @@ const Output = () => {
     });
   }
 
-  const max = outputN === 1 ? (biomass * N) / 100 : Math.max(...surfaceData.map((d) => d.y));
+  const maxSurface = outputN === 1 ? (biomass * N) / 100 : Math.max(...surfaceData.map((d) => d.y));
   const surfaceMin = outputN === 1 ? (biomass * N) / 100 : Math.min(...surfaceData.map((d) => d.y));
   const incorporatedMin = outputN === 1 ? (biomass * N) / 100 : Math.min(...incorporatedData.map((d) => d.y));
 
@@ -650,8 +650,21 @@ const Output = () => {
 
             {mockup === 2 && summary}
 
-            <HighchartsReact highcharts={Highcharts} options={options} />
-
+            <HighchartsReact
+              highcharts={Highcharts}
+              options={getGeneralChartOptions({
+                mockup,
+                outputN,
+                doCornN,
+                unit,
+                minDate,
+                NUptake,
+                surfaceData,
+                doIncorporated,
+                incorporatedData,
+                plantingDate,
+              })}
+            />
             {mockup === 1 && summary}
           </div>
           <div
