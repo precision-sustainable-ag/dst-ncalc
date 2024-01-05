@@ -1,6 +1,7 @@
 /* eslint-disable no-console */
-import React from 'react';
+import React, { useEffect } from 'react';
 import {
+  useDispatch,
   // useDispatch,
   useSelector,
 } from 'react-redux';
@@ -11,7 +12,7 @@ import ResponsiveNavBar from './components/ResponsiveNavBar';
 import Body from './components/Body';
 import './App.scss';
 import 'react-datepicker/dist/react-datepicker.css';
-import { get } from './store/Store';
+import { get, set } from './store/Store';
 
 const screens = {
   init: () => null,
@@ -67,6 +68,32 @@ const App = () => {
   useSelector(get.screen); // force render
   // eslint-disable-next-line no-unused-vars
   const location = useLocation();
+
+  // TO BE REMOVED
+  const dispatch = useDispatch();
+  useEffect(() => {
+    dispatch(set.edited(true));
+    dispatch(set.lat(32.865389));
+    dispatch(set.lon(-82.258361));
+    dispatch(set.location('Example'));
+    dispatch(set.field('Example: Grass'));
+    dispatch(set.OM(0.75));
+    dispatch(set.BD(1.62));
+    dispatch(set.InorganicN(10));
+    dispatch(set.coverCrop(['Rye']));
+    dispatch(set.killDate('2019-03-21'));
+    dispatch(set.plantingDate('2019-04-01'));
+    dispatch(set.biomass(5000));
+    dispatch(set.lwc(1.486));
+    dispatch(set.N(0.6));
+    dispatch(set.carb(33.45));
+    dispatch(set.cell(57.81));
+    dispatch(set.lign(8.74));
+    dispatch(set.cashCrop('Corn'));
+    dispatch(set.yield(150));
+    dispatch(set.targetN(150));
+  }, []);
+  // TO BE REMOVED
 
   return (
     <ThemeProvider theme={theme}>
