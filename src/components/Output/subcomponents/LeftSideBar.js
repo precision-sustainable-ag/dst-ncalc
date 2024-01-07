@@ -17,6 +17,8 @@ const wrapperStyles = {
 const ListStyles = {
   position: 'fixed',
   direction: 'column',
+  left: '150px',
+  transform: 'translate(-50%, 0%)',
   margin: 2,
 };
 
