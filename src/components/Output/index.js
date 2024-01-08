@@ -107,7 +107,7 @@ const summaryData = {
   },
 };
 
-const leftSidebarListData = [
+const sidebarListData = [
   {
     label: 'Summary',
     key: 'sidebar-nav-1',
@@ -127,7 +127,7 @@ const leftSidebarListData = [
     endPos: 300,
   },
   {
-    label: 'Map',
+    label: 'Map Visualization',
     key: 'sidebar-nav-4',
     startPos: 300,
     endPos: 400,
@@ -135,12 +135,12 @@ const leftSidebarListData = [
 ];
 
 const Output = () => {
-  const refs = leftSidebarListData.map(() => React.useRef(null));
+  const refs = sidebarListData.map(() => React.useRef(null));
   return (
     <Box sx={wrapperStyles}>
       <Stack direction="row" justifyContent="space-between">
-        <LeftSideBar sidebarListData={leftSidebarListData} refs={refs} />
-        <RightSideBar summaryData={summaryData} refs={refs} />
+        <LeftSideBar sidebarListData={sidebarListData} refs={refs} />
+        <RightSideBar sidebarListData={sidebarListData} summaryData={summaryData} refs={refs} />
       </Stack>
     </Box>
   );

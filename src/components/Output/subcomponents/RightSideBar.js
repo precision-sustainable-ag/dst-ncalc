@@ -6,12 +6,15 @@ import {
   CardActions,
   CardContent,
   Grid,
+  Skeleton,
   Stack,
   Typography,
   styled,
 } from '@mui/material';
 import React from 'react';
 import Tooltip, { tooltipClasses } from '@mui/material/Tooltip';
+// import Highcharts from 'highcharts';
+// import HighchartsReact from 'highcharts-react-official';
 
 /// /// STYLES /// ///
 const wrapperStyles = {
@@ -73,6 +76,7 @@ const SummaryCard = ({ data, refVal }) => (
         sx={{ fontSize: 22 }}
         color="text.secondary"
         gutterBottom
+        textAlign="center"
       >
         Summary of Statistics
       </Typography>
@@ -89,6 +93,93 @@ const SummaryCard = ({ data, refVal }) => (
   </Card>
 );
 
+const NitrogenCard = ({ refVal }) => (
+  <Card sx={CardStyles} elevation={8} ref={refVal}>
+    <CardContent justifyContent="center">
+      <Typography
+        sx={{ fontSize: 22 }}
+        color="text.secondary"
+        gutterBottom
+        textAlign="center"
+      >
+        Released Nitrogen
+      </Typography>
+
+      <Skeleton variant="rectangular" width={400} height={400} />
+    </CardContent>
+    <CardActions>
+      {/* <Box justifyContent="center">
+        <Skeleton variant="rectangular" width={210} height={60} />
+      </Box> */}
+      {/* <Box>
+        <HighchartsReact
+          highcharts={Highcharts}
+          constructorType="stockChart"
+          option={nitrogenCardOptions}
+        />
+      </Box> */}
+    </CardActions>
+  </Card>
+);
+
+const ResidueCard = ({ refVal }) => (
+  <Card sx={CardStyles} elevation={8} ref={refVal}>
+    <CardContent justifyContent="center">
+      <Typography
+        sx={{ fontSize: 22 }}
+        color="text.secondary"
+        gutterBottom
+        textAlign="center"
+      >
+        Released Nitrogen
+      </Typography>
+
+      <Skeleton variant="rectangular" width={400} height={400} />
+    </CardContent>
+    <CardActions>
+      {/* <Box justifyContent="center">
+        <Skeleton variant="rectangular" width={210} height={60} />
+      </Box> */}
+      {/* <Box>
+        <HighchartsReact
+          highcharts={Highcharts}
+          constructorType="stockChart"
+          option={nitrogenCardOptions}
+        />
+      </Box> */}
+    </CardActions>
+  </Card>
+);
+
+const MapVisCard = ({ refVal }) => (
+  <Card sx={CardStyles} elevation={8} ref={refVal}>
+    <CardContent justifyContent="center">
+      <Typography
+        sx={{ fontSize: 22 }}
+        color="text.secondary"
+        gutterBottom
+        textAlign="center"
+      >
+        Map Visualization
+      </Typography>
+
+      <Skeleton variant="rectangular" width={400} height={400} />
+    </CardContent>
+    <CardActions>
+      {/* <Box justifyContent="center">
+        <Skeleton variant="rectangular" width={210} height={60} />
+      </Box> */}
+      {/* <Box>
+        <HighchartsReact
+          highcharts={Highcharts}
+          constructorType="stockChart"
+          option={nitrogenCardOptions}
+        />
+      </Box> */}
+    </CardActions>
+  </Card>
+);
+
 const OtherCard = ({ refVal }) => (
   <Card sx={CardStyles} elevation={8} ref={refVal}>
     <CardContent>
@@ -96,14 +187,15 @@ const OtherCard = ({ refVal }) => (
         sx={{ fontSize: 22 }}
         color="text.secondary"
         gutterBottom
+        textAlign="center"
       >
-        Summary
+        pages
       </Typography>
       <Typography sx={{ mb: 1.5 }} color="text.secondary">
-        adjective
+        title
       </Typography>
       <Typography variant="body2">
-        well meaning and kindly. a benevolent smile
+        lorem ipsum
       </Typography>
     </CardContent>
     <CardActions>
@@ -122,25 +214,13 @@ const RightSideBar = ({ summaryData, refs }) => {
           <SummaryCard refVal={refs[0]} data={summaryData} />
         </Grid>
         <Grid item sm={12} lg={6} width="100%">
-          <OtherCard refVal={refs[1]} />
+          <NitrogenCard refVal={refs[1]} />
         </Grid>
         <Grid item sm={12} lg={6} width="100%">
-          <OtherCard />
+          <ResidueCard refVal={refs[2]} />
         </Grid>
         <Grid item sm={12} lg={6} width="100%">
-          <OtherCard refVal={refs[2]} />
-        </Grid>
-        <Grid item sm={12} lg={6} width="100%">
-          <OtherCard />
-        </Grid>
-        <Grid item sm={12} lg={6} width="100%">
-          <OtherCard />
-        </Grid>
-        <Grid item sm={12} lg={6} width="100%">
-          <OtherCard refVal={refs[3]} />
-        </Grid>
-        <Grid item sm={12} lg={6} width="100%">
-          <OtherCard />
+          <MapVisCard refVal={refs[3]} />
         </Grid>
         <Grid item sm={12} lg={6} width="100%">
           <OtherCard />

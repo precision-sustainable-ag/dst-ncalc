@@ -6,6 +6,8 @@ import {
 } from '@mui/material';
 import React, { useEffect, useState } from 'react';
 
+const YOFFSET = -100;
+
 const wrapperStyles = {
   display: { xs: 'none', sm: 'block' },
   width: '150px',
@@ -28,7 +30,6 @@ const ListStyles = {
 const ListItem = ({
   activeItem, label, setActiveItem, refVal, setDisableScrollListener,
 }) => {
-  console.log('ListItem');
   const rowStyles = {
     position: 'relative',
     background: activeItem === label ? '#ddd' : 'transparent',
@@ -59,10 +60,9 @@ const ListItem = ({
           setDisableScrollListener(false);
         }, 500);
         setActiveItem(label);
-        refVal.current.scrollIntoView({
-          behavior: 'smooth',
-          block: 'start',
-        });
+        const element = refVal.current;
+        const y = element.getBoundingClientRect().top + window.scrollY + YOFFSET;
+        window.scrollTo({ top: y, behavior: 'smooth' });
       }}
     >
       {activeItem === label && <Box sx={activeRowStyles} />}
@@ -92,18 +92,18 @@ const LeftSideBar = ({ sidebarListData, refs }) => {
 
   useEffect(() => {
     if (!disableScrollListener) {
-      sidebarListData.forEach((el) => {
-        if (scrollPosition > el.startPos && scrollPosition < el.endPos) {
+      sidebarListData.forEach((el, index) => {
+        const element = refs[index].current;
+        const yTop = element.getBoundingClientRect().top + window.scrollY + YOFFSET;
+        const yBot = element.getBoundingClientRect().bottom + window.scrollY + YOFFSET;
+        if (scrollPosition < yBot && scrollPosition > yTop) {
           if (activeItem !== el.label) {
             setActiveItem(el.label);
           }
         }
       });
     }
-    console.log('disableScrollListener', disableScrollListener);
   }, [scrollPosition, disableScrollListener]);
-
-  console.log('scrollPosition', scrollPosition);
 
   return (
     <Box sx={wrapperStyles}>
