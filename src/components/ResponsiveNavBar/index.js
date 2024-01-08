@@ -92,14 +92,12 @@ const ResponsiveNavBar = ({ screens }) => {
       sx={{
         backgroundColor: 'transparent',
         marginBottom: {
-          xs: '2rem',
-          sm: '3rem',
-          md: '4rem',
-          lg: '5rem',
+          xs: '1rem',
+          sm: '2rem',
         },
         paddingTop: {
-          xs: '1rem',
-          lg: '2rem',
+          xs: '0.5rem',
+          lg: '1rem',
         },
       }}
     >
@@ -201,7 +199,7 @@ const ResponsiveNavBar = ({ screens }) => {
         </Toolbar>
         <Toolbar disableGutters sx={{ display: { xs: 'none', md: 'flex' } }}>
           {/* Menu horizontal list */}
-          <Box sx={{ flexGrow: 1, display: { xs: 'none', md: 'flex' }, color: 'white' }}>
+          <Box alignItems="center" sx={{ flexGrow: 1, display: { xs: 'none', md: 'flex' }, color: 'white' }}>
             {Object.keys(screens)
               .filter((scr) => screens[scr].showInMenu !== false)
               .map((scr) => (

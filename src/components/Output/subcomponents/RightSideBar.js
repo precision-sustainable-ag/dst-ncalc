@@ -16,22 +16,29 @@ const wrapperStyles = {
   padding: 5,
 };
 const CardStyles = {
-  minWidth: 275,
+  minWidth: { xs: 400, sm: 300 },
+  width: '100%',
 };
 
 const CardItem = () => (
   <Card sx={CardStyles} elevation={8}>
     <CardContent>
-      <Typography sx={{ fontSize: 22 }} color="text.secondary" gutterBottom>
+      <Typography
+        sx={{ fontSize: 22 }}
+        color="text.secondary"
+        gutterBottom
+      >
         Summary
       </Typography>
-      <Typography sx={{ mb: 1.5 }} color="text.secondary">
+      <Typography
+        sx={{ mb: 1.5 }}
+        color="text.secondary"
+      >
         adjective
       </Typography>
       <Typography variant="body2">
-        well meaning and kindly.
-        <br />
-        a benevolent smile
+        well meaning and kindly. a benevolent
+        smile
       </Typography>
     </CardContent>
     <CardActions>
@@ -43,7 +50,11 @@ const CardItem = () => (
 const RightSideBar = () => {
   console.log('RightSideBar');
   return (
-    <Box sx={wrapperStyles} flex={4} justifyContent="center">
+    <Box
+      sx={wrapperStyles}
+      flex={4}
+      justifyContent="center"
+    >
       <Grid container spacing={5}>
         <Grid item sm={12} xl={6}>
           <CardItem />

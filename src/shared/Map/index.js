@@ -1,3 +1,4 @@
+/* eslint-disable no-console */
 import React, { useState, useEffect } from 'react';
 import mapboxgl from 'mapbox-gl';
 import { useSelector, useDispatch } from 'react-redux';
