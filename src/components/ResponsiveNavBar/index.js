@@ -1,3 +1,4 @@
+/* eslint-disable operator-linebreak */
 import React, { useEffect, useState } from 'react';
 import { useDispatch } from 'react-redux';
 import { NavLink, useLocation } from 'react-router-dom';
@@ -53,6 +54,15 @@ const NavBarButtonText2 = styled(Button)(({ theme, isactive }) => ({
   },
 }));
 
+const navBarBackDropStyles = {
+  position: 'fixed',
+  left: 0,
+  top: 0,
+  width: '100vw',
+  height: { xs: '5rem', lg: '6rem' },
+  background: 'linear-gradient(#111, #333)',
+};
+
 const ResponsiveNavBar = ({ screens }) => {
   const [anchorElNav, setAnchorElNav] = useState(null);
   const [anchorElUser, setAnchorElUser] = useState(null);
@@ -82,12 +92,14 @@ const ResponsiveNavBar = ({ screens }) => {
 
   // // useSelector(get.screen); // force render
   useEffect(() => {
-    setActiveMenu(location.pathname.replace('/', '').replace('2', ''));
+    setActiveMenu(
+      location.pathname.replace('/', '').replace('2', ''),
+    );
   }, [location]);
 
   return (
     <AppBar
-      position="static"
+      position="sticky"
       elevation={0}
       sx={{
         backgroundColor: 'transparent',
@@ -101,6 +113,7 @@ const ResponsiveNavBar = ({ screens }) => {
         },
       }}
     >
+      <Box sx={navBarBackDropStyles} />
       <Stack
         direction="row"
         justifyContent="space-around"
@@ -108,7 +121,12 @@ const ResponsiveNavBar = ({ screens }) => {
       >
         <Toolbar disableGutters>
           {/* Menu Button Box */}
-          <Box sx={{ height: '4rem', display: { xs: 'none', md: 'flex' } }}>
+          <Box
+            sx={{
+              height: '4rem',
+              display: { xs: 'none', md: 'flex' },
+            }}
+          >
             <img
               src="psalogo-text.svg"
               alt="PSA Logo"
@@ -124,7 +142,10 @@ const ResponsiveNavBar = ({ screens }) => {
           </Box>
         </Toolbar>
         {/* Menu vertical list */}
-        <Toolbar disableGutters sx={{ display: { xs: 'flex', md: 'none' } }}>
+        <Toolbar
+          disableGutters
+          sx={{ display: { xs: 'flex', md: 'none' } }}
+        >
           <Box
             sx={{
               flexGrow: 1,
@@ -175,15 +196,28 @@ const ResponsiveNavBar = ({ screens }) => {
                       onClick={() => handleClickNavMenu(scr)}
                       isactive={activeMenu === scr ? 'true' : 'false'}
                     >
-                      {screens[scr].desc.replace(/\s/g, '') || scr.replace(/\s/g, '')}
+                      {screens[scr].desc.replace(/\s/g, '') ||
+                        scr.replace(/\s/g, '')}
                     </NavBarButtonText2>
                   </NavLink>
                 ))}
             </Menu>
           </Box>
         </Toolbar>
-        <Toolbar disableGutters sx={{ display: { xs: 'flex', md: 'none' }, minWidth: '70%', justifyContent: 'center' }}>
-          <Box sx={{ height: '4rem', display: { xs: 'flex', md: 'none' } }}>
+        <Toolbar
+          disableGutters
+          sx={{
+            display: { xs: 'flex', md: 'none' },
+            minWidth: '70%',
+            justifyContent: 'center',
+          }}
+        >
+          <Box
+            sx={{
+              height: '4rem',
+              display: { xs: 'flex', md: 'none' },
+            }}
+          >
             <img
               src="psalogo-text.svg"
               alt="PSA Logo"
@@ -197,9 +231,19 @@ const ResponsiveNavBar = ({ screens }) => {
             />
           </Box>
         </Toolbar>
-        <Toolbar disableGutters sx={{ display: { xs: 'none', md: 'flex' } }}>
+        <Toolbar
+          disableGutters
+          sx={{ display: { xs: 'none', md: 'flex' } }}
+        >
           {/* Menu horizontal list */}
-          <Box alignItems="center" sx={{ flexGrow: 1, display: { xs: 'none', md: 'flex' }, color: 'white' }}>
+          <Box
+            alignItems="center"
+            sx={{
+              flexGrow: 1,
+              display: { xs: 'none', md: 'flex' },
+              color: 'white',
+            }}
+          >
             {Object.keys(screens)
               .filter((scr) => screens[scr].showInMenu !== false)
               .map((scr) => (
@@ -266,9 +310,7 @@ const ResponsiveNavBar = ({ screens }) => {
               >
                 <Typography textAlign="center">Feedback</Typography>
               </MenuItem>
-              <MenuItem
-                key="examples"
-              >
+              <MenuItem key="examples">
                 <Init desktop setNavModalOpen={setNavModalOpen} />
               </MenuItem>
             </Menu>

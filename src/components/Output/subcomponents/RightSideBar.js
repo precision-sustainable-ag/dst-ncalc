@@ -1,5 +1,4 @@
 /* eslint-disable no-console */
-import { HelpOutlineOutlined } from '@mui/icons-material';
 import {
   Box,
   Button,
@@ -24,23 +23,38 @@ const CardStyles = {
 };
 
 /// /// COMPONENTS /// ///
-const SummaryItem = () => (
+const SummaryItem = ({ name, value }) => (
   <Box
     sx={{
-      backgroundColor: 'orange',
-      border: '1px solid black',
-      borderRadius: 2,
+      // backgroundColor: 'orange',
+      // border: '1px solid black',
+      // borderRadius: 2,
       padding: 1,
     }}
   >
     <Stack direction="row">
-      <Typography>Summary Item</Typography>
-      <HelpOutlineOutlined />
+      <Typography
+        sx={{
+          borderBottom: '1px dotted rgb(35, 148, 223)',
+          borderRadius: 0,
+          padding: '0 5px 0 2px',
+          background:
+            'linear-gradient(90deg, rgba(35, 148, 223, 0.2), rgba(35, 148, 223, 0.0))',
+          fontWeight: 900,
+          fontSize: 11,
+        }}
+      >
+        {name}
+        :&nbsp;
+      </Typography>
+      <Typography sx={{ fontWeight: 600, fontSize: 11 }}>
+        {value}
+      </Typography>
     </Stack>
   </Box>
 );
 
-const SummaryCard = () => (
+const SummaryCard = ({ data }) => (
   <Card sx={CardStyles} elevation={8}>
     <CardContent>
       <Typography
@@ -58,8 +72,13 @@ const SummaryCard = () => (
       </Typography>
     </CardContent>
     <CardActions>
-      <Button size="small">Learn More</Button>
-      <SummaryItem />
+      <Grid container spacing={2}>
+        {Object.entries(data).map(([name, value]) => (
+          <Grid item xs={12} sm={6} md={4} lg={3} width="100%">
+            <SummaryItem name={name} value={value} />
+          </Grid>
+        ))}
+      </Grid>
     </CardActions>
   </Card>
 );
@@ -87,18 +106,14 @@ const OtherCard = () => (
   </Card>
 );
 
-/// /// COMPONENT /// ///
-const RightSideBar = () => {
-  console.log('RightSideBar');
+/// /// ROOT COMPONENT /// ///
+const RightSideBar = ({ summaryData }) => {
+  console.log('summaryData', summaryData);
   return (
-    <Box
-      sx={wrapperStyles}
-      flex={4}
-      justifyContent="center"
-    >
+    <Box sx={wrapperStyles} flex={4} justifyContent="center">
       <Grid container spacing={5}>
-        <Grid item sm={12} lg={6} width="100%">
-          <SummaryCard />
+        <Grid item sm={12} width="100%">
+          <SummaryCard data={summaryData} />
         </Grid>
         <Grid item sm={12} lg={6} width="100%">
           <OtherCard />
