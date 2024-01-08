@@ -107,13 +107,40 @@ const summaryData = {
   },
 };
 
+const leftSidebarListData = [
+  {
+    label: 'Summary',
+    key: 'sidebar-nav-1',
+    startPos: 0,
+    endPos: 100,
+  },
+  {
+    label: 'Nitrogen Released',
+    key: 'sidebar-nav-2',
+    startPos: 100,
+    endPos: 200,
+  },
+  {
+    label: 'Residue Remaining',
+    key: 'sidebar-nav-3',
+    startPos: 200,
+    endPos: 300,
+  },
+  {
+    label: 'Map',
+    key: 'sidebar-nav-4',
+    startPos: 300,
+    endPos: 400,
+  },
+];
+
 const Output = () => {
-  console.log('Output');
+  const refs = leftSidebarListData.map(() => React.useRef(null));
   return (
     <Box sx={wrapperStyles}>
       <Stack direction="row" justifyContent="space-between">
-        <LeftSideBar />
-        <RightSideBar summaryData={summaryData} />
+        <LeftSideBar sidebarListData={leftSidebarListData} refs={refs} />
+        <RightSideBar summaryData={summaryData} refs={refs} />
       </Stack>
     </Box>
   );

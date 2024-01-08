@@ -37,7 +37,7 @@ const CustomTypography = styled(Typography)(() => ({
   borderRadius: 0,
   padding: '0 5px 0 2px',
   fontWeight: 300,
-  fontSize: 12,
+  fontSize: 14,
   '&:hover': {
     cursor: 'help',
   },
@@ -59,15 +59,15 @@ const SummaryItem = ({ name, value, desc }) => (
           :&nbsp;
         </CustomTypography>
       </CustomWidthTooltip>
-      <Typography sx={{ fontWeight: 600, fontSize: 11 }}>
+      <Typography sx={{ fontWeight: 600, fontSize: 13 }}>
         {value}
       </Typography>
     </Stack>
   </Box>
 );
 
-const SummaryCard = ({ data }) => (
-  <Card sx={CardStyles} elevation={8}>
+const SummaryCard = ({ data, refVal }) => (
+  <Card sx={CardStyles} elevation={8} ref={refVal}>
     <CardContent>
       <Typography
         sx={{ fontSize: 22 }}
@@ -89,8 +89,8 @@ const SummaryCard = ({ data }) => (
   </Card>
 );
 
-const OtherCard = () => (
-  <Card sx={CardStyles} elevation={8}>
+const OtherCard = ({ refVal }) => (
+  <Card sx={CardStyles} elevation={8} ref={refVal}>
     <CardContent>
       <Typography
         sx={{ fontSize: 22 }}
@@ -113,13 +113,22 @@ const OtherCard = () => (
 );
 
 /// /// ROOT COMPONENT /// ///
-const RightSideBar = ({ summaryData }) => {
+const RightSideBar = ({ summaryData, refs }) => {
   console.log('summaryData', summaryData);
   return (
     <Box sx={wrapperStyles} flex={4} justifyContent="center">
       <Grid container spacing={5}>
         <Grid item sm={12} width="100%">
-          <SummaryCard data={summaryData} />
+          <SummaryCard refVal={refs[0]} data={summaryData} />
+        </Grid>
+        <Grid item sm={12} lg={6} width="100%">
+          <OtherCard refVal={refs[1]} />
+        </Grid>
+        <Grid item sm={12} lg={6} width="100%">
+          <OtherCard />
+        </Grid>
+        <Grid item sm={12} lg={6} width="100%">
+          <OtherCard refVal={refs[2]} />
         </Grid>
         <Grid item sm={12} lg={6} width="100%">
           <OtherCard />
@@ -128,19 +137,7 @@ const RightSideBar = ({ summaryData }) => {
           <OtherCard />
         </Grid>
         <Grid item sm={12} lg={6} width="100%">
-          <OtherCard />
-        </Grid>
-        <Grid item sm={12} lg={6} width="100%">
-          <OtherCard />
-        </Grid>
-        <Grid item sm={12} lg={6} width="100%">
-          <OtherCard />
-        </Grid>
-        <Grid item sm={12} lg={6} width="100%">
-          <OtherCard />
-        </Grid>
-        <Grid item sm={12} lg={6} width="100%">
-          <OtherCard />
+          <OtherCard refVal={refs[3]} />
         </Grid>
         <Grid item sm={12} lg={6} width="100%">
           <OtherCard />
