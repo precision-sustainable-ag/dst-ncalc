@@ -9,14 +9,102 @@ const wrapperStyles = {
 };
 
 const summaryData = {
-  'Field name': 'Example: Grass',
-  Species: 'Rye',
-  'Termination Date': 'Mar 21, 2019',
-  'Dry Biomass': '5000 lb/ac',
-  'Residue N Content': '30 lb/ac',
-  Carbohydrates: '33 %',
-  'Holo-cellulose': '58 %',
-  Lignin: '9 %',
+  'Field name': {
+    value: 'Example: Grass',
+    desc: `Lorem ipsum dolor sit amet, consectetuer adipiscing elit. 
+    Aenean commodo ligula eget dolor. Aenean massa. Cum sociis 
+    natoque penatibus et magnis dis parturient montes, nascetur 
+    ridiculus mus. Donec quam felis, ultricies nec, pellentesque 
+    eu, pretium quis, sem. Nulla consequat massa quis enim. Donec 
+    pede justo, fringilla vel, aliquet nec, vulputate eget, arcu. 
+    In enim justo, rhoncus ut, imperdiet a, venenatis vitae, justo. 
+    Nullam dictum felis eu pede mollis pretium. 
+    Integer tincidunt. Cras dapibus. Vivamus elementum `,
+  },
+  Species: {
+    value: 'Rye',
+    desc: `Lorem ipsum dolor sit amet, consectetuer adipiscing elit. 
+  Aenean commodo ligula eget dolor. Aenean massa. Cum sociis 
+  natoque penatibus et magnis dis parturient montes, nascetur 
+  ridiculus mus. Donec quam felis, ultricies nec, pellentesque 
+  eu, pretium quis, sem. Nulla consequat massa quis enim. Donec 
+  pede justo, fringilla vel, aliquet nec, vulputate eget, arcu. 
+  In enim justo, rhoncus ut, imperdiet a, venenatis vitae, justo. 
+  Nullam dictum felis eu pede mollis pretium. 
+  Integer tincidunt. Cras dapibus. Vivamus elementum `,
+  },
+  'Termination Date': {
+    value: 'Mar 21, 2019',
+    desc: `Lorem ipsum dolor sit amet, consectetuer adipiscing elit. 
+    Aenean commodo ligula eget dolor. Aenean massa. Cum sociis 
+    natoque penatibus et magnis dis parturient montes, nascetur 
+    ridiculus mus. Donec quam felis, ultricies nec, pellentesque 
+    eu, pretium quis, sem. Nulla consequat massa quis enim. Donec 
+    pede justo, fringilla vel, aliquet nec, vulputate eget, arcu. 
+    In enim justo, rhoncus ut, imperdiet a, venenatis vitae, justo. 
+    Nullam dictum felis eu pede mollis pretium. 
+    Integer tincidunt. Cras dapibus. Vivamus elementum `,
+  },
+  'Dry Biomass': {
+    value: '5000 lb/ac',
+    desc: `Lorem ipsum dolor sit amet, consectetuer adipiscing elit. 
+    Aenean commodo ligula eget dolor. Aenean massa. Cum sociis 
+    natoque penatibus et magnis dis parturient montes, nascetur 
+    ridiculus mus. Donec quam felis, ultricies nec, pellentesque 
+    eu, pretium quis, sem. Nulla consequat massa quis enim. Donec 
+    pede justo, fringilla vel, aliquet nec, vulputate eget, arcu. 
+    In enim justo, rhoncus ut, imperdiet a, venenatis vitae, justo. 
+    Nullam dictum felis eu pede mollis pretium. 
+    Integer tincidunt. Cras dapibus. Vivamus elementum `,
+  },
+  'Residue N Content': {
+    value: '30 lb/ac',
+    desc: `Lorem ipsum dolor sit amet, consectetuer adipiscing elit. 
+    Aenean commodo ligula eget dolor. Aenean massa. Cum sociis 
+    natoque penatibus et magnis dis parturient montes, nascetur 
+    ridiculus mus. Donec quam felis, ultricies nec, pellentesque 
+    eu, pretium quis, sem. Nulla consequat massa quis enim. Donec 
+    pede justo, fringilla vel, aliquet nec, vulputate eget, arcu. 
+    In enim justo, rhoncus ut, imperdiet a, venenatis vitae, justo. 
+    Nullam dictum felis eu pede mollis pretium. 
+    Integer tincidunt. Cras dapibus. Vivamus elementum `,
+  },
+  Carbohydrates: {
+    value: '33 %',
+    desc: `Lorem ipsum dolor sit amet, consectetuer adipiscing elit. 
+    Aenean commodo ligula eget dolor. Aenean massa. Cum sociis 
+    natoque penatibus et magnis dis parturient montes, nascetur 
+    ridiculus mus. Donec quam felis, ultricies nec, pellentesque 
+    eu, pretium quis, sem. Nulla consequat massa quis enim. Donec 
+    pede justo, fringilla vel, aliquet nec, vulputate eget, arcu. 
+    In enim justo, rhoncus ut, imperdiet a, venenatis vitae, justo. 
+    Nullam dictum felis eu pede mollis pretium. 
+    Integer tincidunt. Cras dapibus. Vivamus elementum `,
+  },
+  'Holo-cellulose': {
+    value: '58 %',
+    desc: `Lorem ipsum dolor sit amet, consectetuer adipiscing elit. 
+    Aenean commodo ligula eget dolor. Aenean massa. Cum sociis 
+    natoque penatibus et magnis dis parturient montes, nascetur 
+    ridiculus mus. Donec quam felis, ultricies nec, pellentesque 
+    eu, pretium quis, sem. Nulla consequat massa quis enim. Donec 
+    pede justo, fringilla vel, aliquet nec, vulputate eget, arcu. 
+    In enim justo, rhoncus ut, imperdiet a, venenatis vitae, justo. 
+    Nullam dictum felis eu pede mollis pretium. 
+    Integer tincidunt. Cras dapibus. Vivamus elementum `,
+  },
+  Lignin: {
+    value: '9 %',
+    desc: `Lorem ipsum dolor sit amet, consectetuer adipiscing elit. 
+    Aenean commodo ligula eget dolor. Aenean massa. Cum sociis 
+    natoque penatibus et magnis dis parturient montes, nascetur 
+    ridiculus mus. Donec quam felis, ultricies nec, pellentesque 
+    eu, pretium quis, sem. Nulla consequat massa quis enim. Donec 
+    pede justo, fringilla vel, aliquet nec, vulputate eget, arcu. 
+    In enim justo, rhoncus ut, imperdiet a, venenatis vitae, justo. 
+    Nullam dictum felis eu pede mollis pretium. 
+    Integer tincidunt. Cras dapibus. Vivamus elementum `,
+  },
 };
 
 const Output = () => {

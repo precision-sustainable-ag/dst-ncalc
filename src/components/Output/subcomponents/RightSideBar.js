@@ -8,8 +8,10 @@ import {
   Grid,
   Stack,
   Typography,
+  styled,
 } from '@mui/material';
 import React from 'react';
+import Tooltip, { tooltipClasses } from '@mui/material/Tooltip';
 
 /// /// STYLES /// ///
 const wrapperStyles = {
@@ -23,30 +25,40 @@ const CardStyles = {
 };
 
 /// /// COMPONENTS /// ///
-const SummaryItem = ({ name, value }) => (
+const CustomWidthTooltip = styled(({ className, ...props }) => (
+  <Tooltip {...props} classes={{ popper: className }} />
+))({
+  [`& .${tooltipClasses.tooltip}`]: {
+    maxWidth: 300,
+  },
+});
+
+const CustomTypography = styled(Typography)(() => ({
+  borderRadius: 0,
+  padding: '0 5px 0 2px',
+  fontWeight: 300,
+  fontSize: 12,
+  '&:hover': {
+    cursor: 'help',
+  },
+  background:
+    'linear-gradient(90deg, rgba(35, 148, 223, 0.2), rgba(35, 148, 223, 0.0))',
+  borderBottom: '1px dotted rgb(35, 148, 223)',
+}));
+
+const SummaryItem = ({ name, value, desc }) => (
   <Box
     sx={{
-      // backgroundColor: 'orange',
-      // border: '1px solid black',
-      // borderRadius: 2,
       padding: 1,
     }}
   >
     <Stack direction="row">
-      <Typography
-        sx={{
-          borderBottom: '1px dotted rgb(35, 148, 223)',
-          borderRadius: 0,
-          padding: '0 5px 0 2px',
-          background:
-            'linear-gradient(90deg, rgba(35, 148, 223, 0.2), rgba(35, 148, 223, 0.0))',
-          fontWeight: 900,
-          fontSize: 11,
-        }}
-      >
-        {name}
-        :&nbsp;
-      </Typography>
+      <CustomWidthTooltip arrow title={desc} placement="top">
+        <CustomTypography>
+          {name}
+          :&nbsp;
+        </CustomTypography>
+      </CustomWidthTooltip>
       <Typography sx={{ fontWeight: 600, fontSize: 11 }}>
         {value}
       </Typography>
@@ -62,20 +74,14 @@ const SummaryCard = ({ data }) => (
         color="text.secondary"
         gutterBottom
       >
-        Summary
-      </Typography>
-      <Typography sx={{ mb: 1.5 }} color="text.secondary">
-        adjective
-      </Typography>
-      <Typography variant="body2">
-        well meaning and kindly. a benevolent smile
+        Summary of Statistics
       </Typography>
     </CardContent>
     <CardActions>
       <Grid container spacing={2}>
-        {Object.entries(data).map(([name, value]) => (
+        {Object.entries(data).map(([k, v]) => (
           <Grid item xs={12} sm={6} md={4} lg={3} width="100%">
-            <SummaryItem name={name} value={value} />
+            <SummaryItem name={k} value={v.value} desc={v.desc} />
           </Grid>
         ))}
       </Grid>
