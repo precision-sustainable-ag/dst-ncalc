@@ -5,7 +5,6 @@ import LeftSideBar from './subcomponents/LeftSideBar';
 import RightSideBar from './subcomponents/RightSideBar';
 
 const wrapperStyles = {
-  backgroundColor: 'lightBlue',
   width: '100%',
 };
 

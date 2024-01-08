@@ -9,63 +9,43 @@ import React from 'react';
 
 const wrapperStyles = {
   display: { xs: 'none', sm: 'block' },
-  backgroundColor: 'lightBlue',
-  width: '240px',
+  width: '150px',
+};
+
+const ListWrapperStyles = {
+  position: 'fixed',
+  left: '0px',
 };
 
 const ListStyles = {
-  position: 'fixed',
   direction: 'column',
-  left: '120px',
-  transform: 'translate(-50%, 0%)',
-  margin: 2,
+  marginLeft: 2,
+  padding: 2,
+  borderRadius: 2,
+  backgroundColor: '#f5f5f5',
 };
 
 const LeftSideBar = () => {
   console.log('LeftSideBar');
   return (
     <Box sx={wrapperStyles}>
-      <Stack
-        sx={ListStyles}
-        gap={4}
-        alignItems="center"
-      >
-        <Avatar
-          alt="Remy Sharp"
-          src="/static/images/avatar/1.jpg"
-        />
-        <Typography variant="h5" fontWeight={900}>
-          LeftSideBar
-        </Typography>
-        <Avatar
-          alt="Remy Sharp"
-          src="/static/images/avatar/1.jpg"
-        />
-        <Typography variant="h5" fontWeight={900}>
-          LeftSideBar
-        </Typography>
-        <Avatar
-          alt="Remy Sharp"
-          src="/static/images/avatar/1.jpg"
-        />
-        <Typography variant="h5" fontWeight={900}>
-          LeftSideBar
-        </Typography>
-        <Avatar
-          alt="Remy Sharp"
-          src="/static/images/avatar/1.jpg"
-        />
-        <Typography variant="h5" fontWeight={900}>
-          LeftSideBar
-        </Typography>
-        <Avatar
-          alt="Remy Sharp"
-          src="/static/images/avatar/1.jpg"
-        />
-        <Typography variant="h5" fontWeight={900}>
-          LeftSideBar
-        </Typography>
-      </Stack>
+      <Box sx={ListWrapperStyles}>
+        <Stack sx={ListStyles} gap={4} alignItems="center">
+          <Avatar alt="Remy Sharp" src="/avatar/1.jpg" />
+          <Typography variant="span" fontWeight={900}>
+            LeftSideBar
+          </Typography>
+          <Avatar alt="Remy Sharp" src="/avatar/1.jpg" />
+          <Typography variant="span" fontWeight={900}>
+            LeftSideBar
+          </Typography>
+          <Avatar alt="Remy Sharp" src="/avatar/1.jpg" />
+          <Typography variant="span" fontWeight={900}>
+            LeftSideBar
+          </Typography>
+          <Avatar alt="Remy Sharp" src="/avatar/1.jpg" />
+        </Stack>
+      </Box>
     </Box>
   );
 };
