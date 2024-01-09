@@ -6,7 +6,8 @@ import { useDispatch, useSelector } from 'react-redux';
 import { get, set } from '../store/Store';
 import { weightedAverage } from './helpers';
 
-const NCAL_API_URL = 'https://api.precisionsustainableag.org/cc-ncalc/surface';
+const NCAL_API_URL =
+  'https://api.precisionsustainableag.org/cc-ncalc/surface';
 const SSURGO_API_URL = 'https://ssurgo.covercrop-data.org';
 const WEATHER_API_URL = 'https://weather.covercrop-data.org';
 
@@ -22,7 +23,10 @@ const useFetchCornN = () => {
   const plantingDate = useSelector(get.plantingDate);
 
   useEffect(() => {
-    const end = moment(plantingDate).add(110, 'days').add(1, 'hour').format('yyyy-MM-DD');
+    const end = moment(plantingDate)
+      .add(110, 'days')
+      .add(1, 'hour')
+      .format('yyyy-MM-DD');
     setEndDate(end);
   }, [plantingDate]);
 
@@ -30,16 +34,23 @@ const useFetchCornN = () => {
     dispatch(set.cornN(null));
     dispatch(set.errorCorn(false));
     // eslint-disable-next-line max-len
-    const url = `${WEATHER_API_URL}/hourly?lat=${lat}&lon=${lon}&start=${moment(plantingDate).format('yyyy-MM-DD')}&end=${endDate}&attributes=air_temperature&options=predicted`;
+    const url = `${WEATHER_API_URL}/hourly?lat=${lat}&lon=${lon}&start=${moment(
+      plantingDate,
+    ).format(
+      'yyyy-MM-DD',
+    )}&end=${endDate}&attributes=air_temperature&options=predicted`;
     axios
-      .get(url).then((data) => {
+      .get(url)
+      .then((data) => {
         if (data instanceof Array) {
           dispatch(set.cornN(data));
         } else {
           dispatch(set.errorCorn(true));
         }
       })
-      .catch((error) => { console.log(error); });
+      .catch((error) => {
+        console.log(error);
+      });
   }, []);
 }; // fetchCornN
 
@@ -69,11 +80,20 @@ const useFetchModel = () => {
   let InorganicN = useSelector(get.InorganicN);
 
   useEffect(() => {
-    const start = moment(killDate).add(1, 'hour').format('yyyy-MM-DD');
-    const end = moment(plantingDate).add(110, 'days').add(1, 'hour').format('yyyy-MM-DD');
+    const start = moment(killDate)
+      .add(1, 'hour')
+      .format('yyyy-MM-DD');
+    const end = moment(plantingDate)
+      .add(110, 'days')
+      .add(1, 'hour')
+      .format('yyyy-MM-DD');
     setStartDate(start);
     setEndDate(end);
-    setIsDatesValid(start !== 'Invalid date' && end !== 'Invalid date' && end > start);
+    setIsDatesValid(
+      start !== 'Invalid date' &&
+        end !== 'Invalid date' &&
+        end > start,
+    );
     // const end = moment(plantingDate).add(110, 'days').add(1, 'hour').format('yyyy-MM-DD');
     console.log('plantingDate', plantingDate);
     console.log('killDate', killDate);
@@ -83,6 +103,7 @@ const useFetchModel = () => {
   }, [killDate, plantingDate]);
 
   useEffect(() => {
+    console.log('gdfhhgfdhfg############', killDate, plantingDate);
     if (!isDatesValid) {
       console.log('invalid dates for fetch Model'); // eslint-disable-line no-console
     } else {
@@ -91,9 +112,9 @@ const useFetchModel = () => {
       InorganicN = InorganicN || 10;
 
       lwc = lwc || 10;
-      carb = carb || (24.7 + 10.5 * N);
-      cell = cell || (69 - 10.2 * N);
-      lign = lign || (100 - (carb + cell));
+      carb = carb || 24.7 + 10.5 * N;
+      cell = cell || 69 - 10.2 * N;
+      lign = lign || 100 - (carb + cell);
 
       const total = +carb + +cell + +lign;
       carb = (carb * 100) / total;
@@ -108,7 +129,8 @@ const useFetchModel = () => {
       const url = `${NCAL_API_URL}?lat=${lat}&lon=${lon}&start=${startDate}&end=${endDate}&n=${N}&biomass=${biomass}&lwc=${lwc}&carb=${carb}&cell=${cell}&lign=${lign}&om=${OM}&bd=${BD}&in=${InorganicN}&pmn=${pmn}`;
       console.log('NCAL_API_URL', url);
       axios
-        .get(url).then(({ data }) => {
+        .get(url)
+        .then(({ data }) => {
           console.log('data', data);
           if (data.name === 'error' || !data.surface) {
             dispatch(set.errorModel(true));
@@ -131,11 +153,17 @@ const useFetchModel = () => {
             i: modelIncorporated,
           };
 
-          const cols = Object.keys(modelData.s).sort((a, b) => a.toUpperCase().localeCompare(b.toUpperCase()));
+          const cols = Object.keys(modelData.s).sort((a, b) =>
+            a.toUpperCase().localeCompare(b.toUpperCase()),
+          );
 
-          cols.filter((col) => !modelData.s[col].length).forEach((col) => {
-            modelData.s[col] = new Array(modelData.s.Rain.length).fill(modelData.s[col]);
-          });
+          cols
+            .filter((col) => !modelData.s[col].length)
+            .forEach((col) => {
+              modelData.s[col] = new Array(
+                modelData.s.Rain.length,
+              ).fill(modelData.s[col]);
+            });
           console.log('modelData', modelData);
           dispatch(set.model(modelData));
           setModel(modelData);
@@ -143,7 +171,9 @@ const useFetchModel = () => {
           // console.log('gotModel', store.getState().gotModel);
           useFetchCornN();
         })
-        .catch((error) => { console.log(error); });
+        .catch((error) => {
+          console.log(error);
+        });
     }
   }, [isDatesValid]);
   return model;
@@ -163,7 +193,8 @@ const useFetchSSURGO = () => {
     const url = `${SSURGO_API_URL}/?lat=${lat}&lon=${lon}&component=major`;
     dispatch(set.SSURGO(null));
     dispatch(set.model(null));
-    axios.get(url)
+    axios
+      .get(url)
       .then((data) => {
         if (data.ERROR) {
           console.log(`No SSURGO data at ${lat}, ${lon}`);
@@ -180,7 +211,9 @@ const useFetchSSURGO = () => {
           useFetchModel();
         }
       })
-      .catch((error) => { console.log(error); });
+      .catch((error) => {
+        console.log(error);
+      });
   }, [lat, lon]);
 }; // fetchSSURGO
 

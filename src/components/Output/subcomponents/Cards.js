@@ -13,7 +13,13 @@ import {
 } from '@mui/material';
 import { tooltipClasses } from '@mui/material/Tooltip';
 import { NcalcMap } from '@psa/dst.ui.ncalc-map';
+import Highcharts from 'highcharts';
+import HighchartsReact from 'highcharts-react-official';
 import React from 'react';
+import {
+  getNitrogenChartOptions,
+  getResidueChartOptions,
+} from './chartsOptions';
 
 /// /// /// STYLES /// /// ///
 const CardStyles = {
@@ -96,7 +102,19 @@ const SummaryCard = ({ data, refVal }) => (
   </Card>
 );
 
-const NitrogenCard = ({ refVal }) => (
+const NitrogenCard = ({
+  refVal,
+  mockup,
+  outputN,
+  unit,
+  targetN,
+  surfaceMin,
+  doIncorporated,
+  incorporatedNPredict,
+  incorporatedMin,
+  surfaceNPredict,
+  model,
+}) => (
   <Card sx={CardStyles} elevation={8} ref={refVal}>
     <CardContent sx={cardContentStyles}>
       <Stack gap={2}>
@@ -113,16 +131,36 @@ const NitrogenCard = ({ refVal }) => (
       </Stack>
     </CardContent>
     <CardActions>
-      {/* <Box justifyContent="center">
-        <Skeleton variant="rectangular" width={210} height={60} />
-      </Box> */}
-      {/* <Box>
-        <HighchartsReact
-          highcharts={Highcharts}
-          constructorType="stockChart"
-          option={nitrogenCardOptions}
-        />
-      </Box> */}
+      <HighchartsReact
+        highcharts={Highcharts}
+        className="hidden"
+        options={getNitrogenChartOptions({
+          mockup,
+          outputN,
+          unit,
+          targetN,
+          doIncorporated,
+          incorporatedNPredict,
+          surfaceNPredict,
+        })}
+      />
+      {outputN === 1 && targetN < surfaceNPredict && (
+        <div className="footnote">
+          * Your cover crop is supplying all of your needs.
+        </div>
+      )}
+      <HighchartsReact
+        highcharts={Highcharts}
+        options={getResidueChartOptions({
+          mockup,
+          outputN,
+          unit,
+          model,
+          doIncorporated,
+          incorporatedMin,
+          surfaceMin,
+        })}
+      />
     </CardActions>
   </Card>
 );
