@@ -29,7 +29,7 @@ import Biomass from '../../shared/Biomass';
 import { useFetchModel } from '../../hooks/useFetchApi';
 
 import model from './model.json';
-import { getGeneralChartOptions, getNitrogenChartOptions, getResidueChartOptions } from './subcomponents/chart';
+import { getGeneralChartOptions, getNitrogenChartOptions, getResidueChartOptions } from './subcomponents/chartsOptions';
 import SummaryList from './subcomponents/summary';
 
 console.log('modelObj', model);
