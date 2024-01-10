@@ -316,9 +316,6 @@ const OtherCard = ({ refVal }) => (
       >
         pages
       </Typography>
-      <Typography sx={{ mb: 1.5 }} color="text.secondary">
-        title
-      </Typography>
       <Typography variant="body2">lorem ipsum</Typography>
     </CardContent>
     <CardActions>
