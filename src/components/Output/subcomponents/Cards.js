@@ -1,3 +1,5 @@
+/* eslint-disable no-unused-vars */
+/* eslint-disable arrow-body-style */
 import {
   Button,
   Card,
@@ -10,6 +12,7 @@ import {
   Tooltip,
   styled,
   Box,
+  Divider,
 } from '@mui/material';
 import { tooltipClasses } from '@mui/material/Tooltip';
 import { NcalcMap } from '@psa/dst.ui.ncalc-map';
@@ -17,7 +20,9 @@ import Highcharts from 'highcharts';
 import HighchartsReact from 'highcharts-react-official';
 import React from 'react';
 import {
+  getGeneralChartOptions,
   getNitrogenChartOptions,
+  // getNitrogenChartOptions,
   getResidueChartOptions,
 } from './chartsOptions';
 
@@ -36,6 +41,12 @@ const cardContentStyles = {
   alignItems: 'center',
 };
 
+const dividerStyles = {
+  height: '4px',
+  backgroundColor: 'rgba(200,200,200,0.4)',
+  borderRadius: '5px',
+  width: '100%',
+};
 /// /// /// COMPONENTS /// /// ///
 const CustomWidthTooltip = styled(({ className, ...props }) => (
   <Tooltip {...props} classes={{ popper: className }} />
@@ -102,87 +113,180 @@ const SummaryCard = ({ data, refVal }) => (
   </Card>
 );
 
-const NitrogenCard = ({
-  refVal,
-  mockup,
-  outputN,
-  unit,
-  targetN,
-  surfaceMin,
-  doIncorporated,
-  incorporatedNPredict,
-  incorporatedMin,
-  surfaceNPredict,
-  model,
-}) => (
-  <Card sx={CardStyles} elevation={8} ref={refVal}>
-    <CardContent sx={cardContentStyles}>
-      <Stack gap={2}>
-        <Typography
-          sx={{ fontSize: 22 }}
-          color="text.secondary"
-          gutterBottom
-          textAlign="center"
-        >
-          Released Nitrogen
-        </Typography>
-        <Skeleton variant="rectangular" width={400} height={300} />
-        <Skeleton variant="rectangular" width={400} height={100} />
-      </Stack>
-    </CardContent>
-    <CardActions>
-      <HighchartsReact
-        highcharts={Highcharts}
-        className="hidden"
-        options={getNitrogenChartOptions({
-          mockup,
-          outputN,
-          unit,
-          targetN,
-          doIncorporated,
-          incorporatedNPredict,
-          surfaceNPredict,
-        })}
-      />
-      {outputN === 1 && targetN < surfaceNPredict && (
-        <div className="footnote">
-          * Your cover crop is supplying all of your needs.
-        </div>
-      )}
-      <HighchartsReact
-        highcharts={Highcharts}
-        options={getResidueChartOptions({
-          mockup,
-          outputN,
-          unit,
-          model,
-          doIncorporated,
-          incorporatedMin,
-          surfaceMin,
-        })}
-      />
-    </CardActions>
-  </Card>
-);
+const NitrogenCard = ({ props }) => {
+  const {
+    refVal,
+    targetN,
+    surfaceMin,
+    incorporatedNPredict,
+    incorporatedMin,
+    surfaceNPredict,
+    mockup,
+    outputN,
+    doCornN,
+    unit,
+    minDate,
+    NUptake,
+    surfaceData,
+    doIncorporated,
+    incorporatedData,
+    plantingDate,
+    maxSurface,
+    model,
+  } = props;
 
-const ResidueCard = ({ refVal }) => (
-  <Card sx={CardStyles} elevation={8} ref={refVal}>
-    <CardContent sx={cardContentStyles}>
-      <Stack gap={2}>
-        <Typography
-          sx={{ fontSize: 22 }}
-          color="text.secondary"
-          gutterBottom
-          textAlign="center"
-        >
-          Remaining Residue
-        </Typography>
-        <Skeleton variant="rectangular" width={400} height={300} />
-        <Skeleton variant="rectangular" width={400} height={100} />
-      </Stack>
-    </CardContent>
-  </Card>
-);
+  console.log('props', props);
+  console.log('doCornN', doCornN);
+
+  return (
+    <Card sx={CardStyles} elevation={8} ref={refVal}>
+      <CardContent sx={cardContentStyles}>
+        <Stack gap={2}>
+          <Typography
+            sx={{ fontSize: 22 }}
+            color="text.secondary"
+            textAlign="center"
+            gutterBottom
+          >
+            Released Nitrogen
+          </Typography>
+        </Stack>
+      </CardContent>
+      <CardActions>
+        <Stack direction="column" gap={5}>
+          <HighchartsReact
+            highcharts={Highcharts}
+            options={getGeneralChartOptions({
+              mockup,
+              outputN,
+              doCornN,
+              unit,
+              minDate,
+              NUptake,
+              surfaceData,
+              doIncorporated,
+              incorporatedData,
+              plantingDate,
+              maxSurface,
+            })}
+          />
+          <Divider orientation="horizontal" sx={dividerStyles} />
+          <HighchartsReact
+            highcharts={Highcharts}
+            // className="hidden"
+            options={getNitrogenChartOptions({
+              mockup,
+              outputN,
+              unit,
+              targetN,
+              doIncorporated,
+              incorporatedNPredict,
+              surfaceNPredict,
+            })}
+          />
+        </Stack>
+        <HighchartsReact
+          highcharts={Highcharts}
+          options={getResidueChartOptions({
+            mockup,
+            outputN,
+            unit,
+            model,
+            doIncorporated,
+            incorporatedMin,
+            surfaceMin,
+          })}
+        />
+      </CardActions>
+    </Card>
+  );
+};
+
+const ResidueCard = ({ props }) => {
+  const {
+    refVal,
+    targetN,
+    surfaceMin,
+    incorporatedNPredict,
+    incorporatedMin,
+    surfaceNPredict,
+    mockup,
+    outputN,
+    doCornN,
+    unit,
+    minDate,
+    NUptake,
+    surfaceData,
+    doIncorporated,
+    incorporatedData,
+    plantingDate,
+    maxSurface,
+    model,
+  } = props;
+
+  return (
+    <Card sx={CardStyles} elevation={8} ref={refVal}>
+      <CardContent sx={cardContentStyles}>
+        <Stack gap={2}>
+          <Typography
+            sx={{ fontSize: 22 }}
+            color="text.secondary"
+            gutterBottom
+            textAlign="center"
+          >
+            Remaining Residue
+          </Typography>
+        </Stack>
+      </CardContent>
+      <CardActions>
+        <Stack direction="column" gap={5}>
+          <HighchartsReact
+            highcharts={Highcharts}
+            options={getGeneralChartOptions({
+              mockup,
+              outputN,
+              doCornN,
+              unit,
+              minDate,
+              NUptake,
+              surfaceData,
+              doIncorporated,
+              incorporatedData,
+              plantingDate,
+              maxSurface,
+            })}
+          />
+          <Divider orientation="horizontal" sx={dividerStyles} />
+          <HighchartsReact
+            highcharts={Highcharts}
+            // className="hidden"
+            options={getNitrogenChartOptions({
+              mockup,
+              outputN,
+              unit,
+              targetN,
+              doIncorporated,
+              incorporatedNPredict,
+              surfaceNPredict,
+            })}
+          />
+        </Stack>
+        <HighchartsReact
+          highcharts={Highcharts}
+          options={getResidueChartOptions({
+            mockup,
+            outputN,
+            unit,
+            model,
+            doIncorporated,
+            incorporatedMin,
+            surfaceMin,
+          })}
+        />
+      </CardActions>
+    </Card>
+  );
+};
 
 const MapVisCard = ({ refVal }) => (
   <Card sx={CardStyles} elevation={8} ref={refVal}>

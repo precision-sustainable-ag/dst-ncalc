@@ -57,25 +57,31 @@ const getAxisTexts = ({
 /// ////////////////////////////////////////////////////////////////////////////
 /// ////////////////////////////////////////////////////////////////////////////
 /// ////////////////////////////////////////////////////////////////////////////
-const getGeneralChartOptions = ({
-  mockup,
-  outputN,
-  doCornN,
-  unit,
-  minDate,
-  NUptake,
-  surfaceData,
-  doIncorporated,
-  incorporatedData,
-  plantingDate,
-  maxSurface,
-}) => {
+const getGeneralChartOptions = (props) => {
+  const {
+    mockup,
+    outputN,
+    doCornN,
+    unit,
+    minDate,
+    NUptake,
+    surfaceData,
+    doIncorporated,
+    incorporatedData,
+    plantingDate,
+    maxSurface,
+  } = props;
+  console.log('props', props);
+
   const { titleText, xAxisTitle, yAxisTitle } = getAxisTexts({
     mockup,
     outputN,
     doCornN,
     unit,
   });
+  console.log('surfaceData', surfaceData);
+  console.log('NUptake', NUptake);
+  console.log('incorporatedData', incorporatedData);
   return {
     chart: {
       height: 405,
@@ -142,7 +148,7 @@ const getGeneralChartOptions = ({
             color: '#008837',
           },
         },
-        min: 0,
+        min: -10,
         endOnTick: false,
         minorTicks: true,
         lineWidth: 3,

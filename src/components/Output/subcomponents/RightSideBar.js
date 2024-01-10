@@ -11,7 +11,8 @@ import {
   ResidueCard,
   SummaryCard,
 } from './Cards';
-import { useFetchModel } from '../../../hooks/useFetchApi';
+// import { useFetchModel } from '../../../hooks/useFetchApi';
+import model from './model.json';
 import { modelCalc } from './helpers';
 import { get } from '../../../store/redux-autosetters';
 // import Highcharts from 'highcharts';
@@ -25,10 +26,7 @@ const wrapperStyles = {
 
 /// /// ROOT COMPONENT /// ///
 const RightSideBar = ({ summaryData, refs }) => {
-  const model = useFetchModel();
-  const modelData = useFetchModel();
-  console.log('HOOK modelData', modelData);
-  console.log('HOOK model', model);
+  /// /// VARIABLES /// ///
   const doIncorporated = false;
   const N = useSelector(get.N);
   const killDate = useSelector(get.killDate);
@@ -45,6 +43,32 @@ const RightSideBar = ({ summaryData, refs }) => {
   const nweeks = useSelector(get.nweeks);
   const targetN = useSelector(get.targetN);
   const mockup = useSelector(get.mockup);
+  const lat = useSelector(get.lat);
+  const lon = useSelector(get.lon);
+  const OM = useSelector(get.OM);
+  const lwc = useSelector(get.lwc);
+  const BD = useSelector(get.BD);
+  const InorganicN = useSelector(get.InorganicN);
+
+  // /// /// HOOKS /// ///
+  // const model = useFetchModel({
+  //   lat,
+  //   lon,
+  //   N,
+  //   OM,
+  //   BD,
+  //   lwc,
+  //   unit,
+  //   carb,
+  //   cell,
+  //   lign,
+  //   biomass,
+  //   killDate,
+  //   InorganicN,
+  //   plantingDate,
+  // });
+  // console.log('HOOK model', model);
+
   const {
     maxSurface,
     surfaceMin,
@@ -69,10 +93,14 @@ const RightSideBar = ({ summaryData, refs }) => {
     Yield,
     nweeks,
     biomass,
+    doIncorporated: false,
+    doCornN: true,
     N,
-    doIncorporated,
   });
 
+  console.log('model', model);
+
+  /// /// RETURN JSX /// ///
   return (
     <Box sx={wrapperStyles} flex={4} justifyContent="center">
       <Grid container spacing={5}>
@@ -81,23 +109,51 @@ const RightSideBar = ({ summaryData, refs }) => {
         </Grid>
         <Grid item sm={12} lg={6} width="100%">
           <NitrogenCard
-            refVal={refs[1]}
             props={{
-              mockup,
-              outputN,
-              unit,
+              refVal: refs[1],
               targetN,
               surfaceMin,
-              doIncorporated,
               incorporatedNPredict,
               incorporatedMin,
               surfaceNPredict,
+              mockup,
+              outputN,
+              doCornN: true,
+              unit,
+              minDate,
+              NUptake,
+              surfaceData,
+              doIncorporated,
+              incorporatedData,
+              plantingDate,
+              maxSurface,
               model,
             }}
           />
         </Grid>
         <Grid item sm={12} lg={6} width="100%">
-          <ResidueCard refVal={refs[2]} />
+          <ResidueCard
+            props={{
+              refVal: refs[2],
+              targetN,
+              surfaceMin,
+              incorporatedNPredict,
+              incorporatedMin,
+              surfaceNPredict,
+              mockup,
+              outputN,
+              doCornN: true,
+              unit,
+              minDate,
+              NUptake,
+              surfaceData,
+              doIncorporated,
+              incorporatedData,
+              plantingDate,
+              maxSurface,
+              model,
+            }}
+          />
         </Grid>
         <Grid item sm={12} lg={6} width="100%">
           <MapVisCard refVal={refs[3]} />

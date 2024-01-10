@@ -6,8 +6,7 @@ import { useDispatch, useSelector } from 'react-redux';
 import { get, set } from '../store/Store';
 import { weightedAverage } from './helpers';
 
-const NCAL_API_URL =
-  'https://api.precisionsustainableag.org/cc-ncalc/surface';
+const NCAL_API_URL = 'https://api.precisionsustainableag.org/cc-ncalc/surface';
 const SSURGO_API_URL = 'https://ssurgo.covercrop-data.org';
 const WEATHER_API_URL = 'https://weather.covercrop-data.org';
 
@@ -58,28 +57,50 @@ const useFetchCornN = () => {
 /// ..............................................................................
 /// ..............................................................................
 //
-const useFetchModel = () => {
+const useFetchModel = ({
+  lat,
+  lon,
+  N,
+  OM,
+  BD,
+  unit,
+  killDate,
+  plantingDate,
+  carb,
+  cell,
+  lign,
+  biomass,
+  lwc,
+  InorganicN,
+}) => {
   const [startDate, setStartDate] = useState(null);
   const [endDate, setEndDate] = useState(null);
   const [isDatesValid, setIsDatesValid] = useState(null);
   const [model, setModel] = useState(null);
   const dispatch = useDispatch();
-  const lat = useSelector(get.lat);
-  const lon = useSelector(get.lon);
-  const N = useSelector(get.N);
-  const OM = useSelector(get.OM);
-  const BD = useSelector(get.BD);
-  const unit = useSelector(get.unit);
-  const killDate = useSelector(get.killDate);
-  const plantingDate = useSelector(get.plantingDate);
-  let carb = useSelector(get.carb);
-  let cell = useSelector(get.cell);
-  let lign = useSelector(get.lign);
-  let biomass = useSelector(get.biomass);
-  let lwc = useSelector(get.lwc);
-  let InorganicN = useSelector(get.InorganicN);
+
+  console.log('useFetchModel', {
+    lat,
+    lon,
+    N,
+    OM,
+    BD,
+    unit,
+    killDate,
+    plantingDate,
+    carb,
+    cell,
+    lign,
+    biomass,
+    lwc,
+    InorganicN,
+  });
+  // useEffect(() => {
+
+  // }, [killDate, plantingDate]);
 
   useEffect(() => {
+    console.log('####### useFetchModel useEffect');
     const start = moment(killDate)
       .add(1, 'hour')
       .format('yyyy-MM-DD');
@@ -90,9 +111,9 @@ const useFetchModel = () => {
     setStartDate(start);
     setEndDate(end);
     setIsDatesValid(
-      start !== 'Invalid date' &&
-        end !== 'Invalid date' &&
-        end > start,
+      start !== 'Invalid date'
+      && end !== 'Invalid date'
+      && end > start,
     );
     // const end = moment(plantingDate).add(110, 'days').add(1, 'hour').format('yyyy-MM-DD');
     console.log('plantingDate', plantingDate);
@@ -100,9 +121,6 @@ const useFetchModel = () => {
     console.log('startDate', start);
     console.log('endDate', end);
     console.log('isDatesValid', isDatesValid);
-  }, [killDate, plantingDate]);
-
-  useEffect(() => {
     console.log('gdfhhgfdhfg############', killDate, plantingDate);
     if (!isDatesValid) {
       console.log('invalid dates for fetch Model'); // eslint-disable-line no-console
@@ -153,9 +171,7 @@ const useFetchModel = () => {
             i: modelIncorporated,
           };
 
-          const cols = Object.keys(modelData.s).sort((a, b) =>
-            a.toUpperCase().localeCompare(b.toUpperCase()),
-          );
+          const cols = Object.keys(modelData.s).sort((a, b) => a.toUpperCase().localeCompare(b.toUpperCase()));
 
           cols
             .filter((col) => !modelData.s[col].length)
@@ -175,7 +191,7 @@ const useFetchModel = () => {
           console.log(error);
         });
     }
-  }, [isDatesValid]);
+  }, []);
   return model;
 };
 

@@ -18,6 +18,7 @@ const modelCalc = ({
   nweeks,
   biomass,
   N,
+  doCornN,
   doIncorporated,
 }) => {
   const total = +carb + +cell + +lign;
@@ -32,13 +33,14 @@ const modelCalc = ({
   // const NUptake = [[+plantingDate, 0]];
   const NUptake = [];
 
-  const doCornN = cashCrop === 'Corn' && outputN === 1;
+  // const doCornN = cashCrop === 'Corn' && outputN === 1;
+
   if (doCornN) {
     const f = unit === 'lb/ac' ? 1 : 1.12085;
-
+    console.log('cornN', cornN);
     cornN.forEach((rec) => {
       const temp = rec.air_temperature;
-
+      console.log('rec', rec);
       dailyTotal += temp - 8;
       if (d1.getHours() === 0) {
         gdd += dailyTotal / 24;
@@ -47,7 +49,7 @@ const modelCalc = ({
           +d1,
           ((Yield * 1.09) /
             (1 + Math.exp(-0.00615 * (gdd - 646.19)))) *
-            f,
+          f,
         ]);
         dailyTotal = 0;
       }
