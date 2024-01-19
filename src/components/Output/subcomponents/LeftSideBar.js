@@ -11,6 +11,7 @@ const YOFFSET = -100;
 const wrapperStyles = {
   display: { xs: 'none', sm: 'block' },
   width: '150px',
+  zIndex: 1,
 };
 
 const ListWrapperStyles = {

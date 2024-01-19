@@ -1,16 +1,14 @@
 /* eslint-disable no-unused-vars */
 /* eslint-disable no-console */
 import { Box, Grid } from '@mui/material';
-import { useDispatch, useSelector } from 'react-redux';
-import { useNavigate } from 'react-router-dom';
+import { useSelector } from 'react-redux';
+// import { useNavigate } from 'react-router-dom';
 import React from 'react';
-import {
-  MapVisCard,
-  NitrogenCard,
-  OtherCard,
-  ResidueCard,
-  SummaryCard,
-} from './Cards';
+
+import NitrogenCard from './NitrogenWidget';
+import ResidueCard from './ResidueWidget';
+import MapVisCard from './MapVisWidget';
+import { SummaryCard, OtherCard } from './SummaryWidget';
 // import { useFetchModel } from '../../../hooks/useFetchApi';
 import model from './model.json';
 import { modelCalc } from './helpers';
@@ -20,7 +18,7 @@ import { get } from '../../../store/redux-autosetters';
 
 /// /// /// STYLES /// /// ///
 const wrapperStyles = {
-  width: '100%',
+  width: '80%',
   padding: 5,
 };
 
@@ -165,4 +163,5 @@ const RightSideBar = ({ summaryData, refs }) => {
     </Box>
   );
 };
+
 export default RightSideBar;

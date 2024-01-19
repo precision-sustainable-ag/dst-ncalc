@@ -1,6 +1,19 @@
 /* eslint-disable arrow-body-style */
 import Highcharts from 'highcharts';
 
+// const responsiveOptions = {
+//   rules: [{
+//     condition: {
+//       maxWidth: 200,
+//     },
+//     chartOptions: {
+//       legend: {
+//         enabled: false,
+//       },
+//     },
+//   }],
+// };
+
 Highcharts.setOptions({
   chart: {
     animation: false,
@@ -79,9 +92,6 @@ const getGeneralChartOptions = (props) => {
     doCornN,
     unit,
   });
-  console.log('surfaceData', surfaceData);
-  console.log('NUptake', NUptake);
-  console.log('incorporatedData', incorporatedData);
   return {
     chart: {
       height: 405,
