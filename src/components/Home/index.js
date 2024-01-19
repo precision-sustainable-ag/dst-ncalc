@@ -44,6 +44,7 @@ const Home = () => {
   }, [dispatch]);
 
   const handleChange = (event, newValue) => {
+    if (newValue === null) return;
     dispatch(set.biomassCalcMode(newValue));
   };
 

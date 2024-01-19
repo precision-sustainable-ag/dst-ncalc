@@ -94,7 +94,7 @@ const getGeneralChartOptions = (props) => {
   });
   return {
     chart: {
-      height: 405,
+      height: 350,
     },
     plotOptions: {
       series: {
@@ -252,7 +252,7 @@ const getNitrogenChartOptions = ({
   return {
     chart: {
       type: 'bar',
-      height: 350,
+      height: 250,
       className: outputN === 2 ? 'hidden' : '',
     },
     title: {
