@@ -95,8 +95,8 @@ const ResidueCard = ({ props }) => {
             highcharts={Highcharts}
             options={getGeneralChartOptions({
               mockup,
-              outputN,
-              doCornN,
+              outputN: 2,
+              doCornN: 0,
               unit,
               minDate,
               NUptake,

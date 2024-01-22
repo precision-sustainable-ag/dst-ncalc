@@ -74,7 +74,7 @@ const getAxisTexts = ({
 const getGeneralChartOptions = (props) => {
   const {
     mockup,
-    // outputN,
+    outputN,
     doCornN,
     unit,
     minDate,
@@ -85,7 +85,7 @@ const getGeneralChartOptions = (props) => {
     plantingDate,
   } = props;
 
-  const outputN = 1;
+  // const outputN = 1;
 
   const { titleText, xAxisTitle, yAxisTitle } = getAxisTexts({
     mockup,
@@ -264,6 +264,7 @@ const getNitrogenChartOptions = ({
   incorporatedNPredict,
   surfaceNPredict,
 }) => {
+  console.log('targetN', targetN);
   return {
     chart: {
       type: 'bar',
@@ -328,22 +329,24 @@ const getNitrogenChartOptions = ({
       labels: {
         enabled: true,
       },
-      plotLines: [{
-        value: targetN,
-        label: {
-          useHTML: true,
-          text: doIncorporated
-            ? `<div class="IncorporatedTargetN">
-                Target N
-               </div>
-               <div class="SurfaceTargetN">
-                Target N
-               </div>`
-            : `<div class="SurfaceOnlyTargetN">
-                Target N
-               </div>`,
+      plotLines: [
+        {
+          label: {
+            text: `Target N = ${targetN}`,
+            style: {
+              color: 'black',
+              font: '12px Trebuchet MS, Verdana, sans-serif',
+            },
+          },
+          verticalAlign: 'center',
+          align: 'center',
+          zIndex: 5,
+          color: 'gray', // Color value
+          dashStyle: 'Dot', // Style of the plot line. Default to solid
+          value: targetN, // Value of where the line will appear
+          width: 2, // Width of the line
         },
-      }],
+      ],
     }],
     legend: {
       verticalAlign: 'top',
