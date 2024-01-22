@@ -35,7 +35,7 @@ const modelCalc = ({
 
   // const doCornN = cashCrop === 'Corn' && outputN === 1;
 
-  if (doCornN) {
+  if (cornN && doCornN) {
     const f = unit === 'lb/ac' ? 1 : 1.12085;
     console.log('cornN', cornN);
     cornN.forEach((rec) => {
@@ -44,13 +44,24 @@ const modelCalc = ({
       dailyTotal += temp - 8;
       if (d1.getHours() === 0) {
         gdd += dailyTotal / 24;
-        NUptake.push([
-          // d1 - (1000 * 60 * 60 * 24),
-          +d1,
-          ((Yield * 1.09) /
+        NUptake.push({
+          x: +d1,
+          y: ((Yield * 1.09) /
             (1 + Math.exp(-0.00615 * (gdd - 646.19)))) *
-          f,
-        ]);
+            f,
+          marker: {
+            radius: 3,
+            fillColor: 'orange',
+            enabled: false,
+          },
+        });
+        // NUptake.push([
+        //   // d1 - (1000 * 60 * 60 * 24),
+        //   +d1,
+        //   ((Yield * 1.09) /
+        //     (1 + Math.exp(-0.00615 * (gdd - 646.19)))) *
+        //   f,
+        // ]);
         dailyTotal = 0;
       }
       d1.setHours(d1.getHours() + 1);
@@ -82,41 +93,43 @@ const modelCalc = ({
   let mf;
   const dates = [];
 
-  model.s[outputN === 1 ? 'MinNfromFOM' : 'FOM'].forEach(
-    (d, i, a) => {
-      const value = +(d / factor).toFixed(2);
+  if (model) {
+    model.s[outputN === 1 ? 'MinNfromFOM' : 'FOM'].forEach(
+      (d, i, a) => {
+        const value = +(d / factor).toFixed(2);
 
-      if (i === 24 * 2 * 7) {
-        m2 = value;
-      } else if (i === 24 * 4 * 7) {
-        m4 = value;
-      } else if (i === 24 * 13 * 7) {
-        mf = value;
-      }
+        if (i === 24 * 2 * 7) {
+          m2 = value;
+        } else if (i === 24 * 4 * 7) {
+          m4 = value;
+        } else if (i === 24 * 13 * 7) {
+          mf = value;
+        }
 
-      dates.push(moment(date).format('YYYY-MM-DD HH:mm'));
+        dates.push(moment(date).format('YYYY-MM-DD HH:mm'));
 
-      if (date.getHours() === 0) {
-        surfaceData.push({
-          x: +date,
-          y: +value,
-          marker: {
-            radius: 5,
-            fillColor: '#008837',
-            enabled:
-              Math.round(i / 24) === nweeks * 7 ||
-              (i === a.length - 1 && nweeks * 7 * 24 >= a.length),
-          },
-        });
-      }
-      date.setHours(date.getHours() + 1);
-    },
-  );
+        if (date.getHours() === 0) {
+          surfaceData.push({
+            x: +date,
+            y: +value,
+            marker: {
+              radius: 5,
+              fillColor: '#008837',
+              enabled:
+                Math.round(i / 24) === nweeks * 7 ||
+                (i === a.length - 1 && nweeks * 7 * 24 >= a.length),
+            },
+          });
+        }
+        date.setHours(date.getHours() + 1);
+      },
+    );
+  }
 
   date = new Date(killDate);
   const incorporatedData = [];
 
-  if (doIncorporated) {
+  if (model && doIncorporated) {
     model.i[outputN === 1 ? 'FomCumN' : 'FOM'].forEach((d, i, a) => {
       const value = +(d / factor).toFixed(2);
       incorporatedData.push({
@@ -160,12 +173,12 @@ const modelCalc = ({
   //   // labModel = <iframe title="N/A" style={{ display: 'none' }} src={src} />;
   // }
 
-  const surfaceNPredict = Math.round(
+  const surfaceNPredict = model ? Math.round(
     model.s.MinNfromFOM.slice(-1) / factor,
-  );
+  ) : 0;
 
   const incorporatedNPredict =
-    doIncorporated && Math.round(model.i.FomCumN.slice(-1) / factor);
+    model && doIncorporated && Math.round(model.i.FomCumN.slice(-1) / factor);
 
   return {
     maxSurface,

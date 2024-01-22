@@ -16,6 +16,7 @@ const WEATHER_API_URL = 'https://weather.covercrop-data.org';
 //
 const useFetchCornN = () => {
   const [endDate, setEndDate] = useState(null);
+  const [cornData, setCornData] = useState(null);
   const dispatch = useDispatch();
   const lat = useSelector(get.lat);
   const lon = useSelector(get.lon);
@@ -27,10 +28,7 @@ const useFetchCornN = () => {
       .add(1, 'hour')
       .format('yyyy-MM-DD');
     setEndDate(end);
-  }, [plantingDate]);
-
-  useEffect(() => {
-    dispatch(set.cornN(null));
+    // dispatch(set.cornN([]));
     dispatch(set.errorCorn(false));
     // eslint-disable-next-line max-len
     const url = `${WEATHER_API_URL}/hourly?lat=${lat}&lon=${lon}&start=${moment(
@@ -40,9 +38,11 @@ const useFetchCornN = () => {
     )}&end=${endDate}&attributes=air_temperature&options=predicted`;
     axios
       .get(url)
-      .then((data) => {
-        if (data instanceof Array) {
+      .then(({ data }) => {
+        if (data && data instanceof Array) {
+          console.log('cornN4j353j4n3', data);
           dispatch(set.cornN(data));
+          setCornData(data);
         } else {
           dispatch(set.errorCorn(true));
         }
@@ -50,7 +50,8 @@ const useFetchCornN = () => {
       .catch((error) => {
         console.log(error);
       });
-  }, []);
+  }, [plantingDate, endDate]);
+  return cornData;
 }; // fetchCornN
 
 /// Desc: useFetchModel
@@ -73,8 +74,6 @@ const useFetchModel = ({
   lwc,
   InorganicN,
 }) => {
-  const [startDate, setStartDate] = useState(null);
-  const [endDate, setEndDate] = useState(null);
   const [isDatesValid, setIsDatesValid] = useState(null);
   const [model, setModel] = useState(null);
   const dispatch = useDispatch();
@@ -95,36 +94,32 @@ const useFetchModel = ({
     lwc,
     InorganicN,
   });
-  // useEffect(() => {
 
-  // }, [killDate, plantingDate]);
+  console.log('####### useFetchModel useEffect');
+  const start = moment(killDate)
+    .add(1, 'hour')
+    .format('yyyy-MM-DD');
+  const end = moment(plantingDate)
+    .add(110, 'days')
+    .add(1, 'hour')
+    .format('yyyy-MM-DD');
 
   useEffect(() => {
-    console.log('####### useFetchModel useEffect');
-    const start = moment(killDate)
-      .add(1, 'hour')
-      .format('yyyy-MM-DD');
-    const end = moment(plantingDate)
-      .add(110, 'days')
-      .add(1, 'hour')
-      .format('yyyy-MM-DD');
-    setStartDate(start);
-    setEndDate(end);
-    setIsDatesValid(
-      start !== 'Invalid date'
+    const validity = start !== 'Invalid date'
       && end !== 'Invalid date'
-      && end > start,
-    );
+      && moment(end) > moment(start);
+    setIsDatesValid(validity);
     // const end = moment(plantingDate).add(110, 'days').add(1, 'hour').format('yyyy-MM-DD');
     console.log('plantingDate', plantingDate);
     console.log('killDate', killDate);
     console.log('startDate', start);
     console.log('endDate', end);
-    console.log('isDatesValid', isDatesValid);
-    console.log('gdfhhgfdhfg############', killDate, plantingDate);
-    if (!isDatesValid) {
+    console.log('isDatesValid', validity);
+    console.log('gdfhhgfdhfg############', start, end, moment(end) > moment(start));
+    if (!validity) {
       console.log('invalid dates for fetch Model'); // eslint-disable-line no-console
     } else {
+      console.log('fdgfdgd############', start, end, isDatesValid);
       const pmn = 10;
 
       InorganicN = InorganicN || 10;
@@ -143,8 +138,9 @@ const useFetchModel = ({
 
       biomass *= factor;
 
-      // eslint-disable-next-line max-len
-      const url = `${NCAL_API_URL}?lat=${lat}&lon=${lon}&start=${startDate}&end=${endDate}&n=${N}&biomass=${biomass}&lwc=${lwc}&carb=${carb}&cell=${cell}&lign=${lign}&om=${OM}&bd=${BD}&in=${InorganicN}&pmn=${pmn}`;
+      const url = `${NCAL_API_URL}?lat=${lat}&lon=${lon}&start=${start}
+                   &end=${end}&n=${N}&biomass=${biomass}&lwc=${lwc}&carb=${carb}&cell=${cell}
+                   &lign=${lign}&om=${OM}&bd=${BD}&in=${InorganicN}&pmn=${pmn}`;
       console.log('NCAL_API_URL', url);
       axios
         .get(url)
@@ -191,7 +187,8 @@ const useFetchModel = ({
           console.log(error);
         });
     }
-  }, []);
+  }, [plantingDate, killDate, end, start]);
+
   return model;
 };
 
@@ -224,7 +221,8 @@ const useFetchSSURGO = () => {
           dispatch(set.BD(weightedAverage(data, 'dbthirdbar_r')));
           dispatch(set.OM(weightedAverage(data, 'om_r')));
           dispatch(set.SSURGO(data));
-          useFetchModel();
+          console.log('SSURGO', data);
+          // useFetchModel();
         }
       })
       .catch((error) => {

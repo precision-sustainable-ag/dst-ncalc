@@ -1,12 +1,13 @@
 /* eslint-disable no-unused-vars */
 /* eslint-disable arrow-body-style */
+import React from 'react';
 import {
   Card,
   CardContent,
   Typography,
 } from '@mui/material';
 import { NcalcMap } from '@psa/dst.ui.ncalc-map';
-import React from 'react';
+import Biomass from '../../../shared/Biomass';
 
 /// /// /// STYLES /// /// ///
 const CardStyles = {
@@ -22,6 +23,7 @@ const cardContentStyles = {
   justifyContent: 'center',
   alignItems: 'center',
 };
+
 /// /// /// COMPONENTS /// /// ///
 
 /// /// /// RETURN JSX /// /// ///

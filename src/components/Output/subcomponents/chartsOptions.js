@@ -1,5 +1,6 @@
 /* eslint-disable arrow-body-style */
 import Highcharts from 'highcharts';
+import _ from 'lodash';
 
 // const responsiveOptions = {
 //   rules: [{
@@ -73,7 +74,7 @@ const getAxisTexts = ({
 const getGeneralChartOptions = (props) => {
   const {
     mockup,
-    outputN,
+    // outputN,
     doCornN,
     unit,
     minDate,
@@ -82,9 +83,9 @@ const getGeneralChartOptions = (props) => {
     doIncorporated,
     incorporatedData,
     plantingDate,
-    maxSurface,
   } = props;
-  console.log('props', props);
+
+  const outputN = 1;
 
   const { titleText, xAxisTitle, yAxisTitle } = getAxisTexts({
     mockup,
@@ -92,13 +93,26 @@ const getGeneralChartOptions = (props) => {
     doCornN,
     unit,
   });
+
+  const minSurface = surfaceData.length > 0 ? _.minBy(surfaceData, 'y').y : 0;
+  const maxSurface = surfaceData.length > 0 ? _.maxBy(surfaceData, 'y').y : 0;
+  const minNitrogen = NUptake.length > 0 ? _.minBy(NUptake, 'y').y : 0;
+  const maxNitrogen = NUptake.length > 0 ? _.maxBy(NUptake, 'y').y : 0;
+
+  let minYAxis = doCornN ? Math.min(minSurface, minNitrogen) : minSurface;
+  let maxYAxis = doCornN ? Math.max(maxSurface, maxNitrogen) : maxSurface;
+
+  // add 10% margin to the y axis
+  minYAxis -= (maxYAxis - minYAxis) * 0.1;
+  maxYAxis += (maxYAxis - minYAxis) * 0.1;
+
   return {
     chart: {
       height: 350,
     },
     plotOptions: {
       series: {
-        animation: false,
+        animation: true,
       },
     },
     tooltip: {
@@ -158,7 +172,8 @@ const getGeneralChartOptions = (props) => {
             color: '#008837',
           },
         },
-        min: -10,
+        min: minYAxis,
+        max: maxYAxis,
         endOnTick: false,
         minorTicks: true,
         lineWidth: 3,
@@ -382,7 +397,7 @@ const getResidueChartOptions = ({
     title: {
       text: `
         <div class="caption">
-          Cover crop residue mass remaining<br>after ${Math.floor(model.s.Date.length / (24 * 7))} weeks past termination.
+          Cover crop residue mass remaining<br>after ${model && Math.floor(model.s.Date.length / (24 * 7))} weeks past termination.
         </div>
       `,
       verticalAlign: mockup === 1 ? 'bottom' : 'top',

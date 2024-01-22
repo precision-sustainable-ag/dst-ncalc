@@ -95,6 +95,7 @@ const LeftSideBar = ({ sidebarListData, refs }) => {
     if (!disableScrollListener) {
       sidebarListData.forEach((el, index) => {
         const element = refs[index].current;
+        if (element === null) return;
         const yTop = element.getBoundingClientRect().top + window.scrollY + YOFFSET;
         const yBot = element.getBoundingClientRect().bottom + window.scrollY + YOFFSET;
         if (scrollPosition < yBot && scrollPosition > yTop) {

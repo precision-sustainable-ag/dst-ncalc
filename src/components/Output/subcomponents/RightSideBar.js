@@ -3,16 +3,18 @@
 import { Box, Grid } from '@mui/material';
 import { useSelector } from 'react-redux';
 // import { useNavigate } from 'react-router-dom';
-import React from 'react';
+import React, { useEffect } from 'react';
 
 import NitrogenCard from './NitrogenWidget';
 import ResidueCard from './ResidueWidget';
 import MapVisCard from './MapVisWidget';
 import { SummaryCard, OtherCard } from './SummaryWidget';
 // import { useFetchModel } from '../../../hooks/useFetchApi';
-import model from './model.json';
+// import model from './model.json';
 import { modelCalc } from './helpers';
 import { get } from '../../../store/redux-autosetters';
+import { useFetchCornN, useFetchModel } from '../../../hooks/useFetchApi';
+import Loading from './Loading';
 // import Highcharts from 'highcharts';
 // import HighchartsReact from 'highcharts-react-official';
 
@@ -22,9 +24,9 @@ const wrapperStyles = {
   padding: 5,
 };
 
-/// /// ROOT COMPONENT /// ///
+/// /// /// ROOT COMPONENT /// /// ///
 const RightSideBar = ({ summaryData, refs }) => {
-  /// /// VARIABLES /// ///
+  /// /// /// VARIABLES /// /// ///
   const doIncorporated = false;
   const N = useSelector(get.N);
   const killDate = useSelector(get.killDate);
@@ -34,7 +36,7 @@ const RightSideBar = ({ summaryData, refs }) => {
   const lign = useSelector(get.lign);
   const biomass = useSelector(get.biomass);
   const unit = useSelector(get.unit);
-  const cornN = useSelector(get.cornN);
+  let cornN = useSelector(get.cornN);
   const cashCrop = useSelector(get.cashCrop);
   const Yield = useSelector(get.yield);
   const outputN = useSelector(get.outputN);
@@ -49,23 +51,26 @@ const RightSideBar = ({ summaryData, refs }) => {
   const InorganicN = useSelector(get.InorganicN);
 
   // /// /// HOOKS /// ///
-  // const model = useFetchModel({
-  //   lat,
-  //   lon,
-  //   N,
-  //   OM,
-  //   BD,
-  //   lwc,
-  //   unit,
-  //   carb,
-  //   cell,
-  //   lign,
-  //   biomass,
-  //   killDate,
-  //   InorganicN,
-  //   plantingDate,
-  // });
-  // console.log('HOOK model', model);
+  cornN = useFetchCornN();
+  console.log('HOOK cornN', cornN);
+  const model = useFetchModel({
+    lat,
+    lon,
+    N,
+    OM,
+    BD,
+    lwc,
+    unit,
+    carb,
+    cell,
+    lign,
+    biomass,
+    killDate,
+    InorganicN,
+    plantingDate,
+  });
+  console.log('HOOK model', model);
+  if (!model) return <Loading />;
 
   const {
     maxSurface,
@@ -95,8 +100,6 @@ const RightSideBar = ({ summaryData, refs }) => {
     doCornN: true,
     N,
   });
-
-  console.log('model', model);
 
   /// /// RETURN JSX /// ///
   return (
@@ -153,7 +156,7 @@ const RightSideBar = ({ summaryData, refs }) => {
             }}
           />
         </Grid>
-        <Grid item sm={12} lg={6} width="100%">
+        <Grid item sm={12} lg={12} width="100%">
           <MapVisCard refVal={refs[3]} />
         </Grid>
         <Grid item sm={12} lg={6} width="100%">

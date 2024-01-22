@@ -92,7 +92,6 @@ const NitrogenCard = ({ props }) => {
           gap={5}
           justifyContent="space-around"
           width="100%"
-        // alignItems="stretch"
         >
           <HighchartsReact
             containerProps={HighChartsContainerProps}

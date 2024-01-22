@@ -8,7 +8,9 @@ import Toolbar from '@mui/material/Toolbar';
 import IconButton from '@mui/material/IconButton';
 import Typography from '@mui/material/Typography';
 import Menu from '@mui/material/Menu';
-import MenuIcon from '@mui/icons-material/Menu';
+// import MenuIcon from '@mui/icons-material/Menu';
+import KeyboardDoubleArrowDownIcon from '@mui/icons-material/KeyboardDoubleArrowDown';
+import KeyboardDoubleArrowUpIcon from '@mui/icons-material/KeyboardDoubleArrowUp';
 import Button from '@mui/material/Button';
 import Tooltip from '@mui/material/Tooltip';
 import MenuItem from '@mui/material/MenuItem';
@@ -40,7 +42,7 @@ const NavBarButtonText2 = styled(Button)(({ theme, isactive }) => ({
   color: isactive === 'true' ? '#3c52b2' : 'black',
   border: isactive === 'true' ? '1px solid black' : 'none',
   fontWeight: isactive === 'true' ? 'bolder' : 'bold',
-  display: 'block',
+  display: 'flex',
   '&.MuiButton-root': {
     '&:hover': {
       backgroundColor: '#fff',
@@ -48,6 +50,7 @@ const NavBarButtonText2 = styled(Button)(({ theme, isactive }) => ({
       textDecoration: 'none',
     },
   },
+  justifyContent: 'flex-start',
   margin: '0 1rem',
   [theme.breakpoints.up('lg')]: {
     margin: '0 2rem',
@@ -67,6 +70,7 @@ const ResponsiveNavBar = ({ screens }) => {
   const [anchorElNav, setAnchorElNav] = useState(null);
   const [anchorElUser, setAnchorElUser] = useState(null);
   const [activeMenu, setActiveMenu] = useState('home');
+  const [menuIsOpen, setMenuIsOpen] = useState(false);
   // eslint-disable-next-line no-unused-vars
   const [navModalOpen, setNavModalOpen] = useState(false);
 
@@ -75,7 +79,9 @@ const ResponsiveNavBar = ({ screens }) => {
 
   const handleOpenNavMenu = (event) => {
     setAnchorElNav(event.currentTarget);
+    setMenuIsOpen(!menuIsOpen);
   };
+
   const handleOpenUserMenu = (event) => {
     setAnchorElUser(event.currentTarget);
   };
@@ -84,6 +90,7 @@ const ResponsiveNavBar = ({ screens }) => {
     dispatch(set.screen(scr));
     setActiveMenu(scr);
     setAnchorElNav(null);
+    setMenuIsOpen(!menuIsOpen);
   };
 
   const handleCloseUserMenu = () => {
@@ -152,18 +159,45 @@ const ResponsiveNavBar = ({ screens }) => {
               display: { xs: 'flex', md: 'none' },
               backgroundColor: 'white',
               color: 'black',
-              borderRadius: '2rem',
+              borderRadius: '0.2rem',
+              // borderRadius: menuIsOpen ? '0.2rem' : '1rem',
+              paddingBottom: menuIsOpen ? '0.2rem' : '0',
+              width: '3rem',
+              height: '3rem',
+              justifyContent: 'center',
             }}
           >
+
             <IconButton
               size="large"
-              aria-label="account of current user"
+              aria-label="icon of vertical menu"
               aria-controls="menu-appbar"
               aria-haspopup="true"
               onClick={handleOpenNavMenu}
               color="inherit"
+              sx={{ padding: '0px' }}
             >
-              <MenuIcon />
+              <Box sx={{
+                display: 'flex',
+                flexDirection: 'column',
+                alignItems: 'center',
+                justifyContent: 'center',
+              }}
+              >
+                <Typography
+                  sx={{
+                    fontSize: 16,
+                    fontWeight: 900,
+                    padding: 0,
+                    fontFamily: 'sans-serif',
+                  }}
+                >
+                  Menu
+                </Typography>
+                {menuIsOpen
+                  ? (<KeyboardDoubleArrowUpIcon fontSize="small" />)
+                  : (<KeyboardDoubleArrowDownIcon fontSize="small" />)}
+              </Box>
             </IconButton>
             <Menu
               id="menu-appbar"
@@ -172,7 +206,6 @@ const ResponsiveNavBar = ({ screens }) => {
                 vertical: 'bottom',
                 horizontal: 'left',
               }}
-              keepMounted
               transformOrigin={{
                 vertical: 'top',
                 horizontal: 'left',
@@ -196,8 +229,9 @@ const ResponsiveNavBar = ({ screens }) => {
                       onClick={() => handleClickNavMenu(scr)}
                       isactive={activeMenu === scr ? 'true' : 'false'}
                     >
-                      {screens[scr].desc.replace(/\s/g, '') ||
-                        scr.replace(/\s/g, '')}
+                      {/* {screens[scr].desc.replace(/\s/g, '') ||
+                        scr.replace(/\s/g, '')} */}
+                      {''.concat(scr)}
                     </NavBarButtonText2>
                   </NavLink>
                 ))}
