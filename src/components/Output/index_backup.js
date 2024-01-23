@@ -17,7 +17,7 @@ import {
   Stack,
 } from '@mui/material';
 
-import Loading from './subcomponents/loading';
+import Loading from './subcomponents/Loading';
 import Error from './subcomponents/error';
 
 import {

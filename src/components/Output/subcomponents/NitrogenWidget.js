@@ -10,10 +10,14 @@ import {
 import Highcharts from 'highcharts';
 import HighchartsReact from 'highcharts-react-official';
 import React from 'react';
+import { useSelector } from 'react-redux';
 import {
   getGeneralChartOptions,
   getNitrogenChartOptions,
 } from './chartsOptions';
+import { modelCalc } from './helpers';
+import { get } from '../../../store/redux-autosetters';
+import { useFetchCornN, useFetchModel } from '../../../hooks/useFetchApi';
 
 /// /// /// STYLES /// /// ///
 const CardStyles = {
@@ -48,29 +52,78 @@ const HighChartsContainerProps = {
 
 /// /// /// RETURN JSX /// /// ///
 const NitrogenCard = ({ props }) => {
-  const {
-    refVal,
-    targetN,
-    // surfaceMin,
-    incorporatedNPredict,
-    // incorporatedMin,
-    surfaceNPredict,
-    mockup,
-    outputN,
-    doCornN,
-    unit,
-    minDate,
-    NUptake,
-    surfaceData,
-    doIncorporated,
-    incorporatedData,
-    plantingDate,
-    maxSurface,
-    // model,
-  } = props;
+  const { refVal } = props;
 
-  console.log('props', props);
-  console.log('doCornN', doCornN);
+  /// /// /// VARIABLES /// /// ///
+  const doIncorporated = false;
+  const N = useSelector(get.N);
+  const killDate = useSelector(get.killDate);
+  const plantingDate = useSelector(get.plantingDate);
+  const carb = useSelector(get.carb);
+  const cell = useSelector(get.cell);
+  const lign = useSelector(get.lign);
+  const biomass = useSelector(get.biomass);
+  const unit = useSelector(get.unit);
+  let cornN = useSelector(get.cornN);
+  const cashCrop = useSelector(get.cashCrop);
+  const Yield = useSelector(get.yield);
+  const outputN = useSelector(get.outputN);
+  const nweeks = useSelector(get.nweeks);
+  const targetN = useSelector(get.targetN);
+  const mockup = useSelector(get.mockup);
+  const lat = useSelector(get.lat);
+  const lon = useSelector(get.lon);
+  const OM = useSelector(get.OM);
+  const lwc = useSelector(get.lwc);
+  const BD = useSelector(get.BD);
+  const InorganicN = useSelector(get.InorganicN);
+
+  // /// /// HOOKS /// ///
+  cornN = useFetchCornN();
+
+  const model = useFetchModel({
+    lat,
+    lon,
+    N,
+    OM,
+    BD,
+    lwc,
+    unit,
+    carb,
+    cell,
+    lign,
+    biomass,
+    killDate,
+    InorganicN,
+    plantingDate,
+  });
+
+  const {
+    maxSurface,
+    minDate,
+    surfaceData,
+    incorporatedData,
+    NUptake,
+    surfaceNPredict,
+    incorporatedNPredict,
+  } = modelCalc({
+    model,
+    carb,
+    cell,
+    lign,
+    unit,
+    plantingDate,
+    killDate,
+    cashCrop,
+    outputN: 1,
+    cornN,
+    Yield,
+    nweeks,
+    biomass,
+    doIncorporated: false,
+    doCornN: true,
+    N,
+  });
 
   return (
     <Card sx={CardStyles} elevation={8} ref={refVal}>
@@ -99,7 +152,7 @@ const NitrogenCard = ({ props }) => {
             options={getGeneralChartOptions({
               mockup,
               outputN,
-              doCornN,
+              doCornN: true,
               unit,
               minDate,
               NUptake,
@@ -114,10 +167,9 @@ const NitrogenCard = ({ props }) => {
           <HighchartsReact
             containerProps={HighChartsContainerProps}
             highcharts={Highcharts}
-            // className="hidden"
             options={getNitrogenChartOptions({
               mockup,
-              outputN,
+              outputN: 1,
               unit,
               targetN,
               doIncorporated,

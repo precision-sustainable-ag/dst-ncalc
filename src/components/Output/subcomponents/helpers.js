@@ -37,10 +37,8 @@ const modelCalc = ({
 
   if (cornN && doCornN) {
     const f = unit === 'lb/ac' ? 1 : 1.12085;
-    console.log('cornN', cornN);
     cornN.forEach((rec) => {
       const temp = rec.air_temperature;
-      console.log('rec', rec);
       dailyTotal += temp - 8;
       if (d1.getHours() === 0) {
         gdd += dailyTotal / 24;
@@ -55,33 +53,10 @@ const modelCalc = ({
             enabled: false,
           },
         });
-        // NUptake.push([
-        //   // d1 - (1000 * 60 * 60 * 24),
-        //   +d1,
-        //   ((Yield * 1.09) /
-        //     (1 + Math.exp(-0.00615 * (gdd - 646.19)))) *
-        //   f,
-        // ]);
         dailyTotal = 0;
       }
       d1.setHours(d1.getHours() + 1);
     });
-
-    /*
-    model.s.Temp.slice((plantingDate - killDate) / (1000 * 60 * 60)).forEach(temp => {
-      dailyTotal += temp - 8;
-      if (d1.getHours() === 0) {
-        gdd += (dailyTotal / 24);
-        NUptake.push([
-          // d1 - (1000 * 60 * 60 * 24),
-          +d1,
-          (Yield * 1.09) / (1 + Math.exp((-0.00615 * (gdd - 646.19)))) * f
-        ]);
-        dailyTotal = 0;
-      }
-      d1.setHours(d1.getHours() + 1);
-    });
-    */
   }
 
   let date = new Date(killDate);
@@ -130,6 +105,8 @@ const modelCalc = ({
   const incorporatedData = [];
 
   if (model && doIncorporated) {
+    console.log('model', model);
+    console.log('model.i', model.i);
     model.i[outputN === 1 ? 'FomCumN' : 'FOM'].forEach((d, i, a) => {
       const value = +(d / factor).toFixed(2);
       incorporatedData.push({
@@ -179,6 +156,11 @@ const modelCalc = ({
 
   const incorporatedNPredict =
     model && doIncorporated && Math.round(model.i.FomCumN.slice(-1) / factor);
+
+  console.log('#@outputN', outputN);
+  console.log('#@surfaceData', surfaceData);
+  console.log('#@incorporatedData', incorporatedData);
+  console.log('#@incorporatedNPredict', incorporatedNPredict);
 
   return {
     maxSurface,

@@ -1,9 +1,10 @@
+/* eslint-disable arrow-body-style */
 /* eslint-disable no-unused-vars */
 /* eslint-disable no-console */
+import React from 'react';
 import { Box, Grid } from '@mui/material';
-import { useSelector } from 'react-redux';
+// import { useSelector } from 'react-redux';
 // import { useNavigate } from 'react-router-dom';
-import React, { useEffect } from 'react';
 
 import NitrogenCard from './NitrogenWidget';
 import ResidueCard from './ResidueWidget';
@@ -11,10 +12,10 @@ import MapVisCard from './MapVisWidget';
 import { SummaryCard, OtherCard } from './SummaryWidget';
 // import { useFetchModel } from '../../../hooks/useFetchApi';
 // import model from './model.json';
-import { modelCalc } from './helpers';
-import { get } from '../../../store/redux-autosetters';
-import { useFetchCornN, useFetchModel } from '../../../hooks/useFetchApi';
-import Loading from './Loading';
+// import { modelCalc } from './helpers';
+// import { get } from '../../../store/redux-autosetters';
+// import { useFetchCornN, useFetchModel } from '../../../hooks/useFetchApi';
+// import Loading from './Loading';
 // import Highcharts from 'highcharts';
 // import HighchartsReact from 'highcharts-react-official';
 
@@ -27,79 +28,7 @@ const wrapperStyles = {
 /// /// /// ROOT COMPONENT /// /// ///
 const RightSideBar = ({ summaryData, refs }) => {
   /// /// /// VARIABLES /// /// ///
-  const doIncorporated = false;
-  const N = useSelector(get.N);
-  const killDate = useSelector(get.killDate);
-  const plantingDate = useSelector(get.plantingDate);
-  const carb = useSelector(get.carb);
-  const cell = useSelector(get.cell);
-  const lign = useSelector(get.lign);
-  const biomass = useSelector(get.biomass);
-  const unit = useSelector(get.unit);
-  let cornN = useSelector(get.cornN);
-  const cashCrop = useSelector(get.cashCrop);
-  const Yield = useSelector(get.yield);
-  const outputN = useSelector(get.outputN);
-  const nweeks = useSelector(get.nweeks);
-  const targetN = useSelector(get.targetN);
-  const mockup = useSelector(get.mockup);
-  const lat = useSelector(get.lat);
-  const lon = useSelector(get.lon);
-  const OM = useSelector(get.OM);
-  const lwc = useSelector(get.lwc);
-  const BD = useSelector(get.BD);
-  const InorganicN = useSelector(get.InorganicN);
-
-  // /// /// HOOKS /// ///
-  cornN = useFetchCornN();
-  console.log('HOOK cornN', cornN);
-  const model = useFetchModel({
-    lat,
-    lon,
-    N,
-    OM,
-    BD,
-    lwc,
-    unit,
-    carb,
-    cell,
-    lign,
-    biomass,
-    killDate,
-    InorganicN,
-    plantingDate,
-  });
-  console.log('HOOK model', model);
-  if (!model) return <Loading />;
-
-  const {
-    maxSurface,
-    surfaceMin,
-    incorporatedMin,
-    minDate,
-    surfaceData,
-    incorporatedData,
-    NUptake,
-    surfaceNPredict,
-    incorporatedNPredict,
-  } = modelCalc({
-    model,
-    carb,
-    cell,
-    lign,
-    unit,
-    plantingDate,
-    killDate,
-    cashCrop,
-    outputN,
-    cornN,
-    Yield,
-    nweeks,
-    biomass,
-    doIncorporated: false,
-    doCornN: true,
-    N,
-  });
+  // if (!model) return <Loading />;
 
   /// /// RETURN JSX /// ///
   return (
@@ -112,23 +41,6 @@ const RightSideBar = ({ summaryData, refs }) => {
           <NitrogenCard
             props={{
               refVal: refs[1],
-              targetN,
-              surfaceMin,
-              incorporatedNPredict,
-              incorporatedMin,
-              surfaceNPredict,
-              mockup,
-              outputN,
-              doCornN: true,
-              unit,
-              minDate,
-              NUptake,
-              surfaceData,
-              doIncorporated,
-              incorporatedData,
-              plantingDate,
-              maxSurface,
-              model,
             }}
           />
         </Grid>
@@ -136,23 +48,6 @@ const RightSideBar = ({ summaryData, refs }) => {
           <ResidueCard
             props={{
               refVal: refs[2],
-              targetN,
-              surfaceMin,
-              incorporatedNPredict,
-              incorporatedMin,
-              surfaceNPredict,
-              mockup,
-              outputN,
-              doCornN: true,
-              unit,
-              minDate,
-              NUptake,
-              surfaceData,
-              doIncorporated,
-              incorporatedData,
-              plantingDate,
-              maxSurface,
-              model,
             }}
           />
         </Grid>

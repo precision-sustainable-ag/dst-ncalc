@@ -86,7 +86,8 @@ const getGeneralChartOptions = (props) => {
   } = props;
 
   // const outputN = 1;
-
+  console.log('###doIncorporated', doIncorporated);
+  console.log('###incorporatedData', incorporatedData);
   const { titleText, xAxisTitle, yAxisTitle } = getAxisTexts({
     mockup,
     outputN,
@@ -394,7 +395,7 @@ const getResidueChartOptions = ({
   return {
     chart: {
       type: 'bar',
-      height: 350,
+      height: 250,
       className: outputN === 1 ? 'hidden' : '',
     },
     title: {
