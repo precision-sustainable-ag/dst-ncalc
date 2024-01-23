@@ -51,9 +51,7 @@ const HighChartsContainerProps = {
 /// /// /// COMPONENTS /// /// ///
 
 /// /// /// RETURN JSX /// /// ///
-const NitrogenCard = ({ props }) => {
-  const { refVal } = props;
-
+const NitrogenCard = ({ refVal }) => {
   /// /// /// VARIABLES /// /// ///
   const doIncorporated = false;
   const N = useSelector(get.N);
@@ -142,7 +140,7 @@ const NitrogenCard = ({ props }) => {
       <CardActions>
         <Stack
           direction="column"
-          gap={5}
+          gap={2}
           justifyContent="space-around"
           width="100%"
         >

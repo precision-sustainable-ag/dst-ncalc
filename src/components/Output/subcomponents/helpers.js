@@ -105,8 +105,6 @@ const modelCalc = ({
   const incorporatedData = [];
 
   if (model && doIncorporated) {
-    console.log('model', model);
-    console.log('model.i', model.i);
     model.i[outputN === 1 ? 'FomCumN' : 'FOM'].forEach((d, i, a) => {
       const value = +(d / factor).toFixed(2);
       incorporatedData.push({
@@ -139,28 +137,12 @@ const modelCalc = ({
 
   const minDate = new Date(killDate);
 
-  // let labModel = '';
-
-  // if (params.get('fy')) {
-  //   const src = `http://aesl.ces.uga.edu/mineralization/client/surface/?fy=${params.get(
-  //     'fy',
-  //   )}&lab=${params.get(
-  //     'lab',
-  //   )}&modeled2=${m2}&modeled4=${m4}&modeled=${mf}`;
-  //   // labModel = <iframe title="N/A" style={{ display: 'none' }} src={src} />;
-  // }
-
   const surfaceNPredict = model ? Math.round(
     model.s.MinNfromFOM.slice(-1) / factor,
   ) : 0;
 
   const incorporatedNPredict =
     model && doIncorporated && Math.round(model.i.FomCumN.slice(-1) / factor);
-
-  console.log('#@outputN', outputN);
-  console.log('#@surfaceData', surfaceData);
-  console.log('#@incorporatedData', incorporatedData);
-  console.log('#@incorporatedNPredict', incorporatedNPredict);
 
   return {
     maxSurface,

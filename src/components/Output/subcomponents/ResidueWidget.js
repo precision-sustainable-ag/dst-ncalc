@@ -51,8 +51,7 @@ const HighChartsContainerProps = {
 /// /// /// COMPONENTS /// /// ///
 
 /// /// /// RETURN JSX /// /// ///
-const ResidueCard = ({ props }) => {
-  const { refVal } = props;
+const ResidueCard = ({ refVal }) => {
   /// /// /// VARIABLES /// /// ///
   const doIncorporated = false;
   const N = useSelector(get.N);
@@ -140,7 +139,7 @@ const ResidueCard = ({ props }) => {
       <CardActions>
         <Stack
           direction="column"
-          gap={5}
+          gap={2}
           justifyContent="center"
           width="100%"
         >
