@@ -83,11 +83,10 @@ const getGeneralChartOptions = (props) => {
     doIncorporated,
     incorporatedData,
     plantingDate,
+    N,
+    biomass,
   } = props;
 
-  // const outputN = 1;
-  console.log('###doIncorporated', doIncorporated);
-  console.log('###incorporatedData', incorporatedData);
   const { titleText, xAxisTitle, yAxisTitle } = getAxisTexts({
     mockup,
     outputN,
@@ -102,6 +101,7 @@ const getGeneralChartOptions = (props) => {
 
   let minYAxis = doCornN ? Math.min(minSurface, minNitrogen) : minSurface;
   let maxYAxis = doCornN ? Math.max(maxSurface, maxNitrogen) : maxSurface;
+  const maxBiomassN = outputN === 1 ? (biomass * N) / 100 : Math.max(...surfaceData.map((d) => d.y));
 
   // add 10% margin to the y axis
   minYAxis -= (maxYAxis - minYAxis) * 0.1;
@@ -121,11 +121,9 @@ const getGeneralChartOptions = (props) => {
       useHTML: true,
       formatter() {
         const week = Math.floor((this.x - minDate) / (24 * 3600 * 1000) / 7);
-        const maxNUptake = Math.max(...NUptake.map((n) => n[1]));
-
         return this.points.reduce((s, point) => {
           if (point.series.name === 'Corn N uptake') {
-            const pct = Math.round((point.y / maxNUptake) * 100);
+            const pct = Math.round((point.y / maxNitrogen) * 100);
             return `${s}<strong>${point.series.name}: ${point.y.toFixed(0)} ${unit} (${pct}%)<br/></strong>`;
           }
           return `${s}<strong>${point.series.name}: ${point.y.toFixed(0)} ${unit}<br/></strong>`;
@@ -196,14 +194,13 @@ const getGeneralChartOptions = (props) => {
           const increment = doCornN || outputN === 2 ? 25 : 10;
 
           for (let tick = 0; tick <= 100; tick += increment) {
-            positions.push(tick * (maxSurface / 100));
+            positions.push(tick * (maxBiomassN / 100));
           }
-
           return positions;
         },
         labels: {
           formatter() {
-            const result = Math.round(this.value / (maxSurface / 100));
+            const result = Math.round(this.value / (maxBiomassN / 100));
             return `${result}%`;
           },
         },
@@ -265,7 +262,6 @@ const getNitrogenChartOptions = ({
   incorporatedNPredict,
   surfaceNPredict,
 }) => {
-  console.log('targetN', targetN);
   return {
     chart: {
       type: 'bar',

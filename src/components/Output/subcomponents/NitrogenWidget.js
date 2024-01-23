@@ -159,6 +159,8 @@ const NitrogenCard = ({ refVal }) => {
               incorporatedData,
               plantingDate,
               maxSurface,
+              N,
+              biomass,
             })}
           />
           <Divider orientation="horizontal" sx={dividerStyles} />
