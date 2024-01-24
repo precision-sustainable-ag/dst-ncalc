@@ -55,8 +55,8 @@ const NitrogenCard = ({ refVal }) => {
   /// /// /// VARIABLES /// /// ///
   const doIncorporated = false;
   const N = useSelector(get.N);
-  const killDate = useSelector(get.killDate);
-  const plantingDate = useSelector(get.plantingDate);
+  const coverCropTerminationDate = useSelector(get.coverCropTerminationDate);
+  const cashCropPlantingDate = useSelector(get.cashCropPlantingDate);
   const carb = useSelector(get.carb);
   const cell = useSelector(get.cell);
   const lign = useSelector(get.lign);
@@ -91,9 +91,9 @@ const NitrogenCard = ({ refVal }) => {
     cell,
     lign,
     biomass,
-    killDate,
+    coverCropTerminationDate,
     InorganicN,
-    plantingDate,
+    cashCropPlantingDate,
   });
 
   const {
@@ -110,8 +110,8 @@ const NitrogenCard = ({ refVal }) => {
     cell,
     lign,
     unit,
-    plantingDate,
-    killDate,
+    cashCropPlantingDate,
+    coverCropTerminationDate,
     cashCrop,
     outputN: 1,
     cornN,
@@ -157,7 +157,7 @@ const NitrogenCard = ({ refVal }) => {
               surfaceData,
               doIncorporated,
               incorporatedData,
-              plantingDate,
+              cashCropPlantingDate,
               maxSurface,
               N,
               biomass,

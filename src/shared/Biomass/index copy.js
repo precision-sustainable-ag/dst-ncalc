@@ -3,24 +3,26 @@ import React, { useEffect, useState } from 'react';
 import { useSelector, useDispatch } from 'react-redux';
 import axios from 'axios';
 import * as turf from '@turf/turf';
-import {
-  Button,
-  Box,
-  Grid,
-  Stack,
-  Typography,
-  LinearProgress,
-  Container,
-} from '@mui/material';
+import Typography from '@mui/material/Typography';
+import Accordion from '@mui/material/Accordion';
+import Dialog from '@mui/material/Dialog';
+import DialogActions from '@mui/material/DialogActions';
+import DialogContent from '@mui/material/DialogContent';
+import DialogContentText from '@mui/material/DialogContentText';
+import DialogTitle from '@mui/material/DialogTitle';
+import AccordionSummary from '@mui/material/AccordionSummary';
+import AccordionDetails from '@mui/material/AccordionDetails';
+import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
+import Box from '@mui/material/Box';
+import Button from '@mui/material/Button';
+import LinearProgress from '@mui/material/LinearProgress';
 import { get, set } from '../../store/Store';
-import { AreaErrorModal, TaskFailModal } from './Warnings';
-import Datebox from './Datebox';
 
 let interval;
 
 const arrayAverage = (arr) => arr.reduce((p, c) => p + c, 0) / arr.length;
 
-const Biomass = () => {
+const Biomass = ({ minified = false }) => {
   const [loading, setLoading] = useState(false);
   const [errorArea, setErrorArea] = useState(false);
   const [data, setData] = useState(null);
@@ -28,7 +30,7 @@ const Biomass = () => {
   const [taskIsDone, setTaskIsDone] = useState(false);
   const [taskIsFailed, setTaskIsFailed] = useState(false);
   const mapPolygon = useSelector(get.mapPolygon);
-  const coverCropPlantingDate = useSelector(get.coverCropPlantingDate);
+  const coverCropPlantDate = useSelector(get.coverCropPlantDate);
   const coverCropTerminationDate = useSelector(get.coverCropTerminationDate);
   const biomassTotalValue = useSelector(get.biomassTotalValue);
   const biomassTaskResults = useSelector(get.biomassTaskResults);
@@ -52,9 +54,9 @@ const Biomass = () => {
   }, [biomassTaskResults]);
 
   useEffect(() => {
-    dispatch(set.cashCropPlantingDate(coverCropPlantingDate));
+    dispatch(set.cashCropPlantingDate(coverCropPlantDate));
     dispatch(set.coverCropTerminationDate(coverCropTerminationDate));
-  }, [coverCropPlantingDate, coverCropTerminationDate]);
+  }, [coverCropPlantDate, coverCropTerminationDate]);
 
   useEffect(() => {
     if (biomassTotalValue) {
@@ -80,7 +82,7 @@ const Biomass = () => {
       const revertedCoords = [...mapPolygon[0].geometry.coordinates[0]].reverse();
       const payload = {
         maxCloudCover: 5,
-        startDate: coverCropPlantingDate,
+        startDate: coverCropPlantDate,
         endDate: coverCropTerminationDate,
         geometry: {
           type: 'Polygon',
@@ -137,39 +139,84 @@ const Biomass = () => {
     };
   }, [taskId]);
 
+  // const handleChange = (event) => {
+  //   dispatch(set.biomassCropType(event.target.value));
+  // };
   return (
-    <Box pb={2}>
-      {errorArea && (
-        <AreaErrorModal errorArea={errorArea} setErrorArea={setErrorArea} />
-      )}
-      {taskIsFailed && (
-        <TaskFailModal taskIsFailed={taskIsFailed} setTaskIsFailed={setTaskIsFailed} />
-      )}
-      <Box sx={{ margin: 2 }}>
-        <Grid container spacing={2} alignItems="flex-end" justify="center">
-          <Grid item xs={12}>
+    <div className="biomassWrapper">
+      <div className="biomassTextWrapper">
+        {errorArea && (
+          <Dialog
+            open={errorArea}
+            onClose={() => {
+              setErrorArea(false);
+            }}
+            aria-labelledby="alert-dialog-title"
+            aria-describedby="alert-dialog-description"
+          >
+            <DialogTitle id="alert-dialog-title">Large Area Warning!</DialogTitle>
+            <DialogContent>
+              <DialogContentText id="alert-dialog-description">
+                The area selected is too large to calculate. Please select a smaller region under
+                10000 Acres. Please delete the current polygon and draw a new one.
+              </DialogContentText>
+            </DialogContent>
+            <DialogActions>
+              <Button
+                onClick={() => {
+                  setErrorArea(false);
+                }}
+                autoFocus
+              >
+                close
+              </Button>
+            </DialogActions>
+          </Dialog>
+        )}
+        {taskIsFailed && (
+          <Dialog
+            open={taskIsFailed}
+            onClose={() => {
+              setTaskIsFailed(false);
+            }}
+            aria-labelledby="alert-dialog-title"
+            aria-describedby="alert-dialog-description"
+          >
+            <DialogTitle id="alert-dialog-title">Server Failed</DialogTitle>
+            <DialogContent>
+              <DialogContentText id="alert-dialog-description">
+                Task failed to complete. Please try again.
+              </DialogContentText>
+            </DialogContent>
+            <DialogActions>
+              <Button
+                onClick={() => {
+                  setTaskIsFailed(false);
+                }}
+                autoFocus
+              >
+                close
+              </Button>
+            </DialogActions>
+          </Dialog>
+        )}
+        <Accordion defaultExpanded>
+          <AccordionSummary
+            expandIcon={<ExpandMoreIcon />}
+            aria-controls="panel1a-content"
+            id="panel1a-header"
+          >
             <Typography variant="h5" gutterBottom>
               Calculate my field&apos;s Biomass
             </Typography>
-          </Grid>
-          <Grid item xs={12}>
+          </AccordionSummary>
+          <AccordionDetails>
             <Typography variant="h8" gutterBottom>
               You can change your planting date and termination dates below and recalculate the biomass value.
             </Typography>
-          </Grid>
-          <Grid item xs={12} md={8}>
-            <Datebox />
-          </Grid>
-          <Grid
-            item
-            xs={12}
-            md={2}
-            display="flex"
-            justifyContent="center"
-          >
-            <Box display="flex" order="2px solid blue">
-              <Stack direction="column" spacing={0}>
-                {loading && (<LinearProgress />)}
+            <div className="biomassControlWrapper">
+              <DateBox minified={minified} />
+              <div className="biomassButton">
                 <Button
                   variant="outlined"
                   color={errorArea ? 'warning' : 'success'}
@@ -178,29 +225,31 @@ const Biomass = () => {
                 >
                   <div style={{ fontWeight: 900 }}>Calculate Biomass</div>
                 </Button>
-              </Stack>
-            </Box>
-          </Grid>
-          <Grid
-            item
-            xs={12}
-            md={2}
-            display="flex"
-            justifyContent="center"
-          >
-            <Box sx={{ border: 1, maxWidth: 200 }}>
-              <Container>
-                <Typography variant="h8" gutterBottom>
-                  {biomassTotalValue}
-                  &nbsp;
-                  Kg/Ha
-                </Typography>
-              </Container>
-            </Box>
-          </Grid>
-        </Grid>
-      </Box>
-    </Box>
+                {loading && (
+                  <div className="biomassLoading">
+                    <LinearProgress />
+                  </div>
+                )}
+              </div>
+              {!minified && (
+                <div className="biomassResults">
+                  <div className="biomassItemText">Average Dry Biomass</div>
+                  {biomassTotalValue && (
+                    <Box sx={{ border: 1 }}>
+                      <div>
+                        {biomassTotalValue}
+                        &nbsp;
+                        Kg/Ha
+                      </div>
+                    </Box>
+                  )}
+                </div>
+              )}
+            </div>
+          </AccordionDetails>
+        </Accordion>
+      </div>
+    </div>
   ); // Biomass
 };
 export default Biomass;

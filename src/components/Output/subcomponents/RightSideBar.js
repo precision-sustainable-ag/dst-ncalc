@@ -1,23 +1,12 @@
-/* eslint-disable arrow-body-style */
-/* eslint-disable no-unused-vars */
 /* eslint-disable no-console */
 import React from 'react';
 import { Box, Grid } from '@mui/material';
-// import { useSelector } from 'react-redux';
-// import { useNavigate } from 'react-router-dom';
-
+import { useSelector } from 'react-redux';
 import NitrogenCard from './NitrogenWidget';
 import ResidueCard from './ResidueWidget';
 import MapVisCard from './MapVisWidget';
-import { SummaryCard, OtherCard } from './SummaryWidget';
-// import { useFetchModel } from '../../../hooks/useFetchApi';
-// import model from './model.json';
-// import { modelCalc } from './helpers';
-// import { get } from '../../../store/redux-autosetters';
-// import { useFetchCornN, useFetchModel } from '../../../hooks/useFetchApi';
-// import Loading from './Loading';
-// import Highcharts from 'highcharts';
-// import HighchartsReact from 'highcharts-react-official';
+import { SummaryCard } from './SummaryWidget';
+import { get } from '../../../store/redux-autosetters';
 
 /// /// /// STYLES /// /// ///
 const wrapperStyles = {
@@ -29,6 +18,7 @@ const wrapperStyles = {
 const RightSideBar = ({ summaryData, refs }) => {
   /// /// /// VARIABLES /// /// ///
   // if (!model) return <Loading />;
+  const isSatelliteMode = useSelector(get.biomassCalcMode) === 'satellite';
 
   /// /// RETURN JSX /// ///
   return (
@@ -43,12 +33,11 @@ const RightSideBar = ({ summaryData, refs }) => {
         <Grid item sm={12} lg={6} width="100%">
           <ResidueCard refVal={refs[2]} />
         </Grid>
-        <Grid item sm={12} lg={12} width="100%">
-          <MapVisCard refVal={refs[3]} />
-        </Grid>
-        <Grid item sm={12} lg={6} width="100%">
-          <OtherCard />
-        </Grid>
+        {isSatelliteMode && (
+          <Grid item sm={12} lg={12} width="100%">
+            <MapVisCard refVal={refs[3]} />
+          </Grid>
+        )}
       </Grid>
     </Box>
   );

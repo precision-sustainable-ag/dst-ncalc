@@ -24,9 +24,9 @@ const Feedback = () => {
   const field = useSelector(get.field);
   const targetN = useSelector(get.targetN);
   const coverCrop = useSelector(get.coverCrop);
-  const killDate = useSelector(get.killDate);
+  const coverCropTerminationDate = useSelector(get.coverCropTerminationDate);
   const cashCrop = useSelector(get.cashCrop);
-  const plantingDate = useSelector(get.plantingDate);
+  const cashCropPlantingDate = useSelector(get.cashCropPlantingDate);
 
   const N = useSelector(get.N);
   const InorganicN = useSelector(get.InorganicN);
@@ -75,9 +75,9 @@ __________________________________
 field        : ${field.replace(/"/g, '')}
 targetN      : ${targetN}
 coverCrop    : ${coverCrop}
-killDate     : ${killDate}
+killDate     : ${coverCropTerminationDate}
 cashCrop     : ${cashCrop}
-plantingDate : ${plantingDate}
+plantingDate : ${cashCropPlantingDate}
 lat          : ${lat}
 lon          : ${lon}
 N            : ${N}

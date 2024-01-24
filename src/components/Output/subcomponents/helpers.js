@@ -9,8 +9,8 @@ const modelCalc = ({
   cell,
   lign,
   unit,
-  plantingDate,
-  killDate,
+  cashCropPlantingDate,
+  coverCropTerminationDate,
   cashCrop,
   outputN,
   cornN,
@@ -27,10 +27,10 @@ const modelCalc = ({
   lign = (lign * 100) / total;
   const factor = unit === 'lb/ac' ? 1.12085 : 1;
 
-  const d1 = new Date(plantingDate);
+  const d1 = new Date(cashCropPlantingDate);
   let dailyTotal = 0;
   let gdd = 0;
-  // const NUptake = [[+plantingDate, 0]];
+  // const NUptake = [[+cashCropPlantingDate, 0]];
   const NUptake = [];
 
   // const doCornN = cashCrop === 'Corn' && outputN === 1;
@@ -59,7 +59,7 @@ const modelCalc = ({
     });
   }
 
-  let date = new Date(killDate);
+  let date = new Date(coverCropTerminationDate);
   date.setHours(0, 0, 0, 0);
   const surfaceData = [];
 
@@ -101,7 +101,7 @@ const modelCalc = ({
     );
   }
 
-  date = new Date(killDate);
+  date = new Date(coverCropTerminationDate);
   const incorporatedData = [];
 
   if (model && doIncorporated) {
@@ -135,7 +135,7 @@ const modelCalc = ({
       ? (biomass * N) / 100
       : Math.min(...incorporatedData.map((d) => d.y));
 
-  const minDate = new Date(killDate);
+  const minDate = new Date(coverCropTerminationDate);
 
   const surfaceNPredict = model ? Math.round(
     model.s.MinNfromFOM.slice(-1) / factor,

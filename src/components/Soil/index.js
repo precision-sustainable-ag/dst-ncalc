@@ -11,6 +11,7 @@ import {
 import { get } from '../../store/Store';
 import Myslider from '../../shared/Slider';
 import Help from '../../shared/Help';
+import { useFetchSSURGO } from '../../hooks/useFetchApi';
 
 // const ssurgo = [
 //   {
@@ -455,12 +456,16 @@ import Help from '../../shared/Help';
 //   }
 // ]
 
+/// /// /// ROOT COMPONENT /// /// ///
 const Soil = () => {
-  const gotSSURGO = useSelector(get.gotSSURGO);
   const ssurgo = useSelector(get.SSURGO);
   const navigate = useNavigate();
   const isSatelliteMode = useSelector(get.biomassCalcMode) === 'satellite';
 
+  /// /// /// HOOKS /// /// ///
+  useFetchSSURGO();
+
+  /// /// /// RETURN JSX /// ///
   return (
     <Box
       sx={{
@@ -482,7 +487,7 @@ const Soil = () => {
     >
       <Box p={3} pb={0}>
         <Typography variant="h4">Tell us about your Soil</Typography>
-        {gotSSURGO
+        {ssurgo
           ? (
             isSatelliteMode ? (
               <Box>
@@ -513,17 +518,17 @@ const Soil = () => {
                   <Stack direction="column" spacing={3}>
                     <Stack direction="row" spacing={1}>
                       <Typography variant="h6" my={2}>
-                        {gotSSURGO && Object.keys(ssurgo).length > 0 && ssurgo[0].om_r}
+                        {ssurgo && Object.keys(ssurgo).length > 0 && ssurgo[0].om_r}
                       </Typography>
                     </Stack>
                     <Stack direction="row" spacing={1}>
                       <Typography variant="h6" my={2}>
-                        {gotSSURGO && Object.keys(ssurgo).length > 0 && ssurgo[0].dbthirdbar_r}
+                        {ssurgo && Object.keys(ssurgo).length > 0 && ssurgo[0].dbthirdbar_r}
                       </Typography>
                     </Stack>
                     <Stack direction="row" spacing={1}>
                       <Typography variant="h6" my={2}>
-                        {gotSSURGO && Object.keys(ssurgo).length > 0 && 10}
+                        {ssurgo && Object.keys(ssurgo).length > 0 && 10}
                       </Typography>
                     </Stack>
                   </Stack>

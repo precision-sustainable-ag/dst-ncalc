@@ -11,7 +11,7 @@ import './styles.scss';
 const Advanced = () => {
   const BD = useSelector(get.BD);
   const N = useSelector(get.N);
-  const killDate = new Date(useSelector(get.killDate));
+  const coverCropTerminationDate = new Date(useSelector(get.coverCropTerminationDate));
   const carb = useSelector(get.carb);
   const cell = useSelector(get.cell);
   const lign = useSelector(get.lign);
@@ -44,7 +44,7 @@ const Advanced = () => {
 
   const factor = 1;
 
-  const minDate = new Date(killDate);
+  const minDate = new Date(coverCropTerminationDate);
   minDate.setHours(0, 0, 0, 0);
 
   Highcharts.setOptions({
@@ -65,7 +65,7 @@ const Advanced = () => {
     const colors = ['#6b9333', 'blue', 'brown'];
     [parm].flat().forEach((parmm, i) => {
       const cdata = [];
-      date = new Date(killDate);
+      date = new Date(coverCropTerminationDate);
       date.setHours(0, 0, 0, 0);
       let total = 0;
       model.s[parmm].forEach((d) => {

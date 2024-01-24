@@ -20,10 +20,10 @@ const useFetchCornN = () => {
   const dispatch = useDispatch();
   const lat = useSelector(get.lat);
   const lon = useSelector(get.lon);
-  const plantingDate = useSelector(get.plantingDate);
+  const cashCropPlantingDate = useSelector(get.cashCropPlantingDate);
 
   useEffect(() => {
-    const end = moment(plantingDate)
+    const end = moment(cashCropPlantingDate)
       .add(110, 'days')
       .add(1, 'hour')
       .format('yyyy-MM-DD');
@@ -32,7 +32,7 @@ const useFetchCornN = () => {
     dispatch(set.errorCorn(false));
     // eslint-disable-next-line max-len
     const url = `${WEATHER_API_URL}/hourly?lat=${lat}&lon=${lon}&start=${moment(
-      plantingDate,
+      cashCropPlantingDate,
     ).format(
       'yyyy-MM-DD',
     )}&end=${endDate}&attributes=air_temperature&options=predicted`;
@@ -50,7 +50,7 @@ const useFetchCornN = () => {
       .catch((error) => {
         console.log(error);
       });
-  }, [plantingDate, endDate]);
+  }, [cashCropPlantingDate, endDate]);
   return cornData;
 }; // fetchCornN
 
@@ -65,8 +65,8 @@ const useFetchModel = ({
   OM,
   BD,
   unit,
-  killDate,
-  plantingDate,
+  coverCropTerminationDate,
+  cashCropPlantingDate,
   carb,
   cell,
   lign,
@@ -85,8 +85,8 @@ const useFetchModel = ({
     OM,
     BD,
     unit,
-    killDate,
-    plantingDate,
+    coverCropTerminationDate,
+    cashCropPlantingDate,
     carb,
     cell,
     lign,
@@ -96,10 +96,10 @@ const useFetchModel = ({
   });
 
   console.log('####### useFetchModel useEffect');
-  const start = moment(killDate)
+  const start = moment(coverCropTerminationDate)
     .add(1, 'hour')
     .format('yyyy-MM-DD');
-  const end = moment(plantingDate)
+  const end = moment(cashCropPlantingDate)
     .add(110, 'days')
     .add(1, 'hour')
     .format('yyyy-MM-DD');
@@ -109,9 +109,9 @@ const useFetchModel = ({
       && end !== 'Invalid date'
       && moment(end) > moment(start);
     setIsDatesValid(validity);
-    // const end = moment(plantingDate).add(110, 'days').add(1, 'hour').format('yyyy-MM-DD');
-    console.log('plantingDate', plantingDate);
-    console.log('killDate', killDate);
+    // const end = moment(cashCropPlantingDate).add(110, 'days').add(1, 'hour').format('yyyy-MM-DD');
+    console.log('cashCropPlantingDate', cashCropPlantingDate);
+    console.log('coverCropTerminationDate', coverCropTerminationDate);
     console.log('startDate', start);
     console.log('endDate', end);
     console.log('isDatesValid', validity);
@@ -187,7 +187,7 @@ const useFetchModel = ({
           console.log(error);
         });
     }
-  }, [plantingDate, killDate, end, start]);
+  }, [cashCropPlantingDate, coverCropTerminationDate, end, start]);
 
   return model;
 };
@@ -209,20 +209,21 @@ const useFetchSSURGO = () => {
     axios
       .get(url)
       .then((data) => {
-        if (data.ERROR) {
+        console.log('SSURGO url', url);
+        if (data.ERROR || !data.data || !data.data.length) {
           console.log(`No SSURGO data at ${lat}, ${lon}`);
           dispatch(set.BD(''));
           dispatch(set.OM(''));
         } else {
-          data = data.filter((d) => d.desgnmaster !== 'O');
-          // const minhzdept = Math.min.apply(Math, data.map((d) => d.hzdept_r));
-          const minhzdept = Math.min(...data.map((d) => d.hzdept_r));
-          data = data.filter((d) => +d.hzdept_r === +minhzdept);
-          dispatch(set.BD(weightedAverage(data, 'dbthirdbar_r')));
-          dispatch(set.OM(weightedAverage(data, 'om_r')));
-          dispatch(set.SSURGO(data));
-          console.log('SSURGO', data);
-          // useFetchModel();
+          console.log('SSURGO data', data);
+          let filteredData = data.data.filter((d) => d.desgnmaster !== 'O');
+          console.log('SSURGO filteredData', filteredData);
+          const minhzdept = Math.min(...filteredData.map((d) => d.hzdept_r));
+          filteredData = filteredData.filter((d) => +d.hzdept_r === +minhzdept);
+          dispatch(set.BD(weightedAverage(filteredData, 'dbthirdbar_r')));
+          dispatch(set.OM(weightedAverage(filteredData, 'om_r')));
+          dispatch(set.SSURGO(filteredData));
+          console.log('SSURGO', filteredData);
         }
       })
       .catch((error) => {

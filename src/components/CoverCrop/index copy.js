@@ -11,7 +11,6 @@ import {
   Typography,
   styled,
   Paper,
-  Stack,
 } from '@mui/material';
 
 import { get, set } from '../../store/Store';
@@ -125,9 +124,10 @@ const CoverCrop1 = () => {
         }}
       >
         <Typography variant="h4">Tell us about your Cover Crop</Typography>
-        <Stack direction="column" spacing={2} mt={2}>
+        <Box mt={0}>
           <CustomInputText>Cover Crop Species:</CustomInputText>
           <CoverCrops />
+
           {
             isSatelliteMode ? (
               <Paper mt={2}>
@@ -206,7 +206,7 @@ const CoverCrop1 = () => {
           }
           {isSatelliteMode ? '' : (
             <>
-              <Box mt={1} sx={{ display: 'flex', flexDirection: 'row', alignItems: 'center' }}>
+              <Box mt={2} sx={{ display: 'flex', flexDirection: 'row', alignItems: 'center' }}>
                 <CustomInputText>Dry Biomass </CustomInputText>
                 <Help>
                   <p>The amount of cover crop biomass on a dry weight basis.</p>
@@ -295,7 +295,7 @@ const CoverCrop1 = () => {
               />
             </>
           )}
-        </Stack>
+        </Box>
         <Box
           sx={{
             justifyContent: 'space-around',
@@ -304,7 +304,7 @@ const CoverCrop1 = () => {
             display: 'flex',
             flexDirection: 'row',
           }}
-          mt={4}
+          mt={6}
         >
           <Button
             sx={{ borderRadius: '1rem', fontSize: '22px', fontWeight: 900 }}

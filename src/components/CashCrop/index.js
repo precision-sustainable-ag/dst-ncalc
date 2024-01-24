@@ -357,7 +357,7 @@ const CashCrop = () => {
           <CashCrops />
 
           <CustomInputText>Cash Crop Planting Date: </CustomInputText>
-          <Input type="date" id="plantingDate" />
+          <Input type="date" id="cashCropPlantingDate" />
 
           {cashCrop === 'Corn'
             && (

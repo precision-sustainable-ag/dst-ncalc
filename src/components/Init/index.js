@@ -52,7 +52,7 @@ const Init = ({ desktop, setNavModalOpen }) => {
           BD: site.BD,
           coverCrop: [site['Cover Crop']],
           cashCrop: site['Cash Crop'],
-          killDate: new Date(site.Date),
+          coverCropTerminationDate: new Date(site.Date),
           lwc: site.LitterWaterContent,
           biomass: Math.round(site.FOM),
           unit: 'kg/ha',
@@ -64,7 +64,7 @@ const Init = ({ desktop, setNavModalOpen }) => {
           category: site.Category,
         };
       } else {
-        examples[site.ID].plantingDate = new Date(moment(site.Date).add(-111, 'days'));
+        examples[site.ID].cashCropPlantingDate = new Date(moment(site.Date).add(-111, 'days'));
       }
     });
 
@@ -97,8 +97,8 @@ const Init = ({ desktop, setNavModalOpen }) => {
       dispatch(set.BD(1.62));
       dispatch(set.InorganicN(10));
       dispatch(set.coverCrop(['Rye']));
-      dispatch(set.killDate('2019-03-21'));
-      dispatch(set.plantingDate('2019-04-01'));
+      dispatch(set.coverCropTerminationDate('2019-03-21'));
+      dispatch(set.cashCropPlantingDate('2019-04-01'));
       dispatch(set.biomass(5000));
       dispatch(set.lwc(1.486));
       dispatch(set.N(0.6));
@@ -119,8 +119,8 @@ const Init = ({ desktop, setNavModalOpen }) => {
       dispatch(set.BD(1.62));
       dispatch(set.InorganicN(10));
       dispatch(set.coverCrop(['Clover, Crimson']));
-      dispatch(set.killDate('2019-04-27'));
-      dispatch(set.plantingDate('2019-05-15'));
+      dispatch(set.coverCropTerminationDate('2019-04-27'));
+      dispatch(set.cashCropPlantingDate('2019-05-15'));
       dispatch(set.biomass(3500));
       dispatch(set.lwc(7.4));
       dispatch(set.N(3.5));

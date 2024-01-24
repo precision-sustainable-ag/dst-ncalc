@@ -38,7 +38,7 @@ const MapVisCard = ({ refVal }) => (
       >
         Map Visualization
       </Typography>
-      {/* <Biomass /> */}
+      <Biomass />
       <NcalcMap />
     </CardContent>
   </Card>

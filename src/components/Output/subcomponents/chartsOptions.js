@@ -82,7 +82,7 @@ const getGeneralChartOptions = (props) => {
     surfaceData,
     doIncorporated,
     incorporatedData,
-    plantingDate,
+    cashCropPlantingDate,
     N,
     biomass,
   } = props;
@@ -235,7 +235,7 @@ const getGeneralChartOptions = (props) => {
           },
         },
         plotLines: [{
-          value: new Date(plantingDate),
+          value: new Date(cashCropPlantingDate),
           color: '#7b3294',
           dashStyle: 'shortdash',
           width: 0.4,

@@ -1,3 +1,4 @@
+/* eslint-disable consistent-return */
 /* eslint-disable no-console */
 import {
   Box,
@@ -94,6 +95,7 @@ const LeftSideBar = ({ sidebarListData, refs }) => {
   useEffect(() => {
     if (!disableScrollListener) {
       sidebarListData.forEach((el, index) => {
+        if (el.label === 'Map Visualization') return;
         const element = refs[index].current;
         if (element === null) return;
         const yTop = element.getBoundingClientRect().top + window.scrollY + YOFFSET;
@@ -112,16 +114,19 @@ const LeftSideBar = ({ sidebarListData, refs }) => {
       <Box sx={ListWrapperStyles}>
         <Stack sx={ListStyles} gap={2} alignItems="flex-start">
           {
-            sidebarListData.map((el, index) => (
-              <ListItem
-                label={el.label}
-                key={el.key}
-                activeItem={activeItem}
-                setActiveItem={setActiveItem}
-                refVal={refs[index]}
-                setDisableScrollListener={setDisableScrollListener}
-              />
-            ))
+            sidebarListData.map((el, index) => {
+              if (el.label === 'Map Visualization') return;
+              return (
+                <ListItem
+                  label={el.label}
+                  key={el.key}
+                  activeItem={activeItem}
+                  setActiveItem={setActiveItem}
+                  refVal={refs[index]}
+                  setDisableScrollListener={setDisableScrollListener}
+                />
+              );
+            })
           }
         </Stack>
       </Box>
