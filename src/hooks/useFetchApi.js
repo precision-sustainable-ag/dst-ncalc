@@ -204,8 +204,6 @@ const useFetchSSURGO = () => {
 
   useEffect(() => {
     const url = `${SSURGO_API_URL}/?lat=${lat}&lon=${lon}&component=major`;
-    dispatch(set.SSURGO(null));
-    dispatch(set.model(null));
     axios
       .get(url)
       .then((data) => {

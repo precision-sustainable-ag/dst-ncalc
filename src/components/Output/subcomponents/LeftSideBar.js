@@ -6,6 +6,8 @@ import {
   Typography,
 } from '@mui/material';
 import React, { useEffect, useState } from 'react';
+import { useSelector } from 'react-redux';
+import { get } from '../../../store/Store';
 
 const YOFFSET = -100;
 
@@ -79,6 +81,7 @@ const LeftSideBar = ({ sidebarListData, refs }) => {
   const [activeItem, setActiveItem] = React.useState('Summary');
   const [scrollPosition, setScrollPosition] = useState(0);
   const [disableScrollListener, setDisableScrollListener] = useState(false);
+  const isSatelliteMode = useSelector(get.biomassCalcMode) === 'satellite';
 
   const handleScroll = () => {
     const position = window.scrollY;
@@ -95,7 +98,7 @@ const LeftSideBar = ({ sidebarListData, refs }) => {
   useEffect(() => {
     if (!disableScrollListener) {
       sidebarListData.forEach((el, index) => {
-        if (el.label === 'Map Visualization') return;
+        if (!isSatelliteMode && el.label === 'Map Visualization') return;
         const element = refs[index].current;
         if (element === null) return;
         const yTop = element.getBoundingClientRect().top + window.scrollY + YOFFSET;
@@ -115,7 +118,7 @@ const LeftSideBar = ({ sidebarListData, refs }) => {
         <Stack sx={ListStyles} gap={2} alignItems="flex-start">
           {
             sidebarListData.map((el, index) => {
-              if (el.label === 'Map Visualization') return;
+              if (!isSatelliteMode && el.label === 'Map Visualization') return;
               return (
                 <ListItem
                   label={el.label}

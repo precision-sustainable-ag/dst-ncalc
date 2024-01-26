@@ -464,7 +464,7 @@ const Soil = () => {
 
   /// /// /// HOOKS /// /// ///
   useFetchSSURGO();
-
+  console.log('$$ssurgo', ssurgo);
   /// /// /// RETURN JSX /// ///
   return (
     <Box
@@ -553,7 +553,7 @@ const Soil = () => {
             </Typography>
           )}
 
-        {!isSatelliteMode && (
+        {!isSatelliteMode && ssurgo && (
           <Box sx={{ color: '#4f6b14' }}>
             <Box my={5}>
               Organic Matter (%):

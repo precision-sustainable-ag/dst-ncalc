@@ -16,8 +16,8 @@ const initialState = {
   coverCrop: query('covercrop', []),
   cashCrop: '',
   cashCropPlantingDate: query('date2', ''),
-  lat: query('lat', 40.7849),
-  lon: query('lon', -74.8073),
+  lat: query('lat', 32.8654),
+  lon: query('lon', -82.2584),
   InorganicN: 10,
   N: query('N', ''),
   carb: query('carb', ''),
@@ -61,7 +61,7 @@ const initialState = {
   site: '',
   sites: [],
   data: '',
-  biomassCalcMode: 'satellite', // 'sampled' or 'satellite'
+  biomassCalcMode: 'sampled', // 'sampled' or 'satellite'
   openFeedbackModal: false,
   openAboutModal: false,
 };
