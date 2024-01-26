@@ -132,7 +132,7 @@ const CoverCrop1 = () => {
             isSatelliteMode ? (
               <Paper mt={2}>
                 <Biomass minified={false} />
-                {mapPolygon.length === 0 && (
+                {/* {mapPolygon.length === 0 && (
                   <Modal
                     open={open}
                     onClose={() => setOpen(false)}
@@ -195,7 +195,7 @@ const CoverCrop1 = () => {
                       </Box>
                     </Paper>
                   </Modal>
-                )}
+                )} */}
               </Paper>
             ) : (
               <>

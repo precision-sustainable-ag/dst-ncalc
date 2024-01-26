@@ -15,7 +15,6 @@ const initialState = {
   targetN: '150',
   coverCrop: query('covercrop', []),
   cashCrop: '',
-  cashCropPlantingDate: query('date2', ''),
   lat: query('lat', 32.8654),
   lon: query('lon', -82.2584),
   InorganicN: 10,
@@ -31,7 +30,8 @@ const initialState = {
   mapPolygon: [],
   biomassCropType: 'Wheat',
   coverCropPlantingDate: now.subtract(1, 'year').startOf('month').month(9).format('YYYY-MM-DD'),
-  coverCropTerminationDate: now.startOf('month').month(5).format('YYYY-MM-DD'),
+  coverCropTerminationDate: now.startOf('month').month(4).format('YYYY-MM-DD'),
+  cashCropPlantingDate: now.startOf('month').month(4).add(1, 'week').format('YYYY-MM-DD'),
   biomassTaskResults: null,
   biomassTotalValue: null,
   maxZoom: 20,
@@ -61,7 +61,7 @@ const initialState = {
   site: '',
   sites: [],
   data: '',
-  biomassCalcMode: 'sampled', // 'sampled' or 'satellite'
+  biomassCalcMode: 'satellite', // 'sampled' or 'satellite'
   openFeedbackModal: false,
   openAboutModal: false,
 };

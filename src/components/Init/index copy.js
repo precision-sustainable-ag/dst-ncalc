@@ -1,21 +1,26 @@
+/* eslint-disable jsx-a11y/control-has-associated-label */
 /* eslint-disable no-console */
 import React, { useEffect } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { useNavigate } from 'react-router-dom';
 import Airtable from 'airtable';
 import moment from 'moment';
-
 import { set, get } from '../../store/redux-autosetters';
 import './styles.scss';
+import { useFetchSampleBiomass } from '../../hooks/useFetchStatic';
 
 const examples = {};
 
-const Init = () => {
+const Init = ({ desktop, setNavModalOpen }) => {
   const dispatch = useDispatch();
   const navigate = useNavigate();
 
   const PSA = useSelector(get.PSA);
   const field = useSelector(get.field);
+  const screen = useSelector(get.screen);
+
+  // eslint-disable-next-line no-unused-vars
+  const [samplePolygon, sampleBiomass] = useFetchSampleBiomass();
 
   useEffect(() => {
     const base = new Airtable({ apiKey: 'keySO0dHQzGVaSZp2' }).base('appOEj4Ag9MgTTrMg');
@@ -92,7 +97,8 @@ const Init = () => {
       dispatch(set.BD(1.62));
       dispatch(set.InorganicN(10));
       dispatch(set.coverCrop(['Rye']));
-      dispatch(set.coverCropTerminationDate('2019-03-21'));
+      dispatch(set.coverCropPlantingDate('2018-09-01'));
+      dispatch(set.coverCropTerminationDate('2019-03-22'));
       dispatch(set.cashCropPlantingDate('2019-04-01'));
       dispatch(set.biomass(5000));
       dispatch(set.lwc(1.486));
@@ -126,7 +132,7 @@ const Init = () => {
       dispatch(set.yield(150));
       dispatch(set.targetN(100));
     } else {
-      const inputs = JSON.parse(localStorage[field]);
+      const inputs = JSON.parse(localStorage[fieldVal]);
       Object.keys(inputs).forEach((key) => {
         try {
           if (/Date/.test(key)) {
@@ -146,6 +152,7 @@ const Init = () => {
 
   const changePSA = (e) => {
     const PSAval = examples[e.target.value];
+    setNavModalOpen(false);
 
     Object.keys(PSAval).forEach((key) => {
       try {
@@ -159,7 +166,10 @@ const Init = () => {
 
   const changeField = (e) => {
     const fieldStr = e.target.value;
-    if (fieldStr === 'Clear previous runs') {
+    setNavModalOpen(false);
+    if (fieldStr === 'Download data') {
+      document.querySelector('a.download').click();
+    } else if (fieldStr === 'Clear previous runs') {
       // eslint-disable-next-line no-alert
       if (window.confirm('Clear all previous runs?')) {
         localStorage.clear();
@@ -170,8 +180,11 @@ const Init = () => {
     }
   }; // changeField
 
+  const myFields = Object.keys(localStorage).sort().filter((v) => !v.includes('mapbox.eventData'));
+  const showUtilities = screen === 'output' || myFields.length;
+
   return (
-    <div className="Init">
+    <div className={`Init ${desktop ? 'desktop' : 'mobile'}`}>
       {
         PSA
         && (
@@ -207,21 +220,50 @@ const Init = () => {
             onChange={changeField}
             value={field}
           >
-            <option>examples</option>
-            <option>Example: Grass</option>
-            <option>Example: Legume</option>
+            {/* eslint-disable-next-line */}
+            <option>&nbsp;</option>
             {
-              Object.keys(localStorage).filter((v) => !v.includes('mapbox.eventData')).length && (
+              myFields.length && (
                 <>
-                  <option>Clear previous runs</option>
+                  <optgroup label="My fields">
+                    { // additional field names in example dropdown
+                      myFields.map((fld, idx) => (
+                        <option key={idx} checked={fld === field}>{fld}</option> // eslint-disable-line react/no-unknown-property
+                      ))
+                    }
+                  </optgroup>
                   <option disabled>____________________</option>
                 </>
               )
             }
-            { // additional field names in example dropdown
-              Object.keys(localStorage).sort().filter((v) => !v.includes('mapbox.eventData')).map((fld, idx) => (
-                <option key={idx} checked={fld === field}>{fld}</option> // eslint-disable-line react/no-unknown-property
-              ))
+
+            {
+              !myFields.length && (
+                <option>&nbsp;</option>
+              )
+            }
+
+            <optgroup label="Example data">
+              <option>Example: Grass</option>
+              <option>Example: Legume</option>
+            </optgroup>
+            <option disabled>____________________</option>
+
+            {
+              showUtilities && (
+                <optgroup label="Utilities">
+                  {
+                    screen === 'output' && (
+                      <option>Download data</option>
+                    )
+                  }
+                  {
+                    myFields.length && (
+                      <option>Clear previous runs</option>
+                    )
+                  }
+                </optgroup>
+              )
             }
           </select>
         )

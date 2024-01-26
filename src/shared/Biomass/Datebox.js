@@ -32,6 +32,8 @@ const Datebox = () => {
     setMaxTerminationDate(maxTerminationDateObj.format('YYYY-MM-DD'));
   }, [coverCropPlantingDate, coverCropTerminationDate]);
 
+  console.log('coverCropPlantingDate: ', coverCropPlantingDate, coverCropTerminationDate)
+
   return (
     <Grid container spacing={2}>
       <Grid item xs={12} md={6}>
