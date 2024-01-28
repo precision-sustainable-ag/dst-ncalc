@@ -58,6 +58,7 @@ const initialState = {
   errorModel: false,
   errorCorn: false,
   edited: false,
+  activeExample: null,
   site: '',
   sites: [],
   data: '',

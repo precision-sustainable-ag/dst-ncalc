@@ -84,6 +84,7 @@ const Init = () => {
     if (fieldVal === 'Example: Grass') {
       navigate('location');
       dispatch(set.edited(true));
+      dispatch(set.activeExample(fieldVal));
       dispatch(set.lat(32.865389));
       dispatch(set.lon(-82.258361));
       dispatch(set.location('Example'));
@@ -107,6 +108,7 @@ const Init = () => {
     } else if (fieldVal === 'Example: Legume') {
       navigate('location');
       dispatch(set.edited(true));
+      dispatch(set.activeExample(fieldVal));
       dispatch(set.lat(32.865389));
       dispatch(set.lon(-82.258361));
       dispatch(set.location('Example'));

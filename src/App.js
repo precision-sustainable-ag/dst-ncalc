@@ -1,10 +1,6 @@
 /* eslint-disable no-console */
-import React, { useEffect } from 'react';
-import {
-  useDispatch,
-  // useDispatch,
-  useSelector,
-} from 'react-redux';
+import React from 'react';
+import { useSelector } from 'react-redux';
 import { useLocation } from 'react-router-dom';
 import { ThemeProvider, createTheme } from '@mui/material/styles';
 import { Container } from '@mui/material';
@@ -12,7 +8,7 @@ import ResponsiveNavBar from './components/ResponsiveNavBar';
 import Body from './components/Body';
 import './App.scss';
 import 'react-datepicker/dist/react-datepicker.css';
-import { get, set } from './store/Store';
+import { get } from './store/Store';
 
 const screens = {
   init: () => null,

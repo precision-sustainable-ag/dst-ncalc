@@ -18,21 +18,20 @@ const Datebox = () => {
   /// Shared States ///
   const coverCropPlantingDate = useSelector(get.coverCropPlantingDate);
   const coverCropTerminationDate = useSelector(get.coverCropTerminationDate);
+  const activeExample = useSelector(get.activeExample);
   const dispatch = useDispatch();
 
   useEffect(() => {
     const now = dayjs();
-    const minPlantingDateObj = now.subtract(5, 'year');
-    const maxPlantingDateObj = now.subtract(0, 'month');
-    const minTerminationDateObj = dayjs(coverCropPlantingDate).add(2, 'month');
-    const maxTerminationDateObj = dayjs(coverCropPlantingDate).add(12, 'month');
+    const minPlantingDateObj = activeExample ? dayjs(coverCropPlantingDate) : now.subtract(10, 'year');
+    const maxPlantingDateObj = activeExample ? dayjs(coverCropPlantingDate) : now.add(0, 'month');
+    const minTerminationDateObj = activeExample ? dayjs(coverCropTerminationDate) : dayjs(coverCropPlantingDate).add(2, 'month');
+    const maxTerminationDateObj = activeExample ? dayjs(coverCropTerminationDate) : dayjs(coverCropPlantingDate).add(12, 'month');
     setMinPlantingDate(minPlantingDateObj.format('YYYY-MM-DD'));
     setMaxPlantingDate(maxPlantingDateObj.format('YYYY-MM-DD'));
     setMinTerminationDate(minTerminationDateObj.format('YYYY-MM-DD'));
     setMaxTerminationDate(maxTerminationDateObj.format('YYYY-MM-DD'));
   }, [coverCropPlantingDate, coverCropTerminationDate]);
-
-  console.log('coverCropPlantingDate: ', coverCropPlantingDate, coverCropTerminationDate)
 
   return (
     <Grid container spacing={2}>
