@@ -16,32 +16,37 @@ const useFetchSampleBiomass = () => {
   const [polygon, setPolygon] = useState(null);
   const [biomass, setBiomass] = useState(null);
   const biomassCalcMode = useSelector(get.biomassCalcMode);
+  const activeExample = useSelector(get.activeExample);
 
   useEffect(() => {
     const HEADERS = {
       'Content-Type': 'application/json',
       Accept: 'application/json',
     };
-    fetch(POLYGON_FILE_NAME, { HEADERS })
-      .then((response) => response.json())
-      .then((jsonObj) => {
-        dispatch(set.mapPolygon(jsonObj));
-        setPolygon(jsonObj);
-        return null;
-      });
-    if (biomassCalcMode === 'satellite') {
-      fetch(BIOMASS_FILE_NAME, { HEADERS })
+    // fetch sample polygon if example is active
+    if (activeExample) {
+      fetch(POLYGON_FILE_NAME, { HEADERS })
         .then((response) => response.json())
         .then((jsonObj) => {
-          dispatch(set.biomassTaskResults(jsonObj));
-          setBiomass(jsonObj);
+          dispatch(set.mapPolygon(jsonObj));
+          setPolygon(jsonObj);
           return null;
         });
-    } else {
-      dispatch(set.biomassTaskResults(null));
-      setBiomass(null);
+      if (biomassCalcMode === 'satellite') {
+        fetch(BIOMASS_FILE_NAME, { HEADERS })
+          .then((response) => response.json())
+          .then((jsonObj) => {
+            dispatch(set.biomassTaskResults(jsonObj));
+            setBiomass(jsonObj);
+            return null;
+          });
+      }
+      if (biomassCalcMode === 'sampled') {
+        dispatch(set.biomassTaskResults(null));
+        setBiomass(null);
+      }
     }
-  }, [biomassCalcMode]);
+  }, [biomassCalcMode, activeExample]);
 
   return [polygon, biomass];
 };

@@ -6,7 +6,7 @@ import Airtable from 'airtable';
 import moment from 'moment';
 
 import { set, get } from '../../store/redux-autosetters';
-import './styles.scss';
+import { useFetchSampleBiomass } from '../../hooks/useFetchStatic';
 
 const examples = {};
 
@@ -16,6 +16,9 @@ const Init = () => {
 
   const PSA = useSelector(get.PSA);
   const field = useSelector(get.field);
+
+  // eslint-disable-next-line no-unused-vars
+  const [samplePolygon, sampleBiomass] = useFetchSampleBiomass();
 
   useEffect(() => {
     const base = new Airtable({ apiKey: 'keySO0dHQzGVaSZp2' }).base('appOEj4Ag9MgTTrMg');
@@ -82,6 +85,7 @@ const Init = () => {
 
   const loadField = (fieldVal) => {
     if (fieldVal === 'Example: Grass') {
+      console.log('loadField', fieldVal);
       navigate('location');
       dispatch(set.edited(true));
       dispatch(set.activeExample(fieldVal));
