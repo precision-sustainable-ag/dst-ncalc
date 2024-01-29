@@ -65,9 +65,17 @@ const SummaryItem = ({ name, value, desc }) => (
           :&nbsp;
         </CustomTypography>
       </CustomWidthTooltip>
-      <Typography sx={{ fontWeight: 600, fontSize: 13 }}>
-        {value}
-      </Typography>
+      {typeof value === 'object'
+        ? (
+          <Typography sx={{ fontWeight: 600, fontSize: 11 }}>
+            {Object.keys(value).map((k) => <span>{`${k}`}</span>)}
+          </Typography>
+        )
+        : (
+          <Typography sx={{ fontWeight: 600, fontSize: 13 }}>
+            {value}
+          </Typography>
+        )}
     </Stack>
   </Box>
 );

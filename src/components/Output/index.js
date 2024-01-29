@@ -1,109 +1,67 @@
 /* eslint-disable no-console */
 import { Box, Stack } from '@mui/material';
-import React from 'react';
+import React, { useEffect } from 'react';
+import { useSelector } from 'react-redux';
 import LeftSideBar from './subcomponents/LeftSideBar';
 import RightSideBar from './subcomponents/RightSideBar';
+import { get } from '../../store/redux-autosetters';
 
 const wrapperStyles = {
   width: '100%',
 };
 
-const summaryData = {
+const summaryDataDefaults = {
   'Field name': {
-    value: 'Example: Grass',
-    desc: `Lorem ipsum dolor sit amet, consectetuer adipiscing elit. 
-    Aenean commodo ligula eget dolor. Aenean massa. Cum sociis 
-    natoque penatibus et magnis dis parturient montes, nascetur 
-    ridiculus mus. Donec quam felis, ultricies nec, pellentesque 
-    eu, pretium quis, sem. Nulla consequat massa quis enim. Donec 
-    pede justo, fringilla vel, aliquet nec, vulputate eget, arcu. 
-    In enim justo, rhoncus ut, imperdiet a, venenatis vitae, justo. 
-    Nullam dictum felis eu pede mollis pretium. 
-    Integer tincidunt. Cras dapibus. Vivamus elementum `,
+    value: 'not set',
+    desc: `Name of the field 
+          (e.g., “North Field”)`,
   },
   Species: {
-    value: 'Rye',
-    desc: `Lorem ipsum dolor sit amet, consectetuer adipiscing elit. 
-  Aenean commodo ligula eget dolor. Aenean massa. Cum sociis 
-  natoque penatibus et magnis dis parturient montes, nascetur 
-  ridiculus mus. Donec quam felis, ultricies nec, pellentesque 
-  eu, pretium quis, sem. Nulla consequat massa quis enim. Donec 
-  pede justo, fringilla vel, aliquet nec, vulputate eget, arcu. 
-  In enim justo, rhoncus ut, imperdiet a, venenatis vitae, justo. 
-  Nullam dictum felis eu pede mollis pretium. 
-  Integer tincidunt. Cras dapibus. Vivamus elementum `,
+    value: 'not set',
+    desc: `list of species in
+           the cover crop mix`,
   },
   'Termination Date': {
-    value: 'Mar 21, 2019',
-    desc: `Lorem ipsum dolor sit amet, consectetuer adipiscing elit. 
-    Aenean commodo ligula eget dolor. Aenean massa. Cum sociis 
-    natoque penatibus et magnis dis parturient montes, nascetur 
-    ridiculus mus. Donec quam felis, ultricies nec, pellentesque 
-    eu, pretium quis, sem. Nulla consequat massa quis enim. Donec 
-    pede justo, fringilla vel, aliquet nec, vulputate eget, arcu. 
-    In enim justo, rhoncus ut, imperdiet a, venenatis vitae, justo. 
-    Nullam dictum felis eu pede mollis pretium. 
-    Integer tincidunt. Cras dapibus. Vivamus elementum `,
+    value: 'not set',
+    desc: `Date when the 
+          cover crop was terminated`,
   },
   'Dry Biomass': {
-    value: '5000 lb/ac',
-    desc: `Lorem ipsum dolor sit amet, consectetuer adipiscing elit. 
-    Aenean commodo ligula eget dolor. Aenean massa. Cum sociis 
-    natoque penatibus et magnis dis parturient montes, nascetur 
-    ridiculus mus. Donec quam felis, ultricies nec, pellentesque 
-    eu, pretium quis, sem. Nulla consequat massa quis enim. Donec 
-    pede justo, fringilla vel, aliquet nec, vulputate eget, arcu. 
-    In enim justo, rhoncus ut, imperdiet a, venenatis vitae, justo. 
-    Nullam dictum felis eu pede mollis pretium. 
-    Integer tincidunt. Cras dapibus. Vivamus elementum `,
+    value: 'not set',
+    desc: `The amount of cover crop biomass
+           on a dry weight basis`,
   },
   'Residue N Content': {
-    value: '30 lb/ac',
-    desc: `Lorem ipsum dolor sit amet, consectetuer adipiscing elit. 
-    Aenean commodo ligula eget dolor. Aenean massa. Cum sociis 
-    natoque penatibus et magnis dis parturient montes, nascetur 
-    ridiculus mus. Donec quam felis, ultricies nec, pellentesque 
-    eu, pretium quis, sem. Nulla consequat massa quis enim. Donec 
-    pede justo, fringilla vel, aliquet nec, vulputate eget, arcu. 
-    In enim justo, rhoncus ut, imperdiet a, venenatis vitae, justo. 
-    Nullam dictum felis eu pede mollis pretium. 
-    Integer tincidunt. Cras dapibus. Vivamus elementum `,
+    value: 'not set',
+    desc: `residue Nitrogen content 
+            on a dry weight basis`,
   },
   Carbohydrates: {
-    value: '33 %',
-    desc: `Lorem ipsum dolor sit amet, consectetuer adipiscing elit. 
-    Aenean commodo ligula eget dolor. Aenean massa. Cum sociis 
-    natoque penatibus et magnis dis parturient montes, nascetur 
-    ridiculus mus. Donec quam felis, ultricies nec, pellentesque 
-    eu, pretium quis, sem. Nulla consequat massa quis enim. Donec 
-    pede justo, fringilla vel, aliquet nec, vulputate eget, arcu. 
-    In enim justo, rhoncus ut, imperdiet a, venenatis vitae, justo. 
-    Nullam dictum felis eu pede mollis pretium. 
-    Integer tincidunt. Cras dapibus. Vivamus elementum `,
+    value: 'not set',
+    desc: `Non-structural labile carbohydrate concentration 
+          based on lab results. This represents the most readily
+          decomposable C constituents in plant materials.
+          The default value is based on the nitrogen concentration.
+          If you have the raw data from near infra-red reflectance 
+          spectroscopy (NIRS) analysis, use the following equation:
+          carbohydrates 
+          (%) = % crude protein (CP) + % fat + % non-fibrous carbohydrates (NFC)`,
   },
   'Holo-cellulose': {
-    value: '58 %',
-    desc: `Lorem ipsum dolor sit amet, consectetuer adipiscing elit. 
-    Aenean commodo ligula eget dolor. Aenean massa. Cum sociis 
-    natoque penatibus et magnis dis parturient montes, nascetur 
-    ridiculus mus. Donec quam felis, ultricies nec, pellentesque 
-    eu, pretium quis, sem. Nulla consequat massa quis enim. Donec 
-    pede justo, fringilla vel, aliquet nec, vulputate eget, arcu. 
-    In enim justo, rhoncus ut, imperdiet a, venenatis vitae, justo. 
-    Nullam dictum felis eu pede mollis pretium. 
-    Integer tincidunt. Cras dapibus. Vivamus elementum `,
+    value: 'not set',
+    desc: `Structural holo-cellulose (i.e., both cellulose and hemi-cellulose) 
+          concentration based on lab results. This represents the moderately 
+          decomposable C constituents in plant materials. The default value 
+          is based on the nitrogen concentration. If you have the raw data 
+          from near infra-red reflectance spectroscopy (NIRS) analysis, use the following equation:
+          holo-cellulose (%) = % neutral detergent fiber (NDF) – (% lignin + % ash)`,
   },
   Lignin: {
-    value: '9 %',
-    desc: `Lorem ipsum dolor sit amet, consectetuer adipiscing elit. 
-    Aenean commodo ligula eget dolor. Aenean massa. Cum sociis 
-    natoque penatibus et magnis dis parturient montes, nascetur 
-    ridiculus mus. Donec quam felis, ultricies nec, pellentesque 
-    eu, pretium quis, sem. Nulla consequat massa quis enim. Donec 
-    pede justo, fringilla vel, aliquet nec, vulputate eget, arcu. 
-    In enim justo, rhoncus ut, imperdiet a, venenatis vitae, justo. 
-    Nullam dictum felis eu pede mollis pretium. 
-    Integer tincidunt. Cras dapibus. Vivamus elementum `,
+    value: 'not set',
+    desc: `Structural lignin concentration based on lab results. 
+          This represents the most recalcitrant C constituents in 
+          plant materials. The default value is based on the 
+          nitrogen concentration.`,
   },
 };
 
@@ -136,6 +94,31 @@ const sidebarListData = [
 
 const Output = () => {
   const refs = sidebarListData.map(() => React.useRef(null));
+  const [summaryData, setSummaryData] = React.useState(summaryDataDefaults);
+  const field = useSelector(get.field);
+  const species = useSelector(get.species);
+  const coverCropTerminationDate = useSelector(get.coverCropTerminationDate);
+  const biomass = useSelector(get.biomass);
+  const residueC = useSelector(get.residueC);
+  const carb = useSelector(get.carb);
+  const cell = useSelector(get.cell);
+  const lign = useSelector(get.lign);
+  const unit = useSelector(get.unit);
+
+  useEffect(() => {
+    console.log('summaryData', species);
+    const tempSummaryData = { ...summaryData };
+    tempSummaryData['Field name'].value = field;
+    tempSummaryData.Species.value = species;
+    tempSummaryData['Termination Date'].value = coverCropTerminationDate;
+    tempSummaryData['Dry Biomass'].value = String(biomass).concat(' ').concat(unit);
+    tempSummaryData['Residue N Content'].value = String(residueC).concat(' ').concat(unit);
+    tempSummaryData.Carbohydrates.value = String(carb).concat(' %');
+    tempSummaryData['Holo-cellulose'].value = String(cell).concat(' %');
+    tempSummaryData.Lignin.value = String(lign).concat(' %');
+    setSummaryData({ ...tempSummaryData });
+  }, [field]);
+
   return (
     <Box sx={wrapperStyles}>
       <Stack direction="row" justifyContent="space-between">

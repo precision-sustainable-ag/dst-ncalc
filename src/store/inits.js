@@ -47,7 +47,7 @@ const initialState = {
   yield: 150,
   residue: 'surface',
   NContent: '',
-  residueC: '',
+  residueC: '30',
   outputN: 1,
   SSURGO: null,
   gotModel: false,
@@ -68,7 +68,7 @@ const initialState = {
   site: '',
   sites: [],
   data: '',
-  biomassCalcMode: 'satellite', // 'sampled' or 'satellite'
+  biomassCalcMode: 'sampled', // 'sampled' or 'satellite'
   openFeedbackModal: false,
   openAboutModal: false,
 };
