@@ -201,27 +201,23 @@ const useFetchSSURGO = () => {
   const dispatch = useDispatch();
   const lat = useSelector(get.lat);
   const lon = useSelector(get.lon);
+  const SSURGO = useSelector(get.SSURGO);
 
   useEffect(() => {
     const url = `${SSURGO_API_URL}/?lat=${lat}&lon=${lon}&component=major`;
     axios
       .get(url)
       .then((data) => {
-        console.log('SSURGO url', url);
         if (data.ERROR || !data.data || !data.data.length) {
-          console.log(`No SSURGO data at ${lat}, ${lon}`);
           dispatch(set.BD(''));
           dispatch(set.OM(''));
-        } else {
-          console.log('SSURGO data', data);
+        } else if (!SSURGO) {
           let filteredData = data.data.filter((d) => d.desgnmaster !== 'O');
-          console.log('SSURGO filteredData', filteredData);
           const minhzdept = Math.min(...filteredData.map((d) => d.hzdept_r));
           filteredData = filteredData.filter((d) => +d.hzdept_r === +minhzdept);
           dispatch(set.BD(weightedAverage(filteredData, 'dbthirdbar_r')));
           dispatch(set.OM(weightedAverage(filteredData, 'om_r')));
           dispatch(set.SSURGO(filteredData));
-          console.log('SSURGO', filteredData);
         }
       })
       .catch((error) => {
