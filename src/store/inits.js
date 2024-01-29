@@ -3,6 +3,12 @@ import { query } from '../hooks/helpers';
 
 const now = dayjs();
 
+const coverCropPlantingDate = now.month() < 6
+  ? now.subtract(2, 'year').startOf('month').month(10)
+  : now.subtract(1, 'year').startOf('month').month(10);
+const coverCropTerminationDate = coverCropPlantingDate.add(6, 'month');
+const cashCropPlantingDate = coverCropTerminationDate.add(1, 'week');
+
 const initialState = {
   focus: '',
   name: '',
@@ -29,9 +35,9 @@ const initialState = {
   mapType: 'hybrid',
   mapPolygon: [],
   biomassCropType: 'Wheat',
-  coverCropPlantingDate: now.subtract(1, 'year').startOf('month').month(9).format('YYYY-MM-DD'),
-  coverCropTerminationDate: now.startOf('month').month(4).format('YYYY-MM-DD'),
-  cashCropPlantingDate: now.startOf('month').month(4).add(1, 'week').format('YYYY-MM-DD'),
+  coverCropPlantingDate: coverCropPlantingDate.format('YYYY-MM-DD'),
+  coverCropTerminationDate: coverCropTerminationDate.format('YYYY-MM-DD'),
+  cashCropPlantingDate: cashCropPlantingDate.format('YYYY-MM-DD'),
   biomassTaskResults: null,
   biomassTotalValue: null,
   maxZoom: 20,
@@ -62,7 +68,7 @@ const initialState = {
   site: '',
   sites: [],
   data: '',
-  biomassCalcMode: 'satellite', // 'sampled' or 'satellite'
+  biomassCalcMode: 'sampled', // 'sampled' or 'satellite'
   openFeedbackModal: false,
   openAboutModal: false,
 };

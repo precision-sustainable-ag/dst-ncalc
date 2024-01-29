@@ -82,7 +82,7 @@ const SummaryCard = ({ data, refVal }) => (
         gutterBottom
         textAlign="center"
       >
-        Summary of Statistics
+        Summary
       </Typography>
     </CardContent>
     <CardActions>

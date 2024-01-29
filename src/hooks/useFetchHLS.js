@@ -36,7 +36,6 @@ const useFetchHLS = () => {
       .get(url)
       .then(({ data }) => {
         if (data && data instanceof Array) {
-          console.log('cornN4j353j4n3', data);
           dispatch(set.cornN(data));
           setCornData(data);
         } else {

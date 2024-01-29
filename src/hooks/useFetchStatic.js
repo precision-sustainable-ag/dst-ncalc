@@ -17,6 +17,9 @@ const useFetchSampleBiomass = () => {
   const [biomass, setBiomass] = useState(null);
   const biomassCalcMode = useSelector(get.biomassCalcMode);
   const activeExample = useSelector(get.activeExample);
+  const biomassTaskResults = useSelector(get.biomassTaskResults);
+
+  console.log('##biomassTaskResults', biomassTaskResults);
 
   useEffect(() => {
     const HEADERS = {

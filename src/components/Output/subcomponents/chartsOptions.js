@@ -276,13 +276,11 @@ const getNitrogenChartOptions = ({
       verticalAlign: mockup === 1 ? 'bottom' : 'top',
     },
     series: [
-      /*
       {
         name: 'Target N',
-        data: [+targetN, +targetN],
-        color: '#666'
+        data: null,
+        color: 'blue',
       },
-      */
       {
         name: 'Cover Crop N credit',
         data: doIncorporated ? [+incorporatedNPredict, +surfaceNPredict] : [+surfaceNPredict],
@@ -328,20 +326,20 @@ const getNitrogenChartOptions = ({
       },
       plotLines: [
         {
-          label: {
-            text: `Target N = ${targetN}`,
-            style: {
-              color: 'black',
-              font: '12px Trebuchet MS, Verdana, sans-serif',
-            },
-          },
+          // label: {
+          //   text: `Target N = ${targetN}`,
+          //   style: {
+          //     color: 'black',
+          //     font: '12px Trebuchet MS, Verdana, sans-serif',
+          //   },
+          // },
           verticalAlign: 'center',
           align: 'center',
           zIndex: 5,
-          color: 'gray', // Color value
-          dashStyle: 'Dot', // Style of the plot line. Default to solid
+          color: 'blue', // Color value
+          dashStyle: 'solid', // Style of the plot line. Default to solid
           value: targetN, // Value of where the line will appear
-          width: 2, // Width of the line
+          width: 4, // Width of the line
         },
       ],
     }],
@@ -351,7 +349,7 @@ const getNitrogenChartOptions = ({
       useHTML: true,
       reversed: true,
       labelFormatter() {
-        return `<div style="color: ${this.color};">${this.name}</div>`;
+        return `<div style="color: ${this.color};">${this.name === 'Target N' ? this.name.concat(': ').concat(targetN) : this.name}</div>`;
       },
     },
     plotOptions: {

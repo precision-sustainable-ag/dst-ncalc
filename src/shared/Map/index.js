@@ -8,6 +8,7 @@ import { Paper } from '@mui/material';
 import { get, set } from '../../store/Store';
 
 import './styles.scss';
+
 // eslint-disable-next-line import/no-webpack-loader-syntax, import/no-unresolved
 mapboxgl.workerClass = require('worker-loader!mapbox-gl/dist/mapbox-gl-csp-worker').default;
 
@@ -53,6 +54,10 @@ const MapComp = () => {
   useEffect(() => {
     if (zoom) dispatch(set.mapZoom(zoom));
   }, [zoom]);
+
+  useEffect(() => {
+    console.log('@@biomassTaskResultsom', biomassTaskResults);
+  }, [biomassTaskResults]);
 
   console.log('biomassTaskResults', biomassTaskResults);
   console.log('mapPolygon', mapPolygon);
