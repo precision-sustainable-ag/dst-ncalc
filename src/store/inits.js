@@ -59,6 +59,7 @@ const initialState = {
   nweeks: 4,
   mockup: 2,
   species: {},
+  // selectedCoverCropSpecies: [],
   maxBiomass: {},
   privacy: false,
   errorModel: false,

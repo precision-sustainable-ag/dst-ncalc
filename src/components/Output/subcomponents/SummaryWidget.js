@@ -52,33 +52,44 @@ const CustomTypography = styled(Typography)(() => ({
   borderBottom: '1px dotted rgb(35, 148, 223)',
 }));
 
-const SummaryItem = ({ name, value, desc }) => (
-  <Box
-    sx={{
-      padding: 1,
-    }}
-  >
-    <Stack direction="row">
-      <CustomWidthTooltip arrow title={desc} placement="top">
-        <CustomTypography>
-          {name}
-          :&nbsp;
-        </CustomTypography>
-      </CustomWidthTooltip>
-      {typeof value === 'object'
-        ? (
-          <Typography sx={{ fontWeight: 600, fontSize: 11 }}>
-            {Object.keys(value).map((k) => <span>{`${k}`}</span>)}
-          </Typography>
-        )
-        : (
-          <Typography sx={{ fontWeight: 600, fontSize: 13 }}>
-            {value}
-          </Typography>
-        )}
-    </Stack>
-  </Box>
-);
+const SummaryItem = ({ name, value, desc }) => {
+  console.log('xxxname:', name);
+  console.log('xxxvalue:', value);
+  console.log('xxxdesc:', desc);
+  return (
+    <Box
+      sx={{
+        padding: 1,
+      }}
+    >
+      <Stack direction="row">
+        <CustomWidthTooltip arrow title={desc} placement="top">
+          <CustomTypography>
+            {name}
+            :&nbsp;
+          </CustomTypography>
+        </CustomWidthTooltip>
+        {name === 'Species'
+          ? (
+            <Stack direction="column">
+              {
+                value.map((k) => (
+                  <Typography sx={{ fontWeight: 600, fontSize: 11 }}>
+                    {k}
+                  </Typography>
+                ))
+              }
+            </Stack>
+          )
+          : (
+            <Typography sx={{ fontWeight: 600, fontSize: 13 }}>
+              {value}
+            </Typography>
+          )}
+      </Stack>
+    </Box>
+  );
+};
 
 /// /// /// RETURN JSX /// /// ///
 const SummaryCard = ({ data, refVal }) => (

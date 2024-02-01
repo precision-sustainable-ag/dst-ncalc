@@ -96,6 +96,8 @@ const NitrogenCard = ({ refVal }) => {
     cashCropPlantingDate,
   });
 
+  console.log('modelll', model);
+
   const {
     maxSurface,
     minDate,

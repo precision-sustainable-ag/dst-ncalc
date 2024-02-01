@@ -349,7 +349,9 @@ const getNitrogenChartOptions = ({
       useHTML: true,
       reversed: true,
       labelFormatter() {
-        return `<div style="color: ${this.color};">${this.name === 'Target N' ? this.name.concat(': ').concat(targetN) : this.name}</div>`;
+        return `<div style="color: ${this.color};">${this.name === 'Target N'
+          ? this.name.concat(': ').concat(targetN).concat(' ').concat(unit)
+          : this.name}</div>`;
       },
     },
     plotOptions: {

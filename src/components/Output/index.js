@@ -2,6 +2,7 @@
 import { Box, Stack } from '@mui/material';
 import React, { useEffect } from 'react';
 import { useSelector } from 'react-redux';
+import dayjs from 'dayjs';
 import LeftSideBar from './subcomponents/LeftSideBar';
 import RightSideBar from './subcomponents/RightSideBar';
 import { get } from '../../store/redux-autosetters';
@@ -17,7 +18,7 @@ const summaryDataDefaults = {
           (e.g., “North Field”)`,
   },
   Species: {
-    value: 'not set',
+    value: ['not set'],
     desc: `list of species in
            the cover crop mix`,
   },
@@ -96,7 +97,7 @@ const Output = () => {
   const refs = sidebarListData.map(() => React.useRef(null));
   const [summaryData, setSummaryData] = React.useState(summaryDataDefaults);
   const field = useSelector(get.field);
-  const species = useSelector(get.species);
+  const coverCrop = useSelector(get.coverCrop);
   const coverCropTerminationDate = useSelector(get.coverCropTerminationDate);
   const biomass = useSelector(get.biomass);
   const residueC = useSelector(get.residueC);
@@ -104,13 +105,13 @@ const Output = () => {
   const cell = useSelector(get.cell);
   const lign = useSelector(get.lign);
   const unit = useSelector(get.unit);
+  console.log('coverCrop', coverCrop)
 
   useEffect(() => {
-    console.log('summaryData', species);
     const tempSummaryData = { ...summaryData };
     tempSummaryData['Field name'].value = field;
-    tempSummaryData.Species.value = species;
-    tempSummaryData['Termination Date'].value = coverCropTerminationDate;
+    tempSummaryData.Species.value = coverCrop;
+    tempSummaryData['Termination Date'].value = dayjs(coverCropTerminationDate, 'YYYY-MM-DD').format('MMM DD YYYY');
     tempSummaryData['Dry Biomass'].value = String(biomass).concat(' ').concat(unit);
     tempSummaryData['Residue N Content'].value = String(residueC).concat(' ').concat(unit);
     tempSummaryData.Carbohydrates.value = String(carb).concat(' %');

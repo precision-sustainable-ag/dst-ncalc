@@ -28,7 +28,6 @@ const useFetchCornN = () => {
       .add(1, 'hour')
       .format('yyyy-MM-DD');
     setEndDate(end);
-    // dispatch(set.cornN([]));
     dispatch(set.errorCorn(false));
     // eslint-disable-next-line max-len
     const url = `${WEATHER_API_URL}/hourly?lat=${lat}&lon=${lon}&start=${moment(
