@@ -7,11 +7,12 @@ import {
   Stack,
   Typography,
   Divider,
+  Container,
 } from '@mui/material';
 import Highcharts from 'highcharts';
 import HighchartsReact from 'highcharts-react-official';
 import React from 'react';
-import { useSelector } from 'react-redux';
+import { useDispatch, useSelector } from 'react-redux';
 import {
   getGeneralChartOptions,
   getResidueChartOptions,
@@ -65,7 +66,6 @@ const ResidueCard = ({ refVal }) => {
   const cornN = useSelector(get.cornN);
   const cashCrop = useSelector(get.cashCrop);
   const Yield = useSelector(get.yield);
-  const outputN = useSelector(get.outputN);
   const nweeks = useSelector(get.nweeks);
   const mockup = useSelector(get.mockup);
   const lat = useSelector(get.lat);
@@ -74,7 +74,6 @@ const ResidueCard = ({ refVal }) => {
   const lwc = useSelector(get.lwc);
   const BD = useSelector(get.BD);
   const InorganicN = useSelector(get.InorganicN);
-  // const doCornN = useSelector(get.doCornN);
 
   // /// /// HOOKS /// ///
 
@@ -143,6 +142,24 @@ const ResidueCard = ({ refVal }) => {
           justifyContent="center"
           width="100%"
         >
+          {surfaceData.length > 0
+            && (
+              <Container sx={{ fontSize: 9, paddingBottom: '10px' }}>
+                <Typography variant="subtitle2">
+                  By
+                  <Typography variant="subtitle2" component="span" fontWeight="bold" m={1}>
+                    4 weeks
+                  </Typography>
+                  after cover crop termination, undecomposed residue mass remaining is:
+                </Typography>
+                <Typography variant="subtitle2">
+                  <Typography variant="subtitle2" component="span" fontWeight="bold" m={1}>
+                    {Math.round(surfaceData[Math.min(nweeks * 7, surfaceData.length - 1)].y)} {unit}
+                  </Typography>
+                  for incorporated residues.
+                </Typography>
+              </Container>
+            )}
           <HighchartsReact
             containerProps={HighChartsContainerProps}
             highcharts={Highcharts}

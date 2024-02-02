@@ -6,6 +6,7 @@ import {
   Stack,
   Typography,
   Divider,
+  Container,
 } from '@mui/material';
 import Highcharts from 'highcharts';
 import HighchartsReact from 'highcharts-react-official';
@@ -146,6 +147,25 @@ const NitrogenCard = ({ refVal }) => {
           justifyContent="space-around"
           width="100%"
         >
+          {surfaceData.length > 0
+            && (
+              <Container sx={{ fontSize: 9, paddingBottom: '10px' }}>
+                <Typography variant="subtitle2">
+                  By
+                  <Typography variant="subtitle2" component="span" fontWeight="bold" m={1}>
+                    4 weeks
+                  </Typography>
+                  after cover crop termination, cumulative N released is:
+                </Typography>
+                <Typography variant="subtitle2">
+                  <Typography variant="subtitle2" component="span" fontWeight="bold" m={1}>
+                    {Math.round(surfaceData[Math.min(nweeks * 7, surfaceData.length - 1)].y)}
+                    {unit}
+                  </Typography>
+                  for surface residues.
+                </Typography>
+              </Container>
+            )}
           <HighchartsReact
             containerProps={HighChartsContainerProps}
             highcharts={Highcharts}
