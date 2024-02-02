@@ -96,7 +96,7 @@ const NitrogenCard = ({ refVal }) => {
     cashCropPlantingDate,
   });
 
-  console.log('modelll', model);
+  console.log('cashcrop', cashCrop);
 
   const {
     maxSurface,
@@ -121,7 +121,7 @@ const NitrogenCard = ({ refVal }) => {
     nweeks,
     biomass,
     doIncorporated: false,
-    doCornN: true,
+    doCornN: cashCrop.toLowerCase() === 'corn',
     N,
   });
 
