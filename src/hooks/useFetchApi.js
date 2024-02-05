@@ -162,11 +162,9 @@ const useFetchModel = ({
 /// ..............................................................................
 //
 
-const useFetchSSURGO = () => {
+const useFetchSSURGO = ({ lat, lon }) => {
   const dispatch = useDispatch();
-  const lat = useSelector(get.lat);
-  const lon = useSelector(get.lon);
-  const SSURGO = useSelector(get.SSURGO);
+  // const SSURGO = useSelector(get.SSURGO);
 
   useEffect(() => {
     const url = `${SSURGO_API_URL}/?lat=${lat}&lon=${lon}&component=major`;
@@ -176,7 +174,8 @@ const useFetchSSURGO = () => {
         if (data.ERROR || !data.data || !data.data.length) {
           dispatch(set.BD(''));
           dispatch(set.OM(''));
-        } else if (!SSURGO) {
+          // } else if (!SSURGO) {
+        } else {
           let filteredData = data.data.filter((d) => d.desgnmaster !== 'O');
           const minhzdept = Math.min(...filteredData.map((d) => d.hzdept_r));
           filteredData = filteredData.filter((d) => +d.hzdept_r === +minhzdept);
