@@ -156,8 +156,10 @@ const NitrogenCard = ({ refVal }) => {
                   after cover crop termination, cumulative N released is:
                 </Typography>
                 <Typography variant="subtitle2">
-                  <Typography variant="subtitle2" component="span" fontWeight="bold" m={1}>
+                  <Typography variant="subtitle2" component="span" fontWeight="bold" m={0}>
                     {Math.round(surfaceData[Math.min(nweeks * 7, surfaceData.length - 1)].y)}
+                  </Typography>
+                  <Typography variant="subtitle2" component="span" fontWeight="bold" m={1}>
                     {unit}
                   </Typography>
                   for surface residues.

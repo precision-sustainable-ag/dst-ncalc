@@ -2,11 +2,12 @@
 /* eslint-disable arrow-body-style */
 import React from 'react';
 import {
+  Box,
   Card,
   CardContent,
   Typography,
 } from '@mui/material';
-import { NcalcMap } from '@psa/dst.ui.ncalc-map';
+import Map from '../../../shared/Map';
 import Biomass from '../../../shared/Biomass';
 
 /// /// /// STYLES /// /// ///
@@ -39,7 +40,9 @@ const MapVisCard = ({ refVal }) => (
         Map Visualization
       </Typography>
       <Biomass />
-      <NcalcMap />
+      <Box sx={{ height: '90%', width: '100%', marginBottom: 5 }}>
+        <Map />
+      </Box>
     </CardContent>
   </Card>
 );

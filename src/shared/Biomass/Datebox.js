@@ -23,10 +23,10 @@ const Datebox = () => {
 
   useEffect(() => {
     const now = dayjs();
-    const minPlantingDateObj = activeExample ? dayjs(coverCropPlantingDate) : now.subtract(10, 'year');
-    const maxPlantingDateObj = activeExample ? dayjs(coverCropPlantingDate) : now.add(0, 'month');
-    const minTerminationDateObj = activeExample ? dayjs(coverCropTerminationDate) : dayjs(coverCropPlantingDate).add(2, 'month');
-    const maxTerminationDateObj = activeExample ? dayjs(coverCropTerminationDate) : dayjs(coverCropPlantingDate).add(12, 'month');
+    const minPlantingDateObj = now.subtract(10, 'year');
+    const maxPlantingDateObj = now.add(0, 'month');
+    const minTerminationDateObj = dayjs(coverCropPlantingDate).add(2, 'month');
+    const maxTerminationDateObj = dayjs(coverCropPlantingDate).add(12, 'month');
     setMinPlantingDate(minPlantingDateObj.format('YYYY-MM-DD'));
     setMaxPlantingDate(maxPlantingDateObj.format('YYYY-MM-DD'));
     setMinTerminationDate(minTerminationDateObj.format('YYYY-MM-DD'));

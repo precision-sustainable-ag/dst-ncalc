@@ -35,7 +35,7 @@ const Init = () => {
       dispatch(set.BD(1.62));
       dispatch(set.InorganicN(10));
       dispatch(set.coverCrop(['Rye']));
-      dispatch(set.coverCropPlantingDate('2018-10-01'));
+      dispatch(set.coverCropPlantingDate('2018-09-01'));
       dispatch(set.coverCropTerminationDate('2019-03-21'));
       dispatch(set.cashCropPlantingDate('2019-04-01'));
       dispatch(set.biomass(5000));
