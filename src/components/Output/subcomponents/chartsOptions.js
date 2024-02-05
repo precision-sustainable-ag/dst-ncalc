@@ -31,8 +31,6 @@ const getAxisTexts = ({
   doCornN,
   unit,
 }) => {
-  console.log('outputN:', outputN);
-  console.log('doCornN:', doCornN);
   let titleText;
   if (mockup === 2) {
     if (outputN === 1 && doCornN) {
