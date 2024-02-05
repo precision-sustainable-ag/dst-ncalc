@@ -1,5 +1,6 @@
 /* eslint-disable arrow-body-style */
 import Highcharts from 'highcharts';
+// eslint-disable-next-line import/no-extraneous-dependencies
 import _ from 'lodash';
 
 // const responsiveOptions = {
