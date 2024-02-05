@@ -120,7 +120,7 @@ const NitrogenCard = ({ refVal }) => {
     nweeks,
     biomass,
     doIncorporated: false,
-    doCornN: cashCrop.toLowerCase() === 'corn',
+    doCornN: cashCrop ? cashCrop.toLowerCase() === 'corn' : false,
     N,
   });
 
@@ -172,7 +172,7 @@ const NitrogenCard = ({ refVal }) => {
             options={getGeneralChartOptions({
               mockup,
               outputN,
-              doCornN: cashCrop.toLowerCase() === 'corn',
+              doCornN: cashCrop ? cashCrop.toLowerCase() === 'corn' : false,
               unit,
               minDate,
               NUptake,
