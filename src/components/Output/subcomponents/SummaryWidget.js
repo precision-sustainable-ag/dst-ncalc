@@ -53,9 +53,6 @@ const CustomTypography = styled(Typography)(() => ({
 }));
 
 const SummaryItem = ({ name, value, desc }) => {
-  console.log('xxxname:', name);
-  console.log('xxxvalue:', value);
-  console.log('xxxdesc:', desc);
   return (
     <Box
       sx={{

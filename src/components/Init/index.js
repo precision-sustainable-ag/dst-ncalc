@@ -11,6 +11,7 @@ import { useFetchSampleBiomass } from '../../hooks/useFetchStatic';
 const examples = {};
 
 const Init = () => {
+  /// ///// VARIABLES ///// ////
   const dispatch = useDispatch();
   const navigate = useNavigate();
 
@@ -19,6 +20,74 @@ const Init = () => {
 
   // eslint-disable-next-line no-unused-vars
   const [samplePolygon, sampleBiomass] = useFetchSampleBiomass();
+
+  /// ///// FUNCTIONS ///// ////
+  const loadField = (fieldVal) => {
+    if (fieldVal === 'Example: Grass') {
+      // navigate('location');
+      dispatch(set.edited(true));
+      dispatch(set.activeExample(fieldVal));
+      dispatch(set.lat(32.865389));
+      dispatch(set.lon(-82.258361));
+      dispatch(set.location('Example'));
+      dispatch(set.field('Example: Grass'));
+      dispatch(set.OM(0.75));
+      dispatch(set.BD(1.62));
+      dispatch(set.InorganicN(10));
+      dispatch(set.coverCrop(['Rye']));
+      dispatch(set.coverCropPlantingDate('2018-10-01'));
+      dispatch(set.coverCropTerminationDate('2019-03-21'));
+      dispatch(set.cashCropPlantingDate('2019-04-01'));
+      dispatch(set.biomass(5000));
+      dispatch(set.lwc(1.486));
+      dispatch(set.N(0.6));
+      dispatch(set.carb(33.45));
+      dispatch(set.cell(57.81));
+      dispatch(set.lign(8.74));
+      dispatch(set.cashCrop('Corn'));
+      dispatch(set.yield(150));
+      dispatch(set.targetN(150));
+    } else if (fieldVal === 'Example: Legume') {
+      // navigate('location');
+      dispatch(set.edited(true));
+      dispatch(set.activeExample(fieldVal));
+      dispatch(set.lat(32.865389));
+      dispatch(set.lon(-82.258361));
+      dispatch(set.location('Example'));
+      dispatch(set.field('Example: Legume'));
+      dispatch(set.OM(0.75));
+      dispatch(set.BD(1.62));
+      dispatch(set.InorganicN(10));
+      dispatch(set.coverCrop(['Clover, Crimson']));
+      dispatch(set.coverCropPlantingDate('2018-10-01'));
+      dispatch(set.coverCropTerminationDate('2019-04-27'));
+      dispatch(set.cashCropPlantingDate('2019-05-15'));
+      dispatch(set.biomass(3500));
+      dispatch(set.lwc(7.4));
+      dispatch(set.N(3.5));
+      dispatch(set.carb(56.18));
+      dispatch(set.cell(36.74));
+      dispatch(set.lign(7.08));
+      dispatch(set.cashCrop('Corn'));
+      dispatch(set.yield(150));
+      dispatch(set.targetN(100));
+    } else {
+      const inputs = JSON.parse(localStorage[field]);
+      Object.keys(inputs).forEach((key) => {
+        try {
+          if (/Date/.test(key)) {
+            const date = moment(inputs[key]).format('yyyy-MM-DD');
+            dispatch(set[key](date));
+          } else {
+            dispatch(set[key](inputs[key]));
+          }
+        } catch (e) {
+          console.log(key, e.message);
+        }
+      });
+      dispatch(set.lwc(inputs.lwc)); // avoid calculation
+    }
+  }; // loadfield
 
   useEffect(() => {
     const base = new Airtable({ apiKey: 'keySO0dHQzGVaSZp2' }).base('appOEj4Ag9MgTTrMg');
@@ -81,76 +150,9 @@ const Init = () => {
         dispatch(set.species(species));
       },
     );
+    /// temporary to load example
+    loadField('Example: Grass');
   }, [dispatch]);
-
-  const loadField = (fieldVal) => {
-    if (fieldVal === 'Example: Grass') {
-      console.log('loadField', fieldVal);
-      navigate('location');
-      dispatch(set.edited(true));
-      dispatch(set.activeExample(fieldVal));
-      dispatch(set.lat(32.865389));
-      dispatch(set.lon(-82.258361));
-      dispatch(set.location('Example'));
-      dispatch(set.field('Example: Grass'));
-      dispatch(set.OM(0.75));
-      dispatch(set.BD(1.62));
-      dispatch(set.InorganicN(10));
-      dispatch(set.coverCrop(['Rye']));
-      dispatch(set.coverCropPlantingDate('2018-10-01'));
-      dispatch(set.coverCropTerminationDate('2019-03-21'));
-      dispatch(set.cashCropPlantingDate('2019-04-01'));
-      dispatch(set.biomass(5000));
-      dispatch(set.lwc(1.486));
-      dispatch(set.N(0.6));
-      dispatch(set.carb(33.45));
-      dispatch(set.cell(57.81));
-      dispatch(set.lign(8.74));
-      dispatch(set.cashCrop('Corn'));
-      dispatch(set.yield(150));
-      dispatch(set.targetN(150));
-    } else if (fieldVal === 'Example: Legume') {
-      navigate('location');
-      dispatch(set.edited(true));
-      dispatch(set.activeExample(fieldVal));
-      dispatch(set.lat(32.865389));
-      dispatch(set.lon(-82.258361));
-      dispatch(set.location('Example'));
-      dispatch(set.field('Example: Legume'));
-      dispatch(set.OM(0.75));
-      dispatch(set.BD(1.62));
-      dispatch(set.InorganicN(10));
-      dispatch(set.coverCrop(['Clover, Crimson']));
-      dispatch(set.coverCropPlantingDate('2018-10-01'));
-      dispatch(set.coverCropTerminationDate('2019-04-27'));
-      dispatch(set.cashCropPlantingDate('2019-05-15'));
-      dispatch(set.biomass(3500));
-      dispatch(set.lwc(7.4));
-      dispatch(set.N(3.5));
-      dispatch(set.carb(56.18));
-      dispatch(set.cell(36.74));
-      dispatch(set.lign(7.08));
-      dispatch(set.cashCrop('Corn'));
-      dispatch(set.yield(150));
-      dispatch(set.targetN(100));
-    } else {
-      const inputs = JSON.parse(localStorage[field]);
-      Object.keys(inputs).forEach((key) => {
-        try {
-          if (/Date/.test(key)) {
-            const date = moment(inputs[key]).format('yyyy-MM-DD');
-            dispatch(set[key](date));
-          } else {
-            dispatch(set[key](inputs[key]));
-          }
-        } catch (e) {
-          console.log(key, e.message);
-        }
-      });
-
-      dispatch(set.lwc(inputs.lwc)); // avoid calculation
-    }
-  }; // loadfield
 
   const changePSA = (e) => {
     const PSAval = examples[e.target.value];
@@ -178,6 +180,7 @@ const Init = () => {
     }
   }; // changeField
 
+  /// ///// JSX RENDER ///// ////
   return (
     <div className="Init">
       {

@@ -39,7 +39,6 @@ const useFetchCornN = () => {
       .get(url)
       .then(({ data }) => {
         if (data && data instanceof Array) {
-          console.log('cornN4j353j4n3', data);
           dispatch(set.cornN(data));
           setCornData(data);
         } else {
@@ -77,24 +76,6 @@ const useFetchModel = ({
   const [model, setModel] = useState(null);
   const dispatch = useDispatch();
 
-  console.log('useFetchModel', {
-    lat,
-    lon,
-    N,
-    OM,
-    BD,
-    unit,
-    coverCropTerminationDate,
-    cashCropPlantingDate,
-    carb,
-    cell,
-    lign,
-    biomass,
-    lwc,
-    InorganicN,
-  });
-
-  console.log('####### useFetchModel useEffect');
   const start = moment(coverCropTerminationDate)
     .add(1, 'hour')
     .format('yyyy-MM-DD');
@@ -108,17 +89,9 @@ const useFetchModel = ({
       && end !== 'Invalid date'
       && moment(end) > moment(start);
     setIsDatesValid(validity);
-    // const end = moment(cashCropPlantingDate).add(110, 'days').add(1, 'hour').format('yyyy-MM-DD');
-    console.log('cashCropPlantingDate', cashCropPlantingDate);
-    console.log('coverCropTerminationDate', coverCropTerminationDate);
-    console.log('startDate', start);
-    console.log('endDate', end);
-    console.log('isDatesValid', validity);
-    console.log('gdfhhgfdhfg############', start, end, moment(end) > moment(start));
     if (!validity) {
       console.log('invalid dates for fetch Model'); // eslint-disable-line no-console
     } else {
-      console.log('fdgfdgd############', start, end, isDatesValid);
       const pmn = 10;
 
       InorganicN = InorganicN || 10;
@@ -140,14 +113,11 @@ const useFetchModel = ({
       const url = `${NCAL_API_URL}?lat=${lat}&lon=${lon}&start=${start}
                    &end=${end}&n=${N}&biomass=${biomass}&lwc=${lwc}&carb=${carb}&cell=${cell}
                    &lign=${lign}&om=${OM}&bd=${BD}&in=${InorganicN}&pmn=${pmn}`;
-      console.log('NCAL_API_URL', url);
       axios
         .get(url)
         .then(({ data }) => {
-          console.log('data', data);
           if (data.name === 'error' || !data.surface) {
             dispatch(set.errorModel(true));
-            console.log('error in fetch model', data);
             return;
           }
 
@@ -158,7 +128,6 @@ const useFetchModel = ({
               modelSurface[key].push(ddata[key]);
             });
           });
-          console.log('modelSurface', modelSurface);
           const modelIncorporated = {};
 
           const modelData = {
@@ -175,11 +144,8 @@ const useFetchModel = ({
                 modelData.s.Rain.length,
               ).fill(modelData.s[col]);
             });
-          console.log('modelData', modelData);
           dispatch(set.model(modelData));
           setModel(modelData);
-          // dispatch(set.gotModel(true));
-          // console.log('gotModel', store.getState().gotModel);
           useFetchCornN();
         })
         .catch((error) => {

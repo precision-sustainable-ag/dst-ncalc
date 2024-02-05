@@ -105,7 +105,6 @@ const Output = () => {
   const cell = useSelector(get.cell);
   const lign = useSelector(get.lign);
   const unit = useSelector(get.unit);
-  console.log('coverCrop', coverCrop)
 
   useEffect(() => {
     const tempSummaryData = { ...summaryData };

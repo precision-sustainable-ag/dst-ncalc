@@ -101,9 +101,6 @@ const modelCalc = ({
     );
   }
 
-  console.log('modelCalcmodel', model);
-  console.log('modelCalcsurfaceData', surfaceData);
-
   date = new Date(coverCropTerminationDate);
   const incorporatedData = [];
 

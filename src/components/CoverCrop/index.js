@@ -76,10 +76,8 @@ const CoverCrop1 = () => {
   const biomassTotalValue = useSelector(get.biomassTotalValue);
   const navigate = useNavigate();
   const isSatelliteMode = useSelector(get.biomassCalcMode) === 'satellite';
-  const mapPolygon = useSelector(get.mapPolygon);
-  const [open, setOpen] = React.useState(true);
-
-  // console.log("mapPolygon", mapPolygon);
+  // const mapPolygon = useSelector(get.mapPolygon);
+  // const [open, setOpen] = React.useState(true);
 
   if (!species.Grass) {
     return '';

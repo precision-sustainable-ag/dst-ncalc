@@ -51,10 +51,10 @@ const Biomass = () => {
     }
   }, [biomassTaskResults]);
 
-  useEffect(() => {
-    dispatch(set.cashCropPlantingDate(coverCropPlantingDate));
-    dispatch(set.coverCropTerminationDate(coverCropTerminationDate));
-  }, [coverCropPlantingDate, coverCropTerminationDate]);
+  // useEffect(() => {
+  //   dispatch(set.coverCropPlantingDate(coverCropPlantingDate));
+  //   dispatch(set.coverCropTerminationDate(coverCropTerminationDate));
+  // }, [coverCropPlantingDate, coverCropTerminationDate]);
 
   useEffect(() => {
     if (biomassTotalValue) {

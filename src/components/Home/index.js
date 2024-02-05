@@ -24,7 +24,6 @@ const BiomassMethodButton = styled(ToggleButton)(() => ({
   },
   border: '3px solid black',
   borderRadius: '1rem',
-  // fontSize: { xs: '16px', sm: '18px', md: '20px' },
   fontSize: '16px',
   fontWeight: 900,
   padding: '0.5rem',
