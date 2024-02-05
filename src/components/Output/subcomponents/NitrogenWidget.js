@@ -172,7 +172,7 @@ const NitrogenCard = ({ refVal }) => {
             options={getGeneralChartOptions({
               mockup,
               outputN,
-              doCornN: true,
+              doCornN: cashCrop.toLowerCase() === 'corn',
               unit,
               minDate,
               NUptake,
