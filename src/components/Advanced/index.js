@@ -9,17 +9,17 @@ import { get, missingData } from '../../store/Store';
 import './styles.scss';
 
 const Advanced = () => {
-  const BD = useSelector(get.BD);
-  const N = useSelector(get.N);
+  // const BD = useSelector(get.BD);
+  // const N = useSelector(get.N);
   const coverCropTerminationDate = new Date(useSelector(get.coverCropTerminationDate));
-  const carb = useSelector(get.carb);
-  const cell = useSelector(get.cell);
-  const lign = useSelector(get.lign);
-  const lwc = useSelector(get.lwc);
-  const biomass = useSelector(get.biomass);
+  // const carb = useSelector(get.carb);
+  // const cell = useSelector(get.cell);
+  // const lign = useSelector(get.lign);
+  // const lwc = useSelector(get.lwc);
+  // const biomass = useSelector(get.biomass);
   // const unit = useSelector(get.unit);
-  const InorganicN = useSelector(get.InorganicN);
-  const gotModel = useSelector(get.gotModel);
+  // const InorganicN = useSelector(get.InorganicN);
+  // const gotModel = useSelector(get.gotModel);
   const model = useSelector(get.model);
 
   const navigate = useNavigate();
@@ -30,17 +30,17 @@ const Advanced = () => {
     return '';
   }
 
-  if (!gotModel || !model || !biomass || !N || !carb || !cell || !lign || !lwc || !BD || !InorganicN) {
-    return (
-      <div className="loading">
-        <p>Loading Output</p>
-        <p>Please wait</p>
-        <span />
-        <span />
-        <span />
-      </div>
-    );
-  }
+  // if (!gotModel || !model || !biomass || !N || !carb || !cell || !lign || !lwc || !BD || !InorganicN) {
+  //   return (
+  //     <div className="loading">
+  //       <p>Loading Output</p>
+  //       <p>Please wait</p>
+  //       <span />
+  //       <span />
+  //       <span />
+  //     </div>
+  //   );
+  // }
 
   const factor = 1;
 

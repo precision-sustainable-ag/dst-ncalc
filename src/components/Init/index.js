@@ -150,8 +150,8 @@ const Init = () => {
         dispatch(set.species(species));
       },
     );
-    /// temporary to load example
-    loadField('Example: Grass');
+    // /// temporary to load example
+    // loadField('Example: Grass');
   }, [dispatch]);
 
   const changePSA = (e) => {
