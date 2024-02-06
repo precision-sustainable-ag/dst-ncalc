@@ -70,8 +70,8 @@ const SummaryItem = ({ name, value, desc }) => {
           ? (
             <Stack direction="column">
               {
-                value.map((k) => (
-                  <Typography sx={{ fontWeight: 600, fontSize: 11 }}>
+                value.map((k, ix) => (
+                  <Typography key={'summItem'.concat(String(ix))} sx={{ fontWeight: 600, fontSize: 11 }}>
                     {k}
                   </Typography>
                 ))
@@ -84,7 +84,7 @@ const SummaryItem = ({ name, value, desc }) => {
             </Typography>
           )}
       </Stack>
-    </Box>
+    </Box >
   );
 };
 
@@ -103,8 +103,8 @@ const SummaryCard = ({ data, refVal }) => (
     </CardContent>
     <CardActions>
       <Grid container spacing={2}>
-        {Object.entries(data).map(([k, v]) => (
-          <Grid item xs={12} sm={6} md={4} lg={3} width="100%">
+        {Object.entries(data).map(([k, v], ix) => (
+          <Grid item xs={12} sm={6} md={4} lg={3} width="100%" key={'summItem'.concat(String(ix))}>
             <SummaryItem name={k} value={v.value} desc={v.desc} />
           </Grid>
         ))}

@@ -7,6 +7,7 @@ import ResidueCard from './ResidueWidget';
 import MapVisCard from './MapVisWidget';
 import { SummaryCard } from './SummaryWidget';
 import { get } from '../../../store/redux-autosetters';
+import NavigateButtons from '../../../shared/Navigate';
 
 /// /// /// STYLES /// /// ///
 const wrapperStyles = {
@@ -22,7 +23,7 @@ const RightSideBar = ({ summaryData, refs }) => {
   const isSatelliteMode = useSelector(get.biomassCalcMode) === 'satellite';
   const biomass = useSelector(get.biomassTotalValue);
 
-  /// /// /// Effects /// ///
+  /// /// Effects /// ///
   useEffect(() => {
     setUpdated(!updated);
   }, [biomass]);
@@ -45,6 +46,14 @@ const RightSideBar = ({ summaryData, refs }) => {
             <MapVisCard refVal={refs[3]} />
           </Grid>
         )}
+        <Grid item sm={12} lg={12} width="100%">
+          <NavigateButtons
+            backRoute="/cashcrop"
+            nextRoute="/advanced"
+            backText="BACK"
+            nextText="ADVANCED"
+          />
+        </Grid>
       </Grid>
     </Box>
   );

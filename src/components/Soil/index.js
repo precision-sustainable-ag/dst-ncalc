@@ -15,19 +15,20 @@ import { useFetchSSURGO } from '../../hooks/useFetchApi';
 
 /// /// /// ROOT COMPONENT /// /// ///
 const Soil = () => {
-  const ssurgo = useSelector(get.SSURGO);
+  /// /// /// VARIABLES /// /// ///
   const navigate = useNavigate();
+  const ssurgo = useSelector(get.SSURGO);
   const isSatelliteMode = useSelector(get.biomassCalcMode) === 'satellite';
-  const lat = useSelector(get.lat);
-  const lon = useSelector(get.lon);
+
   /// /// /// HOOKS /// /// ///
-  useFetchSSURGO({ lat, lon });
+  useFetchSSURGO();
 
   /// /// /// RETURN JSX /// ///
   return (
     <Box
       sx={{
         justifyContent: 'center',
+        margin: '5% 10% 5% 10%',
         display: 'flex',
         alignItems: 'center',
         backgroundColor: '#fff',

@@ -34,7 +34,7 @@ const useFetchCornN = () => {
       cashCropPlantingDate,
     ).format(
       'yyyy-MM-DD',
-    )}&end=${endDate}&attributes=air_temperature&options=predicted`;
+    )}&end=${end}&attributes=air_temperature&options=predicted`;
     axios
       .get(url)
       .then(({ data }) => {
@@ -72,6 +72,7 @@ const useFetchModel = ({
   lwc,
   InorganicN,
 }) => {
+  // eslint-disable-next-line no-unused-vars
   const [isDatesValid, setIsDatesValid] = useState(null);
   const [model, setModel] = useState(null);
   const dispatch = useDispatch();
@@ -146,7 +147,7 @@ const useFetchModel = ({
             });
           dispatch(set.model(modelData));
           setModel(modelData);
-          useFetchCornN();
+          // useFetchCornN();
         })
         .catch((error) => {
           console.log(error);
@@ -162,9 +163,12 @@ const useFetchModel = ({
 /// ..............................................................................
 //
 
-const useFetchSSURGO = ({ lat, lon }) => {
+const useFetchSSURGO = () => {
   const dispatch = useDispatch();
-  // const SSURGO = useSelector(get.SSURGO);
+  const updateSSURGO = useSelector(get.updateSSURGO);
+  const SSURGO = useSelector(get.SSURGO);
+  const lat = useSelector(get.lat);
+  const lon = useSelector(get.lon);
 
   useEffect(() => {
     const url = `${SSURGO_API_URL}/?lat=${lat}&lon=${lon}&component=major`;
@@ -174,20 +178,21 @@ const useFetchSSURGO = ({ lat, lon }) => {
         if (data.ERROR || !data.data || !data.data.length) {
           dispatch(set.BD(''));
           dispatch(set.OM(''));
-          // } else if (!SSURGO) {
-        } else {
+        } else if (!SSURGO || updateSSURGO) {
+          // } else {
           let filteredData = data.data.filter((d) => d.desgnmaster !== 'O');
           const minhzdept = Math.min(...filteredData.map((d) => d.hzdept_r));
           filteredData = filteredData.filter((d) => +d.hzdept_r === +minhzdept);
           dispatch(set.BD(weightedAverage(filteredData, 'dbthirdbar_r')));
           dispatch(set.OM(weightedAverage(filteredData, 'om_r')));
           dispatch(set.SSURGO(filteredData));
+          dispatch(set.updateSSURGO(false));
         }
       })
       .catch((error) => {
         console.log(error);
       });
-  }, [lat, lon]);
+  }, [updateSSURGO]);
 }; // fetchSSURGO
 
 export { useFetchModel, useFetchSSURGO, useFetchCornN };

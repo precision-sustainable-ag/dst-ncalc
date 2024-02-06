@@ -50,6 +50,7 @@ const initialState = {
   residueC: '30',
   outputN: 1,
   SSURGO: null,
+  updateSSURGO: false,
   gotModel: false,
   cornN: [],
   state: '',
@@ -69,7 +70,7 @@ const initialState = {
   site: '',
   sites: [],
   data: '',
-  biomassCalcMode: 'satellite', // 'sampled' or 'satellite'
+  biomassCalcMode: 'sampled', // 'sampled' or 'satellite'
   openFeedbackModal: false,
   openAboutModal: false,
   incorporatedData: [],

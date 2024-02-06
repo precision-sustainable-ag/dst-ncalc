@@ -7,8 +7,6 @@ import { Paper } from '@mui/material';
 // import { NcalcMap } from './mock/ncalc-map';
 import { get, set } from '../../store/Store';
 
-// import './styles.scss';
-
 // eslint-disable-next-line import/no-webpack-loader-syntax, import/no-unresolved
 mapboxgl.workerClass = require('worker-loader!mapbox-gl/dist/mapbox-gl-csp-worker').default;
 
@@ -44,11 +42,16 @@ const MapComp = () => {
     dispatch(set.mapType('satellite'));
     if (address.latitude && address.latitude !== lat) {
       dispatch(set.lat(address.latitude));
+      dispatch(set.updateSSURGO(true));
     }
     if (address.longitude && address.longitude !== lon) {
       dispatch(set.lon(address.longitude));
+      dispatch(set.updateSSURGO(true));
     }
-    if (address.address) dispatch(set.mapAddress(address.address));
+    if (address.address) {
+      dispatch(set.mapAddress(address.address));
+      // dispatch(set.updateSSURGO(true));
+    }
   }, [address.latitude, address.longitude, address.address]);
 
   useEffect(() => {

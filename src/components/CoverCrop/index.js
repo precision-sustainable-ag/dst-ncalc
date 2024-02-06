@@ -96,6 +96,7 @@ const CoverCrop1 = () => {
     <Box
       sx={{
         justifyContent: 'center',
+        margin: '5% 10% 5% 10%',
         display: 'flex',
         alignItems: 'center',
         backgroundColor: '#fff',
@@ -335,6 +336,7 @@ const CoverCrop2 = () => {
   return (
     <Box
       sx={{
+        margin: '5% 10% 5% 10%',
         justifyContent: 'center',
         display: 'flex',
         alignItems: 'center',

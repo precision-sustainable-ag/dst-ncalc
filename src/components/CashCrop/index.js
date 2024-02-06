@@ -325,6 +325,7 @@ const CashCrop = () => {
     <Box
       sx={{
         justifyContent: 'center',
+        margin: '5% 10% 5% 10%',
         display: 'flex',
         alignItems: 'center',
         backgroundColor: '#fff',
