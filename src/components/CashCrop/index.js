@@ -3,7 +3,6 @@ import { useSelector } from 'react-redux';
 import { useNavigate } from 'react-router-dom';
 import {
   Box,
-  Button,
   Typography,
   styled,
 } from '@mui/material';
@@ -11,6 +10,7 @@ import { get } from '../../store/Store';
 import Myslider from '../../shared/Slider';
 import Input from '../../shared/Inputs';
 import Help from '../../shared/Help';
+import NavButton from '../../shared/Navigate/NavButton';
 
 const CustomInputText = styled(Typography)({
   fontSize: '1.2rem',
@@ -398,22 +398,12 @@ const CashCrop = () => {
             }}
             mt={6}
           >
-            <Button
-              sx={{ borderRadius: '1rem', fontSize: '22px', fontWeight: 900 }}
-              onClick={() => navigate('/covercrop')}
-              variant="contained"
-              color="success"
-            >
+            <NavButton onClick={() => navigate('/covercrop')}>
               BACK
-            </Button>
-            <Button
-              sx={{ borderRadius: '1rem', fontSize: '22px', fontWeight: 900 }}
-              onClick={() => navigate('/output')}
-              variant="contained"
-              color="success"
-            >
+            </NavButton>
+            <NavButton onClick={() => navigate('/output')}>
               NEXT
-            </Button>
+            </NavButton>
           </Box>
         </Box>
       </Box>

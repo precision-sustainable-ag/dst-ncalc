@@ -4,7 +4,6 @@ import { useSelector } from 'react-redux';
 import { useNavigate } from 'react-router-dom';
 import {
   Box,
-  Button,
   Stack,
   Typography,
 } from '@mui/material';
@@ -12,6 +11,7 @@ import { get } from '../../store/Store';
 import Myslider from '../../shared/Slider';
 import Help from '../../shared/Help';
 import { useFetchSSURGO } from '../../hooks/useFetchApi';
+import NavButton from '../../shared/Navigate/NavButton';
 
 /// /// /// ROOT COMPONENT /// /// ///
 const Soil = () => {
@@ -164,22 +164,12 @@ const Soil = () => {
         }}
         mt={6}
       >
-        <Button
-          sx={{ borderRadius: '1rem', fontSize: '22px', fontWeight: 900 }}
-          onClick={() => navigate('/location')}
-          variant="contained"
-          color="success"
-        >
+        <NavButton onClick={() => navigate('/location')}>
           BACK
-        </Button>
-        <Button
-          sx={{ borderRadius: '1rem', fontSize: '22px', fontWeight: 900 }}
-          onClick={() => navigate('/covercrop')}
-          variant="contained"
-          color="success"
-        >
+        </NavButton>
+        <NavButton onClick={() => navigate('/covercrop')}>
           NEXT
-        </Button>
+        </NavButton>
       </Box>
     </Box>
   );

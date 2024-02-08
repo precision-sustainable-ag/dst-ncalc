@@ -7,7 +7,6 @@ import AccordionDetails from '@mui/material/AccordionDetails';
 import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
 import {
   Box,
-  Button,
   Paper,
   Stack,
   styled,
@@ -19,6 +18,7 @@ import Help from '../Help';
 import {
   get,
 } from '../../store/Store';
+import NavButton from '../Navigate/NavButton';
 
 const CustomizedAccordion = styled(Accordion)(() => ({
   '&.MuiPaper-root': {
@@ -106,22 +106,12 @@ const Location = () => {
               flexDirection: 'row',
             }}
           >
-            <Button
-              sx={{ borderRadius: '1rem', fontSize: '22px', fontWeight: 900 }}
-              onClick={() => navigate('/home')}
-              variant="contained"
-              color="success"
-            >
+            <NavButton onClick={() => navigate('/home')}>
               BACK
-            </Button>
-            <Button
-              sx={{ borderRadius: '1rem', fontSize: '22px', fontWeight: 900 }}
-              onClick={() => navigate('/soil')}
-              variant="contained"
-              color="success"
-            >
+            </NavButton>
+            <NavButton onClick={() => navigate('/soil')}>
               NEXT
-            </Button>
+            </NavButton>
           </Box>
         </Paper>
       </Box>

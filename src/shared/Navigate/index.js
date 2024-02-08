@@ -1,6 +1,7 @@
-import { Box, Button, Paper } from '@mui/material';
+import { Box, Paper } from '@mui/material';
 import React from 'react';
 import { useNavigate } from 'react-router-dom';
+import NavButton from './NavButton';
 
 const NavigateBar = ({
   backRoute,
@@ -26,22 +27,12 @@ const NavigateBar = ({
           flexDirection: 'row',
         }}
       >
-        <Button
-          sx={{ borderRadius: '1rem', fontSize: '22px', fontWeight: 900 }}
-          onClick={() => navigate(backRoute)}
-          variant="contained"
-          color="success"
-        >
+        <NavButton onClick={() => navigate(backRoute)}>
           {backText}
-        </Button>
-        <Button
-          sx={{ borderRadius: '1rem', fontSize: '22px', fontWeight: 900 }}
-          onClick={() => navigate(nextRoute)}
-          variant="contained"
-          color="success"
-        >
+        </NavButton>
+        <NavButton onClick={() => navigate(nextRoute)}>
           {nextText}
-        </Button>
+        </NavButton>
       </Box>
     </Paper>
   );

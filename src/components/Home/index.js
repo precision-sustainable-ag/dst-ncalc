@@ -1,11 +1,11 @@
 import React, { useEffect } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
-// import { Link } from 'react-router-dom';
 import {
-  Box, Button, Card, Stack, ToggleButton, ToggleButtonGroup, Typography, styled,
+  Box, Card, Stack, ToggleButton, ToggleButtonGroup, Typography, styled,
 } from '@mui/material';
 import { useNavigate } from 'react-router-dom';
 import { get, set } from '../../store/Store';
+import NavButton from '../../shared/Navigate/NavButton';
 
 const BiomassMethodButton = styled(ToggleButton)(() => ({
   '&.Mui-selected': {
@@ -103,14 +103,12 @@ const Home = () => {
           About
         </Button> */}
 
-        <Button
-          sx={{ fontSize: '24px', fontWeight: 900 }}
+        <NavButton
           onClick={() => navigate('/location')}
-          variant="contained"
-          color="success"
+          fontSize="1.5rem"
         >
           Get Started
-        </Button>
+        </NavButton>
       </Stack>
     </Card>
   );

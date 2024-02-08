@@ -11,6 +11,7 @@ import {
   styled,
   Paper,
   Stack,
+  Modal,
 } from '@mui/material';
 
 import { get, set } from '../../store/Store';
@@ -18,6 +19,7 @@ import Input from '../../shared/Inputs';
 import Myslider from '../../shared/Slider';
 import Help from '../../shared/Help';
 import Biomass from '../../shared/Biomass';
+import NavButton from '../../shared/Navigate/NavButton';
 
 const CustomInputText = styled(Typography)({
   fontSize: '1.2rem',
@@ -75,8 +77,8 @@ const CoverCrop1 = () => {
   const biomassTotalValue = useSelector(get.biomassTotalValue);
   const navigate = useNavigate();
   const isSatelliteMode = useSelector(get.biomassCalcMode) === 'satellite';
-  // const mapPolygon = useSelector(get.mapPolygon);
-  // const [open, setOpen] = React.useState(true);
+  const mapPolygon = useSelector(get.mapPolygon);
+  const [open, setOpen] = React.useState(true);
 
   if (!species.Grass) {
     return '';
@@ -130,7 +132,7 @@ const CoverCrop1 = () => {
             isSatelliteMode ? (
               <Paper mt={2}>
                 <Biomass minified={false} />
-                {/* {mapPolygon.length === 0 && (
+                {mapPolygon.length === 0 && (
                   <Modal
                     open={open}
                     onClose={() => setOpen(false)}
@@ -193,7 +195,7 @@ const CoverCrop1 = () => {
                       </Box>
                     </Paper>
                   </Modal>
-                )} */}
+                )}
               </Paper>
             ) : (
               <>
@@ -304,24 +306,15 @@ const CoverCrop1 = () => {
           }}
           mt={4}
         >
-          <Button
-            sx={{ borderRadius: '1rem', fontSize: '22px', fontWeight: 900 }}
-            onClick={() => navigate('/soil')}
-            variant="contained"
-            color="success"
-          >
+          <NavButton onClick={() => navigate('/soil')}>
             BACK
-          </Button>
-          <Button
-            sx={{ borderRadius: '1rem', fontSize: '22px', fontWeight: 900 }}
+          </NavButton>
+          <NavButton
             onClick={() => navigate('/covercrop2')}
-            variant="contained"
-            color="success"
-            // eslint-disable-next-line react/jsx-props-no-multi-spaces
             disabled={!isSatelliteMode ? false : (!biomassTotalValue)}
           >
             NEXT
-          </Button>
+          </NavButton>
         </Box>
       </Box>
     </Box>
@@ -443,22 +436,12 @@ const CoverCrop2 = () => {
           }}
           mt={6}
         >
-          <Button
-            sx={{ borderRadius: '1rem', fontSize: '22px', fontWeight: 900 }}
-            onClick={() => navigate('/covercrop')}
-            variant="contained"
-            color="success"
-          >
+          <NavButton onClick={() => navigate('/covercrop')}>
             BACK
-          </Button>
-          <Button
-            sx={{ borderRadius: '1rem', fontSize: '22px', fontWeight: 900 }}
-            onClick={() => navigate('/cashcrop')}
-            variant="contained"
-            color="success"
-          >
+          </NavButton>
+          <NavButton onClick={() => navigate('/cashcrop')}>
             NEXT
-          </Button>
+          </NavButton>
         </Box>
       </Box>
     </Box>
