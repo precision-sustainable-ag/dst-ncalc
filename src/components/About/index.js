@@ -1,5 +1,6 @@
 import React from 'react';
 import { useDispatch, useSelector } from 'react-redux';
+import { useNavigate } from 'react-router-dom';
 import { Box, Button } from '@mui/material';
 import List from '@mui/material/List';
 import ListItem from '@mui/material/ListItem';
@@ -10,6 +11,7 @@ import Typography from '@mui/material/Typography';
 import LensIcon from '@mui/icons-material/Lens';
 import CancelPresentationIcon from '@mui/icons-material/CancelPresentation';
 import { get, set } from '../../store/Store';
+import NavButton from '../../shared/Navigate/NavButton';
 
 const BullettedText = ({ children }) => (
   <ListItem
@@ -28,6 +30,7 @@ const About = () => {
   const dispatch = useDispatch();
   const openAboutModal = useSelector(get.openAboutModal);
   const handleCloseModal = () => dispatch(set.openAboutModal(false));
+  const navigate = useNavigate();
 
   return (
     <Modal
@@ -190,11 +193,14 @@ const About = () => {
               paddingY: '1rem',
             }}
           >
-            <Button size="small" variant="contained" sx={{ backgroundColor: 'green' }}>
-              <Typography sx={{ fontWeight: 900 }}>
-                GET STARTED
-              </Typography>
-            </Button>
+            <NavButton onClick={() => {
+              handleCloseModal();
+              navigate('/location');
+              return null;
+            }}
+            >
+              GET STARTED
+            </NavButton>
           </Box>
           <Typography sx={{ paddingY: '0.7rem', fontSize: '14px' }} id="modal-modal-title" variant="body1" component="h6">
             For more information about

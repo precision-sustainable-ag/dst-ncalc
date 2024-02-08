@@ -11,6 +11,7 @@ import { useSelector, useDispatch } from 'react-redux';
 import CancelPresentationIcon from '@mui/icons-material/CancelPresentation';
 import Input from '../../shared/Inputs';
 import { get, set } from '../../store/Store';
+import NavButton from '../../shared/Navigate/NavButton';
 
 import './styles.scss';
 
@@ -172,12 +173,9 @@ __________________________________
             <Typography>Email</Typography>
             <Input type="email" id="email" />
             <Box py="1rem">
-              <Button
-                variant="contained"
-                onClick={(e) => submit(e)}
-              >
-                <Typography>Submit</Typography>
-              </Button>
+              <NavButton onClick={(e) => submit(e)}>
+                Submit
+              </NavButton>
             </Box>
           </Box>
         </Box>

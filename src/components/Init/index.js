@@ -10,7 +10,7 @@ import { useFetchSampleBiomass } from '../../hooks/useFetchStatic';
 
 const examples = {};
 
-const Init = () => {
+const Init = ({ handleCloseUserMenu }) => {
   /// ///// VARIABLES ///// ////
   const dispatch = useDispatch();
   const navigate = useNavigate();
@@ -47,6 +47,7 @@ const Init = () => {
       dispatch(set.cashCrop('Corn'));
       dispatch(set.yield(150));
       dispatch(set.targetN(150));
+      handleCloseUserMenu();
     } else if (fieldVal === 'Example: Legume') {
       // navigate('location');
       dispatch(set.edited(true));
@@ -71,6 +72,7 @@ const Init = () => {
       dispatch(set.cashCrop('Corn'));
       dispatch(set.yield(150));
       dispatch(set.targetN(100));
+      handleCloseUserMenu();
     } else {
       const inputs = JSON.parse(localStorage[field]);
       Object.keys(inputs).forEach((key) => {

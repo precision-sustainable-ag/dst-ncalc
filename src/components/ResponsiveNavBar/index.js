@@ -71,6 +71,7 @@ const ResponsiveNavBar = ({ screens }) => {
   const [anchorElUser, setAnchorElUser] = useState(null);
   const [activeMenu, setActiveMenu] = useState('home');
   const [menuIsOpen, setMenuIsOpen] = useState(false);
+  const [userIsOpen, setUserIsOpen] = useState(false);
   // eslint-disable-next-line no-unused-vars
   const [navModalOpen, setNavModalOpen] = useState(false);
 
@@ -84,6 +85,7 @@ const ResponsiveNavBar = ({ screens }) => {
 
   const handleOpenUserMenu = (event) => {
     setAnchorElUser(event.currentTarget);
+    setUserIsOpen(!userIsOpen);
   };
 
   const handleClickNavMenu = (scr) => {
@@ -95,6 +97,7 @@ const ResponsiveNavBar = ({ screens }) => {
 
   const handleCloseUserMenu = () => {
     setAnchorElUser(null);
+    setUserIsOpen(false);
   };
 
   // // useSelector(get.screen); // force render
@@ -298,13 +301,11 @@ const ResponsiveNavBar = ({ screens }) => {
           </Box>
         </Toolbar>
         <Toolbar disableGutters>
-          {/* Examples Avatar */}
           <Box sx={{ flexGrow: 0 }}>
             <Tooltip title="Open settings">
               <IconButton
                 onClick={handleOpenUserMenu}
                 sx={{
-                  // p: '0.7rem',
                   width: '3rem',
                   height: '3rem',
                   borderRadius: '0.5rem',
@@ -331,13 +332,14 @@ const ResponsiveNavBar = ({ screens }) => {
                 vertical: 'top',
                 horizontal: 'right',
               }}
-              open={Boolean(anchorElUser)}
+              open={userIsOpen}
               onClose={handleCloseUserMenu}
             >
               <MenuItem
                 key="about"
                 onClick={() => {
                   dispatch(set.openAboutModal(true));
+                  handleCloseUserMenu();
                 }}
               >
                 <Typography textAlign="center">About</Typography>
@@ -346,12 +348,13 @@ const ResponsiveNavBar = ({ screens }) => {
                 key="feedback"
                 onClick={() => {
                   dispatch(set.openFeedbackModal(true));
+                  handleCloseUserMenu();
                 }}
               >
                 <Typography textAlign="center">Feedback</Typography>
               </MenuItem>
               <MenuItem key="examples">
-                <Init desktop setNavModalOpen={setNavModalOpen} />
+                <Init handleCloseUserMenu={handleCloseUserMenu} />
               </MenuItem>
             </Menu>
           </Box>
