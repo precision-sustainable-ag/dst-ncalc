@@ -84,7 +84,7 @@ const SummaryItem = ({ name, value, desc }) => {
             </Typography>
           )}
       </Stack>
-    </Box >
+    </Box>
   );
 };
 

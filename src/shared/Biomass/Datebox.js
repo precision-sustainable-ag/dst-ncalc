@@ -18,7 +18,7 @@ const Datebox = () => {
   /// Shared States ///
   const coverCropPlantingDate = useSelector(get.coverCropPlantingDate);
   const coverCropTerminationDate = useSelector(get.coverCropTerminationDate);
-  const activeExample = useSelector(get.activeExample);
+  // const activeExample = useSelector(get.activeExample);
   const dispatch = useDispatch();
 
   useEffect(() => {

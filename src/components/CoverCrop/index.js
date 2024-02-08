@@ -7,7 +7,6 @@ import {
   FormControlLabel,
   Button,
   Box,
-  Modal,
   Typography,
   styled,
   Paper,

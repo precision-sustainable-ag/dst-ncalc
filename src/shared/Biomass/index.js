@@ -45,7 +45,7 @@ const Biomass = () => {
 
   useEffect(() => {
     if (biomassTaskResults && biomassTaskResults.data_array) {
-      console.log('biomass', biomassTaskResults.data_array);
+      // console.log('biomass', biomassTaskResults.data_array);
       const flattenedBiomass = biomassTaskResults.data_array.flat(1).filter((el) => el !== 0);
       const biomassAVG = arrayAverage(flattenedBiomass);
       dispatch(set.biomassTotalValue(Math.round(biomassAVG, 0)));
