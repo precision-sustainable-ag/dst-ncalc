@@ -20,6 +20,9 @@ const wrapperStyles = {
 const ListWrapperStyles = {
   position: 'fixed',
   left: '0px',
+  maxWidth: {
+    sm: '150px', md: '220px',
+  },
 };
 
 const ListStyles = {
@@ -113,7 +116,7 @@ const LeftSideBar = ({ sidebarListData, refs }) => {
   }, [scrollPosition, disableScrollListener]);
 
   return (
-    <Box sx={wrapperStyles}>
+    <Box sx={wrapperStyles} id="leftside-wrapper">
       <Box sx={ListWrapperStyles}>
         <Stack sx={ListStyles} gap={2} alignItems="flex-start">
           {

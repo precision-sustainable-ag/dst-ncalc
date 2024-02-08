@@ -11,8 +11,10 @@ import NavigateButtons from '../../../shared/Navigate';
 
 /// /// /// STYLES /// /// ///
 const wrapperStyles = {
-  width: '80%',
-  padding: 5,
+  maxWidth: {
+    sm: '75%', md: '75%', lg: '80%', xl: '90%',
+  },
+  padding: 0,
 };
 
 /// /// /// ROOT COMPONENT /// /// ///
@@ -30,7 +32,7 @@ const RightSideBar = ({ summaryData, refs }) => {
 
   /// /// RETURN JSX /// ///
   return (
-    <Box sx={wrapperStyles} flex={4} justifyContent="center">
+    <Box sx={wrapperStyles} flex={4} justifyContent="center" id="rightside-wrapper">
       <Grid container spacing={5}>
         <Grid item sm={12} width="100%">
           <SummaryCard refVal={refs[0]} data={summaryData} />
