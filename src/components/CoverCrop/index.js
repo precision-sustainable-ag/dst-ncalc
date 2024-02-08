@@ -97,7 +97,7 @@ const CoverCrop1 = () => {
     <Box
       sx={{
         justifyContent: 'center',
-        margin: '5% 10% 5% 10%',
+        margin: '0% 5% 0% 5%',
         display: 'flex',
         alignItems: 'center',
         backgroundColor: '#fff',
@@ -106,8 +106,8 @@ const CoverCrop1 = () => {
         flexDirection: 'column',
         width: {
           xs: '100%',
-          sm: '90%',
-          md: '80%',
+          sm: '100%',
+          md: '90%',
           lg: '70%',
           xl: '60%',
         },
@@ -328,8 +328,8 @@ const CoverCrop2 = () => {
   return (
     <Box
       sx={{
-        margin: '5% 10% 5% 10%',
         justifyContent: 'center',
+        margin: '0% 5% 0% 5%',
         display: 'flex',
         alignItems: 'center',
         backgroundColor: '#fff',
@@ -338,8 +338,8 @@ const CoverCrop2 = () => {
         flexDirection: 'column',
         width: {
           xs: '100%',
-          sm: '90%',
-          md: '80%',
+          sm: '100%',
+          md: '90%',
           lg: '70%',
           xl: '60%',
         },

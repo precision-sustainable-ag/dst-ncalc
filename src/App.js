@@ -68,10 +68,11 @@ const App = () => {
   return (
     <ThemeProvider theme={theme}>
       <Container
-        py={50}
+        // py={50}
+        id="app-container"
         sx={{
-          minHeight: '100vh',
-          minWidth: '100vw',
+          minHeight: '99.7vh',
+          minWidth: '100%',
           backgroundImage: `url(${'/background_0.jpg'})`,
           backgroundSize: 'cover',
           backgroundRepeat: 'no-repeat',

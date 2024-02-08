@@ -9,12 +9,20 @@ import {
 import Feedback from '../Feedback';
 import About from '../About';
 
+const wrapperStyles = {
+  // position: 'absolute',
+  // top: '100px',
+  // left: 0,
+  display: 'flex',
+  justifyContent: 'center',
+};
+
 export default function index({ screens }) {
   const path = window.location.toString().split('/').pop().toLowerCase() || 'home';
   const Screen = screens[path] || screens.home;
 
   return (
-    <Box sx={{ display: 'flex', justifyContent: 'center' }}>
+    <Box sx={wrapperStyles} id="body-wrapper">
       <Routes>
         {
           Object.keys(screens).map((scr) => (

@@ -28,7 +28,7 @@ const Soil = () => {
     <Box
       sx={{
         justifyContent: 'center',
-        margin: '5% 10% 5% 10%',
+        margin: '0% 5% 0% 5%',
         display: 'flex',
         alignItems: 'center',
         backgroundColor: '#fff',
@@ -37,8 +37,8 @@ const Soil = () => {
         flexDirection: 'column',
         width: {
           xs: '100%',
-          sm: '90%',
-          md: '80%',
+          sm: '100%',
+          md: '90%',
           lg: '70%',
           xl: '60%',
         },

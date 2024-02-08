@@ -60,7 +60,7 @@ const initialState = {
   nweeks: 4,
   mockup: 2,
   species: {},
-  // selectedCoverCropSpecies: [],
+  cropNames: [],
   maxBiomass: {},
   privacy: false,
   errorModel: false,

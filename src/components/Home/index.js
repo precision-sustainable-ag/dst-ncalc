@@ -54,7 +54,7 @@ const Home = () => {
     <Card
       maxwidth="lg"
       sx={{
-        margin: '5% 10% 5% 10%',
+        margin: '0% 5% 0% 5%',
         padding: '5%',
         boxShadow: 5,
         borderRadius: 5,

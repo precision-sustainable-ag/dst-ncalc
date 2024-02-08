@@ -6,6 +6,7 @@ import { get, set } from '../store/Store';
 
 const POLYGON_FILE_NAME = 'sample_polygon.json';
 const BIOMASS_FILE_NAME = 'sample_biomass_result.json';
+const CROPNAMES_FILE_NAME = 'crops.json';
 
 /// Desc: useFetchSampleBiomass
 /// ..............................................................................
@@ -52,4 +53,30 @@ const useFetchSampleBiomass = () => {
   return [polygon, biomass];
 };
 
-export { useFetchSampleBiomass };
+/// Desc: useFetchCropNames
+/// ..............................................................................
+/// ..............................................................................
+//
+const useFetchCropNames = () => {
+  const dispatch = useDispatch();
+  const [cropNames, setCropNames] = useState(null);
+
+  useEffect(() => {
+    const HEADERS = {
+      'Content-Type': 'application/json',
+      Accept: 'application/json',
+    };
+    // fetch sample polygon if example is active
+    fetch(CROPNAMES_FILE_NAME, { HEADERS })
+      .then((response) => response.json())
+      .then((jsonObj) => {
+        console.log('jsonObj', jsonObj);
+        dispatch(set.cropNames(jsonObj));
+        setCropNames(jsonObj);
+        return null;
+      });
+  }, []);
+
+  return cropNames;
+};
+export { useFetchSampleBiomass, useFetchCropNames };
