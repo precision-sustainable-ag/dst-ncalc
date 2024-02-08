@@ -161,7 +161,7 @@ const ResponsiveNavBar = ({ screens }) => {
               color: 'black',
               borderRadius: '0.2rem',
               // borderRadius: menuIsOpen ? '0.2rem' : '1rem',
-              paddingBottom: menuIsOpen ? '0.2rem' : '0',
+              // paddingBottom: menuIsOpen ? '0.2rem' : '0',
               width: '3rem',
               height: '3rem',
               justifyContent: 'center',
@@ -304,9 +304,15 @@ const ResponsiveNavBar = ({ screens }) => {
               <IconButton
                 onClick={handleOpenUserMenu}
                 sx={{
-                  p: '0.7rem',
+                  // p: '0.7rem',
+                  width: '3rem',
+                  height: '3rem',
+                  borderRadius: '0.5rem',
                   color: 'black',
                   backgroundColor: 'white',
+                  '&:hover': {
+                    backgroundColor: '#f5f5f5',
+                  },
                 }}
               >
                 <MoreVertIcon />
