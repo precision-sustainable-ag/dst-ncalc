@@ -34,7 +34,7 @@ const useStoreMem = () => {
   if (field) {
     if (!/Example: Grass|Example: Legume/.test(field)) {
       try {
-        localStorage.setItem(field, JSON.stringify({
+        localStorage.setItem('ncalc-'.concat(field), JSON.stringify({
           lat,
           lon,
           BD,

@@ -73,8 +73,8 @@ const Init = ({ handleCloseUserMenu }) => {
       dispatch(set.targetN(100));
       handleCloseUserMenu();
     } else {
-      console.log('loadField', fieldVal);
-      console.log('localStorage[field]: ', localStorage[fieldVal]);
+      // console.log('loadField', fieldVal);
+      // console.log('localStorage[field]: ', localStorage[fieldVal]);
       const inputs = JSON.parse(localStorage[fieldVal]);
       Object.keys(inputs).forEach((key) => {
         try {
@@ -225,7 +225,7 @@ const Init = ({ handleCloseUserMenu }) => {
             <option>Example: Grass</option>
             <option>Example: Legume</option>
             {
-              Object.keys(localStorage).filter((v) => !v.includes('mapbox.eventData')).length > 0 && (
+              Object.keys(localStorage).filter((v) => v.includes('ncalc-')).length > 0 && (
                 <>
                   <option>Clear previous runs</option>
                   <option disabled>____________________</option>
@@ -233,8 +233,8 @@ const Init = ({ handleCloseUserMenu }) => {
               )
             }
             { // additional field names in example dropdown
-              Object.keys(localStorage).sort().filter((v) => !v.includes('mapbox.eventData')).map((fld, idx) => (
-                <option key={idx} checked={fld === field}>{fld}</option> // eslint-disable-line react/no-unknown-property
+              Object.keys(localStorage).sort().filter((v) => v.includes('ncalc-')).map((fld, idx) => (
+                <option key={idx} checked={fld === field}>{fld.replace('ncalc-', '')}</option> // eslint-disable-line react/no-unknown-property
               ))
             }
           </select>
