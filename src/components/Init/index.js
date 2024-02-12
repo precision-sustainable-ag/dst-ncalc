@@ -74,7 +74,9 @@ const Init = ({ handleCloseUserMenu }) => {
       dispatch(set.targetN(100));
       handleCloseUserMenu();
     } else {
-      const inputs = JSON.parse(localStorage[field]);
+      console.log('loadField', fieldVal);
+      console.log('localStorage[field]: ', localStorage[fieldVal]);
+      const inputs = JSON.parse(localStorage[fieldVal]);
       Object.keys(inputs).forEach((key) => {
         try {
           if (/Date/.test(key)) {
@@ -224,7 +226,7 @@ const Init = ({ handleCloseUserMenu }) => {
             <option>Example: Grass</option>
             <option>Example: Legume</option>
             {
-              Object.keys(localStorage).filter((v) => !v.includes('mapbox.eventData')).length && (
+              Object.keys(localStorage).filter((v) => !v.includes('mapbox.eventData')).length > 0 && (
                 <>
                   <option>Clear previous runs</option>
                   <option disabled>____________________</option>

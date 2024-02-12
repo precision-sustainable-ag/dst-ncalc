@@ -6,6 +6,7 @@ import dayjs from 'dayjs';
 import LeftSideBar from './subcomponents/LeftSideBar';
 import RightSideBar from './subcomponents/RightSideBar';
 import { get } from '../../store/redux-autosetters';
+import useStoreMem from '../../hooks/useStoreMem';
 
 const wrapperStyles = {
   width: '100%',
@@ -105,6 +106,8 @@ const Output = () => {
   const cell = useSelector(get.cell);
   const lign = useSelector(get.lign);
   const unit = useSelector(get.unit);
+
+  useStoreMem();
 
   useEffect(() => {
     const tempSummaryData = { ...summaryData };

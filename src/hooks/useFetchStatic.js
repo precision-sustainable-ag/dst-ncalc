@@ -70,7 +70,6 @@ const useFetchCropNames = () => {
     fetch(CROPNAMES_FILE_NAME, { HEADERS })
       .then((response) => response.json())
       .then((jsonObj) => {
-        console.log('jsonObj', jsonObj);
         dispatch(set.cropNames(jsonObj));
         setCropNames(jsonObj);
         return null;
