@@ -1,8 +1,8 @@
 /* eslint-disable no-console */
-import React, { useEffect } from 'react';
+import React from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { useNavigate } from 'react-router-dom';
-import Airtable from 'airtable';
+// import Airtable from 'airtable';
 import moment from 'moment';
 
 import { set, get } from '../../store/redux-autosetters';
@@ -18,68 +18,68 @@ const Init = ({ desktop, setNavModalOpen }) => {
   const field = useSelector(get.field);
   const screen = useSelector(get.screen);
 
-  useEffect(() => {
-    const base = new Airtable({ apiKey: 'keySO0dHQzGVaSZp2' }).base('appOEj4Ag9MgTTrMg');
+  // useEffect(() => {
+  //   const base = new Airtable({ apiKey: 'keySO0dHQzGVaSZp2' }).base('appOEj4Ag9MgTTrMg');
 
-    const airtable = (table, callback, wrapup) => {
-      base(table).select({
-        view: 'Grid view',
-      }).eachPage((records, fetchNextPage) => {
-        records.forEach((record) => {
-          callback(record.fields);
-        });
+  //   const airtable = (table, callback, wrapup) => {
+  //     base(table).select({
+  //       view: 'Grid view',
+  //     }).eachPage((records, fetchNextPage) => {
+  //       records.forEach((record) => {
+  //         callback(record.fields);
+  //       });
 
-        fetchNextPage();
-      }, (err) => {
-        if (!err && wrapup) {
-          wrapup();
-        }
-      });
-    }; // airtable
+  //       fetchNextPage();
+  //     }, (err) => {
+  //       if (!err && wrapup) {
+  //         wrapup();
+  //       }
+  //     });
+  //   }; // airtable
 
-    airtable('PSA', (site) => {
-      localStorage.removeItem(site.ID);
-      if (site.Hour === 0) {
-        examples[site.ID] = {
-          field: site.ID,
-          lat: site.Lat,
-          lon: site.Lon,
-          location: '',
-          BD: site.BD,
-          coverCrop: [site['Cover Crop']],
-          cashCrop: site['Cash Crop'],
-          killDate: new Date(site.Date),
-          lwc: site.LitterWaterContent,
-          biomass: Math.round(site.FOM),
-          unit: 'kg/ha',
-          N: +(site.FOMpctN.toFixed(2)),
-          carb: +(site.Carb.toFixed(2)),
-          cell: +(site.Cell.toFixed(2)),
-          lign: +(site.Lign.toFixed(2)),
-          targetN: 150,
-          category: site.Category,
-        };
-      } else {
-        examples[site.ID].plantingDate = new Date(moment(site.Date).add(-111, 'days'));
-      }
-    });
+  //   airtable('PSA', (site) => {
+  //     localStorage.removeItem(site.ID);
+  //     if (site.Hour === 0) {
+  //       examples[site.ID] = {
+  //         field: site.ID,
+  //         lat: site.Lat,
+  //         lon: site.Lon,
+  //         location: '',
+  //         BD: site.BD,
+  //         coverCrop: [site['Cover Crop']],
+  //         cashCrop: site['Cash Crop'],
+  //         killDate: new Date(site.Date),
+  //         lwc: site.LitterWaterContent,
+  //         biomass: Math.round(site.FOM),
+  //         unit: 'kg/ha',
+  //         N: +(site.FOMpctN.toFixed(2)),
+  //         carb: +(site.Carb.toFixed(2)),
+  //         cell: +(site.Cell.toFixed(2)),
+  //         lign: +(site.Lign.toFixed(2)),
+  //         targetN: 150,
+  //         category: site.Category,
+  //       };
+  //     } else {
+  //       examples[site.ID].plantingDate = new Date(moment(site.Date).add(-111, 'days'));
+  //     }
+  //   });
 
-    const mb = {};
-    const species = {};
+  //   const mb = {};
+  //   const species = {};
 
-    airtable(
-      'CoverCrops',
-      (crop) => {
-        species[crop.Category] = species[crop.Category] || [];
-        species[crop.Category].push(crop.Crop);
-        mb[crop.Crop] = crop.MaxBiomass;
-      },
-      () => {
-        dispatch(set.maxBiomass(mb));
-        dispatch(set.species(species));
-      },
-    );
-  }, [dispatch]);
+  //   airtable(
+  //     'CoverCrops',
+  //     (crop) => {
+  //       species[crop.Category] = species[crop.Category] || [];
+  //       species[crop.Category].push(crop.Crop);
+  //       mb[crop.Crop] = crop.MaxBiomass;
+  //     },
+  //     () => {
+  //       dispatch(set.maxBiomass(mb));
+  //       dispatch(set.species(species));
+  //     },
+  //   );
+  // }, [dispatch]);
 
   const loadField = (fieldVal) => {
     if (fieldVal === 'Example: Grass') {
