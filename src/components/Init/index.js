@@ -19,9 +19,7 @@ const Init = ({ handleCloseUserMenu }) => {
 
   const PSA = useSelector(get.PSA);
   const field = useSelector(get.field);
-  const screen = useSelector(get.screen);
 
-  console.log('field', field);
   // eslint-disable-next-line no-unused-vars
   const [samplePolygon, sampleBiomass] = useFetchSampleBiomass();
 
@@ -78,8 +76,6 @@ const Init = ({ handleCloseUserMenu }) => {
       dispatch(set.targetN(100));
       handleCloseUserMenu();
     } else {
-      console.log('loadField', fieldVal);
-      console.log('localStorage[fieldVal]: ', localStorage);
       const newFieldVal = 'ncalc-'.concat(fieldVal);
       const inputs = JSON.parse(localStorage[newFieldVal]);
       Object.keys(inputs).forEach((key) => {
@@ -190,7 +186,7 @@ const Init = ({ handleCloseUserMenu }) => {
   }; // changeField
 
   const myFields = Object.keys(localStorage).sort().filter((v) => !v.includes('mapbox.eventData'));
-  const showUtilities = screen === 'output' || myFields.length;
+  const showUtilities = pathname.includes('output') || myFields.length;
 
   /// ///// JSX RENDER ///// ////
   return (
