@@ -120,7 +120,7 @@ const Output = () => {
     tempSummaryData['Holo-cellulose'].value = String(cell).concat(' %');
     tempSummaryData.Lignin.value = String(lign).concat(' %');
     setSummaryData({ ...tempSummaryData });
-  }, [field]);
+  }, [field, biomass]);
 
   return (
     <Box sx={wrapperStyles} id="gfdgdd">

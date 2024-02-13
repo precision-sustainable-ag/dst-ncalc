@@ -144,6 +144,8 @@ const modelCalc = ({
   const incorporatedNPredict =
     model && doIncorporated && Math.round(model.i.FomCumN.slice(-1) / factor);
 
+  // surfaceData[30] && console.log('modelCalc', 'outputN', outputN, biomass, surfaceData[30]);
+
   return {
     maxSurface,
     surfaceMin,

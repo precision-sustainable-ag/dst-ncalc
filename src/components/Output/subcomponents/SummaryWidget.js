@@ -1,5 +1,6 @@
 /* eslint-disable no-unused-vars */
 /* eslint-disable arrow-body-style */
+import React, { useEffect, useState } from 'react';
 import {
   Button,
   Card,
@@ -13,7 +14,8 @@ import {
   Box,
 } from '@mui/material';
 import { tooltipClasses } from '@mui/material/Tooltip';
-import React from 'react';
+import { useSelector } from 'react-redux';
+import { get } from '../../../store/redux-autosetters';
 
 /// /// /// STYLES /// /// ///
 const CardStyles = {
@@ -89,29 +91,31 @@ const SummaryItem = ({ name, value, desc }) => {
 };
 
 /// /// /// RETURN JSX /// /// ///
-const SummaryCard = ({ data, refVal }) => (
-  <Card sx={CardStyles} elevation={8} ref={refVal}>
-    <CardContent sx={cardContentStyles}>
-      <Typography
-        sx={{ fontSize: 22 }}
-        color="text.secondary"
-        gutterBottom
-        textAlign="center"
-      >
-        Summary
-      </Typography>
-    </CardContent>
-    <CardActions>
-      <Grid container spacing={2}>
-        {Object.entries(data).map(([k, v], ix) => (
-          <Grid item xs={12} sm={6} md={4} lg={3} width="100%" key={'summItem'.concat(String(ix))}>
-            <SummaryItem name={k} value={v.value} desc={v.desc} />
-          </Grid>
-        ))}
-      </Grid>
-    </CardActions>
-  </Card>
-);
+const SummaryCard = ({ data, refVal }) => {
+  return (
+    <Card sx={CardStyles} elevation={8} ref={refVal}>
+      <CardContent sx={cardContentStyles}>
+        <Typography
+          sx={{ fontSize: 22 }}
+          color="text.secondary"
+          gutterBottom
+          textAlign="center"
+        >
+          Summary
+        </Typography>
+      </CardContent>
+      <CardActions>
+        <Grid container spacing={2}>
+          {Object.entries(data).map(([k, v], ix) => (
+            <Grid item xs={12} sm={6} md={4} lg={3} width="100%" key={'summItem'.concat(String(ix))}>
+              <SummaryItem name={k} value={v.value} desc={v.desc} />
+            </Grid>
+          ))}
+        </Grid>
+      </CardActions>
+    </Card>
+  );
+};
 
 const OtherCard = ({ refVal }) => (
   <Card sx={CardStyles} elevation={8} ref={refVal}>

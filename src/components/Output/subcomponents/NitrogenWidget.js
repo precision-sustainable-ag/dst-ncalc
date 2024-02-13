@@ -1,4 +1,5 @@
 /* eslint-disable no-console */
+import React from 'react';
 import {
   Card,
   CardActions,
@@ -10,7 +11,6 @@ import {
 } from '@mui/material';
 import Highcharts from 'highcharts';
 import HighchartsReact from 'highcharts-react-official';
-import React from 'react';
 import { useSelector } from 'react-redux';
 import {
   getGeneralChartOptions,

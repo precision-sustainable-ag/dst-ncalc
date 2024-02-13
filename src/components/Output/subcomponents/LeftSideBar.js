@@ -2,6 +2,7 @@
 /* eslint-disable no-console */
 import {
   Box,
+  // Slider,
   Stack,
   Typography,
 } from '@mui/material';
@@ -85,6 +86,9 @@ const LeftSideBar = ({ sidebarListData, refs }) => {
   const [scrollPosition, setScrollPosition] = useState(0);
   const [disableScrollListener, setDisableScrollListener] = useState(false);
   const isSatelliteMode = useSelector(get.biomassCalcMode) === 'satellite';
+  // const biomass = useSelector(get.biomass);
+  // const [value, setValue] = useState(3000);
+  // const dispatch = useDispatch();
 
   const handleScroll = () => {
     const position = window.scrollY;
@@ -135,6 +139,27 @@ const LeftSideBar = ({ sidebarListData, refs }) => {
             })
           }
         </Stack>
+        {/* <Box sx={{ height: '100px' }}>
+          <Slider
+            aria-label="Volume"
+            value={value}
+            // getAriaValueText={value}
+            valueLabelDisplay="auto"
+            defaultValue={3000}
+            min={1000}
+            max={10000}
+            // shiftStep={3500}
+            step={500}
+            marks
+            onChange={(e) => {
+              // dispatch(set.biomass(newVal.target));
+              console.log('biomass slider changed ', e.target.value);
+              dispatch(set.biomass(e.target.value));
+              setValue(e.target.value);
+              return null;
+            }}
+          />
+        </Box> */}
       </Box>
     </Box>
   );

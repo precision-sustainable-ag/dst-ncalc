@@ -1,5 +1,5 @@
 /* eslint-disable no-console */
-import React, { useEffect, useState } from 'react';
+import React from 'react';
 import { Box, Grid } from '@mui/material';
 import { useSelector } from 'react-redux';
 import NitrogenCard from './NitrogenWidget';
@@ -21,14 +21,7 @@ const wrapperStyles = {
 const RightSideBar = ({ summaryData, refs }) => {
   /// /// /// VARIABLES /// /// ///
   // if (!model) return <Loading />;
-  const [updated, setUpdated] = useState(false);
   const isSatelliteMode = useSelector(get.biomassCalcMode) === 'satellite';
-  const biomass = useSelector(get.biomassTotalValue);
-
-  /// /// Effects /// ///
-  useEffect(() => {
-    setUpdated(!updated);
-  }, [biomass]);
 
   /// /// RETURN JSX /// ///
   return (
