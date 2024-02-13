@@ -169,30 +169,33 @@ const useFetchSSURGO = () => {
   const SSURGO = useSelector(get.SSURGO);
   const lat = useSelector(get.lat);
   const lon = useSelector(get.lon);
+  const field = useSelector(get.field);
 
   useEffect(() => {
-    const url = `${SSURGO_API_URL}/?lat=${lat}&lon=${lon}&component=major`;
-    axios
-      .get(url)
-      .then((data) => {
-        if (data.ERROR || !data.data || !data.data.length) {
-          dispatch(set.BD(''));
-          dispatch(set.OM(''));
-        } else if (!SSURGO || updateSSURGO) {
-          // } else {
-          let filteredData = data.data.filter((d) => d.desgnmaster !== 'O');
-          const minhzdept = Math.min(...filteredData.map((d) => d.hzdept_r));
-          filteredData = filteredData.filter((d) => +d.hzdept_r === +minhzdept);
-          dispatch(set.BD(weightedAverage(filteredData, 'dbthirdbar_r')));
-          dispatch(set.OM(weightedAverage(filteredData, 'om_r')));
-          dispatch(set.SSURGO(filteredData));
-          dispatch(set.updateSSURGO(false));
-        }
-      })
-      .catch((error) => {
-        console.log(error);
-      });
-  }, [updateSSURGO]);
+    if (!field.includes('Example') && !field.includes('Mockup')) {
+      const url = `${SSURGO_API_URL}/?lat=${lat}&lon=${lon}&component=major`;
+      axios
+        .get(url)
+        .then((data) => {
+          if (data.ERROR || !data.data || !data.data.length) {
+            dispatch(set.BD(''));
+            dispatch(set.OM(''));
+          } else if (!SSURGO || updateSSURGO) {
+            // } else {
+            let filteredData = data.data.filter((d) => d.desgnmaster !== 'O');
+            const minhzdept = Math.min(...filteredData.map((d) => d.hzdept_r));
+            filteredData = filteredData.filter((d) => +d.hzdept_r === +minhzdept);
+            dispatch(set.BD(weightedAverage(filteredData, 'dbthirdbar_r')));
+            dispatch(set.OM(weightedAverage(filteredData, 'om_r')));
+            dispatch(set.SSURGO(filteredData));
+            dispatch(set.updateSSURGO(false));
+          }
+        })
+        .catch((error) => {
+          console.log(error);
+        });
+    }
+  }, [updateSSURGO, field]);
 }; // fetchSSURGO
 
 export { useFetchModel, useFetchSSURGO, useFetchCornN };

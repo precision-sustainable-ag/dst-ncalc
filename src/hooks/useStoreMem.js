@@ -29,10 +29,13 @@ const useStoreMem = () => {
   const lign = useSelector(get.lign);
   const biomass = useSelector(get.biomass);
   const unit = useSelector(get.unit);
+  const model = useSelector(get.model);
+  const cornN = useSelector(get.cornN);
   const coverCrop = useSelector(get.coverCrop);
 
   if (field) {
-    if (!/Example: Grass|Example: Legume/.test(field)) {
+    console.log('useStoreMem field', field);
+    if (!field.includes('Example') && !field.includes('Mockup')) {
       try {
         localStorage.setItem('ncalc-'.concat(field), JSON.stringify({
           lat,
@@ -53,9 +56,9 @@ const useStoreMem = () => {
           gotModel,
           errorModel,
           errorCorn,
-          // model,
+          model,
           mockup,
-          // cornN,
+          cornN,
           cashCrop,
           yield: Yield,
           outputN,

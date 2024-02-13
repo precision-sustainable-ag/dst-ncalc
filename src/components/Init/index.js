@@ -1,11 +1,13 @@
+/* eslint-disable jsx-a11y/control-has-associated-label */
 /* eslint-disable no-console */
 import React from 'react';
 import { useDispatch, useSelector } from 'react-redux';
-import { useNavigate } from 'react-router-dom';
+import { useLocation, useNavigate } from 'react-router-dom';
 import moment from 'moment';
 
 import { set, get } from '../../store/redux-autosetters';
 import { useFetchSampleBiomass } from '../../hooks/useFetchStatic';
+// import './styles.scss';
 
 const examples = {};
 
@@ -13,10 +15,13 @@ const Init = ({ handleCloseUserMenu }) => {
   /// ///// VARIABLES ///// ////
   const dispatch = useDispatch();
   const navigate = useNavigate();
+  const { pathname } = useLocation();
 
   const PSA = useSelector(get.PSA);
   const field = useSelector(get.field);
+  const screen = useSelector(get.screen);
 
+  console.log('field', field);
   // eslint-disable-next-line no-unused-vars
   const [samplePolygon, sampleBiomass] = useFetchSampleBiomass();
 
@@ -73,9 +78,10 @@ const Init = ({ handleCloseUserMenu }) => {
       dispatch(set.targetN(100));
       handleCloseUserMenu();
     } else {
-      // console.log('loadField', fieldVal);
-      // console.log('localStorage[field]: ', localStorage[fieldVal]);
-      const inputs = JSON.parse(localStorage[fieldVal]);
+      console.log('loadField', fieldVal);
+      console.log('localStorage[fieldVal]: ', localStorage);
+      const newFieldVal = 'ncalc-'.concat(fieldVal);
+      const inputs = JSON.parse(localStorage[newFieldVal]);
       Object.keys(inputs).forEach((key) => {
         try {
           if (/Date/.test(key)) {
@@ -183,9 +189,12 @@ const Init = ({ handleCloseUserMenu }) => {
     }
   }; // changeField
 
+  const myFields = Object.keys(localStorage).sort().filter((v) => !v.includes('mapbox.eventData'));
+  const showUtilities = screen === 'output' || myFields.length;
+
   /// ///// JSX RENDER ///// ////
   return (
-    <div className="Init">
+    <div className="Init desktop">
       {
         PSA
         && (
@@ -221,21 +230,50 @@ const Init = ({ handleCloseUserMenu }) => {
             onChange={changeField}
             value={field}
           >
-            <option>examples</option>
-            <option>Example: Grass</option>
-            <option>Example: Legume</option>
+            <option>&nbsp;</option>
             {
-              Object.keys(localStorage).filter((v) => v.includes('ncalc-')).length > 0 && (
+              myFields.length && (
                 <>
-                  <option>Clear previous runs</option>
+                  <optgroup label="My fields">
+                    { // additional field names in example dropdown
+                      myFields.map((fld, idx) => (
+                        // eslint-disable-next-line max-len
+                        <option key={idx} checked={fld === field}>{fld.replace('ncalc-', '')}</option> // eslint-disable-line react/no-unknown-property
+                      ))
+                    }
+                  </optgroup>
                   <option disabled>____________________</option>
                 </>
               )
             }
-            { // additional field names in example dropdown
-              Object.keys(localStorage).sort().filter((v) => v.includes('ncalc-')).map((fld, idx) => (
-                <option key={idx} checked={fld === field}>{fld.replace('ncalc-', '')}</option> // eslint-disable-line react/no-unknown-property
-              ))
+
+            {
+              !myFields.length && (
+                <option>&nbsp;</option>
+              )
+            }
+
+            <optgroup label="Example data">
+              <option>Example: Grass</option>
+              <option>Example: Legume</option>
+            </optgroup>
+            <option disabled>____________________</option>
+
+            {
+              showUtilities && (
+                <optgroup label="Utilities">
+                  {
+                    pathname.includes('output') && (
+                      <option>Download data</option>
+                    )
+                  }
+                  {
+                    myFields.length && (
+                      <option>Clear previous runs</option>
+                    )
+                  }
+                </optgroup>
+              )
             }
           </select>
         )
