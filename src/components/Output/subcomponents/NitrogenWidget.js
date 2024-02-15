@@ -1,5 +1,5 @@
 /* eslint-disable no-console */
-import React from 'react';
+import React, { useEffect } from 'react';
 import {
   Card,
   CardActions,
@@ -11,13 +11,13 @@ import {
 } from '@mui/material';
 import Highcharts from 'highcharts';
 import HighchartsReact from 'highcharts-react-official';
-import { useSelector } from 'react-redux';
+import { useDispatch, useSelector } from 'react-redux';
 import {
   getGeneralChartOptions,
   getNitrogenChartOptions,
 } from './chartsOptions';
 import { modelCalc } from './helpers';
-import { get } from '../../../store/redux-autosetters';
+import { get, set } from '../../../store/redux-autosetters';
 import { useFetchCornN, useFetchModel } from '../../../hooks/useFetchApi';
 
 /// /// /// STYLES /// /// ///
@@ -54,6 +54,7 @@ const HighChartsContainerProps = {
 /// /// /// RETURN JSX /// /// ///
 const NitrogenCard = ({ refVal }) => {
   /// /// /// VARIABLES /// /// ///
+  const dispatch = useDispatch();
   const doIncorporated = false;
   const N = useSelector(get.N);
   const coverCropTerminationDate = useSelector(get.coverCropTerminationDate);
@@ -105,6 +106,7 @@ const NitrogenCard = ({ refVal }) => {
     NUptake,
     surfaceNPredict,
     incorporatedNPredict,
+    dates,
   } = modelCalc({
     model,
     carb,
@@ -123,6 +125,10 @@ const NitrogenCard = ({ refVal }) => {
     doCornN: cashCrop ? cashCrop.toLowerCase() === 'corn' : false,
     N,
   });
+
+  useEffect(() => {
+    dispatch(set.dates(dates));
+  }, [dates]);
 
   return (
     <Card sx={CardStyles} elevation={8} ref={refVal}>

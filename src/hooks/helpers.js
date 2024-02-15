@@ -25,4 +25,14 @@ const query = (parm, def) => {
   return params.get(parm) || def;
 }; // query
 
-export { weightedAverage, query };
+const downloadOutputCSV = (model, dates) => {
+  const cols = Object.keys(model.s).sort();
+  const csv = `Date,${cols}\n${dates.map((dt, i) => `${dt},${cols.map((col) => model.s[col][i])}`).join('\n')}`;
+  const file = new Blob([csv], { type: 'text/csv;charset=utf-8' });
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(file);
+  a.download = 'ncalc-data.csv';
+  a.click();
+}; // downloadOutputCSV
+
+export { weightedAverage, query, downloadOutputCSV };

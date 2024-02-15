@@ -1,13 +1,18 @@
 /* eslint-disable jsx-a11y/control-has-associated-label */
 /* eslint-disable no-console */
-import React from 'react';
+import React, { useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { useLocation, useNavigate } from 'react-router-dom';
 import moment from 'moment';
-
-import { set, get } from '../../store/redux-autosetters';
+import Button from '@mui/material/Button';
+import Dialog from '@mui/material/Dialog';
+import DialogTitle from '@mui/material/DialogTitle';
+import DialogActions from '@mui/material/DialogActions';
+import DialogContent from '@mui/material/DialogContent';
+import DialogContentText from '@mui/material/DialogContentText';
 import { useFetchSampleBiomass } from '../../hooks/useFetchStatic';
-// import './styles.scss';
+import { downloadOutputCSV } from '../../hooks/helpers';
+import { set, get } from '../../store/redux-autosetters';
 
 const examples = {};
 
@@ -19,6 +24,9 @@ const Init = ({ handleCloseUserMenu }) => {
 
   const PSA = useSelector(get.PSA);
   const field = useSelector(get.field);
+  const model = useSelector(get.model);
+  const dates = useSelector(get.dates);
+  const [downloadCSVFailed, setDownloadCSVFailed] = useState(false);
 
   // eslint-disable-next-line no-unused-vars
   const [samplePolygon, sampleBiomass] = useFetchSampleBiomass();
@@ -75,7 +83,14 @@ const Init = ({ handleCloseUserMenu }) => {
       dispatch(set.yield(150));
       dispatch(set.targetN(100));
       handleCloseUserMenu();
+    } else if (fieldVal === 'Download data') {
+      if (model && dates) {
+        downloadOutputCSV(model, dates);
+      } else {
+        setDownloadCSVFailed(true);
+      }
     } else {
+      console.log('loadField', fieldVal);
       const newFieldVal = 'ncalc-'.concat(fieldVal);
       const inputs = JSON.parse(localStorage[newFieldVal]);
       Object.keys(inputs).forEach((key) => {
@@ -260,7 +275,12 @@ const Init = ({ handleCloseUserMenu }) => {
                 <optgroup label="Utilities">
                   {
                     pathname.includes('output') && (
-                      <option>Download data</option>
+                      <option onClick={() => {
+                        console.log('bhhvhg');
+                      }}
+                      >
+                        Download data
+                      </option>
                     )
                   }
                   {
@@ -274,6 +294,34 @@ const Init = ({ handleCloseUserMenu }) => {
           </select>
         )
       }
+      {downloadCSVFailed
+        && (
+          <Dialog
+            open={downloadCSVFailed}
+            onClose={() => {
+              setDownloadCSVFailed(false);
+            }}
+            aria-labelledby="alert-dialog-title"
+            aria-describedby="alert-dialog-description"
+          >
+            <DialogTitle id="alert-dialog-title">Download Failed</DialogTitle>
+            <DialogContent>
+              <DialogContentText id="alert-dialog-description">
+                Download of CSV Failed. Please try again.
+              </DialogContentText>
+            </DialogContent>
+            <DialogActions>
+              <Button
+                onClick={() => {
+                  setDownloadCSVFailed(false);
+                }}
+                autoFocus
+              >
+                close
+              </Button>
+            </DialogActions>
+          </Dialog>
+        )}
     </div>
   );
 };

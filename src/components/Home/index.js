@@ -99,13 +99,15 @@ const Home = () => {
       </Stack>
       <Box sx={{ height: 100 }} />
       <Stack spacing={2} direction="row" justifyContent="space-around">
-        {/* <Button sx={{ fontSize: '24px', fontWeight: 900 }} variant="contained" color="success">
+        <NavButton
+          onClick={() => dispatch(set.openAboutModal(true))}
+          fontSize="1rem"
+        >
           About
-        </Button> */}
-
+        </NavButton>
         <NavButton
           onClick={() => navigate('/location')}
-          fontSize="1.5rem"
+          fontSize="1rem"
         >
           Get Started
         </NavButton>

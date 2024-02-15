@@ -156,6 +156,7 @@ const modelCalc = ({
     NUptake,
     surfaceNPredict,
     incorporatedNPredict,
+    dates,
   };
 };
 
