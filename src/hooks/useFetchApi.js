@@ -172,7 +172,7 @@ const useFetchSSURGO = () => {
   const field = useSelector(get.field);
 
   useEffect(() => {
-    if (!field.includes('Example') && !field.includes('Mockup')) {
+    if (!field.includes('Mockup')) {
       const url = `${SSURGO_API_URL}/?lat=${lat}&lon=${lon}&component=major`;
       axios
         .get(url)

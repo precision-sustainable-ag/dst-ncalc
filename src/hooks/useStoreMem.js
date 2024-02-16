@@ -34,7 +34,6 @@ const useStoreMem = () => {
   const coverCrop = useSelector(get.coverCrop);
 
   if (field) {
-    console.log('useStoreMem field', field);
     if (!field.includes('Example') && !field.includes('Mockup')) {
       try {
         localStorage.setItem('ncalc-'.concat(field), JSON.stringify({

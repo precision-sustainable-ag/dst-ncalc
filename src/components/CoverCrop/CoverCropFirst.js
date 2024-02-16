@@ -96,6 +96,25 @@ const CoverCropFirst = () => {
           {
             isSatelliteMode ? (
               <Paper mt={2}>
+                <Stack m={2} direction="row" alignItems="center">
+                  <Typography>
+                    Biomass Unit: &nbsp;
+                  </Typography>
+                  <RadioGroup row aria-label="position" name="position" style={{ display: 'inline-block', marginLeft: '1em' }}>
+                    <FormControlLabel
+                      value="lb/ac"
+                      control={<Radio id="unit" checked={unit === 'lb/ac'} />}
+                      onChange={() => dispatch(set.unit('lb/ac'))}
+                      label="lb/ac"
+                    />
+                    <FormControlLabel
+                      value="kg/ha"
+                      control={<Radio id="unit" checked={unit === 'kg/ha'} />}
+                      onChange={() => dispatch(set.unit('kg/ha'))}
+                      label="kg/ha"
+                    />
+                  </RadioGroup>
+                </Stack>
                 <Biomass minified={false} />
                 {mapPolygon.length === 0 && (
                   <Modal

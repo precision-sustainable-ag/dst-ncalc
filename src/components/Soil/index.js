@@ -19,7 +19,6 @@ const Soil = () => {
   const navigate = useNavigate();
   const ssurgo = useSelector(get.SSURGO);
   const isSatelliteMode = useSelector(get.biomassCalcMode) === 'satellite';
-
   /// /// /// HOOKS /// /// ///
   useFetchSSURGO();
 

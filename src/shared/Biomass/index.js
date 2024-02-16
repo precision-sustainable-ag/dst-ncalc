@@ -1,17 +1,14 @@
 /* eslint-disable import/no-extraneous-dependencies */
 import React, { useEffect, useState } from 'react';
 import { useSelector, useDispatch } from 'react-redux';
+import Button from '@mui/material/Button';
+import Grid from '@mui/material/Grid';
+import Typography from '@mui/material/Typography';
+import Box from '@mui/material/Box';
+import LinearProgress from '@mui/material/LinearProgress';
+import Stack from '@mui/material/Stack';
 import axios from 'axios';
 import * as turf from '@turf/turf';
-import {
-  Button,
-  Box,
-  Grid,
-  Stack,
-  Typography,
-  LinearProgress,
-  Container,
-} from '@mui/material';
 import { get, set } from '../../store/Store';
 import { AreaErrorModal, TaskFailModal } from './Warnings';
 import Datebox from './Datebox';
@@ -32,6 +29,7 @@ const Biomass = () => {
   const coverCropTerminationDate = useSelector(get.coverCropTerminationDate);
   const biomassTotalValue = useSelector(get.biomassTotalValue);
   const biomassTaskResults = useSelector(get.biomassTaskResults);
+  const unit = useSelector(get.unit);
   const dispatch = useDispatch();
 
   useEffect(() => {
@@ -42,15 +40,15 @@ const Biomass = () => {
       dispatch(set.biomassTaskResults(rasterObject));
     }
   }, [data]);
-
+  // .data_array.map(row => row.map(el => el*0.001))
   useEffect(() => {
     if (biomassTaskResults && biomassTaskResults.data_array) {
-      // console.log('biomass', biomassTaskResults.data_array);
       const flattenedBiomass = biomassTaskResults.data_array.flat(1).filter((el) => el !== 0);
-      const biomassAVG = arrayAverage(flattenedBiomass);
+      const factor = unit === 'lb/ac' ? 1.12085 : 1;
+      const biomassAVG = arrayAverage(flattenedBiomass) * factor;
       dispatch(set.biomassTotalValue(Math.round(biomassAVG, 0)));
     }
-  }, [biomassTaskResults]);
+  }, [biomassTaskResults, unit]);
 
   // useEffect(() => {
   //   dispatch(set.coverCropPlantingDate(coverCropPlantingDate));
@@ -61,7 +59,7 @@ const Biomass = () => {
     if (biomassTotalValue) {
       dispatch(set.biomass(biomassTotalValue));
     }
-  }, [biomassTotalValue]);
+  }, [biomassTotalValue, unit]);
 
   const handleButton = () => {
     dispatch(set.biomassTaskResults({}));
@@ -189,14 +187,15 @@ const Biomass = () => {
             display="flex"
             justifyContent="center"
           >
-            <Box sx={{ border: 1, maxWidth: 200 }}>
-              <Container>
+            <Box sx={{ border: 1, maxWidth: 200, padding: '0.3rem 1.2rem' }}>
+              <Stack direction="column" justifyContent="center" alignItems="center">
                 <Typography variant="h8" gutterBottom>
                   {biomassTotalValue}
-                  &nbsp;
-                  Kg/Ha
                 </Typography>
-              </Container>
+                <Typography variant="h8" gutterBottom>
+                  {unit === 'lb/ac' ? 'lb/ac' : 'kg/ha'}
+                </Typography>
+              </Stack>
             </Box>
           </Grid>
         </Grid>
