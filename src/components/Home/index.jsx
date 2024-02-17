@@ -9,9 +9,9 @@ import NavButton from '../../shared/Navigate/NavButton';
 
 const BiomassMethodButton = styled(ToggleButton)(() => ({
   '&.Mui-selected': {
-    borderRadius: '1rem',
+    borderRadius: '0rem',
     boxShadow: 'none',
-    backgroundColor: 'lightblue',
+    backgroundColor: '#bde0fe',
     color: 'black',
     '&:hover': {
       backgroundColor: 'lightblue',
@@ -19,15 +19,15 @@ const BiomassMethodButton = styled(ToggleButton)(() => ({
     },
   },
   '&:hover': {
-    backgroundColor: 'lightblue',
+    backgroundColor: '#bde0fe',
     color: 'black',
   },
   border: '3px solid black',
-  borderRadius: '1rem',
+  borderRadius: '0rem',
   fontSize: '16px',
   fontWeight: 900,
   padding: '0.5rem',
-  backgroundColor: 'white',
+  backgroundColor: '#ffffff',
   color: 'black',
 }));
 
