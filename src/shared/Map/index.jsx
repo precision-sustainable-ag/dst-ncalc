@@ -1,6 +1,7 @@
+/* eslint-disable react-hooks/exhaustive-deps */
 /* eslint-disable no-console */
 import React, { useState, useEffect } from 'react';
-import mapboxgl from 'mapbox-gl';
+// import mapboxgl from 'mapbox-gl';
 import { useSelector, useDispatch } from 'react-redux';
 import { NcalcMap } from '@psa/dst.ui.ncalc-map';
 import { Paper } from '@mui/material';

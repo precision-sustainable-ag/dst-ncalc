@@ -1,6 +1,8 @@
 import React, { useRef, useState } from 'react';
-import { Icon, Modal, Typography } from '@mui/material';
-import { Box } from '@mui/system';
+import Box from '@mui/material/Box';
+import Icon from '@mui/material/Icon';
+import Modal from '@mui/material/Modal';
+import Typography from '@mui/material/Typography';
 
 import './styles.scss';
 

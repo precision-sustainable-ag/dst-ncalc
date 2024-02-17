@@ -1,3 +1,4 @@
+/* eslint-disable react-hooks/exhaustive-deps */
 /* eslint-disable import/prefer-default-export */
 /* eslint-disable no-console */
 import { useEffect, useState } from 'react';

@@ -1,3 +1,5 @@
+/* eslint-disable react-hooks/exhaustive-deps */
+/* eslint-disable no-console */
 import { useEffect, useState } from 'react';
 import axios from 'axios';
 import moment from 'moment';
