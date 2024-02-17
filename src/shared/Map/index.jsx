@@ -8,7 +8,8 @@ import { Paper } from '@mui/material';
 import { get, set } from '../../store/Store';
 
 // eslint-disable-next-line import/no-webpack-loader-syntax, import/no-unresolved
-mapboxgl.workerClass = require('worker-loader!mapbox-gl/dist/mapbox-gl-csp-worker').default;
+// mapboxgl.workerClass = require('worker-loader!mapbox-gl/dist/mapbox-gl-csp-worker').default;
+// import MapboxWorker from 'worker-loader!mapbox-gl/dist/mapbox-gl-csp-worker';
 
 let removedShapes = new Set();
 
