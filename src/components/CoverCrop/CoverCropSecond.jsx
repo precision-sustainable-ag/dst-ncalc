@@ -20,6 +20,7 @@ const CustomInputText = styled(Typography)({
 const CoverCropSecond = () => {
   const N = useSelector(get.N);
   const navigate = useNavigate();
+  const isSatelliteMode = useSelector(get.biomassCalcMode) === 'satellite';
 
   return (
     <Box
@@ -67,8 +68,9 @@ const CoverCropSecond = () => {
             min={0}
             max={6}
             step={0.1}
+            disabled={isSatelliteMode}
           />
-          {N ? <p className="note">Adjust default values below based on lab results.</p> : ''}
+          {!isSatelliteMode && N ? <p className="note">Adjust default values below based on lab results.</p> : ''}
           <Box mt={2} sx={{ display: 'flex', flexDirection: 'row', alignItems: 'center' }}>
             <CustomInputText>Carbohydrates (%)</CustomInputText>
             <Help>
@@ -87,6 +89,7 @@ const CoverCropSecond = () => {
             min={20}
             max={70}
             step={0.1}
+            disabled={isSatelliteMode}
           />
           <Box mt={2} sx={{ display: 'flex', flexDirection: 'row', alignItems: 'center' }}>
             <CustomInputText>Holo-cellulose (%)</CustomInputText>
@@ -106,6 +109,7 @@ const CoverCropSecond = () => {
             min={20}
             max={70}
             step={0.1}
+            disabled={isSatelliteMode}
           />
           <Box mt={2} sx={{ display: 'flex', flexDirection: 'row', alignItems: 'center' }}>
             <CustomInputText>Lignin (%)</CustomInputText>
@@ -120,6 +124,7 @@ const CoverCropSecond = () => {
             min={1}
             max={10}
             step={0.1}
+            disabled={isSatelliteMode}
           />
         </Box>
         <Box

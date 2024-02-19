@@ -1,25 +1,28 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { useNavigate } from 'react-router-dom';
-import {
-  Radio,
-  RadioGroup,
-  FormControlLabel,
-  Button,
-  Box,
-  Typography,
-  styled,
-  Paper,
-  Stack,
-  Modal,
-} from '@mui/material';
-import CoverCrops from './CoverCrops';
+import Radio from '@mui/material/Radio';
+import RadioGroup from '@mui/material/RadioGroup';
+import FormControlLabel from '@mui/material/FormControlLabel';
+import Typography from '@mui/material/Typography';
+import Box from '@mui/material/Box';
+import Snackbar from '@mui/material/Snackbar';
+import Paper from '@mui/material/Paper';
+import Stack from '@mui/material/Stack';
+import Button from '@mui/material/Button';
+import Modal from '@mui/material/Modal';
+import Alert from '@mui/material/Alert';
+import Slide from '@mui/material/Slide';
+import { styled } from '@mui/material';
 import { get, set } from '../../store/Store';
+import CoverCropsInput from './CoverCropsInput';
+import GrowthStageInput from './GrowthStageInput';
 import Input from '../../shared/Inputs';
 import Myslider from '../../shared/Slider';
 import Help from '../../shared/Help';
 import Biomass from '../../shared/Biomass';
 import NavButton from '../../shared/Navigate/NavButton';
+import { useFetchPlantFactors } from '../../hooks/useFetchApi';
 
 const CustomInputText = styled(Typography)({
   fontSize: '1.2rem',
@@ -50,20 +53,22 @@ const CoverCropFirst = () => {
   const biomassTotalValue = useSelector(get.biomassTotalValue);
   const navigate = useNavigate();
   const mapPolygon = useSelector(get.mapPolygon);
-  const [open, setOpen] = React.useState(true);
+  const [open, setOpen] = useState(true);
+  const [biomassNotExist, setBiomassNotExist] = useState(!isSatelliteMode ? false : (!biomassTotalValue));
 
   const cashCrop = useSelector(get.cashCrop);
+  const coverCropSpecieGroup = useSelector(get.coverCropSpecieGroup);
   console.log('coverCrop', coverCrop);
   console.log('cashCrop', cashCrop);
+  console.log('species', species);
+  console.log('coverCropSpecieGroup', coverCropSpecieGroup);
 
-  if (!species.Grass) {
-    return '';
-  }
+  useFetchPlantFactors();
 
   let warningText;
-  if (coverCrop.length > 1) {
+  if (coverCrop && coverCrop.length > 1) {
     warningText = ' for these particular species';
-  } else if (coverCrop.length) {
+  } else if (coverCrop && coverCrop.length) {
     warningText = ' for this particular species';
   } else {
     warningText = '';
@@ -103,7 +108,15 @@ const CoverCropFirst = () => {
         <Typography variant="h4">Tell us about your Cover Crop</Typography>
         <Stack direction="column" spacing={2} mt={2}>
           <CustomInputText>Cover Crop Species:</CustomInputText>
-          <CoverCrops isSatelliteMode={isSatelliteMode} />
+          <CoverCropsInput isSatelliteMode={isSatelliteMode} />
+          {
+            isSatelliteMode && (
+              <Box>
+                <CustomInputText>Cover Crop Growth Stage:</CustomInputText>
+                <GrowthStageInput isSatelliteMode={isSatelliteMode} />
+              </Box>
+            )
+          }
           {
             isSatelliteMode ? (
               <Paper mt={2}>
@@ -310,6 +323,23 @@ const CoverCropFirst = () => {
           >
             NEXT
           </NavButton>
+          <Snackbar
+            open={biomassNotExist}
+            TransitionComponent={Slide}
+            autoHideDuration={5000}
+            onClose={() => { setBiomassNotExist(false); }}
+          >
+            <Alert
+              onClose={() => { setBiomassNotExist(false); }}
+              severity="warning"
+              variant="filled"
+              sx={{ width: '100%' }}
+            >
+              <Typography variant="subtitle1">
+                Biomass value need to be calculated first
+              </Typography>
+            </Alert>
+          </Snackbar>
         </Box>
       </Box>
     </Box>

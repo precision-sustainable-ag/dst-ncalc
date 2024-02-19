@@ -188,16 +188,19 @@ const Biomass = () => {
             display="flex"
             justifyContent="center"
           >
-            <Box sx={{ border: 1, maxWidth: 200, padding: '0.3rem 1.2rem' }}>
-              <Stack direction="column" justifyContent="center" alignItems="center">
-                <Typography variant="h8" gutterBottom>
-                  {biomassTotalValue}
-                </Typography>
-                <Typography variant="h8" gutterBottom>
-                  {unit === 'lb/ac' ? 'lb/ac' : 'kg/ha'}
-                </Typography>
-              </Stack>
-            </Box>
+            {biomassTotalValue
+              && (
+                <Box sx={{ border: 1, maxWidth: 200, padding: '0.3rem 1.2rem' }}>
+                  <Stack direction="column" justifyContent="center" alignItems="center">
+                    <Typography variant="h8" gutterBottom>
+                      {biomassTotalValue}
+                    </Typography>
+                    <Typography variant="h8" gutterBottom>
+                      {unit === 'lb/ac' ? 'lb/ac' : 'kg/ha'}
+                    </Typography>
+                  </Stack>
+                </Box>
+              )}
           </Grid>
         </Grid>
       </Box>

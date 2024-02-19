@@ -10,6 +10,7 @@ import { weightedAverage } from './helpers';
 const NCAL_API_URL = 'https://api.precisionsustainableag.org/cc-ncalc/surface';
 const SSURGO_API_URL = 'https://ssurgo.covercrop-data.org';
 const WEATHER_API_URL = 'https://weather.covercrop-data.org';
+const PLANTFACTORS_API_URL = 'https://api.covercrop-imagery.org';
 
 /// Desc: useFetchCornN
 /// ..............................................................................
@@ -199,4 +200,116 @@ const useFetchSSURGO = () => {
   }, [updateSSURGO, field]);
 }; // fetchSSURGO
 
-export { useFetchModel, useFetchSSURGO, useFetchCornN };
+// /// Desc: useFetchPlantSpecies
+// /// ..............................................................................
+// /// ..............................................................................
+// //
+
+// const useFetchPlantSpecies = () => {
+//   const dispatch = useDispatch();
+//   const species = useSelector(get.species);
+//   const plantGrowthStages = useSelector(get.plantGrowthStages);
+
+//   useEffect(() => {
+//     if (!species) {
+//       const url = `${PLANTFACTORS_API_URL}/species`;
+//       axios
+//         .get(url)
+//         .then((data) => {
+//           if (data.data) {
+//             dispatch(set.species(data.data));
+//           }
+//         })
+//         .catch((error) => {
+//           console.log(error);
+//         });
+//     }
+//     if (!plantGrowthStages) {
+//       const url = `${PLANTFACTORS_API_URL}/plantgrowthstages`;
+//       axios
+//         .get(url)
+//         .then((data) => {
+//           if (data.data) {
+//             dispatch(set.plantGrowthStages(data.data));
+//           }
+//         })
+//         .catch((error) => {
+//           console.log(error);
+//         });
+//     }
+//   }, [dispatch, species, plantGrowthStages]);
+// }; // useFetchPlantSpecies
+
+/// Desc: useFetchPlantFactors
+/// ..............................................................................
+/// ..............................................................................
+//
+
+const useFetchPlantFactors = () => {
+  const dispatch = useDispatch();
+  const species = useSelector(get.species);
+  const plantGrowthStages = useSelector(get.plantGrowthStages);
+  const coverCrop = useSelector(get.coverCrop);
+  const coverCropGrowthStage = useSelector(get.coverCropGrowthStage);
+  const N = useSelector(get.N);
+  const carb = useSelector(get.carb);
+  const cell = useSelector(get.cell);
+  const lign = useSelector(get.lign);
+
+  useEffect(() => {
+    if (coverCrop && coverCropGrowthStage && !N && !carb && !cell && !lign) {
+      const url = `${PLANTFACTORS_API_URL}/plantfactors/${coverCrop}/${coverCropGrowthStage}`;
+      console.log(url);
+      axios
+        .get(url)
+        .then((data) => {
+          if (data.data) {
+            dispatch(set.N(data.data.nitrogen_percentage));
+            dispatch(set.carb(data.data.carbohydrates_percentage));
+            dispatch(set.cell(data.data.holo_cellulose_percentage));
+            dispatch(set.lign(data.data.lignin_percentage));
+          }
+        })
+        .catch((error) => {
+          console.log(error);
+        });
+    }
+  }, [dispatch, coverCrop, coverCropGrowthStage]);
+
+  useEffect(() => {
+    if (!species) {
+      const url = `${PLANTFACTORS_API_URL}/species`;
+      axios
+        .get(url)
+        .then((data) => {
+          if (data.data) {
+            dispatch(set.species(data.data));
+          }
+        })
+        .catch((error) => {
+          console.log(error);
+        });
+    }
+    if (!plantGrowthStages) {
+      const url = `${PLANTFACTORS_API_URL}/plantgrowthstages`;
+      axios
+        .get(url)
+        .then((data) => {
+          if (data.data) {
+            dispatch(set.plantGrowthStages(data.data));
+          }
+        })
+        .catch((error) => {
+          console.log(error);
+        });
+    }
+  }, [dispatch, species, plantGrowthStages]);
+}; // useFetchPlantFactors
+
+export {
+  useFetchModel,
+  useFetchSSURGO,
+  useFetchCornN,
+  // useFetchPlantSpecies,
+  useFetchPlantFactors,
+};
