@@ -1,3 +1,4 @@
+/* eslint-disable react-hooks/exhaustive-deps */
 import React, { useEffect } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import {
@@ -46,6 +47,10 @@ const Home = () => {
     if (newValue === null) return;
     dispatch(set.biomassCalcMode(newValue));
   };
+
+  useEffect(() => {
+    dispatch(set.coverCrop([]));
+  }, [biomassCalcMode]);
 
   const navigate = useNavigate();
   // const className = privacy ? 'home background' : 'home';

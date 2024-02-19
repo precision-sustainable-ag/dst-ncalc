@@ -244,6 +244,7 @@ const Input = ({
         options={options}
         value={v}
         onChange={(evt, va) => {
+          console.log('onChange', evt, va);
           update(evt, va);
         }}
       />

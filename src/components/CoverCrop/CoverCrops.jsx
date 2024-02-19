@@ -7,8 +7,21 @@ const CoverCrops = ({ isSatelliteMode }) => {
   const species = useSelector(get.species);
   return (
     <Input
-      id="cashCrop"
+      id="coverCrop"
+      multiple={!isSatelliteMode}
       autoFocus
+      getOptionLabel={(obj) => {
+        let label = '';
+        console.log('getOptionLabel', obj);
+        if (obj && typeof obj === 'object') {
+          console.log('getOptionLabel_11', obj);
+          label = obj.value;
+        } else {
+          console.log('getOptionLabel_22', obj);
+          label = obj;
+        }
+        return label;
+      }}
       groupBy={
         (option) => {
           let out;

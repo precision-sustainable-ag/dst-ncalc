@@ -32,8 +32,16 @@ const CustomInputText = styled(Typography)({
 const CoverCropFirst = () => {
   const dispatch = useDispatch();
   const maxBiomass = useSelector(get.maxBiomass);
+  const isSatelliteMode = useSelector(get.biomassCalcMode) === 'satellite';
   const coverCrop = useSelector(get.coverCrop);
-  const max = coverCrop.length ? coverCrop.map((s) => maxBiomass[s]).sort((a, b) => b - a)[0] || 15000 : 15000;
+  // eslint-disable-next-line no-nested-ternary
+  const max = isSatelliteMode
+    ? maxBiomass[coverCrop]
+    : (
+      coverCrop.length && Array.isArray(coverCrop)
+        ? coverCrop.map((s) => maxBiomass[s]).sort((a, b) => b - a)[0] || 15000
+        : 15000
+    );
   const freshMax = max * 4 || 30000;
   const biomass = useSelector(get.biomass);
   const unit = useSelector(get.unit);
@@ -41,9 +49,12 @@ const CoverCropFirst = () => {
   const species = useSelector(get.species);
   const biomassTotalValue = useSelector(get.biomassTotalValue);
   const navigate = useNavigate();
-  const isSatelliteMode = useSelector(get.biomassCalcMode) === 'satellite';
   const mapPolygon = useSelector(get.mapPolygon);
   const [open, setOpen] = React.useState(true);
+
+  const cashCrop = useSelector(get.cashCrop);
+  console.log('coverCrop', coverCrop);
+  console.log('cashCrop', cashCrop);
 
   if (!species.Grass) {
     return '';
