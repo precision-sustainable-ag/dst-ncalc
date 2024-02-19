@@ -1,7 +1,12 @@
 import { Button } from '@mui/material';
 import React from 'react';
 
-const NavButton = ({ children, onClick, disabled = false, fontSize = '1rem' }) => (
+const NavButton = ({
+  children,
+  onClick,
+  disabled = false,
+  fontSize = '1rem',
+}) => (
   <Button
     sx={{
       padding: '0.8rem 1.5rem',
