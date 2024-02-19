@@ -3,12 +3,11 @@ import { useSelector } from 'react-redux';
 import { get } from '../../store/Store';
 import Input from '../../shared/Inputs';
 
-const CoverCrops = () => {
+const CoverCrops = ({ isSatelliteMode }) => {
   const species = useSelector(get.species);
   return (
     <Input
-      multiple
-      id="coverCrop"
+      id="cashCrop"
       autoFocus
       groupBy={
         (option) => {
@@ -33,7 +32,7 @@ const CoverCrops = () => {
         ...species.Brassica,
         ...species.Broadleaf,
       ]}
-      placeholder="Select one or more cover crops"
+      placeholder={isSatelliteMode ? 'Select a cover crop' : 'Select one or more cover crops'}
     />
   );
 }; // CoverCrops

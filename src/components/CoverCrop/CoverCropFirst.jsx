@@ -92,7 +92,7 @@ const CoverCropFirst = () => {
         <Typography variant="h4">Tell us about your Cover Crop</Typography>
         <Stack direction="column" spacing={2} mt={2}>
           <CustomInputText>Cover Crop Species:</CustomInputText>
-          <CoverCrops />
+          <CoverCrops isSatelliteMode={isSatelliteMode} />
           {
             isSatelliteMode ? (
               <Paper mt={2}>
@@ -116,7 +116,7 @@ const CoverCropFirst = () => {
                   </RadioGroup>
                 </Stack>
                 <Biomass minified={false} />
-                {mapPolygon.length === 0 && (
+                {/* {mapPolygon.length === 0 && (
                   <Modal
                     open={open}
                     onClose={() => setOpen(false)}
@@ -179,7 +179,7 @@ const CoverCropFirst = () => {
                       </Box>
                     </Paper>
                   </Modal>
-                )}
+                )} */}
               </Paper>
             ) : (
               <>
