@@ -44,7 +44,8 @@ const Init = ({ handleCloseUserMenu }) => {
       dispatch(set.OM(0.75));
       dispatch(set.BD(1.62));
       dispatch(set.InorganicN(10));
-      dispatch(set.coverCrop(['Rye']));
+      dispatch(set.coverCrop('cereal rye'));
+      dispatch(set.coverCropGrowthStage('stemming'));
       dispatch(set.coverCropPlantingDate('2018-09-01'));
       dispatch(set.coverCropTerminationDate('2019-03-21'));
       dispatch(set.cashCropPlantingDate('2019-04-01'));
@@ -69,7 +70,8 @@ const Init = ({ handleCloseUserMenu }) => {
       dispatch(set.OM(0.75));
       dispatch(set.BD(1.62));
       dispatch(set.InorganicN(10));
-      dispatch(set.coverCrop(['Clover, Crimson']));
+      dispatch(set.coverCrop('clover, crimson'));
+      dispatch(set.coverCropGrowthStage('stemming'));
       dispatch(set.coverCropPlantingDate('2018-10-01'));
       dispatch(set.coverCropTerminationDate('2019-04-27'));
       dispatch(set.cashCropPlantingDate('2019-05-15'));

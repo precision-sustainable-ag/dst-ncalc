@@ -34,6 +34,7 @@ const CustomInputText = styled(Typography)({
 
 const CoverCropFirst = () => {
   const dispatch = useDispatch();
+  const navigate = useNavigate();
   const maxBiomass = useSelector(get.maxBiomass);
   const isSatelliteMode = useSelector(get.biomassCalcMode) === 'satellite';
   const coverCrop = useSelector(get.coverCrop);
@@ -49,19 +50,10 @@ const CoverCropFirst = () => {
   const biomass = useSelector(get.biomass);
   const unit = useSelector(get.unit);
   const freshBiomass = useSelector(get.freshBiomass);
-  const species = useSelector(get.species);
   const biomassTotalValue = useSelector(get.biomassTotalValue);
-  const navigate = useNavigate();
   const mapPolygon = useSelector(get.mapPolygon);
   const [open, setOpen] = useState(true);
   const [biomassNotExist, setBiomassNotExist] = useState(!isSatelliteMode ? false : (!biomassTotalValue));
-
-  const cashCrop = useSelector(get.cashCrop);
-  const coverCropSpecieGroup = useSelector(get.coverCropSpecieGroup);
-  console.log('coverCrop', coverCrop);
-  console.log('cashCrop', cashCrop);
-  console.log('species', species);
-  console.log('coverCropSpecieGroup', coverCropSpecieGroup);
 
   useFetchPlantFactors();
 
@@ -319,7 +311,7 @@ const CoverCropFirst = () => {
           </NavButton>
           <NavButton
             onClick={() => navigate('/covercrop2')}
-            disabled={!isSatelliteMode ? false : (!biomassTotalValue)}
+            // disabled={!isSatelliteMode ? false : (!biomassTotalValue)}
           >
             NEXT
           </NavButton>

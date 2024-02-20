@@ -1,6 +1,6 @@
 /* eslint-disable no-unused-vars */
 /* eslint-disable arrow-body-style */
-import React, { useEffect, useState } from 'react';
+import React from 'react';
 import {
   Button,
   Card,
@@ -14,8 +14,8 @@ import {
   Box,
 } from '@mui/material';
 import { tooltipClasses } from '@mui/material/Tooltip';
-import { useSelector } from 'react-redux';
-import { get } from '../../../store/redux-autosetters';
+// import { useSelector } from 'react-redux';
+// import { get } from '../../../store/redux-autosetters';
 
 /// /// /// STYLES /// /// ///
 const CardStyles = {
@@ -68,7 +68,7 @@ const SummaryItem = ({ name, value, desc }) => {
             :&nbsp;
           </CustomTypography>
         </CustomWidthTooltip>
-        {name === 'Species'
+        {name === 'Species' && value && Array.isArray(value)
           ? (
             <Stack direction="column">
               {

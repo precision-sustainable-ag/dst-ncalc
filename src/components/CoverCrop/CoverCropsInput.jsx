@@ -47,7 +47,8 @@ const CoverCropsInput = ({ isSatelliteMode }) => {
             ...species.broadleaf,
           ]}
           sx={{ width: '100%' }}
-          defaultValue={coverCrop}
+          // defaultValue={coverCrop ? coverCrop : ''}
+          value={coverCrop}
           renderInput={(params) => <TextField {...params} label="Select a cover crop" />}
           onChange={(el, va) => {
             dispatch(set.coverCrop(va));

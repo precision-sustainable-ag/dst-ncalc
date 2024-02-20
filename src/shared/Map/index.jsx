@@ -14,13 +14,14 @@ import { get, set } from '../../store/Store';
 
 let removedShapes = new Set();
 
-const MapComp = () => {
+const MapComp = ({ variant }) => {
   const [address, setAddress] = useState({});
   const [zoom, setZoom] = useState(null);
   const dispatch = useDispatch();
   const lat = useSelector(get.lat);
   const lon = useSelector(get.lon);
   const biomassTaskResults = useSelector(get.biomassTaskResults);
+  const nitrogenTaskResults = useSelector(get.nitrogenTaskResults);
   const mapAddress = useSelector(get.mapAddress);
   const mapZoom = useSelector(get.mapZoom);
   const mapPolygon = useSelector(get.mapPolygon);
@@ -68,7 +69,7 @@ const MapComp = () => {
         setZoom={setZoom}
         setMap={() => { }}
         onDraw={setDrawEvent}
-        initRasterObject={biomassTaskResults}
+        initRasterObject={variant === 'biomass' ? biomassTaskResults : nitrogenTaskResults}
         initFeatures={mapPolygon}
         initWidth="100%"
         initHeight="380px"

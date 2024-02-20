@@ -37,11 +37,22 @@ const MapVisCard = ({ refVal }) => (
         gutterBottom
         textAlign="center"
       >
-        Map Visualization
+        Biomass Map
       </Typography>
       <Biomass />
       <Box sx={{ height: '90%', width: '100%', marginBottom: 5 }}>
-        <Map />
+        <Map variant="biomass" />
+      </Box>
+      <Typography
+        sx={{ fontSize: 22 }}
+        color="text.secondary"
+        gutterBottom
+        textAlign="center"
+      >
+        Nitrogen Map
+      </Typography>
+      <Box sx={{ height: '90%', width: '100%', marginBottom: 5 }}>
+        <Map variant="nitrogen" />
       </Box>
     </CardContent>
   </Card>

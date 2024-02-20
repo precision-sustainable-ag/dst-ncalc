@@ -1,12 +1,14 @@
 import React from 'react';
-import { useSelector } from 'react-redux';
+import { useDispatch, useSelector } from 'react-redux';
 import { useNavigate } from 'react-router-dom';
 import {
+  Autocomplete,
   Box,
+  TextField,
   Typography,
   styled,
 } from '@mui/material';
-import { get } from '../../store/Store';
+import { get, set } from '../../store/Store';
 import Myslider from '../../shared/Slider';
 import Input from '../../shared/Inputs';
 import Help from '../../shared/Help';
@@ -23,16 +25,36 @@ const CustomInputText = styled(Typography)({
 
 const CashCrops = () => {
   /// Desc: Fetch the crop names
+  const dispatch = useDispatch();
   const crops = useFetchCropNames();
+  const cashCrop = useSelector(get.cashCrop);
 
   /// Desc: Return the input component with the crops
   return (
-    <Input
-      id="cashCrop"
-      options={crops}
-      autoFocus
-      placeholder="Start typing your crop, then select from the list"
-    />
+    // <Input
+    //   id="cashCrop"
+    //   options={crops}
+    //   autoFocus
+    //   placeholder="Start typing your crop, then select from the list"
+    // />
+    crops && (
+      <Autocomplete
+        placeholder="Start typing your crop, then select from the list"
+        disablePortal
+        id="combo-box-demo"
+        autoFocus
+        options={[
+          ...crops,
+        ]}
+        sx={{ width: '100%' }}
+        // defaultValue={coverCrop ? coverCrop : ''}
+        value={cashCrop}
+        renderInput={(params) => <TextField {...params} label="Select a cash crop" />}
+        onChange={(el, va) => {
+          dispatch(set.cashCrop(va));
+        }}
+      />
+    )
   );
 }; // CashCrops
 

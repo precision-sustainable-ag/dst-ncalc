@@ -200,46 +200,6 @@ const useFetchSSURGO = () => {
   }, [updateSSURGO, field]);
 }; // fetchSSURGO
 
-// /// Desc: useFetchPlantSpecies
-// /// ..............................................................................
-// /// ..............................................................................
-// //
-
-// const useFetchPlantSpecies = () => {
-//   const dispatch = useDispatch();
-//   const species = useSelector(get.species);
-//   const plantGrowthStages = useSelector(get.plantGrowthStages);
-
-//   useEffect(() => {
-//     if (!species) {
-//       const url = `${PLANTFACTORS_API_URL}/species`;
-//       axios
-//         .get(url)
-//         .then((data) => {
-//           if (data.data) {
-//             dispatch(set.species(data.data));
-//           }
-//         })
-//         .catch((error) => {
-//           console.log(error);
-//         });
-//     }
-//     if (!plantGrowthStages) {
-//       const url = `${PLANTFACTORS_API_URL}/plantgrowthstages`;
-//       axios
-//         .get(url)
-//         .then((data) => {
-//           if (data.data) {
-//             dispatch(set.plantGrowthStages(data.data));
-//           }
-//         })
-//         .catch((error) => {
-//           console.log(error);
-//         });
-//     }
-//   }, [dispatch, species, plantGrowthStages]);
-// }; // useFetchPlantSpecies
-
 /// Desc: useFetchPlantFactors
 /// ..............................................................................
 /// ..............................................................................
@@ -251,17 +211,16 @@ const useFetchPlantFactors = () => {
   const plantGrowthStages = useSelector(get.plantGrowthStages);
   const coverCrop = useSelector(get.coverCrop);
   const coverCropGrowthStage = useSelector(get.coverCropGrowthStage);
-  const N = useSelector(get.N);
-  const carb = useSelector(get.carb);
-  const cell = useSelector(get.cell);
-  const lign = useSelector(get.lign);
+  // const N = useSelector(get.N);
+  // const carb = useSelector(get.carb);
+  // const cell = useSelector(get.cell);
+  // const lign = useSelector(get.lign);
 
   useEffect(() => {
-    if (coverCrop && coverCropGrowthStage && !N && !carb && !cell && !lign) {
-      const url = `${PLANTFACTORS_API_URL}/plantfactors/${coverCrop}/${coverCropGrowthStage}`;
-      console.log(url);
+    if (coverCrop && coverCropGrowthStage) {
+      const url = `${PLANTFACTORS_API_URL}/plantfactors`;
       axios
-        .get(url)
+        .get(url, { params: { plant_specie: coverCrop, growth_stage: coverCropGrowthStage } })
         .then((data) => {
           if (data.data) {
             dispatch(set.N(data.data.nitrogen_percentage));
@@ -310,6 +269,5 @@ export {
   useFetchModel,
   useFetchSSURGO,
   useFetchCornN,
-  // useFetchPlantSpecies,
   useFetchPlantFactors,
 };

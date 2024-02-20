@@ -32,6 +32,8 @@ const CustomizedAccordion = styled(Accordion)(() => ({
 const Location = () => {
   const navigate = useNavigate();
   const isSatelliteMode = useSelector(get.biomassCalcMode) === 'satellite';
+  const biomassTaskResults = useSelector(get.biomassTaskResults);
+  console.log('biomassTaskResults', biomassTaskResults);
 
   return (
     <Box sx={{ width: { xs: '95%', sm: '90%', lg: '70%' } }}>

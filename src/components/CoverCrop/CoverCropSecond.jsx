@@ -54,7 +54,12 @@ const CoverCropSecond = () => {
         }}
       >
         <Typography variant="h4">Tell us about your Cover Crop Quality</Typography>
-
+        {isSatelliteMode
+          && (
+            <Typography variant="subtitle1" fontWeight={900}>
+              These values are estimated based on plant species and growth satge
+            </Typography>
+          )}
         <Box sx={{ width: '90%' }}>
           <Box mt={2} sx={{ display: 'flex', flexDirection: 'row', alignItems: 'center' }}>
             <CustomInputText>Nitrogen (%)</CustomInputText>

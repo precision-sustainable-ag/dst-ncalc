@@ -126,6 +126,7 @@ const initialState = {
   coverCropTerminationDate: coverCropTerminationDate.format('YYYY-MM-DD'),
   cashCropPlantingDate: cashCropPlantingDate.format('YYYY-MM-DD'),
   biomassTaskResults: null,
+  nitrogenTaskResults: null,
   biomassTotalValue: null,
   maxZoom: 20,
   model: {},
