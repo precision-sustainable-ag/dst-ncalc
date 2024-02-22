@@ -1,9 +1,17 @@
 /* eslint-disable no-alert */
 import React from 'react';
-import { Button } from '@mui/material';
+import {
+  Box,
+  Button,
+  Modal,
+  Paper,
+  Typography,
+} from '@mui/material';
 import { useSelector, useDispatch } from 'react-redux';
+import CancelPresentationIcon from '@mui/icons-material/CancelPresentation';
 import Input from '../../shared/Inputs';
 import { get, set } from '../../store/Store';
+import NavButton from '../../shared/Navigate/NavButton';
 
 import './styles.scss';
 
@@ -17,9 +25,9 @@ const Feedback = () => {
   const field = useSelector(get.field);
   const targetN = useSelector(get.targetN);
   const coverCrop = useSelector(get.coverCrop);
-  const killDate = useSelector(get.killDate);
+  const coverCropTerminationDate = useSelector(get.coverCropTerminationDate);
   const cashCrop = useSelector(get.cashCrop);
-  const plantingDate = useSelector(get.plantingDate);
+  const cashCropPlantingDate = useSelector(get.cashCropPlantingDate);
 
   const N = useSelector(get.N);
   const InorganicN = useSelector(get.InorganicN);
@@ -33,6 +41,9 @@ const Feedback = () => {
   const feedback = useSelector(get.feedback);
   const name = useSelector(get.name);
   const email = useSelector(get.email);
+
+  const openFeedbackModal = useSelector(get.openFeedbackModal);
+  const handleCloseModal = () => dispatch(set.openFeedbackModal(false));
 
   const submit = (e) => {
     if (!feedback.trim()) {
@@ -65,9 +76,9 @@ __________________________________
 field        : ${field.replace(/"/g, '')}
 targetN      : ${targetN}
 coverCrop    : ${coverCrop}
-killDate     : ${killDate}
+killDate     : ${coverCropTerminationDate}
 cashCrop     : ${cashCrop}
-plantingDate : ${plantingDate}
+plantingDate : ${cashCropPlantingDate}
 lat          : ${lat}
 lon          : ${lon}
 N            : ${N}
@@ -96,52 +107,80 @@ __________________________________
   }; // submit
 
   return (
-    <div className="feedback">
-      <h2>CC-NCALC Feedback</h2>
-      <br />
-
-      <p>
-        Please provide any comments or suggestions that will help us improve the tool.
-        <br />
-        Include any difficulties you may have encountered while running the program.
-        <br />
-        <br />
-      </p>
-
-      <p>
-        Note that your inputs will be sent to us along with your feedback, in order to help us troubleshoot.
-        Please delete any personal information that you do not wish to share with us.
-        <span style={{ display: 'none' }}>You can attach a screenshot of your feedback below.</span>
-      </p>
-
-      <div
-        id="Feedback"
-        contentEditable
-        placeholder="Enter comments here"
-        // eslint-disable-next-line react/no-danger
-        dangerouslySetInnerHTML={{ __html: feedback }}
-        onBlur={(e) => dispatch(set.feedback(e.currentTarget.innerText.replace(/[\n\r]/g, '<br>')))}
-      />
-
-      <div>
-        <p>Name</p>
-        <Input id="name" />
-
-        <p>Email</p>
-        <Input type="email" id="email" />
-
-        <br />
-        <br />
-        <div>
-          <Button
-            variant="contained"
-            onClick={(e) => submit(e)}
+    <Modal
+      open={openFeedbackModal}
+      onClose={handleCloseModal}
+      aria-labelledby="modal-modal-title"
+      aria-describedby="modal-modal-description"
+      style={{
+        display: 'flex',
+        top: '0%',
+        left: '10%',
+        width: '80vw',
+        alignItems: 'center',
+        justifyContent: 'center',
+      }}
+    >
+      <Paper>
+        <Box
+          sx={{
+            padding: '0rem 2rem',
+            overflow: 'auto',
+            fontFamily: 'monospace !important',
+          }}
+        >
+          <Box
+            sx={{
+              display: 'flex',
+              flexDirection: 'row',
+              minWidth: '100%',
+              justifyContent: 'flex-end',
+              maxHeight: 'auto',
+              p: 0,
+              m: 0,
+              marginLeft: '2rem',
+            }}
           >
-            Submit
-          </Button>
-        </div>
-      </div>
-    </div>
+            <Button size="small" onClick={handleCloseModal}>
+              <CancelPresentationIcon sx={{ fontSize: '2rem' }} />
+            </Button>
+          </Box>
+          <Typography pb="1rem" sx={{ fontSize: '1.2rem', fontWeight: 700 }}>CC-NCALC Feedback</Typography>
+
+          <Typography variant="feedback">
+            Please provide any comments or suggestions that will help us improve the tool.
+          </Typography>
+          <Typography variant="feedback" pb="1rem">
+            Include any difficulties you may have encountered while running the program.
+          </Typography>
+
+          <Typography variant="feedback">
+            Note that your inputs will be sent to us along with your feedback, in order to help us troubleshoot.
+            Please delete any personal information that you do not wish to share with us.
+            <span style={{ display: 'none' }}>You can attach a screenshot of your feedback below.</span>
+          </Typography>
+          <div
+            id="Feedback"
+            contentEditable
+            placeholder="Enter comments here"
+            // eslint-disable-next-line react/no-danger
+            dangerouslySetInnerHTML={{ __html: feedback }}
+            onBlur={(e) => dispatch(set.feedback(e.currentTarget.innerText.replace(/[\n\r]/g, '<br>')))}
+          />
+          <Box>
+            <Typography>Name</Typography>
+            <Input id="name" />
+            <Typography>Email</Typography>
+            <Input type="email" id="email" />
+            <Box py="1rem">
+              <NavButton onClick={(e) => submit(e)}>
+                Submit
+              </NavButton>
+            </Box>
+          </Box>
+        </Box>
+      </Paper>
+    </Modal>
   );
 }; // Feedback
 

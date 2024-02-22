@@ -1,9 +1,12 @@
+/* eslint-disable no-console */
 import React, { useState, useEffect } from 'react';
-import { Map } from '@psa/dst.ui.map';
-import { useSelector, useDispatch } from 'react-redux';
 import mapboxgl from 'mapbox-gl';
+import { useSelector, useDispatch } from 'react-redux';
+import { NcalcMap } from '@psa/dst.ui.ncalc-map';
+import { Paper } from '@mui/material';
+// import { NcalcMap } from './mock/ncalc-map';
 import { get, set } from '../../store/Store';
-import './styles.scss';
+
 // eslint-disable-next-line import/no-webpack-loader-syntax, import/no-unresolved
 mapboxgl.workerClass = require('worker-loader!mapbox-gl/dist/mapbox-gl-csp-worker').default;
 
@@ -15,12 +18,13 @@ const MapComp = () => {
   const dispatch = useDispatch();
   const lat = useSelector(get.lat);
   const lon = useSelector(get.lon);
+  const biomassTaskResults = useSelector(get.biomassTaskResults);
   const mapAddress = useSelector(get.mapAddress);
   const mapZoom = useSelector(get.mapZoom);
   const mapPolygon = useSelector(get.mapPolygon);
   const [features, setFeatures] = useState(mapPolygon);
   const [drawEvent, setDrawEvent] = useState({});
-  // const [removedShapes, setRemovedShapes] = useState(new Set());
+
   // mapAddress
   useEffect(() => {
     if (drawEvent.mode === 'delete') {
@@ -38,11 +42,16 @@ const MapComp = () => {
     dispatch(set.mapType('satellite'));
     if (address.latitude && address.latitude !== lat) {
       dispatch(set.lat(address.latitude));
+      dispatch(set.updateSSURGO(true));
     }
     if (address.longitude && address.longitude !== lon) {
       dispatch(set.lon(address.longitude));
+      dispatch(set.updateSSURGO(true));
     }
-    if (address.address) dispatch(set.mapAddress(address.address));
+    if (address.address) {
+      dispatch(set.mapAddress(address.address));
+      // dispatch(set.updateSSURGO(true));
+    }
   }, [address.latitude, address.longitude, address.address]);
 
   useEffect(() => {
@@ -50,16 +59,18 @@ const MapComp = () => {
   }, [zoom]);
 
   return (
-    <div className="map">
-      <Map
+    <Paper>
+      <NcalcMap
         setAddress={setAddress}
         setFeatures={setFeatures}
         setZoom={setZoom}
+        setMap={() => { }}
         onDraw={setDrawEvent}
+        initRasterObject={biomassTaskResults}
         initFeatures={mapPolygon}
         initWidth="100%"
-        initHeight="400px"
-        initAddress={mapAddress?.address}
+        initHeight="380px"
+        initAddress={mapAddress}
         initLon={lon}
         initLat={lat}
         initStartZoom={mapZoom}
@@ -74,8 +85,14 @@ const MapComp = () => {
         hasFullScreen
         hasMarkerPopup
         hasMarkerMovable
+        scrollZoom
+        dragRotate
+        dragPan
+        keyboard
+        doubleClickZoom={false}
+        touchZoomRotate
       />
-    </div>
+    </Paper>
   );
 };
 

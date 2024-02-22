@@ -1,17 +1,14 @@
 /* eslint-disable no-console */
-import React, { useState } from 'react';
-import { useDispatch, useSelector } from 'react-redux';
-import MenuIcon from '@mui/icons-material/Menu';
-import CloseIcon from '@mui/icons-material/Close';
-import {
-  Route, NavLink, Routes, useNavigate,
-} from 'react-router-dom';
-
-import { get, set } from './store/Store';
-import Help from './shared/Help';
-
-import './App.css';
+import React from 'react';
+import { useSelector } from 'react-redux';
+import { useLocation } from 'react-router-dom';
+import { ThemeProvider, createTheme } from '@mui/material/styles';
+import { Container } from '@mui/material';
+import ResponsiveNavBar from './components/ResponsiveNavBar';
+import Body from './components/Body';
+import './App.scss';
 import 'react-datepicker/dist/react-datepicker.css';
+import { get } from './store/Store';
 
 const screens = {
   init: () => null,
@@ -22,8 +19,8 @@ screens.home = require('./components/Home').default;
 screens.about = require('./components/About').default;
 screens.location = require('./shared/Location').default;
 screens.soil = require('./components/Soil').default;
-screens.covercrop = require('./components/CoverCrop').CoverCrop1;
-screens.covercrop2 = require('./components/CoverCrop').CoverCrop2;
+screens.covercrop = require('./components/CoverCrop').CoverCropFirst;
+screens.covercrop2 = require('./components/CoverCrop').CoverCropSecond;
 screens.cashcrop = require('./components/CashCrop').default;
 screens.output = require('./components/Output').default;
 screens.feedback = require('./components/Feedback').default;
@@ -41,142 +38,50 @@ Object.keys(screens).forEach((key) => {
 
 const holdWarn = console.warn;
 console.warn = (msg, ...subst) => {
-  // Deprecation: moment
-  // Autocomplete: useless warning, which has an overcomplicated isOptionEqualTo solution
-  //               https://github.com/mui/material-ui/issues/29727
-
   if (!/Deprecation|Autocomplete/.test(msg)) {
     holdWarn(msg, ...subst);
   }
 };
 
-const Init = screens.init;
+// const Init = screens.init;
+
+const theme = createTheme({
+  typography: {
+    feedback: {
+      fontFamily: 'IBM Plex Sans',
+      textTransform: 'none',
+      fontSize: '1rem',
+    },
+    about: {
+      fontFamily: 'IBM Plex Sans',
+      textTransform: 'none',
+      fontSize: '1rem',
+    },
+  },
+});
 
 const App = () => {
-  const dispatch = useDispatch();
-  const navigate = useNavigate();
-  const [navModalOpen, setNavModalOpen] = useState(false);
-
   useSelector(get.screen); // force render
-
-  const path = window.location.toString().split('/').pop().toLowerCase() || 'home';
-  const Screen = screens[path] || screens.home;
+  // eslint-disable-next-line no-unused-vars
+  const location = useLocation();
 
   return (
-    <div
-      tabIndex="0"
-      role="button"
-      onKeyDown={(e) => {
-        if (e.key === 'Escape') {
-          dispatch(set.privacy(false));
-        }
-      }}
-      id="Main"
-    >
-      <Help />
-      <Init desktop setNavModalOpen={setNavModalOpen} />
-      {
-        screens.feedback && (
-          <button
-            className="feedback"
-            type="button"
-            onClick={() => navigate('feedback')}
-          >
-            FEEDBACK
-          </button>
-        )
-      }
-
-      <img alt="logo" src="PSALogo.png" id="PSALogo" />
-      <div className="nav-menu-div">
-        <nav className="nav">
-          {
-            Object.keys(screens)
-              .filter((scr) => screens[scr].showInMenu !== false)
-              .map((scr) => (
-                <NavLink
-                  key={scr}
-                  className={scr.toLowerCase()}
-                  onClick={() => dispatch(set.screen(scr))}
-                  style={({ isActive }) => ({
-                    color: isActive ? '#385E1B' : '',
-                  })}
-                  to={`/${scr.toLowerCase()}`}
-                >
-                  {screens[scr].desc || scr}
-                </NavLink>
-              ))
-          }
-        </nav>
-        <MenuIcon
-          className="menu-icon"
-          fontSize="large"
-          onClick={() => setNavModalOpen(true)}
-        />
-        {navModalOpen && (
-          <div className="menu-modal">
-            <CloseIcon
-              className="close-icon"
-              fontSize="large"
-              onClick={() => setNavModalOpen(false)}
-            />
-            <div className="menu-modal-div">
-              {
-              Object.keys(screens)
-                .filter((scr) => screens[scr].showInMenu !== false)
-                .map((scr) => (
-                  <NavLink
-                    key={scr}
-                    className={scr.toLowerCase()}
-                    onClick={() => {
-                      dispatch(set.screen(scr));
-                      setNavModalOpen(false);
-                    }}
-                    style={({ isActive }) => ({
-                      color: isActive ? '#385E1B' : '#fff',
-                    })}
-                    to={`/${scr.toLowerCase()}`}
-                  >
-                    {screens[scr].desc || scr}
-                  </NavLink>
-                ))
-              }
-              {screens.feedback && (
-                <button
-                  type="button"
-                  className="feedback-mobile"
-                  onClick={() => {
-                    setNavModalOpen(false);
-                    navigate('feedback');
-                  }}
-                >
-                  FEEDBACK
-                </button>
-              )}
-              <div>
-                <Init desktop={false} setNavModalOpen={setNavModalOpen} />
-              </div>
-            </div>
-          </div>
-        )}
-      </div>
-
-      <Routes>
-        {
-          Object.keys(screens).map((scr) => (
-            <Route
-              key={scr}
-              path={scr.toLowerCase()}
-              element={<Screen />}
-            />
-          ))
-        }
-        <Route
-          path=""
-          element={<Screen />}
-        />
-      </Routes>
-    </div>
+    <ThemeProvider theme={theme}>
+      <Container
+        // py={50}
+        id="app-container"
+        sx={{
+          minHeight: '99.7vh',
+          minWidth: '100%',
+          backgroundImage: `url(${'/background_0.jpg'})`,
+          backgroundSize: 'cover',
+          backgroundRepeat: 'no-repeat',
+        }}
+      >
+        <ResponsiveNavBar screens={screens} />
+        <Body screens={screens} />
+      </Container>
+    </ThemeProvider>
   );
 }; // App
 

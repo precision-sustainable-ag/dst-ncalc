@@ -123,8 +123,9 @@ export const createStore = (initialState, { afterChange = {}, reducers = {} }) =
             alert(`Error: ${JSON.stringify(payload, null, 2)}`); // eslint-disable-line no-alert
           }
         })
-        .catch(() => {
-          // console.log('api error: ', error);
+        .catch((error) => {
+          // eslint-disable-next-line no-console
+          console.log('api error: ', error);
         });
     });
 

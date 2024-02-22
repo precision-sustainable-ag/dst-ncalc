@@ -25,3 +25,6 @@ yarn-error.log*
 .vscode/*
 .env
 pnpm-lock.yaml
+
+/src/shared/Map/mock
+/src/shared/Map/response.json

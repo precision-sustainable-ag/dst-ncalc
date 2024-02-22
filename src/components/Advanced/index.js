@@ -9,17 +9,17 @@ import { get, missingData } from '../../store/Store';
 import './styles.scss';
 
 const Advanced = () => {
-  const BD = useSelector(get.BD);
-  const N = useSelector(get.N);
-  const killDate = new Date(useSelector(get.killDate));
-  const carb = useSelector(get.carb);
-  const cell = useSelector(get.cell);
-  const lign = useSelector(get.lign);
-  const lwc = useSelector(get.lwc);
-  const biomass = useSelector(get.biomass);
+  // const BD = useSelector(get.BD);
+  // const N = useSelector(get.N);
+  const coverCropTerminationDate = new Date(useSelector(get.coverCropTerminationDate));
+  // const carb = useSelector(get.carb);
+  // const cell = useSelector(get.cell);
+  // const lign = useSelector(get.lign);
+  // const lwc = useSelector(get.lwc);
+  // const biomass = useSelector(get.biomass);
   // const unit = useSelector(get.unit);
-  const InorganicN = useSelector(get.InorganicN);
-  const gotModel = useSelector(get.gotModel);
+  // const InorganicN = useSelector(get.InorganicN);
+  // const gotModel = useSelector(get.gotModel);
   const model = useSelector(get.model);
 
   const navigate = useNavigate();
@@ -30,21 +30,21 @@ const Advanced = () => {
     return '';
   }
 
-  if (!gotModel || !model || !biomass || !N || !carb || !cell || !lign || !lwc || !BD || !InorganicN) {
-    return (
-      <div className="loading">
-        <p>Loading Output</p>
-        <p>Please wait</p>
-        <span />
-        <span />
-        <span />
-      </div>
-    );
-  }
+  // if (!gotModel || !model || !biomass || !N || !carb || !cell || !lign || !lwc || !BD || !InorganicN) {
+  //   return (
+  //     <div className="loading">
+  //       <p>Loading Output</p>
+  //       <p>Please wait</p>
+  //       <span />
+  //       <span />
+  //       <span />
+  //     </div>
+  //   );
+  // }
 
   const factor = 1;
 
-  const minDate = new Date(killDate);
+  const minDate = new Date(coverCropTerminationDate);
   minDate.setHours(0, 0, 0, 0);
 
   Highcharts.setOptions({
@@ -65,7 +65,7 @@ const Advanced = () => {
     const colors = ['#6b9333', 'blue', 'brown'];
     [parm].flat().forEach((parmm, i) => {
       const cdata = [];
-      date = new Date(killDate);
+      date = new Date(coverCropTerminationDate);
       date.setHours(0, 0, 0, 0);
       let total = 0;
       model.s[parmm].forEach((d) => {

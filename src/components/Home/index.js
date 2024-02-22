@@ -1,11 +1,40 @@
-import { useDispatch, useSelector } from 'react-redux';
-import { Link } from 'react-router-dom';
 import React, { useEffect } from 'react';
+import { useDispatch, useSelector } from 'react-redux';
+import {
+  Box, Card, Stack, ToggleButton, ToggleButtonGroup, Typography, styled,
+} from '@mui/material';
+import { useNavigate } from 'react-router-dom';
 import { get, set } from '../../store/Store';
+import NavButton from '../../shared/Navigate/NavButton';
+
+const BiomassMethodButton = styled(ToggleButton)(() => ({
+  '&.Mui-selected': {
+    borderRadius: '1rem',
+    boxShadow: 'none',
+    backgroundColor: 'lightblue',
+    color: 'black',
+    '&:hover': {
+      backgroundColor: 'lightblue',
+      color: 'black',
+    },
+  },
+  '&:hover': {
+    backgroundColor: 'lightblue',
+    color: 'black',
+  },
+  border: '3px solid black',
+  borderRadius: '1rem',
+  fontSize: '16px',
+  fontWeight: 900,
+  padding: '0.5rem',
+  backgroundColor: 'white',
+  color: 'black',
+}));
 
 const Home = () => {
   const dispatch = useDispatch();
-  const privacy = useSelector(get.privacy);
+  // const privacy = useSelector(get.privacy);
+  const biomassCalcMode = useSelector(get.biomassCalcMode);
 
   useEffect(() => {
     if (window.location.toString().includes('PSA')) {
@@ -13,57 +42,77 @@ const Home = () => {
     }
   }, [dispatch]);
 
-  const className = privacy ? 'home background' : 'home';
+  const handleChange = (event, newValue) => {
+    if (newValue === null) return;
+    dispatch(set.biomassCalcMode(newValue));
+  };
+
+  const navigate = useNavigate();
+  // const className = privacy ? 'home background' : 'home';
 
   return (
-    <>
-      <div
-        className={className}
-      >
-        <p>Welcome to the</p>
-        <h1>Cover Crop Nitrogen Calculator (CC-NCALC)</h1>
-
-        <p>
-          This calculator aids farmers with decision support regarding cover crop
-          residue persistence, as well as the amount and timing of nitrogen availability.
-        </p>
-
-        <div className="home-button-container">
-          <Link className="link about" to="/about">ABOUT</Link>
-          <Link className="link location" to="/location">GET STARTED</Link>
-        </div>
-
-        <img className="crops fullwidth" src="background.png" alt="" />
-      </div>
-
-      <div>
-        <button
-          type="button"
-          id="Privacy"
-          className="bn"
-          onClick={() => dispatch(set.privacy(!privacy))}
-        >
-          Your privacy
-        </button>
-        {
-          privacy
-          && (
-          <div id="PrivacyPolicy">
-            <button
-              type="button"
-              className="close"
-              onClick={() => dispatch(set.privacy(false))}
+    <Card
+      maxwidth="lg"
+      sx={{
+        margin: '0% 5% 0% 5%',
+        padding: '5%',
+        boxShadow: 5,
+        borderRadius: 5,
+        opacity: 0.9,
+      }}
+    >
+      <Stack spacing={2} direction="column">
+        <Box>
+          <Typography variant="h4">Welcome to the Cover Crop Nitrogen Calculator (CC-NCALC)</Typography>
+        </Box>
+        <Box>
+          <Typography variant="h6">
+            This calculator aids farmers with decision support regarding
+            cover crop residue persistence, as well as the amount and timing of nitrogen availability.
+          </Typography>
+        </Box>
+      </Stack>
+      <Box sx={{ height: 60 }} />
+      <Stack spacing={2} direction="column">
+        <Stack justifyContent="space-around" alignItems="center" sx={{ flexDirection: { sm: 'column', md: 'row' } }}>
+          <Typography variant="h6"> Select biomass calculation method </Typography>
+          <ToggleButtonGroup
+            color="primary"
+            value={biomassCalcMode}
+            exclusive
+            onChange={handleChange}
+            aria-label="biomassCalcMode"
+          >
+            <BiomassMethodButton
+              value="sampled"
             >
-              x
-            </button>
-            <p>Your information is stored on your computer only.  It will not be uploaded to a server.</p>
-            <p>If you enter a fieldname, you can select it from the upper-right drop down list the next time you run the program.</p>
-            <p>If you clear your browser&apos;s cache, you&apos;ll need to re-enter your data the next time you run the program.</p>
-          </div>
-          )
-        }
-      </div>
-    </>
+              User Sampled
+            </BiomassMethodButton>
+            {/* <Box sx={{ width: 10, borderRight: '2px solid black' }} /> */}
+            <BiomassMethodButton
+              value="satellite"
+            >
+              Satellite
+            </BiomassMethodButton>
+          </ToggleButtonGroup>
+        </Stack>
+      </Stack>
+      <Box sx={{ height: 100 }} />
+      <Stack spacing={2} direction="row" justifyContent="space-around">
+        <NavButton
+          onClick={() => dispatch(set.openAboutModal(true))}
+          fontSize="1rem"
+        >
+          About
+        </NavButton>
+        <NavButton
+          onClick={() => navigate('/location')}
+          fontSize="1rem"
+        >
+          Get Started
+        </NavButton>
+      </Stack>
+    </Card>
   );
 }; // Home
 
