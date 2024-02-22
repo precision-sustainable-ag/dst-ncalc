@@ -4,6 +4,7 @@ import { useNavigate } from 'react-router-dom';
 import {
   Autocomplete,
   Box,
+  Stack,
   TextField,
   Typography,
   styled,
@@ -12,6 +13,7 @@ import { get, set } from '../../store/Store';
 import Myslider from '../../shared/Slider';
 import Input from '../../shared/Inputs';
 import Help from '../../shared/Help';
+import Required from '../../shared/Required';
 import NavButton from '../../shared/Navigate/NavButton';
 import { useFetchCropNames } from '../../hooks/useFetchStatic';
 
@@ -61,6 +63,8 @@ const CashCrops = () => {
 const CashCrop = () => {
   const unit = useSelector(get.unit);
   const cashCrop = useSelector(get.cashCrop);
+  const targetN = useSelector(get.targetN);
+  const cashCropPlantingDate = useSelector(get.cashCropPlantingDate);
   const navigate = useNavigate();
 
   return (
@@ -96,9 +100,11 @@ const CashCrop = () => {
       >
         <Typography variant="h4">Tell us about your Cash Crop</Typography>
         <Box mt={2}>
-          <CustomInputText>Cash Crop: </CustomInputText>
+          <Stack direction="row" alignItems="center">
+            <CustomInputText>Cash Crop: </CustomInputText>
+            {!cashCrop && <Required />}
+          </Stack>
           <CashCrops />
-
           <CustomInputText>Cash Crop Planting Date: </CustomInputText>
           <Input type="date" id="cashCropPlantingDate" />
 
@@ -143,7 +149,10 @@ const CashCrop = () => {
             <NavButton onClick={() => navigate('/covercrop')}>
               BACK
             </NavButton>
-            <NavButton onClick={() => navigate('/output')}>
+            <NavButton
+              onClick={() => navigate('/output')}
+              disabled={!cashCrop || !cashCropPlantingDate || !targetN || targetN <= 0}
+            >
               NEXT
             </NavButton>
           </Box>

@@ -31,10 +31,10 @@ const GrowthStageInput = ({ isSatelliteMode }) => {
                 : 'ERROR',
       ));
     }
-  }, [coverCrop, field]);
+  }, [coverCrop, field, dispatch, species]);
 
   return (
-    isSatelliteMode && coverCrop && coverCropSpecieGroup && plantGrowthStages
+    isSatelliteMode && coverCrop && coverCropSpecieGroup && plantGrowthStages && coverCropSpecieGroup !== 'ERROR'
     && (
       <Autocomplete
         key={updateGrowthStage}

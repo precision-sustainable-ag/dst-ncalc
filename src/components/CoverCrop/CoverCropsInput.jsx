@@ -52,6 +52,7 @@ const CoverCropsInput = ({ isSatelliteMode }) => {
           renderInput={(params) => <TextField {...params} label="Select a cover crop" />}
           onChange={(el, va) => {
             dispatch(set.coverCrop(va));
+            dispatch(set.coverCropGrowthStage(null));
             if (species) {
               dispatch(set.coverCropSpecieGroup(
                 species.brassica.includes(va)

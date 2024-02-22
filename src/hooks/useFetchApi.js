@@ -220,7 +220,7 @@ const useFetchPlantFactors = () => {
     if (coverCrop && coverCropGrowthStage) {
       const url = `${PLANTFACTORS_API_URL}/plantfactors`;
       axios
-        .get(url, { params: { plant_specie: coverCrop, growth_stage: coverCropGrowthStage } })
+        .get(url, { params: { plant_species: coverCrop, growth_stage: coverCropGrowthStage } })
         .then((data) => {
           if (data.data) {
             dispatch(set.N(data.data.nitrogen_percentage));

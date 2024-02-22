@@ -21,6 +21,7 @@ import Input from '../../shared/Inputs';
 import Myslider from '../../shared/Slider';
 import Help from '../../shared/Help';
 import Biomass from '../../shared/Biomass';
+import Required from '../../shared/Required';
 import NavButton from '../../shared/Navigate/NavButton';
 import { useFetchPlantFactors } from '../../hooks/useFetchApi';
 
@@ -54,6 +55,7 @@ const CoverCropFirst = () => {
   const mapPolygon = useSelector(get.mapPolygon);
   const [open, setOpen] = useState(true);
   const [biomassNotExist, setBiomassNotExist] = useState(!isSatelliteMode ? false : (!biomassTotalValue));
+  const coverCropGrowthStage = useSelector(get.coverCropGrowthStage);
 
   useFetchPlantFactors();
 
@@ -99,12 +101,18 @@ const CoverCropFirst = () => {
       >
         <Typography variant="h4">Tell us about your Cover Crop</Typography>
         <Stack direction="column" spacing={2} mt={2}>
-          <CustomInputText>Cover Crop Species:</CustomInputText>
+          <Stack direction="row" alignItems="center">
+            <CustomInputText>Cover Crop Species:</CustomInputText>
+            {!coverCrop && <Required />}
+          </Stack>
           <CoverCropsInput isSatelliteMode={isSatelliteMode} />
           {
-            isSatelliteMode && (
+            isSatelliteMode && coverCrop && (
               <Box>
-                <CustomInputText>Cover Crop Growth Stage:</CustomInputText>
+                <Stack direction="row" alignItems="center">
+                  <CustomInputText>Cover Crop Growth Stage:</CustomInputText>
+                  {!coverCropGrowthStage && <Required />}
+                </Stack>
                 <GrowthStageInput isSatelliteMode={isSatelliteMode} />
               </Box>
             )
@@ -311,7 +319,7 @@ const CoverCropFirst = () => {
           </NavButton>
           <NavButton
             onClick={() => navigate('/covercrop2')}
-            // disabled={!isSatelliteMode ? false : (!biomassTotalValue)}
+            disabled={!isSatelliteMode ? false : (!biomassTotalValue || !coverCrop || !coverCropGrowthStage)}
           >
             NEXT
           </NavButton>
