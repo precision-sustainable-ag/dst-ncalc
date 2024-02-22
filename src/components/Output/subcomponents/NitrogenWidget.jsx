@@ -1,6 +1,6 @@
 /* eslint-disable react-hooks/exhaustive-deps */
 /* eslint-disable no-console */
-import React, { useEffect } from 'react';
+import React, { useEffect, useRef } from 'react';
 import {
   Card,
   CardActions,
@@ -9,6 +9,7 @@ import {
   Typography,
   Divider,
   Container,
+  Box,
 } from '@mui/material';
 import Highcharts from 'highcharts';
 import HighchartsReact from 'highcharts-react-official';
@@ -45,12 +46,10 @@ const dividerStyles = {
 
 const HighChartsContainerProps = {
   style: {
-    // border: '1px solid red',
+    // border: '2px solid red',
     minWidth: '100%',
   },
 };
-
-/// /// /// COMPONENTS /// /// ///
 
 /// /// /// RETURN JSX /// /// ///
 const NitrogenCard = ({ refVal }) => {
@@ -78,6 +77,8 @@ const NitrogenCard = ({ refVal }) => {
   const lwc = useSelector(get.lwc);
   const BD = useSelector(get.BD);
   const InorganicN = useSelector(get.InorganicN);
+  const chartRef1 = useRef(null);
+  const chartRef2 = useRef(null);
 
   // /// /// HOOKS /// ///
   cornN = useFetchCornN();
@@ -131,6 +132,18 @@ const NitrogenCard = ({ refVal }) => {
     dispatch(set.dates(dates));
   }, [dates]);
 
+  useEffect(() => {
+    if (chartRef1.current && chartRef2.current) {
+      if (!surfaceData || surfaceData.length === 0) {
+        chartRef1.current.chart.showLoading();
+        chartRef2.current.chart.showLoading();
+      } else {
+        chartRef1.current.chart.hideLoading();
+        chartRef2.current.chart.hideLoading();
+      }
+    }
+  }, [surfaceData, incorporatedData]);
+
   return (
     <Card sx={CardStyles} elevation={8} ref={refVal}>
       <CardContent sx={cardContentStyles}>
@@ -173,27 +186,32 @@ const NitrogenCard = ({ refVal }) => {
                 </Typography>
               </Container>
             )}
-          <HighchartsReact
-            containerProps={HighChartsContainerProps}
-            highcharts={Highcharts}
-            options={getGeneralChartOptions({
-              mockup,
-              outputN,
-              doCornN: cashCrop ? cashCrop.toLowerCase() === 'corn' : false,
-              unit,
-              minDate,
-              NUptake,
-              surfaceData,
-              doIncorporated,
-              incorporatedData,
-              cashCropPlantingDate,
-              maxSurface,
-              N,
-              biomass,
-            })}
-          />
+          <Box sx={{ width: '100%' }}>
+            <HighchartsReact
+              ref={chartRef1}
+              containerProps={HighChartsContainerProps}
+              highcharts={Highcharts}
+              showLoading
+              options={getGeneralChartOptions({
+                mockup,
+                outputN,
+                doCornN: cashCrop ? cashCrop.toLowerCase() === 'corn' : false,
+                unit,
+                minDate,
+                NUptake,
+                surfaceData,
+                doIncorporated,
+                incorporatedData,
+                cashCropPlantingDate,
+                maxSurface,
+                N,
+                biomass,
+              })}
+            />
+          </Box>
           <Divider orientation="horizontal" sx={dividerStyles} />
           <HighchartsReact
+            ref={chartRef2}
             containerProps={HighChartsContainerProps}
             highcharts={Highcharts}
             options={getNitrogenChartOptions({

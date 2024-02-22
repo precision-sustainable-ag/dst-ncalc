@@ -64,6 +64,7 @@ const CashCrop = () => {
   const unit = useSelector(get.unit);
   const cashCrop = useSelector(get.cashCrop);
   const targetN = useSelector(get.targetN);
+  const Yield = useSelector(get.yield);
   const cashCropPlantingDate = useSelector(get.cashCropPlantingDate);
   const navigate = useNavigate();
 
@@ -105,13 +106,19 @@ const CashCrop = () => {
             {!cashCrop && <Required />}
           </Stack>
           <CashCrops />
-          <CustomInputText>Cash Crop Planting Date: </CustomInputText>
+          <Stack direction="row" alignItems="center">
+            <CustomInputText>Cash Crop Planting Date: </CustomInputText>
+            {(!cashCropPlantingDate) && <Required />}
+          </Stack>
           <Input type="date" id="cashCropPlantingDate" />
 
           {cashCrop === 'Corn'
             && (
               <Box mt={2}>
-                <CustomInputText>Yield Goal (bu/ac):</CustomInputText>
+                <Stack direction="row" alignItems="center">
+                  <CustomInputText>Yield Goal (bu/ac):</CustomInputText>
+                  {(!Yield || Yield <= 0) && <Required />}
+                </Stack>
                 <Myslider
                   id="yield"
                   min={0}
@@ -121,14 +128,17 @@ const CashCrop = () => {
             )}
 
           <Box mt={2} sx={{ display: 'flex', flexDirection: 'row', alignItems: 'center' }}>
-            <CustomInputText>
-              What is your Target Nitrogen Fertilizer Rate? (
-              {unit}
-              ):
-            </CustomInputText>
-            <Help>
-              Please specify the target N rate for your region.
-            </Help>
+            <Stack direction="row" alignItems="center">
+              <CustomInputText>
+                What is your Target Nitrogen Fertilizer Rate? (
+                {unit}
+                ):
+              </CustomInputText>
+              <Help>
+                Specify the target N rate for your region.
+              </Help>
+              {(!targetN || targetN <= 0) && <Required />}
+            </Stack>
           </Box>
 
           <Myslider
@@ -151,7 +161,7 @@ const CashCrop = () => {
             </NavButton>
             <NavButton
               onClick={() => navigate('/output')}
-              disabled={!cashCrop || !cashCropPlantingDate || !targetN || targetN <= 0}
+              disabled={!cashCrop || !cashCropPlantingDate || !targetN || targetN < 0 || !Yield || Yield < 0}
             >
               NEXT
             </NavButton>

@@ -3,10 +3,11 @@ import { useSelector } from 'react-redux';
 import { useNavigate } from 'react-router-dom';
 import Box from '@mui/material/Box';
 import Typography from '@mui/material/Typography';
-import { styled } from '@mui/material';
+import { Stack, styled } from '@mui/material';
 import { get } from '../../store/Store';
 import Myslider from '../../shared/Slider';
 import Help from '../../shared/Help';
+import Required from '../../shared/Required';
 import NavButton from '../../shared/Navigate/NavButton';
 
 const CustomInputText = styled(Typography)({
@@ -18,8 +19,11 @@ const CustomInputText = styled(Typography)({
 });
 
 const CoverCropSecond = () => {
-  const N = useSelector(get.N);
   const navigate = useNavigate();
+  const N = useSelector(get.N);
+  const carb = useSelector(get.carb);
+  const cell = useSelector(get.cell);
+  const lign = useSelector(get.lign);
   const isSatelliteMode = useSelector(get.biomassCalcMode) === 'satellite';
 
   return (
@@ -62,10 +66,13 @@ const CoverCropSecond = () => {
           )}
         <Box sx={{ width: '90%' }}>
           <Box mt={2} sx={{ display: 'flex', flexDirection: 'row', alignItems: 'center' }}>
-            <CustomInputText>Nitrogen (%)</CustomInputText>
-            <Help>
-              Cover crop nitrogen concentration based on lab results.
-            </Help>
+            <Stack direction="row" alignItems="center">
+              <CustomInputText>Nitrogen (%)</CustomInputText>
+              <Help>
+                Cover crop nitrogen concentration based on lab results.
+              </Help>
+              {!N && <Required />}
+            </Stack>
             :
           </Box>
           <Myslider
@@ -77,16 +84,19 @@ const CoverCropSecond = () => {
           />
           {!isSatelliteMode && N ? <p className="note">Adjust default values below based on lab results.</p> : ''}
           <Box mt={2} sx={{ display: 'flex', flexDirection: 'row', alignItems: 'center' }}>
-            <CustomInputText>Carbohydrates (%)</CustomInputText>
-            <Help>
-              <p>
-                Non-structural labile carbohydrate concentration based on lab results. This represents the most
-                readily decomposable C constituents in plant materials.
-              </p>
-              <p>The default value is based on the nitrogen concentration.</p>
-              <p>If you have the raw data from near infra-red reflectance spectroscopy (NIRS) analysis, use the following equation:</p>
-              <p>carbohydrates (%) = % crude protein (CP) + % fat + % non-fibrous carbohydrates (NFC)</p>
-            </Help>
+            <Stack direction="row" alignItems="center">
+              <CustomInputText>Carbohydrates (%)</CustomInputText>
+              <Help>
+                <p>
+                  Non-structural labile carbohydrate concentration based on lab results. This represents the most
+                  readily decomposable C constituents in plant materials.
+                </p>
+                <p>The default value is based on the nitrogen concentration.</p>
+                <p>If you have the raw data from near infra-red reflectance spectroscopy (NIRS) analysis, use the following equation:</p>
+                <p>carbohydrates (%) = % crude protein (CP) + % fat + % non-fibrous carbohydrates (NFC)</p>
+              </Help>
+              {!carb && <Required />}
+            </Stack>
             :
           </Box>
           <Myslider
@@ -97,16 +107,19 @@ const CoverCropSecond = () => {
             disabled={isSatelliteMode}
           />
           <Box mt={2} sx={{ display: 'flex', flexDirection: 'row', alignItems: 'center' }}>
-            <CustomInputText>Holo-cellulose (%)</CustomInputText>
-            <Help>
-              <p>
-                Structural holo-cellulose (i.e., both cellulose and hemi-cellulose) concentration
-                based on lab results. This represents the moderately decomposable C constituents in plant materials.
-              </p>
-              <p>The default value is based on the nitrogen concentration.</p>
-              <p>If you have the raw data from near infra-red reflectance spectroscopy (NIRS) analysis, use the following equation:</p>
-              <p>holo-cellulose (%) = % neutral detergent fiber (NDF) – (% lignin + % ash)</p>
-            </Help>
+            <Stack direction="row" alignItems="center">
+              <CustomInputText>Holo-cellulose (%)</CustomInputText>
+              <Help>
+                <p>
+                  Structural holo-cellulose (i.e., both cellulose and hemi-cellulose) concentration
+                  based on lab results. This represents the moderately decomposable C constituents in plant materials.
+                </p>
+                <p>The default value is based on the nitrogen concentration.</p>
+                <p>If you have the raw data from near infra-red reflectance spectroscopy (NIRS) analysis, use the following equation:</p>
+                <p>holo-cellulose (%) = % neutral detergent fiber (NDF) – (% lignin + % ash)</p>
+              </Help>
+              {!cell && <Required />}
+            </Stack>
             :
           </Box>
           <Myslider
@@ -117,11 +130,14 @@ const CoverCropSecond = () => {
             disabled={isSatelliteMode}
           />
           <Box mt={2} sx={{ display: 'flex', flexDirection: 'row', alignItems: 'center' }}>
-            <CustomInputText>Lignin (%)</CustomInputText>
-            <Help>
-              <p>Structural lignin concentration based on lab results. This represents the most recalcitrant C constituents in plant materials.</p>
-              <p>The default value is based on the nitrogen concentration.</p>
-            </Help>
+            <Stack direction="row" alignItems="center">
+              <CustomInputText>Lignin (%)</CustomInputText>
+              <Help>
+                <p>Structural lignin concentration based on lab results. This represents the most recalcitrant C constituents in plant materials.</p>
+                <p>The default value is based on the nitrogen concentration.</p>
+              </Help>
+              {!lign && <Required />}
+            </Stack>
             :
           </Box>
           <Myslider
@@ -145,7 +161,10 @@ const CoverCropSecond = () => {
           <NavButton onClick={() => navigate('/covercrop')}>
             BACK
           </NavButton>
-          <NavButton onClick={() => navigate('/cashcrop')}>
+          <NavButton
+            onClick={() => navigate('/cashcrop')}
+            disabled={!N || !carb || !cell || !lign}
+          >
             NEXT
           </NavButton>
         </Box>

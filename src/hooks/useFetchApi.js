@@ -265,9 +265,51 @@ const useFetchPlantFactors = () => {
   }, [dispatch, species, plantGrowthStages]);
 }; // useFetchPlantFactors
 
+/// Desc: useFetchNitrogenArray
+/// ..............................................................................
+/// ..............................................................................
+//
+
+const useFetchNitrogenArray = () => {
+  const dispatch = useDispatch();
+  const N = useSelector(get.N);
+  const carb = useSelector(get.carb);
+  const cell = useSelector(get.cell);
+  const lign = useSelector(get.lign);
+  const biomassTaskResults = useSelector(get.biomassTaskResults);
+  // const nitrogenTaskResults = useSelector(get.nitrogenTaskResults);
+
+  useEffect(() => {
+    if (biomassTaskResults && N && carb && cell && lign) {
+      console.log('biomassTaskResults', biomassTaskResults);
+      const url = `${PLANTFACTORS_API_URL}/nitrogen`;
+      const payload = {
+        nitrogen_percentage: N,
+        carbohydrates_percentage: carb,
+        holo_cellulose_percentage: cell,
+        lignin_percentage: lign,
+        data_array: biomassTaskResults.data_array,
+        bbox: biomassTaskResults.bbox,
+      };
+      console.log('payload', payload);
+      axios
+        .post(url, payload)
+        .then((response) => {
+          if (response.data) {
+            dispatch(set.nitrogenTaskResults(response.data));
+          }
+        })
+        .catch((error) => {
+          console.log(error);
+        });
+    }
+  }, [dispatch, biomassTaskResults, N, carb, cell, lign]);
+}; // useFetchNitrogenArray
+
 export {
   useFetchModel,
   useFetchSSURGO,
   useFetchCornN,
   useFetchPlantFactors,
+  useFetchNitrogenArray,
 };

@@ -11,7 +11,7 @@ import {
 } from '@mui/material';
 import Highcharts from 'highcharts';
 import HighchartsReact from 'highcharts-react-official';
-import React from 'react';
+import React, { useEffect, useRef } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import {
   getGeneralChartOptions,
@@ -74,6 +74,8 @@ const ResidueCard = ({ refVal }) => {
   const lwc = useSelector(get.lwc);
   const BD = useSelector(get.BD);
   const InorganicN = useSelector(get.InorganicN);
+  const chartRef1 = useRef(null);
+  const chartRef2 = useRef(null);
 
   // /// /// HOOKS /// ///
 
@@ -121,6 +123,18 @@ const ResidueCard = ({ refVal }) => {
     N,
   });
 
+  useEffect(() => {
+    if (chartRef1.current && chartRef2.current) {
+      if (!surfaceData || surfaceData.length === 0) {
+        chartRef1.current.chart.showLoading();
+        chartRef2.current.chart.showLoading();
+      } else {
+        chartRef1.current.chart.hideLoading();
+        chartRef2.current.chart.hideLoading();
+      }
+    }
+  }, [surfaceData, incorporatedData]);
+
   return (
     <Card sx={CardStyles} elevation={8} ref={refVal}>
       <CardContent sx={cardContentStyles}>
@@ -164,6 +178,7 @@ const ResidueCard = ({ refVal }) => {
               </Container>
             )}
           <HighchartsReact
+            ref={chartRef1}
             containerProps={HighChartsContainerProps}
             highcharts={Highcharts}
             options={getGeneralChartOptions({
@@ -182,6 +197,7 @@ const ResidueCard = ({ refVal }) => {
           />
           <Divider orientation="horizontal" sx={dividerStyles} />
           <HighchartsReact
+            ref={chartRef2}
             containerProps={HighChartsContainerProps}
             highcharts={Highcharts}
             options={getResidueChartOptions({

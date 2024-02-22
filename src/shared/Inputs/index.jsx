@@ -254,7 +254,7 @@ const Input = ({
       <TextField
         {...props}
         id={id}
-        value={v === undefined ? '' : v} // https://github.com/facebook/react/issues/6222
+        value={v === undefined || v === null ? '' : v} // https://github.com/facebook/react/issues/6222
         onFocus={(e) => e.target.select()}
         size="small"
         type={/dollar|percent/.test(type) ? 'number' : type || 'text'}
@@ -289,10 +289,10 @@ const Input = ({
           change(e.target.value);
           if (
             immediate
-              || (e.target.form
-                && (e.target.form.getAttribute('options') || '').includes(
-                  'immediate',
-                ))
+            || (e.target.form
+              && (e.target.form.getAttribute('options') || '').includes(
+                'immediate',
+              ))
           ) {
             update(e, e.target.value);
           }
@@ -301,10 +301,10 @@ const Input = ({
           if (
             !(
               immediate
-                || (e.target.form
-                  && (e.target.form.getAttribute('options') || '').includes(
-                    'immediate',
-                  ))
+              || (e.target.form
+                && (e.target.form.getAttribute('options') || '').includes(
+                  'immediate',
+                ))
             )
           ) {
             update(e, e.target.value);

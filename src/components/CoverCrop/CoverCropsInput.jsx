@@ -77,13 +77,13 @@ const CoverCropsInput = ({ isSatelliteMode }) => {
           groupBy={
             (option) => {
               let out;
-              if (species.Brassica.includes(option)) {
+              if (species.brassica.includes(option)) {
                 out = 'Brassica';
-              } else if (species.Broadleaf.includes(option)) {
+              } else if (species.broadleaf.includes(option)) {
                 out = 'Broadleaf';
-              } else if (species.Grass.includes(option)) {
+              } else if (species.grass.includes(option)) {
                 out = 'Grass';
-              } else if (species.Legume.includes(option)) {
+              } else if (species.legume.includes(option)) {
                 out = 'Legume';
               } else {
                 out = 'ERROR';
@@ -92,10 +92,10 @@ const CoverCropsInput = ({ isSatelliteMode }) => {
             }
           }
           options={[
-            ...species.Grass,
-            ...species.Legume,
-            ...species.Brassica,
-            ...species.Broadleaf,
+            ...species.grass,
+            ...species.legume,
+            ...species.brassica,
+            ...species.broadleaf,
           ]}
           placeholder="Select one or more cover crops"
         />

@@ -9,6 +9,7 @@ import LeftSideBar from './subcomponents/LeftSideBar';
 import RightSideBar from './subcomponents/RightSideBar';
 import { get } from '../../store/redux-autosetters';
 import useStoreMem from '../../hooks/useStoreMem';
+import { useFetchNitrogenArray } from '../../hooks/useFetchApi';
 
 const wrapperStyles = {
   width: '100%',
@@ -110,6 +111,7 @@ const Output = () => {
   const unit = useSelector(get.unit);
 
   useStoreMem();
+  useFetchNitrogenArray();
 
   useEffect(() => {
     const tempSummaryData = { ...summaryData };

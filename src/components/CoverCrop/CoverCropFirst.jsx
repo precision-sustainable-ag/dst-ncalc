@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { useNavigate } from 'react-router-dom';
 import Radio from '@mui/material/Radio';
@@ -24,6 +24,8 @@ import Biomass from '../../shared/Biomass';
 import Required from '../../shared/Required';
 import NavButton from '../../shared/Navigate/NavButton';
 import { useFetchPlantFactors } from '../../hooks/useFetchApi';
+
+const UGA_LINK = 'https://extension.uga.edu/publications/detail.html?number=C1077';
 
 const CustomInputText = styled(Typography)({
   fontSize: '1.2rem',
@@ -56,9 +58,14 @@ const CoverCropFirst = () => {
   const [open, setOpen] = useState(true);
   const [biomassNotExist, setBiomassNotExist] = useState(!isSatelliteMode ? false : (!biomassTotalValue));
   const coverCropGrowthStage = useSelector(get.coverCropGrowthStage);
+  const coverCropTerminationDate = useSelector(get.coverCropTerminationDate);
+  const lwc = useSelector(get.lwc);
+  const [disableNextButton, setDisableNextButton] = useState(true);
 
+  /// Desc: Fetch the plant factors
   useFetchPlantFactors();
 
+  /// Desc: Set the warning text
   let warningText;
   if (coverCrop && coverCrop.length > 1) {
     warningText = ' for these particular species';
@@ -67,6 +74,15 @@ const CoverCropFirst = () => {
   } else {
     warningText = '';
   }
+
+  /// Desc: Set the disableNextButton state
+  useEffect(() => {
+    if (isSatelliteMode) {
+      setDisableNextButton((!biomassTotalValue || !coverCrop || !coverCropGrowthStage));
+    } else {
+      setDisableNextButton(!biomass || coverCrop.length === 0 || !coverCropTerminationDate || !lwc);
+    }
+  }, [isSatelliteMode, biomass, coverCrop, coverCropGrowthStage, coverCropTerminationDate, lwc, biomassTotalValue]);
 
   return (
     <Box
@@ -103,7 +119,7 @@ const CoverCropFirst = () => {
         <Stack direction="column" spacing={2} mt={2}>
           <Stack direction="row" alignItems="center">
             <CustomInputText>Cover Crop Species:</CustomInputText>
-            {!coverCrop && <Required />}
+            {(!coverCrop || coverCrop.length === 0) && <Required />}
           </Stack>
           <CoverCropsInput isSatelliteMode={isSatelliteMode} />
           {
@@ -207,7 +223,10 @@ const CoverCropFirst = () => {
               </Paper>
             ) : (
               <>
-                <CustomInputText>Cover Crop Termination Date:</CustomInputText>
+                <Stack direction="row" alignItems="center">
+                  <CustomInputText>Cover Crop Termination Date:</CustomInputText>
+                  {(!coverCropTerminationDate) && <Required />}
+                </Stack>
                 <Input type="date" id="coverCropTerminationDate" />
               </>
             )
@@ -215,15 +234,18 @@ const CoverCropFirst = () => {
           {isSatelliteMode ? '' : (
             <>
               <Box mt={1} sx={{ display: 'flex', flexDirection: 'row', alignItems: 'center' }}>
-                <CustomInputText>Dry Biomass </CustomInputText>
-                <Help>
-                  <p>The amount of cover crop biomass on a dry weight basis.</p>
-                  <p>
-                    For details on cover crop biomass sampling and taking a representative sub-sample for quality analysis, please refer to
-                    <a tabIndex="-1" target="_blank" rel="noreferrer" href="https://extension.uga.edu/publications/detail.html?number=C1077">here</a>
-                    .
-                  </p>
-                </Help>
+                <Stack direction="row" alignItems="center">
+                  <CustomInputText>Dry Biomass </CustomInputText>
+                  <Help>
+                    <p>The amount of cover crop biomass on a dry weight basis.</p>
+                    <p>
+                      For details on cover crop biomass sampling and taking a representative sub-sample for quality analysis, please refer to
+                      <a tabIndex="-1" target="_blank" rel="noreferrer" href={UGA_LINK}>here</a>
+                      .
+                    </p>
+                  </Help>
+                  {!biomass && <Required />}
+                </Stack>
                 :
                 <RadioGroup row aria-label="position" name="position" style={{ display: 'inline-block', marginLeft: '1em' }}>
                   <FormControlLabel
@@ -257,25 +279,6 @@ const CoverCropFirst = () => {
                     Please make sure the biomass entered is on a dry matter basis.
                   </p>
                 )}
-
-              <Box mt={2} sx={{ display: 'flex', flexDirection: 'row', alignItems: 'center' }}>
-                <CustomInputText>Fresh Biomass </CustomInputText>
-                <Help>
-                  <p>The amount of cover crop biomass on a wet weight basis.</p>
-                  <p>
-                    For details on cover crop biomass sampling and taking a representative sub-sample for quality analysis, please refer to
-                    <a tabIndex="-1" target="_blank" rel="noreferrer" href="https://extension.uga.edu/publications/detail.html?number=C1077">here</a>
-                    .
-                  </p>
-                </Help>
-              </Box>
-
-              <Myslider
-                id="freshBiomass"
-                min={0}
-                max={freshMax}
-              />
-
               {+freshBiomass > +freshMax
                 && (
                   <p className="warning">
@@ -288,11 +291,14 @@ const CoverCropFirst = () => {
                 )}
 
               <Box mt={2} sx={{ display: 'flex', flexDirection: 'row', alignItems: 'center' }}>
-                <CustomInputText>Cover Crop Water Content at Termination (g water/g dry biomass)</CustomInputText>
-                <Help>
-                  <p>Use the following calculation to adjust default values:</p>
-                  <p>Cover Crop Water Content = (Total fresh weight - Total dry weight)/(Total dry weight)</p>
-                </Help>
+                <Stack direction="row" alignItems="center">
+                  <CustomInputText>Cover Crop Water Content at Termination (g water/g dry biomass)</CustomInputText>
+                  <Help>
+                    <p>Use the following calculation to adjust default values:</p>
+                    <p>Cover Crop Water Content = (Total fresh weight - Total dry weight)/(Total dry weight)</p>
+                  </Help>
+                  {!lwc && <Required />}
+                </Stack>
                 :
               </Box>
               <Myslider
@@ -319,7 +325,7 @@ const CoverCropFirst = () => {
           </NavButton>
           <NavButton
             onClick={() => navigate('/covercrop2')}
-            disabled={!isSatelliteMode ? false : (!biomassTotalValue || !coverCrop || !coverCropGrowthStage)}
+            disabled={disableNextButton}
           >
             NEXT
           </NavButton>
