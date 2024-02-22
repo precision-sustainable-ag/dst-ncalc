@@ -152,7 +152,7 @@ const initialState = {
   errorModel: false,
   errorCorn: false,
   edited: false,
-  activeExample: null,
+  activeExample: true,
   site: '',
   sites: [],
   data: '',

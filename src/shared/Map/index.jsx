@@ -25,6 +25,7 @@ const MapComp = ({ variant }) => {
   const mapAddress = useSelector(get.mapAddress);
   const mapZoom = useSelector(get.mapZoom);
   const mapPolygon = useSelector(get.mapPolygon);
+  const unit = useSelector(get.unit);
   const [features, setFeatures] = useState(mapPolygon);
   const [drawEvent, setDrawEvent] = useState({});
 
@@ -71,6 +72,7 @@ const MapComp = ({ variant }) => {
         onDraw={setDrawEvent}
         initRasterObject={variant === 'biomass' ? biomassTaskResults : nitrogenTaskResults}
         initFeatures={mapPolygon}
+        unit={unit}
         initWidth="100%"
         initHeight="380px"
         initAddress={mapAddress}
