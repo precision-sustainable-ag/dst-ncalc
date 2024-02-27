@@ -1,13 +1,14 @@
 /* eslint-disable no-console */
 import React from 'react';
 import { Box, Grid } from '@mui/material';
-import { useSelector } from 'react-redux';
+import { useSelector, useDispatch } from 'react-redux';
 import NitrogenCard from './NitrogenWidget';
 import ResidueCard from './ResidueWidget';
-import MapVisCard from './MapVisWidget';
+import BiomassMapWidget from './BiomassMapWidget';
 import { SummaryCard } from './SummaryWidget';
 import { get } from '../../../store/redux-autosetters';
 import NavigateButtons from '../../../shared/Navigate';
+import NitrogenMapWidget from './NitrogenMapWidget';
 
 /// /// /// STYLES /// /// ///
 const wrapperStyles = {
@@ -22,6 +23,9 @@ const RightSideBar = ({ summaryData, refs }) => {
   /// /// /// VARIABLES /// /// ///
   // if (!model) return <Loading />;
   const isSatelliteMode = useSelector(get.biomassCalcMode) === 'satellite';
+  useSelector(get.screen); // force render
+  useSelector(get.biomassTaskResults); // force render
+  useSelector(get.nitrogenTaskResults); // force render
 
   /// /// RETURN JSX /// ///
   return (
@@ -38,7 +42,12 @@ const RightSideBar = ({ summaryData, refs }) => {
         </Grid>
         {isSatelliteMode && (
           <Grid item sm={12} lg={12} width="100%">
-            <MapVisCard refVal={refs[3]} />
+            <BiomassMapWidget refVal={refs[3]} />
+          </Grid>
+        )}
+        {isSatelliteMode && (
+          <Grid item sm={12} lg={12} width="100%">
+            <NitrogenMapWidget refVal={refs[4]} />
           </Grid>
         )}
         <Grid item sm={12} lg={12} width="100%">

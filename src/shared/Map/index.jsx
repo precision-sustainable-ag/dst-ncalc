@@ -13,6 +13,9 @@ import { get, set } from '../../store/Store';
 // import MapboxWorker from 'worker-loader!mapbox-gl/dist/mapbox-gl-csp-worker';
 
 let removedShapes = new Set();
+const biomassRasterColors = ['red', 'orange', 'magenta', 'lime', 'green', 'white'];
+const nitrogenRasterColors = ['red', 'orange', 'magenta', 'lime', 'green', 'white'];
+// const nitrogenRasterColors = ['cyan', 'brown', 'white'];
 
 const MapComp = ({ variant }) => {
   const [address, setAddress] = useState({});
@@ -73,6 +76,8 @@ const MapComp = ({ variant }) => {
         initRasterObject={variant === 'biomass' ? biomassTaskResults : nitrogenTaskResults}
         initFeatures={mapPolygon}
         unit={unit}
+        material={variant}
+        rasterColors={variant === 'biomass' ? biomassRasterColors : nitrogenRasterColors}
         initWidth="100%"
         initHeight="380px"
         initAddress={mapAddress}

@@ -846,10 +846,10 @@
   resolved "https://registry.yarnpkg.com/@popperjs/core/-/core-2.11.8.tgz#6b79032e760a0899cd4204710beede972a3a185f"
   integrity sha512-P1st0aksCrn9sGZhp8GMYwBnQsbvAWsZAX44oXNNvLHGqAOcoVxmjZiohstwQ7SqKnbR47akdNi+uleWD8+g6A==
 
-"@psa/dst.ui.ncalc-map@^0.0.18":
-  version "0.0.18"
-  resolved "https://node.bit.cloud/@psa/dst.ui.ncalc-map/-/@psa-dst.ui.ncalc-map-0.0.18.tgz#a7d8e1f01a4a14536ee8700cc2af56ba7ef1c8fb"
-  integrity sha1-p9jh8BpKFFNu6HAMwq9Wun7xyPs=
+"@psa/dst.ui.ncalc-map@^0.0.23":
+  version "0.0.23"
+  resolved "https://node.bit.cloud/@psa/dst.ui.ncalc-map/-/@psa-dst.ui.ncalc-map-0.0.23.tgz#8309b1b09a6f0ae2e11b2f5ecac97c6f2a41e741"
+  integrity sha1-gwmxsJpvCuLhGy9eysl8bypB50E=
   dependencies:
     chroma-js "2.4.2"
     core-js "^3.0.0"

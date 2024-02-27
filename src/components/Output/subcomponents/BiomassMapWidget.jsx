@@ -28,7 +28,7 @@ const cardContentStyles = {
 /// /// /// COMPONENTS /// /// ///
 
 /// /// /// RETURN JSX /// /// ///
-const MapVisCard = ({ refVal }) => (
+const BiomassMapWidget = ({ refVal }) => (
   <Card sx={CardStyles} elevation={8} ref={refVal}>
     <CardContent sx={cardContentStyles}>
       <Typography
@@ -43,19 +43,8 @@ const MapVisCard = ({ refVal }) => (
       <Box sx={{ height: '90%', width: '100%', marginBottom: 5 }}>
         <Map variant="biomass" />
       </Box>
-      <Typography
-        sx={{ fontSize: 22 }}
-        color="text.secondary"
-        gutterBottom
-        textAlign="center"
-      >
-        Nitrogen Map
-      </Typography>
-      <Box sx={{ height: '90%', width: '100%', marginBottom: 5 }}>
-        <Map variant="nitrogen" />
-      </Box>
     </CardContent>
   </Card>
 );
 
-export default MapVisCard;
+export default BiomassMapWidget;

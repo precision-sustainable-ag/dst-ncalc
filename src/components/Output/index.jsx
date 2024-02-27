@@ -90,8 +90,14 @@ const sidebarListData = [
     endPos: 300,
   },
   {
-    label: 'Map Visualization',
+    label: 'Biomass Map',
     key: 'sidebar-nav-4',
+    startPos: 300,
+    endPos: 400,
+  },
+  {
+    label: 'Nitrogen Map',
+    key: 'sidebar-nav-5',
     startPos: 300,
     endPos: 400,
   },
