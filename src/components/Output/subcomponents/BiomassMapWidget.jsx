@@ -7,7 +7,7 @@ import {
   CardContent,
   Typography,
 } from '@mui/material';
-import Map from '../../../shared/Map';
+import Map from '../../../shared/Map/NitrogenMap';
 import Biomass from '../../../shared/Biomass';
 
 /// /// /// STYLES /// /// ///

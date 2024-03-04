@@ -1,7 +1,7 @@
 /* eslint-disable no-console */
 import React from 'react';
 import { Box, Grid } from '@mui/material';
-import { useSelector, useDispatch } from 'react-redux';
+import { useSelector } from 'react-redux';
 import NitrogenCard from './NitrogenWidget';
 import ResidueCard from './ResidueWidget';
 import BiomassMapWidget from './BiomassMapWidget';

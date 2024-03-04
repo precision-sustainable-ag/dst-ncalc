@@ -12,7 +12,8 @@ import {
   styled,
 } from '@mui/material';
 import { useSelector } from 'react-redux';
-import Map from '../Map';
+import BiomassMap from '../Map/BiomassMap';
+// import NitrogenMap from '../Map/NitrogenMap';
 import Input from '../Inputs';
 import Help from '../Help';
 import {
@@ -97,7 +98,7 @@ const Location = () => {
       </Box>
       <Box sx={{ margin: '2rem 0rem' }}>
         <Paper sx={{ padding: '1rem', borderRadius: '1rem' }}>
-          <Map variant="biomass" />
+          <BiomassMap variant="biomass" />
           <Box
             mt={2}
             sx={{

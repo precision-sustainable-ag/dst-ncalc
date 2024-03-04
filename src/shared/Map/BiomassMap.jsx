@@ -14,17 +14,16 @@ import { get, set } from '../../store/Store';
 
 let removedShapes = new Set();
 const biomassRasterColors = ['red', 'orange', 'magenta', 'lime', 'green', 'white'];
-const nitrogenRasterColors = ['red', 'orange', 'magenta', 'lime', 'green', 'white'];
+// const nitrogenRasterColors = ['red', 'orange', 'magenta', 'lime', 'green', 'white'];
 // const nitrogenRasterColors = ['cyan', 'brown', 'white'];
 
-const MapComp = ({ variant }) => {
+const BiomassMapComp = ({ variant }) => {
   const [address, setAddress] = useState({});
   const [zoom, setZoom] = useState(null);
   const dispatch = useDispatch();
   const lat = useSelector(get.lat);
   const lon = useSelector(get.lon);
   const biomassTaskResults = useSelector(get.biomassTaskResults);
-  const nitrogenTaskResults = useSelector(get.nitrogenTaskResults);
   const mapAddress = useSelector(get.mapAddress);
   const mapZoom = useSelector(get.mapZoom);
   const mapPolygon = useSelector(get.mapPolygon);
@@ -73,11 +72,11 @@ const MapComp = ({ variant }) => {
         setZoom={setZoom}
         setMap={() => { }}
         onDraw={setDrawEvent}
-        initRasterObject={variant === 'biomass' ? biomassTaskResults : nitrogenTaskResults}
+        initRasterObject={biomassTaskResults}
         initFeatures={mapPolygon}
         unit={unit}
         material={variant}
-        rasterColors={variant === 'biomass' ? biomassRasterColors : nitrogenRasterColors}
+        rasterColors={biomassRasterColors}
         initWidth="100%"
         initHeight="380px"
         initAddress={mapAddress}
@@ -106,4 +105,4 @@ const MapComp = ({ variant }) => {
   );
 };
 
-export default MapComp;
+export default BiomassMapComp;
