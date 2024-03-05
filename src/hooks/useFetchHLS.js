@@ -8,7 +8,7 @@ import { get, set } from '../store/Store';
 
 const WEATHER_API_URL = 'https://weather.covercrop-data.org';
 
-/// Desc: useFetchCornN
+/// Desc: useFetchHLS
 /// ..............................................................................
 /// ..............................................................................
 //

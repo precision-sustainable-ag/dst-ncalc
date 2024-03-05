@@ -13,7 +13,7 @@ import { get, set } from '../../store/Store';
 // import MapboxWorker from 'worker-loader!mapbox-gl/dist/mapbox-gl-csp-worker';
 
 let removedShapes = new Set();
-const biomassRasterColors = ['red', 'orange', 'magenta', 'lime', 'green', 'white'];
+const biomassRasterColors = ['red', 'orange', 'lime', 'green', 'white'];
 // const nitrogenRasterColors = ['red', 'orange', 'magenta', 'lime', 'green', 'white'];
 // const nitrogenRasterColors = ['cyan', 'brown', 'white'];
 
