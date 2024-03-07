@@ -43,6 +43,8 @@ const useFetchNitrogen = () => {
       return null;
     }
     const url = `${NITROGEN_SURFACE_API_URL}`;
+    console.log('biomassTaskResults: ', biomassTaskResults.data_array);
+    console.log('biomassTaskResults flat: ', biomassTaskResults.data_array.flat(1));
     const payload = {
       lat: lat,
       lon: lon,
@@ -51,7 +53,8 @@ const useFetchNitrogen = () => {
       ad: 0.14,
       start: moment(cashCropPlantingDate).format('yyyy-MM-DD'),
       end: end.format('yyyy-MM-DD'),
-      biomass: biomassTaskResults.data_array.flat(1),
+      biomass: [2000, 3000, 5000],
+      // biomass: biomassTaskResults.data_array.flat(1),
       n: n,
       lwc: lwc,
       carb: carb,
@@ -61,6 +64,7 @@ const useFetchNitrogen = () => {
       simple: 'true',
       nonly: 'true',
     };
+    console.log('useFetchNitrogen payload: ', payload);
     const headers = {
       'Content-Type': 'application/json',
     };
@@ -69,10 +73,12 @@ const useFetchNitrogen = () => {
       .then(({ data }) => {
         if (data && data instanceof Array) {
           console.log('useFetchNitrogen data: ', data);
+          // const newArr = [];
+          // while (data.length) newArr.push(data.splice(0, 3));
           // dispatch(set.cornN(data));
           setResData(data);
         } else {
-          dispatch(set.errorCorn(true));
+          // dispatch(set.errorCorn(true));
         }
       })
       .catch((error) => {
