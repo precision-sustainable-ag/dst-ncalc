@@ -37,14 +37,16 @@ const useFetchNitrogen = () => {
       .add(110, 'days')
       .add(1, 'hour');
     // setEndDate(end);
+    let arrayFlat;
     if (biomassTaskResults && biomassTaskResults.data_array && biomassTaskResults.data_array.length > 0) {
       setArrayDim([biomassTaskResults.data_array.length, biomassTaskResults.data_array[0].length]);
+      arrayFlat = [].concat(...biomassTaskResults.data_array);
     } else {
       return null;
     }
+    const biomassAverage = arrayFlat.reduce((a, b) => a + b, 0) / arrayFlat.length; // average
+    const biomassMax = Math.max(...arrayFlat);
     const url = `${NITROGEN_SURFACE_API_URL}`;
-    console.log('biomassTaskResults: ', biomassTaskResults.data_array);
-    console.log('biomassTaskResults flat: ', biomassTaskResults.data_array.flat(1));
     const payload = {
       lat: lat,
       lon: lon,
@@ -53,7 +55,8 @@ const useFetchNitrogen = () => {
       ad: 0.14,
       start: moment(cashCropPlantingDate).format('yyyy-MM-DD'),
       end: end.format('yyyy-MM-DD'),
-      biomass: [2000, 3000, 5000],
+      biomass: [biomassAverage, biomassMax],
+      // biomass: arrayFlat,
       // biomass: biomassTaskResults.data_array.flat(1),
       n: n,
       lwc: lwc,
@@ -65,14 +68,23 @@ const useFetchNitrogen = () => {
       nonly: 'true',
     };
     console.log('useFetchNitrogen payload: ', payload);
-    const headers = {
-      'Content-Type': 'application/json',
-    };
-    axios
-      .post(url, payload, { headers: headers })
-      .then(({ data }) => {
+    fetch(url, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify(payload),
+    })
+      .then((response) => {
+        if (!response.ok) {
+          throw new Error('Network response was not ok');
+        }
+        return response.json();
+      })
+      .then((data) => {
         if (data && data instanceof Array) {
           console.log('useFetchNitrogen data: ', data);
+          // const newArr = arrayFlat.map((item, index) => 
           // const newArr = [];
           // while (data.length) newArr.push(data.splice(0, 3));
           // dispatch(set.cornN(data));
@@ -82,7 +94,7 @@ const useFetchNitrogen = () => {
         }
       })
       .catch((error) => {
-        console.log(error);
+        console.error('Error:', error);
       });
   }, [cashCropPlantingDate, biomassTaskResults, n, lwc, carb, cell, lign, bd, lat, lon]);
   return resData;
