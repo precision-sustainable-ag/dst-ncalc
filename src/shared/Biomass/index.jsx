@@ -109,6 +109,11 @@ const Biomass = () => {
     axios
       .get(`https://covercrop-imagery.org/tasks/${taskId}`)
       .then((response) => {
+        if (response.data && response.data.task_result && response.data.task_result.message) {
+          dispatch(set.dataFetchStatus(response.data.task_result.message));
+        } else {
+          dispatch(set.dataFetchStatus('idle'));
+        }
         if (response.data.task_status === 'SUCCESS') {
           setData(response.data);
           setTaskIsDone(true);
@@ -130,7 +135,7 @@ const Biomass = () => {
 
   useEffect(() => {
     if (taskId && !data && !taskIsDone) {
-      interval = setInterval(fetchTask, 1000);
+      interval = setInterval(fetchTask, 200);
     }
     return () => {
       clearInterval(interval);

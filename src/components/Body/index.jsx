@@ -6,6 +6,7 @@ import {
   Box,
 } from '@mui/material';
 
+import SnackbarMessage from '../../shared/SnackbarMessage';
 import Feedback from '../Feedback';
 import About from '../About';
 
@@ -40,6 +41,7 @@ export default function index({ screens }) {
       </Routes>
       <Feedback />
       <About />
+      <SnackbarMessage />
     </Box>
   );
 }

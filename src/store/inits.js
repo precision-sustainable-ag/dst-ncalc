@@ -158,6 +158,7 @@ const initialState = {
   data: '',
   dates: [],
   biomassCalcMode: 'sampled', // 'sampled' or 'satellite'
+  dataFetchStatus: 'idle',
   openFeedbackModal: false,
   openAboutModal: false,
   incorporatedData: [],
