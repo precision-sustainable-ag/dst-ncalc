@@ -167,6 +167,9 @@ const initialState = {
   coverCropSpecieGroup: null,
   coverCropGrowthStage: null,
   maxBiomass: initMaxBiomass,
+  biomassFetchIsFailed: false,
+  biomassFetchIsLoading: false,
+  polyDrawTooBig: false,
 };
 
 export default initialState;
