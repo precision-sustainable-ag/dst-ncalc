@@ -1,3 +1,4 @@
+/* eslint-disable consistent-return */
 /* eslint-disable object-shorthand */
 /* eslint-disable react-hooks/exhaustive-deps */
 /* eslint-disable no-console */

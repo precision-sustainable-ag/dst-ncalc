@@ -60,6 +60,7 @@ const Biomass = () => {
                   variant="outlined"
                   color={polyDrawTooBig ? 'warning' : 'success'}
                   disabled={mapPolygon.length !== 1 || biomassFetchIsLoading}
+                  // eslint-disable-next-line no-undef
                   onClick={handleButton}
                 >
                   <div style={{ fontWeight: 900 }}>Calculate Biomass</div>

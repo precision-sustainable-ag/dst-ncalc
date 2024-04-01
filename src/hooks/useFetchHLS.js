@@ -26,6 +26,7 @@ const useFetchHLS = () => {
   const unit = useSelector(get.unit);
   const dispatch = useDispatch();
 
+  // eslint-disable-next-line no-unused-vars
   const handleButton = () => {
     dispatch(set.biomassTaskResults({}));
     setTaskIsDone(false);
