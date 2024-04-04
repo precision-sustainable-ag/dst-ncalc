@@ -169,6 +169,8 @@ const initialState = {
   maxBiomass: initMaxBiomass,
   biomassFetchIsFailed: false,
   biomassFetchIsLoading: false,
+  biomassTaskIsDone: true,
+  biomassTaskId: null,
   polyDrawTooBig: false,
 };
 

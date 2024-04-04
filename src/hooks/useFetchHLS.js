@@ -3,10 +3,8 @@
 import { useEffect, useState } from 'react';
 import axios from 'axios';
 import { useDispatch, useSelector } from 'react-redux';
-import * as turf from '@turf/turf';
 import { get, set } from '../store/Store';
 
-const HLS_API_URL = 'https://covercrop-imagery.org';
 let interval;
 const arrayAverage = (arr) => arr.reduce((p, c) => p + c, 0) / arr.length;
 
@@ -18,57 +16,10 @@ const useFetchHLS = () => {
   const [data, setData] = useState(null);
   const [taskId, setTaskId] = useState(null);
   const [taskIsDone, setTaskIsDone] = useState(false);
-  const mapPolygon = useSelector(get.mapPolygon);
-  const coverCropPlantingDate = useSelector(get.coverCropPlantingDate);
-  const coverCropTerminationDate = useSelector(get.coverCropTerminationDate);
   const biomassTotalValue = useSelector(get.biomassTotalValue);
   const biomassTaskResults = useSelector(get.biomassTaskResults);
   const unit = useSelector(get.unit);
   const dispatch = useDispatch();
-
-  // eslint-disable-next-line no-unused-vars
-  const handleButton = () => {
-    dispatch(set.biomassTaskResults({}));
-    setTaskIsDone(false);
-    setData(null);
-    let area;
-    area = 0;
-    // reverse order of vertices
-    if (mapPolygon.length > 0) {
-      area = 0.000247105 * turf.area(turf.polygon(mapPolygon[0].geometry.coordinates));
-    }
-
-    if (area > 10000) {
-      dispatch(set.polyDrawTooBig(true));
-      dispatch(set.mapPolygon([]));
-    } else {
-      const revertedCoords = [...mapPolygon[0].geometry.coordinates[0]].reverse();
-      const payload = {
-        maxCloudCover: 5,
-        startDate: coverCropPlantingDate,
-        endDate: coverCropTerminationDate,
-        geometry: {
-          type: 'Polygon',
-          coordinates: [revertedCoords],
-        },
-      };
-      dispatch(set.biomassFetchIsLoading(true));
-      const headers = {
-        'Content-Type': 'application/json',
-      };
-      axios
-        .post(`${HLS_API_URL}/tasks`, payload, { headers })
-        .then((response) => {
-          if (response.status === 200 && response.data) {
-            setTaskId(response.data.task_id);
-          }
-        })
-        .catch((error) => {
-          // eslint-disable-next-line no-console
-          console.log(error);
-        });
-    }
-  };
 
   const fetchTask = () => {
     axios

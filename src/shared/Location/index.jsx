@@ -1,25 +1,31 @@
 import React from 'react';
 import { useNavigate } from 'react-router-dom';
+import * as turf from '@turf/turf';
+import axios from 'axios';
 import Typography from '@mui/material/Typography';
 import Accordion from '@mui/material/Accordion';
 import AccordionSummary from '@mui/material/AccordionSummary';
 import AccordionDetails from '@mui/material/AccordionDetails';
 import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
 import {
+  Badge,
   Box,
   Paper,
   Stack,
+  Tooltip,
   styled,
 } from '@mui/material';
-import { useSelector } from 'react-redux';
+import { useDispatch, useSelector } from 'react-redux';
 import BiomassMap from '../Map/BiomassMap';
 // import NitrogenMap from '../Map/NitrogenMap';
 import Input from '../Inputs';
 import Help from '../Help';
 import {
-  get,
+  get, set,
 } from '../../store/Store';
 import NavButton from '../Navigate/NavButton';
+
+const HLS_API_URL = 'https://covercrop-imagery.org';
 
 const CustomizedAccordion = styled(Accordion)(() => ({
   '&.MuiPaper-root': {
@@ -30,11 +36,67 @@ const CustomizedAccordion = styled(Accordion)(() => ({
   boxShadow: 'none',
 }));
 
+const nextButtonBadgeContent = () => (
+  <Tooltip title="No polygon is drawn">
+    <Typography>?</Typography>
+  </Tooltip>
+);
+
+const nextButtonHelpStyle = {
+  borderRadius: '0.5rem',
+  backgroundColor: 'cyan',
+};
+
 const Location = () => {
   const navigate = useNavigate();
   const isSatelliteMode = useSelector(get.biomassCalcMode) === 'satellite';
-  // const biomassTaskResults = useSelector(get.biomassTaskResults);
-  // console.log('biomassTaskResults', biomassTaskResults);
+  const mapPolygon = useSelector(get.mapPolygon);
+  const coverCropPlantingDate = useSelector(get.coverCropPlantingDate);
+  const coverCropTerminationDate = useSelector(get.coverCropTerminationDate);
+  const dispatch = useDispatch();
+
+  const calcBiomass = () => {
+    dispatch(set.biomassTaskResults({}));
+    dispatch(set.biomassTaskIsDone(false));
+    // setData(null);
+    let area;
+    area = 0;
+    // reverse order of vertices
+    if (mapPolygon.length > 0) {
+      area = 0.000247105 * turf.area(turf.polygon(mapPolygon[0].geometry.coordinates));
+    }
+
+    if (area > 10000) {
+      dispatch(set.polyDrawTooBig(true));
+      dispatch(set.mapPolygon([]));
+    } else {
+      const revertedCoords = [...mapPolygon[0].geometry.coordinates[0]].reverse();
+      const payload = {
+        maxCloudCover: 5,
+        startDate: coverCropPlantingDate,
+        endDate: coverCropTerminationDate,
+        geometry: {
+          type: 'Polygon',
+          coordinates: [revertedCoords],
+        },
+      };
+      dispatch(set.biomassFetchIsLoading(true));
+      const headers = {
+        'Content-Type': 'application/json',
+      };
+      axios
+        .post(`${HLS_API_URL}/tasks`, payload, { headers })
+        .then((response) => {
+          if (response.status === 200 && response.data) {
+            dispatch(set.biomassTaskId(response.data.task_id));
+          }
+        })
+        .catch((error) => {
+          // eslint-disable-next-line no-console
+          console.log(error);
+        });
+    }
+  };
 
   return (
     <Box sx={{ width: { xs: '95%', sm: '90%', lg: '70%' } }}>
@@ -112,9 +174,22 @@ const Location = () => {
             <NavButton onClick={() => navigate('/home')}>
               BACK
             </NavButton>
-            <NavButton onClick={() => navigate('/soil')}>
-              NEXT
-            </NavButton>
+            <Badge
+              color="primary"
+              invisible={mapPolygon.length > 0}
+              badgeContent={nextButtonBadgeContent()}
+            >
+              <NavButton
+                disabled={mapPolygon.length === 0}
+                onClick={() => {
+                  calcBiomass();
+                  // navigate('/soil');
+                  return null;
+                }}
+              >
+                NEXT
+              </NavButton>
+            </Badge>
           </Box>
         </Paper>
       </Box>
