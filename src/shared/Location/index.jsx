@@ -42,11 +42,6 @@ const nextButtonBadgeContent = () => (
   </Tooltip>
 );
 
-const nextButtonHelpStyle = {
-  borderRadius: '0.5rem',
-  backgroundColor: 'cyan',
-};
-
 const Location = () => {
   const navigate = useNavigate();
   const isSatelliteMode = useSelector(get.biomassCalcMode) === 'satellite';
