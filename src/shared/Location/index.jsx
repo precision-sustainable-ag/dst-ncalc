@@ -32,7 +32,6 @@ const CustomizedAccordion = styled(Accordion)(() => ({
     borderRadius: '1rem',
     boxShadow: 'none',
   },
-  // padding: '1rem',
   boxShadow: 'none',
 }));
 
@@ -128,27 +127,7 @@ const Location = () => {
                 autoComplete="off"
                 style={{ height: '2rem', minWidth: '13rem' }}
               />
-              <Help className="moveLeft">
-                <p>
-                  This input is optional. If you enter a field name, you will be able to rerun the
-                  model on this computer without re-entering your data.
-                </p>
-                <p>Notes:</p>
-                <ul>
-                  <li>
-                    If you have multiple fields, you will be able to select them from a drop-down
-                    menu in the upper-right.
-                  </li>
-                  <li>
-                    Your information is stored on your computer only. It will not be uploaded to a
-                    server.
-                  </li>
-                  <li>
-                    If you clear your browser&apos;s cache, you will need to re-enter your data the
-                    next time you run the program.
-                  </li>
-                </ul>
-              </Help>
+              <Help />
             </Box>
           </AccordionDetails>
         </CustomizedAccordion>
