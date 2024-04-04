@@ -2,19 +2,17 @@ import React from 'react';
 import { useNavigate } from 'react-router-dom';
 import * as turf from '@turf/turf';
 import axios from 'axios';
-import Typography from '@mui/material/Typography';
+import Box from '@mui/material/Box';
+import Paper from '@mui/material/Paper';
+import Badge from '@mui/material/Badge';
+import Stack from '@mui/material/Stack';
+import { styled } from '@mui/material/styles';
+import Tooltip from '@mui/material/Tooltip';
 import Accordion from '@mui/material/Accordion';
+import Typography from '@mui/material/Typography';
+import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
 import AccordionSummary from '@mui/material/AccordionSummary';
 import AccordionDetails from '@mui/material/AccordionDetails';
-import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
-import {
-  Badge,
-  Box,
-  Paper,
-  Stack,
-  Tooltip,
-  styled,
-} from '@mui/material';
 import { useDispatch, useSelector } from 'react-redux';
 import BiomassMap from '../Map/BiomassMap';
 // import NitrogenMap from '../Map/NitrogenMap';
