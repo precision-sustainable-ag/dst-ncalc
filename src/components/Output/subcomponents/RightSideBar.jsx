@@ -2,11 +2,11 @@
 import React from 'react';
 import { Box, Grid } from '@mui/material';
 import { useSelector } from 'react-redux';
-import NitrogenCard from '../subcomponents/NitrogenWidget';
-import ResidueCard from '../subcomponents/ResidueWidget';
-import BiomassMapWidget from '../subcomponents/BiomassMapWidget';
-import { SummaryCard } from '../subcomponents/SummaryWidget';
-import NitrogenMapWidget from '../subcomponents/NitrogenMapWidget';
+import NitrogenCard from './NitrogenWidget';
+import ResidueCard from './ResidueWidget';
+import BiomassMapWidget from './BiomassMapWidget';
+import { SummaryCard } from './SummaryWidget';
+import NitrogenMapWidget from './NitrogenMapWidget';
 import { get } from '../../../store/redux-autosetters';
 import NavigateButtons from '../../../shared/Navigate';
 

@@ -111,7 +111,17 @@ const Home = () => {
           About
         </NavButton>
         <NavButton
-          onClick={() => navigate('/location')}
+          onClick={() => {
+            if (biomassCalcMode === 'sampled') {
+              console.log('sampled path');
+              navigate('/location');
+            }
+            if (biomassCalcMode === 'satellite') {
+              console.log('satellite path');
+              navigate('/satpath');
+            }
+            return null;
+          }}
           fontSize="1rem"
         >
           Get Started

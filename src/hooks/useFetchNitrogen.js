@@ -12,6 +12,7 @@ import {
 } from '../store/Store';
 
 const NITROGEN_SURFACE_API_URL = 'https://api.covercrop-ncalc.org/surface';
+let arrayFlat;
 
 /// Desc: useFetchNitrogen
 /// ..............................................................................
@@ -40,7 +41,7 @@ const useFetchNitrogen = () => {
     console.log('useFetchNitrogen nitrogenTaskResults: ', nitrogenTaskResults);
     const end = moment(cashCropPlantingDate).add(110, 'days').add(1, 'hour');
     // setEndDate(end);
-    let arrayFlat;
+
     if (
       biomassTaskResults &&
       biomassTaskResults.data_array &&
@@ -51,62 +52,62 @@ const useFetchNitrogen = () => {
         biomassTaskResults.data_array[0].length,
       ]);
       arrayFlat = [].concat(...biomassTaskResults.data_array);
-    } else {
-      return null;
+      const biomassAverage =
+        arrayFlat.reduce((a, b) => a + b, 0) / arrayFlat.length; // average
+      const biomassMax = Math.max(...arrayFlat);
+      const url = `${NITROGEN_SURFACE_API_URL}`;
+      const payload = {
+        lat: lat,
+        lon: lon,
+        bd: bd,
+        dul: 0.27,
+        ad: 0.14,
+        start: moment(cashCropPlantingDate).format('yyyy-MM-DD'),
+        end: end.format('yyyy-MM-DD'),
+        biomass: [biomassAverage, biomassMax],
+        // biomass: arrayFlat,
+        // biomass: biomassTaskResults.data_array.flat(1),
+        n: n,
+        lwc: lwc,
+        carb: carb,
+        cell: cell,
+        lign: lign,
+        output: 'json',
+        simple: 'true',
+        nonly: 'true',
+      };
+      console.log('useFetchNitrogen payload: ', payload);
+
+      // wrap async function of data loading
+      fetch(url, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(payload),
+      })
+        .then((response) => {
+          if (!response.ok) {
+            throw new Error('Network response was not ok');
+          }
+          return response.json();
+        })
+        .then((data) => {
+          if (data && data instanceof Array) {
+            console.log('useFetchNitrogen data: ', data);
+            // const newArr = arrayFlat.map((item, index) =>
+            // const newArr = [];
+            // while (data.length) newArr.push(data.splice(0, 3));
+            // dispatch(set.cornN(data));
+            setResData(data);
+          } else {
+            // dispatch(set.errorCorn(true));
+          }
+        })
+        .catch((error) => {
+          console.error('Error:', error);
+        });
     }
-    const biomassAverage =
-      arrayFlat.reduce((a, b) => a + b, 0) / arrayFlat.length; // average
-    const biomassMax = Math.max(...arrayFlat);
-    const url = `${NITROGEN_SURFACE_API_URL}`;
-    const payload = {
-      lat: lat,
-      lon: lon,
-      bd: bd,
-      dul: 0.27,
-      ad: 0.14,
-      start: moment(cashCropPlantingDate).format('yyyy-MM-DD'),
-      end: end.format('yyyy-MM-DD'),
-      biomass: [biomassAverage, biomassMax],
-      // biomass: arrayFlat,
-      // biomass: biomassTaskResults.data_array.flat(1),
-      n: n,
-      lwc: lwc,
-      carb: carb,
-      cell: cell,
-      lign: lign,
-      output: 'json',
-      simple: 'true',
-      nonly: 'true',
-    };
-    console.log('useFetchNitrogen payload: ', payload);
-    fetch(url, {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify(payload),
-    })
-      .then((response) => {
-        if (!response.ok) {
-          throw new Error('Network response was not ok');
-        }
-        return response.json();
-      })
-      .then((data) => {
-        if (data && data instanceof Array) {
-          console.log('useFetchNitrogen data: ', data);
-          // const newArr = arrayFlat.map((item, index) =>
-          // const newArr = [];
-          // while (data.length) newArr.push(data.splice(0, 3));
-          // dispatch(set.cornN(data));
-          setResData(data);
-        } else {
-          // dispatch(set.errorCorn(true));
-        }
-      })
-      .catch((error) => {
-        console.error('Error:', error);
-      });
   }, [
     nitrogenTaskResults,
     cashCropPlantingDate,

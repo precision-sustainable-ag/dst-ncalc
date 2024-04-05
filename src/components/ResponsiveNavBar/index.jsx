@@ -1,6 +1,6 @@
 /* eslint-disable operator-linebreak */
 import React, { useEffect, useState } from 'react';
-import { useDispatch } from 'react-redux';
+import { useDispatch, useSelector } from 'react-redux';
 import { NavLink, useLocation } from 'react-router-dom';
 import AppBar from '@mui/material/AppBar';
 import Box from '@mui/material/Box';
@@ -18,7 +18,7 @@ import Stack from '@mui/material/Stack';
 import MoreVertIcon from '@mui/icons-material/MoreVert';
 import { styled } from '@mui/material';
 import Init from '../Init';
-import { set } from '../../store/Store';
+import { get, set } from '../../store/Store';
 
 const NavBarButtonText1 = styled(Button)(({ theme, isactive }) => ({
   color: 'white',
@@ -74,9 +74,12 @@ const ResponsiveNavBar = ({ screens }) => {
   const [userIsOpen, setUserIsOpen] = useState(false);
   // eslint-disable-next-line no-unused-vars
   const [navModalOpen, setNavModalOpen] = useState(false);
+  const isSatelliteMode = useSelector(get.biomassCalcMode) === 'satellite';
 
   const location = useLocation();
   const dispatch = useDispatch();
+
+  const showNavbarMenu = location.pathname.replace('/', '') !== 'home' && !isSatelliteMode;
 
   const handleOpenNavMenu = (event) => {
     setAnchorElNav(event.currentTarget);
@@ -159,7 +162,7 @@ const ResponsiveNavBar = ({ screens }) => {
           <Box
             sx={{
               flexGrow: 1,
-              display: { xs: 'flex', md: 'none' },
+              display: showNavbarMenu ? { xs: 'flex', md: 'none' } : 'none',
               backgroundColor: 'white',
               color: 'black',
               borderRadius: '0.2rem',
@@ -281,7 +284,7 @@ const ResponsiveNavBar = ({ screens }) => {
               color: 'white',
             }}
           >
-            {Object.keys(screens)
+            {showNavbarMenu && Object.keys(screens)
               .filter((scr) => screens[scr].showInMenu !== false)
               .map((scr) => (
                 <NavLink

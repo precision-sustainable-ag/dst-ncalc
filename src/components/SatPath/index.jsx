@@ -16,7 +16,7 @@ const wrapperStyles = {
   width: '100%',
 };
 
-const Output = () => {
+const Index = () => {
   const [summaryData, setSummaryData] = useState(summaryDataDefaults);
   const refs = sidebarListData.map(() => useRef(null));
   const field = useSelector(get.field);
@@ -54,4 +54,4 @@ const Output = () => {
     </Box>
   );
 };
-export default Output;
+export default Index;

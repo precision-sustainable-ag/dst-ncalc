@@ -25,8 +25,10 @@ screens.cashcrop = require('./components/CashCrop').default;
 screens.output = require('./components/Output').default;
 screens.feedback = require('./components/Feedback').default;
 screens.advanced = require('./components/Advanced').default;
+screens.satpath = require('./components/SatPath').default;
 
 screens.init.showInMenu = false;
+screens.satpath.showInMenu = false;
 
 if (screens.feedback) {
   screens.feedback.showInMenu = false;
