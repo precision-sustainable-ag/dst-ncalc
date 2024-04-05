@@ -14,18 +14,23 @@ const arrayAverage = (arr) => arr.reduce((p, c) => p + c, 0) / arr.length;
 //
 const useFetchHLS = () => {
   const [data, setData] = useState(null);
-  const [taskId, setTaskId] = useState(null);
+  // const [taskId, setTaskId] = useState(null);
   const [taskIsDone, setTaskIsDone] = useState(false);
   const biomassTotalValue = useSelector(get.biomassTotalValue);
   const biomassTaskResults = useSelector(get.biomassTaskResults);
+  const biomassTaskId = useSelector(get.biomassTaskId);
   const unit = useSelector(get.unit);
   const dispatch = useDispatch();
 
   const fetchTask = () => {
     axios
-      .get(`https://covercrop-imagery.org/tasks/${taskId}`)
+      .get(`https://covercrop-imagery.org/tasks/${biomassTaskId}`)
       .then((response) => {
-        if (response.data && response.data.task_result && response.data.task_result.message) {
+        if (
+          response.data &&
+          response.data.task_result &&
+          response.data.task_result.message
+        ) {
           dispatch(set.dataFetchStatus(response.data.task_result.message));
         } else {
           dispatch(set.dataFetchStatus('idle'));
@@ -60,7 +65,9 @@ const useFetchHLS = () => {
   // .data_array.map(row => row.map(el => el*0.001))
   useEffect(() => {
     if (biomassTaskResults && biomassTaskResults.data_array) {
-      const flattenedBiomass = biomassTaskResults.data_array.flat(1).filter((el) => el !== 0);
+      const flattenedBiomass = biomassTaskResults.data_array
+        .flat(1)
+        .filter((el) => el !== 0);
       const factor = unit === 'lb/ac' ? 1.12085 : 1;
       const biomassAVG = arrayAverage(flattenedBiomass) * factor;
       dispatch(set.biomassTotalValue(Math.round(biomassAVG, 0)));
@@ -79,13 +86,13 @@ const useFetchHLS = () => {
   }, [biomassTotalValue, unit]);
 
   useEffect(() => {
-    if (taskId && !data && !taskIsDone) {
+    if (biomassTaskId && !data && !taskIsDone) {
       interval = setInterval(fetchTask, 200);
     }
     return () => {
       clearInterval(interval);
     };
-  }, [taskId]);
+  }, [biomassTaskId]);
   return null;
 }; // useFetchHLS
 

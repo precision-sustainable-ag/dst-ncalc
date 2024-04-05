@@ -18,10 +18,9 @@ import BiomassMap from '../Map/BiomassMap';
 // import NitrogenMap from '../Map/NitrogenMap';
 import Input from '../Inputs';
 import Help from '../Help';
-import {
-  get, set,
-} from '../../store/Store';
+import { get, set } from '../../store/Store';
 import NavButton from '../Navigate/NavButton';
+import useFetchHLS from '../../hooks/useFetchHLS';
 
 const HLS_API_URL = 'https://covercrop-imagery.org';
 
@@ -47,6 +46,8 @@ const Location = () => {
   const coverCropTerminationDate = useSelector(get.coverCropTerminationDate);
   const dispatch = useDispatch();
 
+  useFetchHLS();
+
   const calcBiomass = () => {
     dispatch(set.biomassTaskResults({}));
     dispatch(set.biomassTaskIsDone(false));
@@ -55,14 +56,18 @@ const Location = () => {
     area = 0;
     // reverse order of vertices
     if (mapPolygon.length > 0) {
-      area = 0.000247105 * turf.area(turf.polygon(mapPolygon[0].geometry.coordinates));
+      area =
+        0.000247105 *
+        turf.area(turf.polygon(mapPolygon[0].geometry.coordinates));
     }
 
     if (area > 10000) {
       dispatch(set.polyDrawTooBig(true));
       dispatch(set.mapPolygon([]));
     } else {
-      const revertedCoords = [...mapPolygon[0].geometry.coordinates[0]].reverse();
+      const revertedCoords = [
+        ...mapPolygon[0].geometry.coordinates[0],
+      ].reverse();
       const payload = {
         maxCloudCover: 5,
         startDate: coverCropPlantingDate,
@@ -106,17 +111,17 @@ const Location = () => {
           <AccordionDetails>
             <Stack mb={1}>
               <Typography variant="h8" gutterBottom>
-                Enter your address or zip code to determine your field&apos;s location. You can then
-                zoom in and click to pinpoint it on the map. If you know your exact coordinates, you
-                can enter them in search bar separated by comma (ex. 37.7, -80.2 ).
+                Enter your address or zip code to determine your field&apos;s
+                location. You can then zoom in and click to pinpoint it on the
+                map. If you know your exact coordinates, you can enter them in
+                search bar separated by comma (ex. 37.7, -80.2 ).
               </Typography>
-              {
-                isSatelliteMode && (
-                  <Typography variant="h8" gutterBottom pt={1}>
-                    Specify your field&apos;s boundary on the map using the drawing tool.
-                  </Typography>
-                )
-              }
+              {isSatelliteMode && (
+                <Typography variant="h8" gutterBottom pt={1}>
+                  Specify your field&apos;s boundary on the map using the
+                  drawing tool.
+                </Typography>
+              )}
             </Stack>
             <Box mb={2}>
               <Input
@@ -143,19 +148,23 @@ const Location = () => {
               flexDirection: 'row',
             }}
           >
-            <NavButton onClick={() => navigate('/home')}>
-              BACK
-            </NavButton>
+            <NavButton onClick={() => navigate('/home')}>BACK</NavButton>
             <Badge
               color="primary"
-              invisible={mapPolygon.length > 0}
+              invisible={
+                !isSatelliteMode || (isSatelliteMode && mapPolygon.length > 0)
+              }
               badgeContent={nextButtonBadgeContent()}
             >
               <NavButton
-                disabled={mapPolygon.length === 0}
+                disabled={isSatelliteMode && mapPolygon.length === 0}
                 onClick={() => {
-                  calcBiomass();
-                  // navigate('/soil');
+                  if (isSatelliteMode) {
+                    calcBiomass();
+                    navigate('/covercrop');
+                  } else {
+                    navigate('/soil');
+                  }
                   return null;
                 }}
               >

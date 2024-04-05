@@ -3,7 +3,6 @@
 /* eslint-disable no-console */
 import {
   Box,
-  // Slider,
   Stack,
   Typography,
 } from '@mui/material';

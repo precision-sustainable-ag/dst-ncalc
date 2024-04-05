@@ -11,7 +11,7 @@ import Stack from '@mui/material/Stack';
 import { get } from '../../store/Store';
 import { AreaErrorModal, TaskFailModal } from './Warnings';
 import Datebox from './Datebox';
-import useFetchHLS from '../../hooks/useFetchHLS';
+// import useFetchHLS from '../../hooks/useFetchHLS';
 
 const Biomass = () => {
   const mapPolygon = useSelector(get.mapPolygon);
@@ -21,7 +21,7 @@ const Biomass = () => {
   const polyDrawTooBig = useSelector(get.polyDrawTooBig);
   const unit = useSelector(get.unit);
 
-  useFetchHLS();
+  // useFetchHLS();
 
   return (
     <Box pb={2}>
@@ -61,7 +61,7 @@ const Biomass = () => {
                   color={polyDrawTooBig ? 'warning' : 'success'}
                   disabled={mapPolygon.length !== 1 || biomassFetchIsLoading}
                   // eslint-disable-next-line no-undef
-                  onClick={handleButton}
+                  // onClick={handleButton}
                 >
                   <div style={{ fontWeight: 900 }}>Calculate Biomass</div>
                 </Button>
