@@ -139,27 +139,6 @@ const LeftSideBar = ({ sidebarListData, refs }) => {
             })
           }
         </Stack>
-        {/* <Box sx={{ height: '100px' }}>
-          <Slider
-            aria-label="Volume"
-            value={value}
-            // getAriaValueText={value}
-            valueLabelDisplay="auto"
-            defaultValue={3000}
-            min={1000}
-            max={10000}
-            // shiftStep={3500}
-            step={500}
-            marks
-            onChange={(e) => {
-              // dispatch(set.biomass(newVal.target));
-              console.log('biomass slider changed ', e.target.value);
-              dispatch(set.biomass(e.target.value));
-              setValue(e.target.value);
-              return null;
-            }}
-          />
-        </Box> */}
       </Box>
     </Box>
   );

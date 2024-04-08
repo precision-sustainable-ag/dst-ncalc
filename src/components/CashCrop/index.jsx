@@ -1,3 +1,4 @@
+/* eslint-disable operator-linebreak */
 import React from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { useNavigate } from 'react-router-dom';
@@ -45,13 +46,13 @@ const CashCrops = () => {
         disablePortal
         id="combo-box-demo"
         autoFocus
-        options={[
-          ...crops,
-        ]}
+        options={[...crops]}
         sx={{ width: '100%' }}
         // defaultValue={coverCrop ? coverCrop : ''}
         value={cashCrop}
-        renderInput={(params) => <TextField {...params} label="Select a cash crop" />}
+        renderInput={(params) => (
+          <TextField {...params} label="Select a cash crop" />
+        )}
         onChange={(el, va) => {
           dispatch(set.cashCrop(va));
         }}
@@ -60,7 +61,7 @@ const CashCrops = () => {
   );
 }; // CashCrops
 
-const CashCrop = () => {
+const CashCrop = ({ barebone = false }) => {
   const unit = useSelector(get.unit);
   const cashCrop = useSelector(get.cashCrop);
   const targetN = useSelector(get.targetN);
@@ -99,7 +100,11 @@ const CashCrop = () => {
           width: '100%',
         }}
       >
-        <Typography variant="h4">Tell us about your Cash Crop</Typography>
+        {barebone ? (
+          <Typography variant="h5">Tell us about your Cash Crop</Typography>
+        ) : (
+          <Typography variant="h4">Tell us about your Cash Crop</Typography>
+        )}
         <Box mt={2}>
           <Stack direction="row" alignItems="center">
             <CustomInputText>Cash Crop: </CustomInputText>
@@ -108,64 +113,62 @@ const CashCrop = () => {
           <CashCrops />
           <Stack direction="row" alignItems="center">
             <CustomInputText>Cash Crop Planting Date: </CustomInputText>
-            {(!cashCropPlantingDate) && <Required />}
+            {!cashCropPlantingDate && <Required />}
           </Stack>
           <Input type="date" id="cashCropPlantingDate" />
 
-          {cashCrop === 'Corn'
-            && (
-              <Box mt={2}>
-                <Stack direction="row" alignItems="center">
-                  <CustomInputText>Yield Goal (bu/ac):</CustomInputText>
-                  {(!Yield || Yield <= 0) && <Required />}
-                </Stack>
-                <Myslider
-                  id="yield"
-                  min={0}
-                  max={300}
-                />
-              </Box>
-            )}
+          {cashCrop === 'Corn' && (
+            <Box mt={2}>
+              <Stack direction="row" alignItems="center">
+                <CustomInputText>Yield Goal (bu/ac):</CustomInputText>
+                {(!Yield || Yield <= 0) && <Required />}
+              </Stack>
+              <Myslider id="yield" min={0} max={300} />
+            </Box>
+          )}
 
-          <Box mt={2} sx={{ display: 'flex', flexDirection: 'row', alignItems: 'center' }}>
+          <Box
+            mt={2}
+            sx={{ display: 'flex', flexDirection: 'row', alignItems: 'center' }}
+          >
             <Stack direction="row" alignItems="center">
               <CustomInputText>
-                What is your Target Nitrogen Fertilizer Rate? (
-                {unit}
+                What is your Target Nitrogen Fertilizer Rate? ({unit}
                 ):
               </CustomInputText>
-              <Help>
-                Specify the target N rate for your region.
-              </Help>
+              <Help>Specify the target N rate for your region.</Help>
               {(!targetN || targetN <= 0) && <Required />}
             </Stack>
           </Box>
 
-          <Myslider
-            id="targetN"
-            min={0}
-            max={300}
-          />
-          <Box
-            sx={{
-              justifyContent: 'space-around',
-              alignItems: 'space-between',
-              width: '100%',
-              display: 'flex',
-              flexDirection: 'row',
-            }}
-            mt={6}
-          >
-            <NavButton onClick={() => navigate('/covercrop')}>
-              BACK
-            </NavButton>
-            <NavButton
-              onClick={() => navigate('/output')}
-              disabled={!cashCrop || !cashCropPlantingDate || !targetN || targetN < 0 || !Yield || Yield < 0}
+          <Myslider id="targetN" min={0} max={300} />
+          {!barebone && (
+            <Box
+              sx={{
+                justifyContent: 'space-around',
+                alignItems: 'space-between',
+                width: '100%',
+                display: 'flex',
+                flexDirection: 'row',
+              }}
+              mt={6}
             >
-              NEXT
-            </NavButton>
-          </Box>
+              <NavButton onClick={() => navigate('/covercrop')}>BACK</NavButton>
+              <NavButton
+                onClick={() => navigate('/output')}
+                disabled={
+                  !cashCrop ||
+                  !cashCropPlantingDate ||
+                  !targetN ||
+                  targetN < 0 ||
+                  !Yield ||
+                  Yield < 0
+                }
+              >
+                NEXT
+              </NavButton>
+            </Box>
+          )}
         </Box>
       </Box>
     </Box>

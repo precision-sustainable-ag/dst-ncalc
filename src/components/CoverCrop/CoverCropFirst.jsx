@@ -1,3 +1,4 @@
+/* eslint-disable indent */
 import React, { useEffect, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { useNavigate } from 'react-router-dom';
@@ -9,8 +10,8 @@ import Box from '@mui/material/Box';
 import Snackbar from '@mui/material/Snackbar';
 import Paper from '@mui/material/Paper';
 import Stack from '@mui/material/Stack';
-import Button from '@mui/material/Button';
-import Modal from '@mui/material/Modal';
+// import Button from '@mui/material/Button';
+// import Modal from '@mui/material/Modal';
 import Alert from '@mui/material/Alert';
 import Slide from '@mui/material/Slide';
 import { styled } from '@mui/material';
@@ -25,7 +26,8 @@ import Required from '../../shared/Required';
 import NavButton from '../../shared/Navigate/NavButton';
 import { useFetchPlantFactors } from '../../hooks/useFetchApi';
 
-const UGA_LINK = 'https://extension.uga.edu/publications/detail.html?number=C1077';
+const UGA_LINK =
+  'https://extension.uga.edu/publications/detail.html?number=C1077';
 
 const CustomInputText = styled(Typography)({
   fontSize: '1.2rem',
@@ -35,7 +37,7 @@ const CustomInputText = styled(Typography)({
   marginBottom: '0.2rem',
 });
 
-const CoverCropFirst = () => {
+const CoverCropFirst = ({ barebone = false }) => {
   const dispatch = useDispatch();
   const navigate = useNavigate();
   const maxBiomass = useSelector(get.maxBiomass);
@@ -44,19 +46,19 @@ const CoverCropFirst = () => {
   // eslint-disable-next-line no-nested-ternary
   const max = isSatelliteMode
     ? maxBiomass[coverCrop]
-    : (
-      coverCrop.length && Array.isArray(coverCrop)
-        ? coverCrop.map((s) => maxBiomass[s]).sort((a, b) => b - a)[0] || 15000
-        : 15000
-    );
+    : coverCrop.length && Array.isArray(coverCrop)
+    ? coverCrop.map((s) => maxBiomass[s]).sort((a, b) => b - a)[0] || 15000
+    : 15000;
   const freshMax = max * 4 || 30000;
   const biomass = useSelector(get.biomass);
   const unit = useSelector(get.unit);
   const freshBiomass = useSelector(get.freshBiomass);
   const biomassTotalValue = useSelector(get.biomassTotalValue);
-  const mapPolygon = useSelector(get.mapPolygon);
-  const [open, setOpen] = useState(true);
-  const [biomassNotExist, setBiomassNotExist] = useState(!isSatelliteMode ? false : (!biomassTotalValue));
+  // const mapPolygon = useSelector(get.mapPolygon);
+  // const [open, setOpen] = useState(true);
+  const [biomassNotExist, setBiomassNotExist] = useState(
+    !isSatelliteMode ? false : !biomassTotalValue,
+  );
   const coverCropGrowthStage = useSelector(get.coverCropGrowthStage);
   const coverCropTerminationDate = useSelector(get.coverCropTerminationDate);
   const lwc = useSelector(get.lwc);
@@ -78,11 +80,23 @@ const CoverCropFirst = () => {
   /// Desc: Set the disableNextButton state
   useEffect(() => {
     if (isSatelliteMode) {
-      setDisableNextButton((!biomassTotalValue || !coverCrop || !coverCropGrowthStage));
+      setDisableNextButton(
+        !biomassTotalValue || !coverCrop || !coverCropGrowthStage,
+      );
     } else {
-      setDisableNextButton(!biomass || coverCrop.length === 0 || !coverCropTerminationDate || !lwc);
+      setDisableNextButton(
+        !biomass || coverCrop.length === 0 || !coverCropTerminationDate || !lwc,
+      );
     }
-  }, [isSatelliteMode, biomass, coverCrop, coverCropGrowthStage, coverCropTerminationDate, lwc, biomassTotalValue]);
+  }, [
+    isSatelliteMode,
+    biomass,
+    coverCrop,
+    coverCropGrowthStage,
+    coverCropTerminationDate,
+    lwc,
+    biomassTotalValue,
+  ]);
 
   return (
     <Box
@@ -115,48 +129,52 @@ const CoverCropFirst = () => {
           width: '100%',
         }}
       >
-        <Typography variant="h4">Tell us about your Cover Crop</Typography>
+        {barebone ? (
+          <Typography variant="h5">Tell us about your Cover Crop</Typography>
+        ) : (
+          <Typography variant="h4">Tell us about your Cover Crop</Typography>
+        )}
         <Stack direction="column" spacing={2} mt={2}>
           <Stack direction="row" alignItems="center">
             <CustomInputText>Cover Crop Species:</CustomInputText>
             {(!coverCrop || coverCrop.length === 0) && <Required />}
           </Stack>
           <CoverCropsInput isSatelliteMode={isSatelliteMode} />
-          {
-            isSatelliteMode && coverCrop && (
-              <Box>
-                <Stack direction="row" alignItems="center">
-                  <CustomInputText>Cover Crop Growth Stage:</CustomInputText>
-                  {!coverCropGrowthStage && <Required />}
-                </Stack>
-                <GrowthStageInput isSatelliteMode={isSatelliteMode} />
-              </Box>
-            )
-          }
-          {
-            isSatelliteMode ? (
-              <Paper mt={2}>
-                <Stack m={2} direction="row" alignItems="center">
-                  <Typography>
-                    Biomass Unit: &nbsp;
-                  </Typography>
-                  <RadioGroup row aria-label="position" name="position" style={{ display: 'inline-block', marginLeft: '1em' }}>
-                    <FormControlLabel
-                      value="lb/ac"
-                      control={<Radio id="unit" checked={unit === 'lb/ac'} />}
-                      onChange={() => dispatch(set.unit('lb/ac'))}
-                      label="lb/ac"
-                    />
-                    <FormControlLabel
-                      value="kg/ha"
-                      control={<Radio id="unit" checked={unit === 'kg/ha'} />}
-                      onChange={() => dispatch(set.unit('kg/ha'))}
-                      label="kg/ha"
-                    />
-                  </RadioGroup>
-                </Stack>
-                <Biomass minified={false} />
-                {/* {mapPolygon.length === 0 && (
+          {isSatelliteMode && coverCrop && (
+            <Box>
+              <Stack direction="row" alignItems="center">
+                <CustomInputText>Cover Crop Growth Stage:</CustomInputText>
+                {!coverCropGrowthStage && <Required />}
+              </Stack>
+              <GrowthStageInput isSatelliteMode={isSatelliteMode} />
+            </Box>
+          )}
+          {isSatelliteMode ? (
+            <Paper mt={2}>
+              <Stack m={2} direction="row" alignItems="center">
+                <Typography>Biomass Unit: &nbsp;</Typography>
+                <RadioGroup
+                  row
+                  aria-label="position"
+                  name="position"
+                  style={{ display: 'inline-block', marginLeft: '1em' }}
+                >
+                  <FormControlLabel
+                    value="lb/ac"
+                    control={<Radio id="unit" checked={unit === 'lb/ac'} />}
+                    onChange={() => dispatch(set.unit('lb/ac'))}
+                    label="lb/ac"
+                  />
+                  <FormControlLabel
+                    value="kg/ha"
+                    control={<Radio id="unit" checked={unit === 'kg/ha'} />}
+                    onChange={() => dispatch(set.unit('kg/ha'))}
+                    label="kg/ha"
+                  />
+                </RadioGroup>
+              </Stack>
+              <Biomass minified={false} />
+              {/* {mapPolygon.length === 0 && (
                   <Modal
                     open={open}
                     onClose={() => setOpen(false)}
@@ -220,34 +238,58 @@ const CoverCropFirst = () => {
                     </Paper>
                   </Modal>
                 )} */}
-              </Paper>
-            ) : (
-              <>
-                <Stack direction="row" alignItems="center">
-                  <CustomInputText>Cover Crop Termination Date:</CustomInputText>
-                  {(!coverCropTerminationDate) && <Required />}
-                </Stack>
-                <Input type="date" id="coverCropTerminationDate" />
-              </>
-            )
-          }
-          {isSatelliteMode ? '' : (
+            </Paper>
+          ) : (
             <>
-              <Box mt={1} sx={{ display: 'flex', flexDirection: 'row', alignItems: 'center' }}>
+              <Stack direction="row" alignItems="center">
+                <CustomInputText>Cover Crop Termination Date:</CustomInputText>
+                {!coverCropTerminationDate && <Required />}
+              </Stack>
+              <Input type="date" id="coverCropTerminationDate" />
+            </>
+          )}
+          {isSatelliteMode ? (
+            ''
+          ) : (
+            <>
+              <Box
+                mt={1}
+                sx={{
+                  display: 'flex',
+                  flexDirection: 'row',
+                  alignItems: 'center',
+                }}
+              >
                 <Stack direction="row" alignItems="center">
                   <CustomInputText>Dry Biomass </CustomInputText>
                   <Help>
-                    <p>The amount of cover crop biomass on a dry weight basis.</p>
                     <p>
-                      For details on cover crop biomass sampling and taking a representative sub-sample for quality analysis, please refer to
-                      <a tabIndex="-1" target="_blank" rel="noreferrer" href={UGA_LINK}>here</a>
+                      The amount of cover crop biomass on a dry weight basis.
+                    </p>
+                    <p>
+                      For details on cover crop biomass sampling and taking a
+                      representative sub-sample for quality analysis, please
+                      refer to
+                      <a
+                        tabIndex="-1"
+                        target="_blank"
+                        rel="noreferrer"
+                        href={UGA_LINK}
+                      >
+                        here
+                      </a>
                       .
                     </p>
                   </Help>
                   {!biomass && <Required />}
                 </Stack>
                 :
-                <RadioGroup row aria-label="position" name="position" style={{ display: 'inline-block', marginLeft: '1em' }}>
+                <RadioGroup
+                  row
+                  aria-label="position"
+                  name="position"
+                  style={{ display: 'inline-block', marginLeft: '1em' }}
+                >
                   <FormControlLabel
                     value="lb/ac"
                     control={<Radio id="unit" checked={unit === 'lb/ac'} />}
@@ -263,90 +305,99 @@ const CoverCropFirst = () => {
                 </RadioGroup>
               </Box>
 
-              <Myslider
-                id="biomass"
-                min={0}
-                max={max}
-              />
+              <Myslider id="biomass" min={0} max={max} />
 
-              {+biomass > +max
-                && (
-                  <p className="warning">
-                    This biomass seems too high
-                    {warningText}
-                    .
-                    <br />
-                    Please make sure the biomass entered is on a dry matter basis.
-                  </p>
-                )}
-              {+freshBiomass > +freshMax
-                && (
-                  <p className="warning">
-                    This biomass seems too high
-                    {warningText}
-                    .
-                    <br />
-                    Please make sure the biomass entered is on a fresh matter basis.
-                  </p>
-                )}
+              {+biomass > +max && (
+                <p className="warning">
+                  This biomass seems too high
+                  {warningText}
+                  .
+                  <br />
+                  Please make sure the biomass entered is on a dry matter basis.
+                </p>
+              )}
+              {+freshBiomass > +freshMax && (
+                <p className="warning">
+                  This biomass seems too high
+                  {warningText}
+                  .
+                  <br />
+                  Please make sure the biomass entered is on a fresh matter
+                  basis.
+                </p>
+              )}
 
-              <Box mt={2} sx={{ display: 'flex', flexDirection: 'row', alignItems: 'center' }}>
+              <Box
+                mt={2}
+                sx={{
+                  display: 'flex',
+                  flexDirection: 'row',
+                  alignItems: 'center',
+                }}
+              >
                 <Stack direction="row" alignItems="center">
-                  <CustomInputText>Cover Crop Water Content at Termination (g water/g dry biomass)</CustomInputText>
+                  <CustomInputText>
+                    Cover Crop Water Content at Termination (g water/g dry
+                    biomass)
+                  </CustomInputText>
                   <Help>
-                    <p>Use the following calculation to adjust default values:</p>
-                    <p>Cover Crop Water Content = (Total fresh weight - Total dry weight)/(Total dry weight)</p>
+                    <p>
+                      Use the following calculation to adjust default values:
+                    </p>
+                    <p>
+                      Cover Crop Water Content = (Total fresh weight - Total dry
+                      weight)/(Total dry weight)
+                    </p>
                   </Help>
                   {!lwc && <Required />}
                 </Stack>
                 :
               </Box>
-              <Myslider
-                id="lwc"
-                min={0}
-                max={10}
-                step={0.1}
-              />
+              <Myslider id="lwc" min={0} max={10} step={0.1} />
             </>
           )}
         </Stack>
-        <Box
-          sx={{
-            justifyContent: 'space-around',
-            alignItems: 'space-between',
-            width: '100%',
-            display: 'flex',
-            flexDirection: 'row',
-          }}
-          mt={4}
-        >
-          <NavButton onClick={() => navigate('/soil')}>
-            BACK
-          </NavButton>
-          <NavButton
-            onClick={() => navigate('/covercrop2')}
-            disabled={disableNextButton}
+        {!barebone && (
+          <Box
+            sx={{
+              justifyContent: 'space-around',
+              alignItems: 'space-between',
+              width: '100%',
+              display: 'flex',
+              flexDirection: 'row',
+            }}
+            mt={4}
           >
-            NEXT
-          </NavButton>
-          <Snackbar
-            open={biomassNotExist}
-            TransitionComponent={Slide}
-            autoHideDuration={5000}
-            onClose={() => { setBiomassNotExist(false); }}
-          >
-            <Alert
-              onClose={() => { setBiomassNotExist(false); }}
-              severity="warning"
-              variant="filled"
-              sx={{ width: '100%' }}
+            <NavButton onClick={() => navigate('/soil')}>BACK</NavButton>
+            <NavButton
+              onClick={() => navigate('/covercrop2')}
+              disabled={disableNextButton}
             >
-              <Typography variant="subtitle1">
-                Biomass value need to be calculated first
-              </Typography>
-            </Alert>
-          </Snackbar>
-        </Box>
+              NEXT
+            </NavButton>
+            <Snackbar
+              open={biomassNotExist}
+              TransitionComponent={Slide}
+              autoHideDuration={5000}
+              onClose={() => {
+                setBiomassNotExist(false);
+              }}
+            >
+              <Alert
+                onClose={() => {
+                  setBiomassNotExist(false);
+                }}
+                severity="warning"
+                variant="filled"
+                sx={{ width: '100%' }}
+              >
+                <Typography variant="subtitle1">
+                  Biomass value need to be calculated first
+                </Typography>
+              </Alert>
+            </Snackbar>
+          </Box>
+        )}
       </Box>
     </Box>
   );

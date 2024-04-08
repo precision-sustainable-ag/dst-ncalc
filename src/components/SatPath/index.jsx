@@ -10,7 +10,7 @@ import RightSideBar from './subcomponents/RightSideBar';
 import { get } from '../../store/redux-autosetters';
 import useStoreMem from '../../hooks/useStoreMem';
 import { useFetchNitrogenArray } from '../../hooks/useFetchApi';
-import { sidebarListData, summaryDataDefaults } from '../../constants';
+import { sidebarListDataSatpath, summaryDataDefaults } from '../../constants';
 
 const wrapperStyles = {
   width: '100%',
@@ -18,7 +18,7 @@ const wrapperStyles = {
 
 const Index = () => {
   const [summaryData, setSummaryData] = useState(summaryDataDefaults);
-  const refs = sidebarListData.map(() => useRef(null));
+  const refs = sidebarListDataSatpath.map(() => useRef(null));
   const field = useSelector(get.field);
   const coverCrop = useSelector(get.coverCrop);
   const coverCropTerminationDate = useSelector(get.coverCropTerminationDate);
@@ -48,8 +48,8 @@ const Index = () => {
   return (
     <Box sx={wrapperStyles} id="gfdgdd">
       <Stack direction="row" justifyContent="space-between">
-        <LeftSideBar sidebarListData={sidebarListData} refs={refs} />
-        <RightSideBar sidebarListData={sidebarListData} summaryData={summaryData} refs={refs} />
+        <LeftSideBar sidebarListData={sidebarListDataSatpath} refs={refs} />
+        <RightSideBar sidebarListData={sidebarListDataSatpath} summaryData={summaryData} refs={refs} />
       </Stack>
     </Box>
   );

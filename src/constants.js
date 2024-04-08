@@ -86,4 +86,61 @@ const sidebarListData = [
   },
 ];
 
-export { summaryDataDefaults, sidebarListData };
+const sidebarListDataSatpath = [
+  {
+    label: 'Location',
+    key: 'sidebar-nav-1',
+    startPos: 0,
+    endPos: 100,
+  },
+  {
+    label: 'Soil Data',
+    key: 'sidebar-nav-2',
+    startPos: 100,
+    endPos: 200,
+  },
+  {
+    label: 'Cover Crop',
+    key: 'sidebar-nav-3',
+    startPos: 200,
+    endPos: 300,
+  },
+  {
+    label: 'Cash Crop',
+    key: 'sidebar-nav-4',
+    startPos: 300,
+    endPos: 400,
+  },
+  {
+    label: 'Data Summary',
+    key: 'sidebar-nav-5',
+    startPos: 400,
+    endPos: 500,
+  },
+  {
+    label: 'Nitrogen Released',
+    key: 'sidebar-nav-6',
+    startPos: 500,
+    endPos: 600,
+  },
+  {
+    label: 'Residue Remaining',
+    key: 'sidebar-nav-7',
+    startPos: 600,
+    endPos: 700,
+  },
+  {
+    label: 'Biomass Map',
+    key: 'sidebar-nav-8',
+    startPos: 700,
+    endPos: 800,
+  },
+  {
+    label: 'Nitrogen Map',
+    key: 'sidebar-nav-9',
+    startPos: 800,
+    endPos: 900,
+  },
+];
+
+export { summaryDataDefaults, sidebarListData, sidebarListDataSatpath };

@@ -38,7 +38,7 @@ const nextButtonBadgeContent = () => (
   </Tooltip>
 );
 
-const Location = () => {
+const Location = ({ barebone = false }) => {
   const navigate = useNavigate();
   const isSatelliteMode = useSelector(get.biomassCalcMode) === 'satellite';
   const mapPolygon = useSelector(get.mapPolygon);
@@ -104,9 +104,11 @@ const Location = () => {
             aria-controls="panel1a-content"
             id="panel1a-header"
           >
-            <Typography variant="h5" gutterBottom>
-              Where is your Field located?
-            </Typography>
+            {!barebone && (
+              <Typography variant="h5" gutterBottom>
+                Where is your Field located?
+              </Typography>
+            )}
           </AccordionSummary>
           <AccordionDetails>
             <Stack mb={1}>
@@ -138,40 +140,42 @@ const Location = () => {
       <Box sx={{ margin: '2rem 0rem' }}>
         <Paper sx={{ padding: '1rem', borderRadius: '1rem' }}>
           <BiomassMap variant="biomass" />
-          <Box
-            mt={2}
-            sx={{
-              justifyContent: 'space-around',
-              alignItems: 'space-between',
-              width: '100%',
-              display: 'flex',
-              flexDirection: 'row',
-            }}
-          >
-            <NavButton onClick={() => navigate('/home')}>BACK</NavButton>
-            <Badge
-              color="primary"
-              invisible={
-                !isSatelliteMode || (isSatelliteMode && mapPolygon.length > 0)
-              }
-              badgeContent={nextButtonBadgeContent()}
+          {!barebone && (
+            <Box
+              mt={2}
+              sx={{
+                justifyContent: 'space-around',
+                alignItems: 'space-between',
+                width: '100%',
+                display: 'flex',
+                flexDirection: 'row',
+              }}
             >
-              <NavButton
-                disabled={isSatelliteMode && mapPolygon.length === 0}
-                onClick={() => {
-                  if (isSatelliteMode) {
-                    calcBiomass();
-                    navigate('/covercrop');
-                  } else {
-                    navigate('/soil');
-                  }
-                  return null;
-                }}
+              <NavButton onClick={() => navigate('/home')}>BACK</NavButton>
+              <Badge
+                color="primary"
+                invisible={
+                  !isSatelliteMode || (isSatelliteMode && mapPolygon.length > 0)
+                }
+                badgeContent={nextButtonBadgeContent()}
               >
-                NEXT
-              </NavButton>
-            </Badge>
-          </Box>
+                <NavButton
+                  disabled={isSatelliteMode && mapPolygon.length === 0}
+                  onClick={() => {
+                    if (isSatelliteMode) {
+                      calcBiomass();
+                      navigate('/covercrop');
+                    } else {
+                      navigate('/soil');
+                    }
+                    return null;
+                  }}
+                >
+                  NEXT
+                </NavButton>
+              </Badge>
+            </Box>
+          )}
         </Paper>
       </Box>
     </Box>
