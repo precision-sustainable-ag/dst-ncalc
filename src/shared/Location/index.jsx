@@ -15,6 +15,7 @@ import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
 import AccordionSummary from '@mui/material/AccordionSummary';
 import AccordionDetails from '@mui/material/AccordionDetails';
 import { useSelector } from 'react-redux';
+import { LinearProgress } from '@mui/material';
 import BiomassMap from '../Map/BiomassMap';
 // import NitrogenMap from '../Map/NitrogenMap';
 import Input from '../Inputs';
@@ -22,7 +23,6 @@ import Help from '../Help';
 import { get } from '../../store/Store';
 import NavButton from '../Navigate/NavButton';
 import useFetchHLS from '../../hooks/useFetchHLS';
-import { LinearProgress } from '@mui/material';
 import Datebox from '../Biomass/Datebox';
 
 const CustomizedAccordion = styled(Accordion)(() => ({
@@ -45,53 +45,6 @@ const Location = ({ barebone = false }) => {
   const biomassFetchIsLoading = useSelector(get.biomassFetchIsLoading);
 
   useFetchHLS();
-
-  // const calcBiomass = () => {
-  //   dispatch(set.biomassTaskResults({}));
-  //   dispatch(set.biomassTaskIsDone(false));
-  //   // setData(null);
-  //   let area;
-  //   area = 0;
-  //   // reverse order of vertices
-  //   if (mapPolygon.length > 0) {
-  //     area =
-  //       0.000247105 *
-  //       turf.area(turf.polygon(mapPolygon[0].geometry.coordinates));
-  //   }
-
-  //   if (area > 10000) {
-  //     dispatch(set.polyDrawTooBig(true));
-  //     dispatch(set.mapPolygon([]));
-  //   } else {
-  //     const revertedCoords = [
-  //       ...mapPolygon[0].geometry.coordinates[0],
-  //     ].reverse();
-  //     const payload = {
-  //       maxCloudCover: 5,
-  //       startDate: coverCropPlantingDate,
-  //       endDate: coverCropTerminationDate,
-  //       geometry: {
-  //         type: 'Polygon',
-  //         coordinates: [revertedCoords],
-  //       },
-  //     };
-  //     dispatch(set.biomassFetchIsLoading(true));
-  //     const headers = {
-  //       'Content-Type': 'application/json',
-  //     };
-  //     axios
-  //       .post(`${HLS_API_URL}/tasks`, payload, { headers })
-  //       .then((response) => {
-  //         if (response.status === 200 && response.data) {
-  //           dispatch(set.biomassTaskId(response.data.task_id));
-  //         }
-  //       })
-  //       .catch((error) => {
-  //         // eslint-disable-next-line no-console
-  //         console.log(error);
-  //       });
-  //   }
-  // };
 
   return (
     <Box sx={{ width: '100%', padding: '0rem' }}>

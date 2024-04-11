@@ -1,11 +1,11 @@
 /* eslint-disable no-console */
 import React from 'react';
-import { Box, Grid } from '@mui/material';
+import { Box, Grid, Stack } from '@mui/material';
 import { useSelector } from 'react-redux';
 import NitrogenCard from './NitrogenWidget';
 import ResidueCard from './ResidueWidget';
 import SoilCard from './SoilWidget';
-import BiomassMapWidget from './BiomassMapWidget';
+// import BiomassMapWidget from './BiomassMapWidget';
 import { SummaryCard } from './SummaryWidget';
 import NitrogenMapWidget from './NitrogenMapWidget';
 import { get } from '../../../store/redux-autosetters';
@@ -44,35 +44,24 @@ const RightSideBar = ({ summaryData, refs }) => {
       id="rightside-wrapper"
     >
       <Grid container spacing={3}>
-        <Grid item sm={12} lg={6} width="100%">
-          <LocationCard refVal={refs[0]} />
+        <Grid item sm={12} width="100%">
+          <SummaryCard refVal={refs[0]} data={summaryData} />
         </Grid>
         <Grid item sm={12} lg={6} width="100%">
-          <SoilCard refVal={refs[1]} />
+          <Stack direction="column" spacing={3}>
+            <LocationCard refVal={refs[1]} />
+            <SoilCard refVal={refs[2]} />
+            <CoverCropFirstCard refVal={refs[3]} />
+            <CoverCropSecondCard refVal={refs[4]} />
+          </Stack>
         </Grid>
         <Grid item sm={12} lg={6} width="100%">
-          <CoverCropFirstCard refVal={refs[2]} />
-        </Grid>
-        <Grid item sm={12} lg={6} width="100%">
-          <CoverCropSecondCard refVal={refs[3]} />
-        </Grid>
-        <Grid item sm={12} lg={6} width="100%">
-          <CashCropCard refVal={refs[4]} />
-        </Grid>
-        <Grid item sm={12} lg={6} width="100%">
-          <NitrogenCard refVal={refs[5]} />
-        </Grid>
-        <Grid item sm={12} lg={6} width="100%">
-          <ResidueCard refVal={refs[6]} />
-        </Grid>
-        {/* <Grid item sm={12} lg={6} width="100%">
-          <BiomassMapWidget refVal={refs[7]} />
-        </Grid> */}
-        <Grid item sm={12} lg={6} width="100%">
-          <SummaryCard refVal={refs[7]} data={summaryData} />
-        </Grid>
-        <Grid item sm={12} lg={6} width="100%">
-          <NitrogenMapWidget refVal={refs[8]} />
+          <Stack direction="column" spacing={3}>
+            <CashCropCard refVal={refs[5]} />
+            <NitrogenCard refVal={refs[6]} />
+            <ResidueCard refVal={refs[7]} />
+            <NitrogenMapWidget refVal={refs[8]} />
+          </Stack>
         </Grid>
         <Grid item sm={12} lg={12} width="100%" my={5}>
           <NavigateButtons

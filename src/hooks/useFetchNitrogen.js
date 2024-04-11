@@ -43,9 +43,7 @@ const useFetchNitrogen = () => {
     // setEndDate(end);
 
     if (
-      biomassTaskResults &&
-      biomassTaskResults.data_array &&
-      biomassTaskResults.data_array.length > 0
+      biomassTaskResults && biomassTaskResults.data_array && biomassTaskResults.data_array.length > 0
     ) {
       setArrayDim([
         biomassTaskResults.data_array.length,
