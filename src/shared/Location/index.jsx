@@ -43,6 +43,7 @@ const Location = ({ barebone = false }) => {
   const navigate = useNavigate();
   const isSatelliteMode = useSelector(get.biomassCalcMode) === 'satellite';
   const biomassFetchIsLoading = useSelector(get.biomassFetchIsLoading);
+  const biomassTaskResults = useSelector(get.biomassTaskResults);
 
   useFetchHLS();
 
@@ -98,7 +99,34 @@ const Location = ({ barebone = false }) => {
       </Box>
       <Box sx={{ margin: '2rem 0rem' }}>
         <Paper sx={{ padding: '1rem', borderRadius: '1rem' }}>
-          {biomassFetchIsLoading && (<LinearProgress />)}
+          {biomassFetchIsLoading
+            && (
+              <Box>
+                <Stack>
+                  <LinearProgress />
+                </Stack>
+              </Box>
+            )}
+          {biomassTaskResults && !biomassFetchIsLoading && (
+            <Box
+              justifyContent="center"
+              alignItems="center"
+            >
+              <Typography variant="h6" fontWeight="bold" gutterBottom textAlign="center">
+                Biomass Map
+              </Typography>
+            </Box>
+          )}
+          { biomassFetchIsLoading && (
+            <Box
+              justifyContent="center"
+              alignItems="center"
+            >
+              <Typography variant="h6" fontWeight="bold" gutterBottom textAlign="center">
+                Calculating Biomass ...
+              </Typography>
+            </Box>
+          )}
           <BiomassMap variant="biomass" />
           {!barebone && (
             <Box

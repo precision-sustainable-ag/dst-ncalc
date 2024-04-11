@@ -27,10 +27,11 @@ const useFetchHLS = () => {
   const coverCropPlantingDate = useSelector(get.coverCropPlantingDate);
   const coverCropTerminationDate = useSelector(get.coverCropTerminationDate);
   const mapPolygon = useSelector(get.mapPolygon);
+  const activeExample = useSelector(get.activeExample);
   const dispatch = useDispatch();
 
   useEffect(() => {
-    if (mapPolygon.length > 0) {
+    if (mapPolygon.length > 0 && !activeExample && !biomassTaskId) {
       dispatch(set.biomassTaskResults({}));
       dispatch(set.biomassTaskIsDone(false));
       // setData(null);
