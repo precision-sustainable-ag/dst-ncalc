@@ -132,9 +132,14 @@ const Location = ({ barebone = false }) => {
               />
               <Help />
             </Box>
-            <Box mt={5}>
+            <Stack mt={5} gap={1}>
+              {isSatelliteMode && (
+                <Typography variant="h8" gutterBottom>
+                  Specify your crop&apos;s planting and termination dates.
+                </Typography>
+              )}
               <Datebox />
-            </Box>
+            </Stack>
           </AccordionDetails>
         </CustomizedAccordion>
       </Box>
