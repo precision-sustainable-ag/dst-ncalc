@@ -30,13 +30,14 @@ const Soil = ({ barebone = false }) => {
         padding: '1rem',
         borderRadius: '1rem',
         flexDirection: 'column',
-        width: {
-          xs: '100%',
-          sm: '100%',
-          md: '90%',
-          lg: '70%',
-          xl: '60%',
-        },
+        width: '100%',
+        // width: {
+        //   xs: '100%',
+        //   sm: '100%',
+        //   md: '90%',
+        //   lg: '70%',
+        //   xl: '60%',
+        // },
       }}
     >
       <Box p={3} pb={0}>

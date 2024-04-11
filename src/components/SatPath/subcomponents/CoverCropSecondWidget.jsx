@@ -28,7 +28,7 @@ const cardContentStyles = {
 
 /// /// /// COMPONENTS /// /// ///
 /// /// /// RETURN JSX /// /// ///
-const CoverCropCard = ({ refVal }) => {
+const CoverCropSecondCard = ({ refVal }) => {
   return (
     <Card sx={CardStyles} elevation={8} ref={refVal}>
       <CardContent sx={cardContentStyles}>
@@ -40,15 +40,16 @@ const CoverCropCard = ({ refVal }) => {
         >
           Cover Crop
         </Typography>
+        <CoverCropSecond barebone />
       </CardContent>
-      <CardActions>
+      {/* <CardActions>
         <Grid container spacing={2}>
           <CoverCropFirst barebone />
           <CoverCropSecond barebone />
         </Grid>
-      </CardActions>
+      </CardActions> */}
     </Card>
   );
 };
 
-export default CoverCropCard;
+export default CoverCropSecondCard;

@@ -39,12 +39,13 @@ const CashCropCard = ({ refVal }) => {
         >
           Cash Crop
         </Typography>
+        <CashCrop barebone />
       </CardContent>
-      <CardActions>
+      {/* <CardActions>
         <Grid container spacing={2}>
           <CashCrop barebone/>
         </Grid>
-      </CardActions>
+      </CardActions> */}
     </Card>
   );
 };

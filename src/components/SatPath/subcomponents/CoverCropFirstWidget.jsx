@@ -2,21 +2,14 @@
 /* eslint-disable arrow-body-style */
 import React from 'react';
 import {
-  Button,
   Card,
   CardActions,
   CardContent,
   Grid,
-  Stack,
   Typography,
-  Tooltip,
-  styled,
-  Box,
 } from '@mui/material';
-import { tooltipClasses } from '@mui/material/Tooltip';
-import Soil from '../../Soil';
-// import { useSelector } from 'react-redux';
-// import { get } from '../../../store/redux-autosetters';
+import CoverCropFirst from '../../CoverCrop/CoverCropFirst';
+import CoverCropSecond from '../../CoverCrop/CoverCropSecond';
 
 /// /// /// STYLES /// /// ///
 const CardStyles = {
@@ -35,7 +28,7 @@ const cardContentStyles = {
 
 /// /// /// COMPONENTS /// /// ///
 /// /// /// RETURN JSX /// /// ///
-const SoilCard = ({ refVal }) => {
+const CoverCropFirstCard = ({ refVal }) => {
   return (
     <Card sx={CardStyles} elevation={8} ref={refVal}>
       <CardContent sx={cardContentStyles}>
@@ -45,16 +38,18 @@ const SoilCard = ({ refVal }) => {
           gutterBottom
           textAlign="center"
         >
-          Soil Data
+          Cover Crop
         </Typography>
-        <Soil barebone />
+        <CoverCropFirst barebone />
       </CardContent>
-      {/* <CardActions> */}
-      {/* <Grid container spacing={2}> */}
-      {/* </Grid> */}
-      {/* </CardActions> */}
+      {/* <CardActions>
+        <Grid container spacing={2}>
+          <CoverCropFirst barebone />
+          <CoverCropSecond barebone />
+        </Grid>
+      </CardActions> */}
     </Card>
   );
 };
 
-export default SoilCard;
+export default CoverCropFirstCard;

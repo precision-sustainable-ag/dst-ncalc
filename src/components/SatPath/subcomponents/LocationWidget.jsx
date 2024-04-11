@@ -1,9 +1,10 @@
+/* eslint-disable arrow-body-style */
 /* eslint-disable react-hooks/exhaustive-deps */
 /* eslint-disable no-console */
 import React, { useRef } from 'react';
 import {
   Card,
-  CardActions,
+  // CardActions,
   CardContent,
   Stack,
   Typography,
@@ -25,6 +26,8 @@ const cardContentStyles = {
   flexDirection: 'column',
   justifyContent: 'center',
   alignItems: 'center',
+  width: '100%',
+  // padding: '0',
 };
 
 // const dividerStyles = {
@@ -38,18 +41,18 @@ const cardContentStyles = {
 const LocationCard = ({ refVal }) => {
   /// /// /// VARIABLES /// /// ///
   // const dispatch = useDispatch();
-  const doIncorporated = false;
-  const N = useSelector(get.N);
-  const cashCropPlantingDate = useSelector(get.cashCropPlantingDate);
-  const biomass = useSelector(get.biomass);
-  const unit = useSelector(get.unit);
-  const cashCrop = useSelector(get.cashCrop);
-  const outputN = useSelector(get.outputN);
-  const nweeks = useSelector(get.nweeks);
-  const targetN = useSelector(get.targetN);
-  const mockup = useSelector(get.mockup);
-  const chartRef1 = useRef(null);
-  const chartRef2 = useRef(null);
+  // const doIncorporated = false;
+  // const N = useSelector(get.N);
+  // const cashCropPlantingDate = useSelector(get.cashCropPlantingDate);
+  // const biomass = useSelector(get.biomass);
+  // const unit = useSelector(get.unit);
+  // const cashCrop = useSelector(get.cashCrop);
+  // const outputN = useSelector(get.outputN);
+  // const nweeks = useSelector(get.nweeks);
+  // const targetN = useSelector(get.targetN);
+  // const mockup = useSelector(get.mockup);
+  // const chartRef1 = useRef(null);
+  // const chartRef2 = useRef(null);
 
   // /// /// HOOKS /// ///
   return (
@@ -65,10 +68,8 @@ const LocationCard = ({ refVal }) => {
             Field Location
           </Typography>
         </Stack>
-      </CardContent>
-      <CardActions>
         <Location barebone />
-      </CardActions>
+      </CardContent>
     </Card>
   );
 };

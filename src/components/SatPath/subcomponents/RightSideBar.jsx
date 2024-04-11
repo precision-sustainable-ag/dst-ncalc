@@ -11,8 +11,10 @@ import NitrogenMapWidget from './NitrogenMapWidget';
 import { get } from '../../../store/redux-autosetters';
 import NavigateButtons from '../../../shared/Navigate';
 import LocationCard from './LocationWidget';
-import CoverCropCard from './CoverCropWidget';
+// import CoverCropCard from './CoverCropFirstWidget';
 import CashCropCard from './CashCropWidget';
+import CoverCropFirstCard from './CoverCropFirstWidget';
+import CoverCropSecondCard from './CoverCropSecondWidget';
 
 /// /// /// STYLES /// /// ///
 const wrapperStyles = {
@@ -41,21 +43,21 @@ const RightSideBar = ({ summaryData, refs }) => {
       justifyContent="center"
       id="rightside-wrapper"
     >
-      <Grid container spacing={5}>
-        <Grid item sm={12} width="100%">
+      <Grid container spacing={3}>
+        <Grid item sm={12} lg={6} width="100%">
           <LocationCard refVal={refs[0]} />
         </Grid>
-        <Grid item sm={12} width="100%">
+        <Grid item sm={12} lg={6} width="100%">
           <SoilCard refVal={refs[1]} />
         </Grid>
-        <Grid item sm={12} width="100%">
-          <CoverCropCard refVal={refs[2]} />
+        <Grid item sm={12} lg={6} width="100%">
+          <CoverCropFirstCard refVal={refs[2]} />
         </Grid>
-        <Grid item sm={12} width="100%">
-          <CashCropCard refVal={refs[3]} />
+        <Grid item sm={12} lg={6} width="100%">
+          <CoverCropSecondCard refVal={refs[3]} />
         </Grid>
-        <Grid item sm={12} width="100%">
-          <SummaryCard refVal={refs[4]} data={summaryData} />
+        <Grid item sm={12} lg={6} width="100%">
+          <CashCropCard refVal={refs[4]} />
         </Grid>
         <Grid item sm={12} lg={6} width="100%">
           <NitrogenCard refVal={refs[5]} />
@@ -63,13 +65,16 @@ const RightSideBar = ({ summaryData, refs }) => {
         <Grid item sm={12} lg={6} width="100%">
           <ResidueCard refVal={refs[6]} />
         </Grid>
-        <Grid item sm={12} lg={12} width="100%">
+        <Grid item sm={12} lg={6} width="100%">
           <BiomassMapWidget refVal={refs[7]} />
         </Grid>
-        <Grid item sm={12} lg={12} width="100%">
-          <NitrogenMapWidget refVal={refs[8]} />
+        <Grid item sm={12} lg={6} width="100%">
+          <SummaryCard refVal={refs[8]} data={summaryData} />
         </Grid>
-        <Grid item sm={12} lg={12} width="100%">
+        <Grid item sm={12} lg={6} width="100%">
+          <NitrogenMapWidget refVal={refs[9]} />
+        </Grid>
+        <Grid item sm={12} lg={12} width="100%" my={5}>
           <NavigateButtons
             backRoute="/home"
             nextRoute="/advanced"

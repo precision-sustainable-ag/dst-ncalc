@@ -1,12 +1,16 @@
+/* eslint-disable operator-linebreak */
 /* eslint-disable react-hooks/exhaustive-deps */
 /* eslint-disable no-console */
 import { useEffect, useState } from 'react';
+import * as turf from '@turf/turf';
 import axios from 'axios';
 import { useDispatch, useSelector } from 'react-redux';
 import { get, set } from '../store/Store';
+import { map } from 'lodash';
 
 let interval;
 const arrayAverage = (arr) => arr.reduce((p, c) => p + c, 0) / arr.length;
+const HLS_API_URL = 'https://covercrop-imagery.org';
 
 /// Desc: useFetchHLS
 /// ..............................................................................
@@ -20,7 +24,59 @@ const useFetchHLS = () => {
   const biomassTaskResults = useSelector(get.biomassTaskResults);
   const biomassTaskId = useSelector(get.biomassTaskId);
   const unit = useSelector(get.unit);
+  const coverCropPlantingDate = useSelector(get.coverCropPlantingDate);
+  const coverCropTerminationDate = useSelector(get.coverCropTerminationDate);
+  const mapPolygon = useSelector(get.mapPolygon);
   const dispatch = useDispatch();
+
+  useEffect(() => {
+    if (mapPolygon.length > 0) {
+      dispatch(set.biomassTaskResults({}));
+      dispatch(set.biomassTaskIsDone(false));
+      // setData(null);
+      let area;
+      area = 0;
+      // reverse order of vertices
+      if (mapPolygon.length > 0) {
+        area =
+          0.000247105 *
+          turf.area(turf.polygon(mapPolygon[0].geometry.coordinates));
+      }
+
+      if (area > 10000) {
+        dispatch(set.polyDrawTooBig(true));
+        dispatch(set.mapPolygon([]));
+      } else {
+        const revertedCoords = [
+          ...mapPolygon[0].geometry.coordinates[0],
+        ].reverse();
+        const payload = {
+          maxCloudCover: 5,
+          startDate: coverCropPlantingDate,
+          endDate: coverCropTerminationDate,
+          geometry: {
+            type: 'Polygon',
+            coordinates: [revertedCoords],
+          },
+        };
+        dispatch(set.biomassFetchIsLoading(true));
+        const headers = {
+          'Content-Type': 'application/json',
+        };
+        axios
+          .post(`${HLS_API_URL}/tasks`, payload, { headers })
+          .then((response) => {
+            if (response.status === 200 && response.data) {
+              dispatch(set.biomassTaskId(response.data.task_id));
+            }
+          })
+          .catch((error) => {
+            // eslint-disable-next-line no-console
+            console.log(error);
+          });
+      }
+    }
+  }, [mapPolygon]);
 
   const fetchTask = () => {
     axios
@@ -39,17 +95,17 @@ const useFetchHLS = () => {
           setData(response.data);
           setTaskIsDone(true);
           clearInterval(interval);
-          dispatch(set.biomassFetchIsLoading(true));
+          dispatch(set.biomassFetchIsLoading(false));
         } else if (response.data.task_status === 'FAILURE') {
           setTaskIsDone(true);
           clearInterval(interval);
-          dispatch(set.biomassFetchIsLoading(true));
+          dispatch(set.biomassFetchIsLoading(false));
           dispatch(set.biomassFetchIsFailed(true));
         }
       })
       .catch(() => {
         setTaskIsDone(true);
-        dispatch(set.biomassFetchIsLoading(true));
+        dispatch(set.biomassFetchIsLoading(false));
         clearInterval(interval);
       });
   };

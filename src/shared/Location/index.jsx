@@ -1,7 +1,8 @@
+/* eslint-disable operator-linebreak */
 import React from 'react';
 import { useNavigate } from 'react-router-dom';
-import * as turf from '@turf/turf';
-import axios from 'axios';
+// import * as turf from '@turf/turf';
+// import axios from 'axios';
 import Box from '@mui/material/Box';
 import Paper from '@mui/material/Paper';
 import Badge from '@mui/material/Badge';
@@ -13,16 +14,15 @@ import Typography from '@mui/material/Typography';
 import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
 import AccordionSummary from '@mui/material/AccordionSummary';
 import AccordionDetails from '@mui/material/AccordionDetails';
-import { useDispatch, useSelector } from 'react-redux';
+import { useSelector } from 'react-redux';
 import BiomassMap from '../Map/BiomassMap';
 // import NitrogenMap from '../Map/NitrogenMap';
 import Input from '../Inputs';
 import Help from '../Help';
-import { get, set } from '../../store/Store';
+import { get } from '../../store/Store';
 import NavButton from '../Navigate/NavButton';
 import useFetchHLS from '../../hooks/useFetchHLS';
-
-const HLS_API_URL = 'https://covercrop-imagery.org';
+import { LinearProgress } from '@mui/material';
 
 const CustomizedAccordion = styled(Accordion)(() => ({
   '&.MuiPaper-root': {
@@ -41,62 +41,59 @@ const nextButtonBadgeContent = () => (
 const Location = ({ barebone = false }) => {
   const navigate = useNavigate();
   const isSatelliteMode = useSelector(get.biomassCalcMode) === 'satellite';
-  const mapPolygon = useSelector(get.mapPolygon);
-  const coverCropPlantingDate = useSelector(get.coverCropPlantingDate);
-  const coverCropTerminationDate = useSelector(get.coverCropTerminationDate);
-  const dispatch = useDispatch();
+  const biomassFetchIsLoading = useSelector(get.biomassFetchIsLoading);
 
   useFetchHLS();
 
-  const calcBiomass = () => {
-    dispatch(set.biomassTaskResults({}));
-    dispatch(set.biomassTaskIsDone(false));
-    // setData(null);
-    let area;
-    area = 0;
-    // reverse order of vertices
-    if (mapPolygon.length > 0) {
-      area =
-        0.000247105 *
-        turf.area(turf.polygon(mapPolygon[0].geometry.coordinates));
-    }
+  // const calcBiomass = () => {
+  //   dispatch(set.biomassTaskResults({}));
+  //   dispatch(set.biomassTaskIsDone(false));
+  //   // setData(null);
+  //   let area;
+  //   area = 0;
+  //   // reverse order of vertices
+  //   if (mapPolygon.length > 0) {
+  //     area =
+  //       0.000247105 *
+  //       turf.area(turf.polygon(mapPolygon[0].geometry.coordinates));
+  //   }
 
-    if (area > 10000) {
-      dispatch(set.polyDrawTooBig(true));
-      dispatch(set.mapPolygon([]));
-    } else {
-      const revertedCoords = [
-        ...mapPolygon[0].geometry.coordinates[0],
-      ].reverse();
-      const payload = {
-        maxCloudCover: 5,
-        startDate: coverCropPlantingDate,
-        endDate: coverCropTerminationDate,
-        geometry: {
-          type: 'Polygon',
-          coordinates: [revertedCoords],
-        },
-      };
-      dispatch(set.biomassFetchIsLoading(true));
-      const headers = {
-        'Content-Type': 'application/json',
-      };
-      axios
-        .post(`${HLS_API_URL}/tasks`, payload, { headers })
-        .then((response) => {
-          if (response.status === 200 && response.data) {
-            dispatch(set.biomassTaskId(response.data.task_id));
-          }
-        })
-        .catch((error) => {
-          // eslint-disable-next-line no-console
-          console.log(error);
-        });
-    }
-  };
+  //   if (area > 10000) {
+  //     dispatch(set.polyDrawTooBig(true));
+  //     dispatch(set.mapPolygon([]));
+  //   } else {
+  //     const revertedCoords = [
+  //       ...mapPolygon[0].geometry.coordinates[0],
+  //     ].reverse();
+  //     const payload = {
+  //       maxCloudCover: 5,
+  //       startDate: coverCropPlantingDate,
+  //       endDate: coverCropTerminationDate,
+  //       geometry: {
+  //         type: 'Polygon',
+  //         coordinates: [revertedCoords],
+  //       },
+  //     };
+  //     dispatch(set.biomassFetchIsLoading(true));
+  //     const headers = {
+  //       'Content-Type': 'application/json',
+  //     };
+  //     axios
+  //       .post(`${HLS_API_URL}/tasks`, payload, { headers })
+  //       .then((response) => {
+  //         if (response.status === 200 && response.data) {
+  //           dispatch(set.biomassTaskId(response.data.task_id));
+  //         }
+  //       })
+  //       .catch((error) => {
+  //         // eslint-disable-next-line no-console
+  //         console.log(error);
+  //       });
+  //   }
+  // };
 
   return (
-    <Box sx={{ width: { xs: '95%', sm: '90%', lg: '70%' } }}>
+    <Box sx={{ width: '100%', padding: '0rem' }}>
       <Box mb={-2}>
         <CustomizedAccordion defaultExpanded>
           <AccordionSummary
@@ -139,6 +136,7 @@ const Location = ({ barebone = false }) => {
       </Box>
       <Box sx={{ margin: '2rem 0rem' }}>
         <Paper sx={{ padding: '1rem', borderRadius: '1rem' }}>
+          {biomassFetchIsLoading && (<LinearProgress />)}
           <BiomassMap variant="biomass" />
           {!barebone && (
             <Box
@@ -155,15 +153,15 @@ const Location = ({ barebone = false }) => {
               <Badge
                 color="primary"
                 invisible={
-                  !isSatelliteMode || (isSatelliteMode && mapPolygon.length > 0)
+                  !isSatelliteMode || (isSatelliteMode)
                 }
                 badgeContent={nextButtonBadgeContent()}
               >
                 <NavButton
-                  disabled={isSatelliteMode && mapPolygon.length === 0}
+                  disabled={isSatelliteMode}
                   onClick={() => {
                     if (isSatelliteMode) {
-                      calcBiomass();
+                      // calcBiomass();
                       navigate('/covercrop');
                     } else {
                       navigate('/soil');

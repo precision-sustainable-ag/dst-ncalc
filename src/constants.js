@@ -81,8 +81,8 @@ const sidebarListData = [
   {
     label: 'Nitrogen Map',
     key: 'sidebar-nav-5',
-    startPos: 300,
-    endPos: 400,
+    startPos: 400,
+    endPos: 500,
   },
 ];
 
@@ -100,46 +100,52 @@ const sidebarListDataSatpath = [
     endPos: 200,
   },
   {
-    label: 'Cover Crop',
+    label: 'Cover Crop 1',
     key: 'sidebar-nav-3',
     startPos: 200,
     endPos: 300,
   },
   {
-    label: 'Cash Crop',
+    label: 'Cover Crop 2',
     key: 'sidebar-nav-4',
     startPos: 300,
     endPos: 400,
   },
   {
-    label: 'Data Summary',
+    label: 'Cash Crop',
     key: 'sidebar-nav-5',
     startPos: 400,
     endPos: 500,
   },
   {
     label: 'Nitrogen Released',
-    key: 'sidebar-nav-6',
+    key: 'sidebar-nav-7',
     startPos: 500,
     endPos: 600,
   },
   {
     label: 'Residue Remaining',
-    key: 'sidebar-nav-7',
+    key: 'sidebar-nav-8',
     startPos: 600,
     endPos: 700,
   },
   {
     label: 'Biomass Map',
-    key: 'sidebar-nav-8',
+    key: 'sidebar-nav-9',
     startPos: 700,
     endPos: 800,
   },
   {
-    label: 'Nitrogen Map',
-    key: 'sidebar-nav-9',
+    label: 'Data Summary',
+    key: 'sidebar-nav-6',
     startPos: 800,
     endPos: 900,
+  },
+  {
+    label: 'Nitrogen Map',
+    key: 'sidebar-nav-10',
+    startPos: 900,
+    endPos: 1000,
   },
 ];
 

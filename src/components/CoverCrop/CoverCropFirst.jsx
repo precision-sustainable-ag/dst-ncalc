@@ -109,13 +109,15 @@ const CoverCropFirst = ({ barebone = false }) => {
         padding: '1rem',
         borderRadius: '1rem',
         flexDirection: 'column',
-        width: {
-          xs: '100%',
-          sm: '100%',
-          md: '90%',
-          lg: '70%',
-          xl: '60%',
-        },
+        width: '100%',
+        marginBottom: '2rem',
+        // width: {
+        //   xs: '100%',
+        //   sm: '100%',
+        //   md: '90%',
+        //   lg: '70%',
+        //   xl: '60%',
+        // },
       }}
     >
       <Box
@@ -173,7 +175,7 @@ const CoverCropFirst = ({ barebone = false }) => {
                   />
                 </RadioGroup>
               </Stack>
-              <Biomass minified={false} />
+              {!barebone && <Biomass minified={false} />}
               {/* {mapPolygon.length === 0 && (
                   <Modal
                     open={open}

@@ -46,7 +46,7 @@ const Index = () => {
   }, [field, biomass]);
 
   return (
-    <Box sx={wrapperStyles} id="gfdgdd">
+    <Box sx={wrapperStyles} id="box-gf">
       <Stack direction="row" justifyContent="space-between">
         <LeftSideBar sidebarListData={sidebarListDataSatpath} refs={refs} />
         <RightSideBar sidebarListData={sidebarListDataSatpath} summaryData={summaryData} refs={refs} />
