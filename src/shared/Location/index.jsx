@@ -23,6 +23,7 @@ import { get } from '../../store/Store';
 import NavButton from '../Navigate/NavButton';
 import useFetchHLS from '../../hooks/useFetchHLS';
 import { LinearProgress } from '@mui/material';
+import Datebox from '../Biomass/Datebox';
 
 const CustomizedAccordion = styled(Accordion)(() => ({
   '&.MuiPaper-root': {
@@ -130,6 +131,9 @@ const Location = ({ barebone = false }) => {
                 style={{ height: '2rem', minWidth: '13rem' }}
               />
               <Help />
+            </Box>
+            <Box mt={5}>
+              <Datebox />
             </Box>
           </AccordionDetails>
         </CustomizedAccordion>
