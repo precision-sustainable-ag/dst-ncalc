@@ -37,8 +37,8 @@ const useFetchNitrogen = () => {
   const cashCropPlantingDate = useSelector(get.cashCropPlantingDate);
 
   useEffect(() => {
-    console.log('useFetchNitrogen biomassTaskResults: ', biomassTaskResults);
-    console.log('useFetchNitrogen nitrogenTaskResults: ', nitrogenTaskResults);
+    // console.log('useFetchNitrogen biomassTaskResults: ', biomassTaskResults);
+    // console.log('useFetchNitrogen nitrogenTaskResults: ', nitrogenTaskResults);
     const end = moment(cashCropPlantingDate).add(110, 'days').add(1, 'hour');
     // setEndDate(end);
 
@@ -76,7 +76,7 @@ const useFetchNitrogen = () => {
         simple: 'true',
         nonly: 'true',
       };
-      console.log('useFetchNitrogen payload: ', payload);
+      // console.log('useFetchNitrogen payload: ', payload);
 
       // wrap async function of data loading
       fetch(url, {
@@ -94,7 +94,7 @@ const useFetchNitrogen = () => {
         })
         .then((data) => {
           if (data && data instanceof Array) {
-            console.log('useFetchNitrogen data: ', data);
+            // console.log('useFetchNitrogen data: ', data);
             // const newArr = arrayFlat.map((item, index) =>
             // const newArr = [];
             // while (data.length) newArr.push(data.splice(0, 3));

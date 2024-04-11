@@ -6,7 +6,7 @@ import * as turf from '@turf/turf';
 import axios from 'axios';
 import { useDispatch, useSelector } from 'react-redux';
 import { get, set } from '../store/Store';
-import { map } from 'lodash';
+// import { map } from 'lodash';
 
 let interval;
 const arrayAverage = (arr) => arr.reduce((p, c) => p + c, 0) / arr.length;

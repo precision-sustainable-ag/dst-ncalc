@@ -65,14 +65,14 @@ const RightSideBar = ({ summaryData, refs }) => {
         <Grid item sm={12} lg={6} width="100%">
           <ResidueCard refVal={refs[6]} />
         </Grid>
-        <Grid item sm={12} lg={6} width="100%">
+        {/* <Grid item sm={12} lg={6} width="100%">
           <BiomassMapWidget refVal={refs[7]} />
+        </Grid> */}
+        <Grid item sm={12} lg={6} width="100%">
+          <SummaryCard refVal={refs[7]} data={summaryData} />
         </Grid>
         <Grid item sm={12} lg={6} width="100%">
-          <SummaryCard refVal={refs[8]} data={summaryData} />
-        </Grid>
-        <Grid item sm={12} lg={6} width="100%">
-          <NitrogenMapWidget refVal={refs[9]} />
+          <NitrogenMapWidget refVal={refs[8]} />
         </Grid>
         <Grid item sm={12} lg={12} width="100%" my={5}>
           <NavigateButtons

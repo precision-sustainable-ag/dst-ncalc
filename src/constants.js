@@ -119,33 +119,33 @@ const sidebarListDataSatpath = [
   },
   {
     label: 'Nitrogen Released',
-    key: 'sidebar-nav-7',
+    key: 'sidebar-nav-6',
     startPos: 500,
     endPos: 600,
   },
   {
     label: 'Residue Remaining',
-    key: 'sidebar-nav-8',
+    key: 'sidebar-nav-7',
     startPos: 600,
     endPos: 700,
   },
+  // {
+  //   label: 'Biomass Map',
+  //   key: 'sidebar-nav-9',
+  //   startPos: 700,
+  //   endPos: 800,
+  // },
   {
-    label: 'Biomass Map',
-    key: 'sidebar-nav-9',
+    label: 'Data Summary',
+    key: 'sidebar-nav-8',
     startPos: 700,
     endPos: 800,
   },
   {
-    label: 'Data Summary',
-    key: 'sidebar-nav-6',
+    label: 'Nitrogen Map',
+    key: 'sidebar-nav-9',
     startPos: 800,
     endPos: 900,
-  },
-  {
-    label: 'Nitrogen Map',
-    key: 'sidebar-nav-10',
-    startPos: 900,
-    endPos: 1000,
   },
 ];
 

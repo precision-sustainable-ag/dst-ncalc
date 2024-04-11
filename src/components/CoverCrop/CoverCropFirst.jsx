@@ -1,3 +1,4 @@
+/* eslint-disable operator-linebreak */
 /* eslint-disable indent */
 import React, { useEffect, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
