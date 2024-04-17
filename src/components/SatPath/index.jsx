@@ -18,7 +18,6 @@ const wrapperStyles = {
 
 const Index = () => {
   const [summaryData, setSummaryData] = useState(summaryDataDefaults);
-  const refs = sidebarListDataSatpath.map(() => useRef(null));
   const field = useSelector(get.field);
   const coverCrop = useSelector(get.coverCrop);
   const coverCropTerminationDate = useSelector(get.coverCropTerminationDate);
@@ -28,6 +27,9 @@ const Index = () => {
   const cell = useSelector(get.cell);
   const lign = useSelector(get.lign);
   const unit = useSelector(get.unit);
+  const refs = Object.fromEntries(
+    sidebarListDataSatpath.map(({ label, key }) => [key, { ref: useRef(null), label, key }]),
+  );
 
   useStoreMem();
   useFetchNitrogenArray();

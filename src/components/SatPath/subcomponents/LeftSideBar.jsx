@@ -86,9 +86,6 @@ const LeftSideBar = ({ sidebarListData, refs }) => {
   const [scrollPosition, setScrollPosition] = useState(0);
   const [disableScrollListener, setDisableScrollListener] = useState(false);
   const isSatelliteMode = useSelector(get.biomassCalcMode) === 'satellite';
-  // const biomass = useSelector(get.biomass);
-  // const [value, setValue] = useState(3000);
-  // const dispatch = useDispatch();
 
   const handleScroll = () => {
     const position = window.scrollY;
@@ -104,16 +101,18 @@ const LeftSideBar = ({ sidebarListData, refs }) => {
 
   useEffect(() => {
     if (!disableScrollListener) {
-      sidebarListData.forEach((el, index) => {
-        if (!isSatelliteMode && el.label === 'Map Visualization') return;
-        const element = refs[index].current;
+      let minDistance = Infinity;
+      sidebarListData.forEach(({ key, label }) => {
+        const element = refs[key].ref.current;
         if (element === null) return;
         const yTop = element.getBoundingClientRect().top + window.scrollY + YOFFSET;
-        const yBot = element.getBoundingClientRect().bottom + window.scrollY + YOFFSET;
-        if (scrollPosition < yBot && scrollPosition > yTop) {
-          if (activeItem !== el.label) {
-            setActiveItem(el.label);
-          }
+        // const yBot = element.getBoundingClientRect().bottom + window.scrollY + YOFFSET;
+        // const yCenter = (yBot + 9 * yTop) / 10;
+        // const yCenter = (yTop) / 1;
+        const distance = Math.abs(scrollPosition - yTop);
+        if (distance < minDistance) {
+          minDistance = distance;
+          setActiveItem(label);
         }
       });
     }
@@ -124,15 +123,15 @@ const LeftSideBar = ({ sidebarListData, refs }) => {
       <Box sx={ListWrapperStyles}>
         <Stack sx={ListStyles} gap={2} alignItems="flex-start">
           {
-            sidebarListData.map((el, index) => {
-              if (!isSatelliteMode && el.label === 'Map Visualization') return;
+            sidebarListData.map(({ key, label }) => {
+              if (!isSatelliteMode && label === 'Map Visualization') return;
               return (
                 <ListItem
-                  label={el.label}
-                  key={el.key}
+                  label={label}
+                  key={key}
+                  refVal={refs[key].ref}
                   activeItem={activeItem}
                   setActiveItem={setActiveItem}
-                  refVal={refs[index]}
                   setDisableScrollListener={setDisableScrollListener}
                 />
               );

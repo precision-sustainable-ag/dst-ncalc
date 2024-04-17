@@ -35,23 +35,27 @@ const useFetchNitrogen = () => {
   const biomassTaskResults = useSelector(get.biomassTaskResults);
   const nitrogenTaskResults = useSelector(get.nitrogenTaskResults);
   const cashCropPlantingDate = useSelector(get.cashCropPlantingDate);
+  const activeExample = useSelector(get.activeExample);
 
   useEffect(() => {
-    // console.log('useFetchNitrogen biomassTaskResults: ', biomassTaskResults);
-    // console.log('useFetchNitrogen nitrogenTaskResults: ', nitrogenTaskResults);
+    console.log('useFetchNitrogen biomassTaskResults: ', biomassTaskResults);
+    console.log('useFetchNitrogen nitrogenTaskResults: ', nitrogenTaskResults);
     const end = moment(cashCropPlantingDate).add(110, 'days').add(1, 'hour');
-    // setEndDate(end);
-
     if (
-      biomassTaskResults && biomassTaskResults.data_array && biomassTaskResults.data_array.length > 0
+      biomassTaskResults
+      && biomassTaskResults.data_array
+      && biomassTaskResults.data_array.length > 0
+      && !activeExample
+      && carb
+      && lign
+      && cell
     ) {
       setArrayDim([
         biomassTaskResults.data_array.length,
         biomassTaskResults.data_array[0].length,
       ]);
       arrayFlat = [].concat(...biomassTaskResults.data_array);
-      const biomassAverage =
-        arrayFlat.reduce((a, b) => a + b, 0) / arrayFlat.length; // average
+      const biomassAverage = arrayFlat.reduce((a, b) => a + b, 0) / arrayFlat.length;
       const biomassMax = Math.max(...arrayFlat);
       const url = `${NITROGEN_SURFACE_API_URL}`;
       const payload = {
@@ -74,7 +78,7 @@ const useFetchNitrogen = () => {
         simple: 'true',
         nonly: 'true',
       };
-      // console.log('useFetchNitrogen payload: ', payload);
+      console.log('useFetchNitrogen payload: ', payload);
 
       // wrap async function of data loading
       fetch(url, {

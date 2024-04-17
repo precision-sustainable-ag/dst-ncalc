@@ -57,96 +57,62 @@ const sidebarListData = [
   {
     label: 'Summary',
     key: 'sidebar-nav-1',
-    startPos: 0,
-    endPos: 100,
   },
   {
     label: 'Nitrogen Released',
     key: 'sidebar-nav-2',
-    startPos: 100,
-    endPos: 200,
   },
   {
     label: 'Residue Remaining',
     key: 'sidebar-nav-3',
-    startPos: 200,
-    endPos: 300,
   },
   {
     label: 'Biomass Map',
     key: 'sidebar-nav-4',
-    startPos: 300,
-    endPos: 400,
   },
   {
     label: 'Nitrogen Map',
     key: 'sidebar-nav-5',
-    startPos: 400,
-    endPos: 500,
   },
 ];
 
 const sidebarListDataSatpath = [
   {
     label: 'Data Summary',
-    key: 'sidebar-nav-1',
-    startPos: 0,
-    endPos: 100,
+    key: 'sideNavDataSummary',
   },
   {
     label: 'Location',
-    key: 'sidebar-nav-2',
-    startPos: 100,
-    endPos: 200,
+    key: 'sideNavLocation',
   },
   {
     label: 'Soil Data',
-    key: 'sidebar-nav-3',
-    startPos: 200,
-    endPos: 300,
+    key: 'sideNavSoilData',
   },
   {
     label: 'Cover Crop 1',
-    key: 'sidebar-nav-4',
-    startPos: 300,
-    endPos: 400,
+    key: 'sideNavCoverCrop1',
   },
   {
     label: 'Cover Crop 2',
-    key: 'sidebar-nav-5',
-    startPos: 400,
-    endPos: 500,
+    key: 'sideNavCoverCrop2',
   },
   {
     label: 'Cash Crop',
-    key: 'sidebar-nav-6',
-    startPos: 500,
-    endPos: 600,
+    key: 'sideNavCashCrop',
   },
   {
     label: 'Nitrogen Released',
-    key: 'sidebar-nav-7',
-    startPos: 600,
-    endPos: 700,
+    key: 'sideNavNitrogenReleased',
   },
   {
     label: 'Residue Remaining',
-    key: 'sidebar-nav-8',
-    startPos: 700,
-    endPos: 800,
+    key: 'sideNavResidueRemaining',
   },
   {
     label: 'Nitrogen Map',
-    key: 'sidebar-nav-9',
-    startPos: 800,
-    endPos: 900,
+    key: 'sideNavNitrogenMap',
   },
-  // {
-  //   label: 'Biomass Map',
-  //   key: 'sidebar-nav-9',
-  //   startPos: 700,
-  //   endPos: 800,
-  // },
 ];
 
 export { summaryDataDefaults, sidebarListData, sidebarListDataSatpath };
