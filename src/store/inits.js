@@ -172,6 +172,7 @@ const initialState = {
   biomassTaskIsDone: true,
   biomassTaskId: null,
   polyDrawTooBig: false,
+  nitrogenTaskIsDone: true,
 };
 
 export default initialState;

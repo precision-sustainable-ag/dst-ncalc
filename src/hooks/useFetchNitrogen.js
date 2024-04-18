@@ -3,12 +3,12 @@ import { useEffect, useState } from 'react';
 // import axios from 'axios';
 import moment from 'moment';
 import {
-  // useDispatch,
+  useDispatch,
   useSelector,
 } from 'react-redux';
 import {
   get,
-  // set,
+  set,
 } from '../store/Store';
 
 const NITROGEN_SURFACE_API_URL = 'https://api.covercrop-ncalc.org/surface';
@@ -23,7 +23,6 @@ const useFetchNitrogen = () => {
   const [resData, setResData] = useState(null);
   // eslint-disable-next-line no-unused-vars
   const [arrayDim, setArrayDim] = useState(null);
-  // const dispatch = useDispatch();
   const lat = useSelector(get.lat);
   const lon = useSelector(get.lon);
   const bd = useSelector(get.BD);
@@ -35,21 +34,25 @@ const useFetchNitrogen = () => {
   const biomassTaskResults = useSelector(get.biomassTaskResults);
   const nitrogenTaskResults = useSelector(get.nitrogenTaskResults);
   const cashCropPlantingDate = useSelector(get.cashCropPlantingDate);
+  const nitrogenTaskIsDone = useSelector(get.nitrogenTaskIsDone);
   const activeExample = useSelector(get.activeExample);
+  const dispatch = useDispatch();
 
   useEffect(() => {
-    console.log('useFetchNitrogen biomassTaskResults: ', biomassTaskResults);
-    console.log('useFetchNitrogen nitrogenTaskResults: ', nitrogenTaskResults);
+    // console.log('useFetchNitrogen biomassTaskResults: ', biomassTaskResults);
+    // console.log('useFetchNitrogen nitrogenTaskResults: ', nitrogenTaskResults);
     const end = moment(cashCropPlantingDate).add(110, 'days').add(1, 'hour');
     if (
       biomassTaskResults
       && biomassTaskResults.data_array
       && biomassTaskResults.data_array.length > 0
-      && !activeExample
+      // && !activeExample
       && carb
       && lign
       && cell
+      && nitrogenTaskIsDone
     ) {
+      // console.log('useFetchNitrogen arrayFlat: ', arrayFlat);
       setArrayDim([
         biomassTaskResults.data_array.length,
         biomassTaskResults.data_array[0].length,
@@ -57,6 +60,9 @@ const useFetchNitrogen = () => {
       arrayFlat = [].concat(...biomassTaskResults.data_array);
       const biomassAverage = arrayFlat.reduce((a, b) => a + b, 0) / arrayFlat.length;
       const biomassMax = Math.max(...arrayFlat);
+      // console.log('useFetchNitrogen arrayFlat: ', arrayFlat);
+      // console.log('useFetchNitrogen biomassTaskResults.data_array.flat(1): ', biomassTaskResults.data_array.flat(1));
+      // console.log('useFetchNitrogen arrayDim: ', arrayDim);
       const url = `${NITROGEN_SURFACE_API_URL}`;
       const payload = {
         lat: lat,
@@ -66,7 +72,7 @@ const useFetchNitrogen = () => {
         ad: 0.14,
         start: moment(cashCropPlantingDate).format('yyyy-MM-DD'),
         end: end.format('yyyy-MM-DD'),
-        biomass: [biomassAverage, biomassMax],
+        biomass: [biomassAverage, 300, 200, 400, biomassMax],
         // biomass: arrayFlat,
         // biomass: biomassTaskResults.data_array.flat(1),
         n: n,
@@ -78,9 +84,10 @@ const useFetchNitrogen = () => {
         simple: 'true',
         nonly: 'true',
       };
-      console.log('useFetchNitrogen payload: ', payload);
+      // console.log('useFetchNitrogen payload: ', payload);
 
       // wrap async function of data loading
+      dispatch(set.nitrogenTaskIsDone(false));
       fetch(url, {
         method: 'POST',
         headers: {
@@ -89,6 +96,7 @@ const useFetchNitrogen = () => {
         body: JSON.stringify(payload),
       })
         .then((response) => {
+          dispatch(set.nitrogenTaskIsDone(true));
           if (!response.ok) {
             throw new Error('Network response was not ok');
           }
@@ -108,6 +116,7 @@ const useFetchNitrogen = () => {
         })
         .catch((error) => {
           console.error('Error:', error);
+          dispatch(set.nitrogenTaskIsDone(true));
         });
     }
   }, [
