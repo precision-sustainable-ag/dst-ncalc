@@ -51,6 +51,11 @@ const summaryDataDefaults = {
           plant materials. The default value is based on the 
           nitrogen concentration.`,
   },
+  Nitrogen: {
+    value: 'not set',
+    desc: `Nitrogen percentage for the 
+          selected soil.`,
+  },
 };
 
 const sidebarListData = [

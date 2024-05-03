@@ -1,5 +1,5 @@
 /* eslint-disable no-console */
-import React, { useEffect } from 'react';
+import React from 'react';
 import Box from '@mui/material/Box';
 import Grid from '@mui/material/Grid';
 import Stack from '@mui/material/Stack';
@@ -39,7 +39,6 @@ const RightSideBar = ({ summaryData, refs }) => {
   useSelector(get.nitrogenTaskResults); // force render
   const isLargeScreen = useMediaQuery((theme) => theme.breakpoints.up('lg'));
 
-  // useEffect
   /// /// RETURN JSX /// ///
   return (
     <Box

@@ -1,3 +1,4 @@
+/* eslint-disable max-len */
 /* eslint-disable react-hooks/rules-of-hooks */
 /* eslint-disable react-hooks/exhaustive-deps */
 /* eslint-disable no-console */
@@ -37,14 +38,15 @@ const Index = () => {
 
   useEffect(() => {
     const tempSummaryData = { ...summaryData };
-    tempSummaryData['Field name'].value = field;
-    tempSummaryData.Species.value = coverCrop;
-    tempSummaryData['Termination Date'].value = dayjs(coverCropTerminationDate, 'YYYY-MM-DD').format('MMM DD YYYY');
-    tempSummaryData['Dry Biomass'].value = String(biomass).concat(' ').concat(unit);
-    tempSummaryData['Residue N Content'].value = String(residueC).concat(' ').concat(unit);
-    tempSummaryData.Carbohydrates.value = String(carb).concat(' %');
-    tempSummaryData['Holo-cellulose'].value = String(cell).concat(' %');
-    tempSummaryData.Lignin.value = String(lign).concat(' %');
+    tempSummaryData['Field name'].value = field || 'not set';
+    tempSummaryData.Species.value = (!coverCrop || coverCrop.length === 0) ? 'not set' : coverCrop;
+    tempSummaryData['Termination Date'].value = coverCropTerminationDate ? dayjs(coverCropTerminationDate, 'YYYY-MM-DD').format('MMM DD YYYY') : 'not set';
+    tempSummaryData['Dry Biomass'].value = biomass ? String(biomass).concat(' ').concat(unit) : 'not set';
+    tempSummaryData['Residue N Content'].value = residueC ? String(residueC).concat(' ').concat(unit) : 'not set';
+    tempSummaryData.Carbohydrates.value = carb ? String(carb).concat(' %') : 'not set';
+    tempSummaryData['Holo-cellulose'].value = cell ? String(cell).concat(' %') : 'not set';
+    tempSummaryData.Lignin.value = lign ? String(lign).concat(' %') : 'not set';
+    tempSummaryData.Nitrogen.value = N ? String(N).concat(' %') : 'not set';
     setSummaryData({ ...tempSummaryData });
   }, [field, biomass, coverCrop, coverCropTerminationDate, residueC, carb, cell, lign, unit, N]);
 
