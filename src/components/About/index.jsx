@@ -206,7 +206,8 @@ const About = () => {
             For more information about
             <strong> Precision Sustainable Agriculture </strong>
             projects, please
-            visit
+            visit:
+            &nbsp;
             <a href="https://precisionsustainableag.org/">https://precisionsustainableag.org/.</a>
           </Typography>
         </Box>
