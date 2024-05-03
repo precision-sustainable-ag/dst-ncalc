@@ -27,6 +27,7 @@ const Index = () => {
   const cell = useSelector(get.cell);
   const lign = useSelector(get.lign);
   const unit = useSelector(get.unit);
+  const N = useSelector(get.N);
   const refs = Object.fromEntries(
     sidebarListDataSatpath.map(({ label, key }) => [key, { ref: useRef(null), label, key }]),
   );
@@ -45,7 +46,7 @@ const Index = () => {
     tempSummaryData['Holo-cellulose'].value = String(cell).concat(' %');
     tempSummaryData.Lignin.value = String(lign).concat(' %');
     setSummaryData({ ...tempSummaryData });
-  }, [field, biomass, coverCrop, coverCropTerminationDate, residueC, carb, cell, lign, unit]);
+  }, [field, biomass, coverCrop, coverCropTerminationDate, residueC, carb, cell, lign, unit, N]);
 
   return (
     <Box sx={wrapperStyles} id="box-gf">

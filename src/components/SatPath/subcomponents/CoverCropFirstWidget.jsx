@@ -42,12 +42,6 @@ const CoverCropFirstCard = ({ refVal }) => {
         </Typography>
         <CoverCropFirst barebone />
       </CardContent>
-      {/* <CardActions>
-        <Grid container spacing={2}>
-          <CoverCropFirst barebone />
-          <CoverCropSecond barebone />
-        </Grid>
-      </CardActions> */}
     </Card>
   );
 };

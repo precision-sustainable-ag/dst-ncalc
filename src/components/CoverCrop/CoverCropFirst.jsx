@@ -112,13 +112,6 @@ const CoverCropFirst = ({ barebone = false }) => {
         flexDirection: 'column',
         width: '100%',
         marginBottom: '2rem',
-        // width: {
-        //   xs: '100%',
-        //   sm: '100%',
-        //   md: '90%',
-        //   lg: '70%',
-        //   xl: '60%',
-        // },
       }}
     >
       <Box
@@ -177,70 +170,6 @@ const CoverCropFirst = ({ barebone = false }) => {
                 </RadioGroup>
               </Stack>
               {!barebone && <Biomass minified={false} />}
-              {/* {mapPolygon.length === 0 && (
-                  <Modal
-                    open={open}
-                    onClose={() => setOpen(false)}
-                    aria-labelledby="modal-modal-title"
-                    aria-describedby="modal-modal-description"
-                    style={{
-                      display: 'flex',
-                      top: '0%',
-                      left: '10%',
-                      width: '80vw',
-                      alignItems: 'center',
-                      justifyContent: 'center',
-                    }}
-                  >
-                    <Paper
-                      sx={{
-                        borderRadius: '2rem',
-                      }}
-                    >
-                      <Box
-                        sx={{
-                          padding: '0rem 2rem',
-                          overflow: 'auto',
-                          fontFamily: 'monospace !important',
-                        }}
-                      >
-                        <Box
-                          sx={{
-                            display: 'flex',
-                            flexDirection: 'column',
-                            minWidth: '100%',
-                            justifyContent: 'center',
-                            alignItems: 'center',
-                            maxHeight: 'auto',
-                            padding: '2rem',
-                            borderRadius: '1rem',
-                          }}
-                        >
-                          <Typography variant="h5">
-                            You haven&apos;t drawn a field on the Location tab yet.
-                          </Typography>
-                          <Typography variant="h5">
-                            Please draw a field on the map to continue.
-                          </Typography>
-                          <Button
-                            sx={{
-                              borderRadius: '1rem',
-                              fontSize: '18px',
-                              fontWeight: 900,
-                              marginTop: '2rem',
-
-                            }}
-                            onClick={() => navigate('/location')}
-                            variant="outlined"
-                            color="warning"
-                          >
-                            Go to Location Tab
-                          </Button>
-                        </Box>
-                      </Box>
-                    </Paper>
-                  </Modal>
-                )} */}
             </Paper>
           ) : (
             <>
