@@ -45,7 +45,7 @@ const Index = () => {
     tempSummaryData['Holo-cellulose'].value = String(cell).concat(' %');
     tempSummaryData.Lignin.value = String(lign).concat(' %');
     setSummaryData({ ...tempSummaryData });
-  }, [field, biomass]);
+  }, [field, biomass, coverCrop, coverCropTerminationDate, residueC, carb, cell, lign, unit]);
 
   return (
     <Box sx={wrapperStyles} id="box-gf">
