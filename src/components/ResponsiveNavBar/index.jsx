@@ -338,7 +338,7 @@ const ResponsiveNavBar = ({ screens }) => {
               open={userIsOpen}
               onClose={handleCloseUserMenu}
             >
-              <MenuItem
+              {/* <MenuItem
                 key="about"
                 onClick={() => {
                   dispatch(set.openAboutModal(true));
@@ -346,7 +346,7 @@ const ResponsiveNavBar = ({ screens }) => {
                 }}
               >
                 <Typography textAlign="center">About</Typography>
-              </MenuItem>
+              </MenuItem> */}
               <MenuItem
                 key="feedback"
                 onClick={() => {
