@@ -35,6 +35,8 @@ const Init = ({ handleCloseUserMenu }) => {
   const loadField = (fieldVal) => {
     if (fieldVal === 'Example: Grass') {
       // navigate('location');
+      dispatch(set.mapPolygon([]));
+      dispatch(set.biomassTaskResults(null));
       dispatch(set.edited(true));
       dispatch(set.activeExample(fieldVal));
       dispatch(set.lat(32.865389));
@@ -61,6 +63,8 @@ const Init = ({ handleCloseUserMenu }) => {
       handleCloseUserMenu();
     } else if (fieldVal === 'Example: Legume') {
       // navigate('location');
+      dispatch(set.mapPolygon([]));
+      dispatch(set.biomassTaskResults(null));
       dispatch(set.edited(true));
       dispatch(set.activeExample(fieldVal));
       dispatch(set.lat(32.865389));
