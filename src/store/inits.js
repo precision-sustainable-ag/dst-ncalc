@@ -3,9 +3,8 @@ import { query } from '../hooks/helpers';
 
 const now = dayjs();
 
-const coverCropPlantingDate = now.month() < 6
-  ? now.subtract(2, 'year').startOf('month').month(10)
-  : now.subtract(1, 'year').startOf('month').month(10);
+const coverCropPlantingDate =
+  now.month() < 6 ? now.subtract(2, 'year').startOf('month').month(10) : now.subtract(1, 'year').startOf('month').month(10);
 const coverCropTerminationDate = coverCropPlantingDate.add(6, 'month');
 const cashCropPlantingDate = coverCropTerminationDate.add(1, 'week');
 
@@ -106,7 +105,7 @@ const initialState = {
   PSA: window.location.toString().includes('PSA'),
   field: query('field', ''),
   targetN: '150',
-  coverCrop: query('covercrop', null),
+  coverCrop: query('covercrop', []),
   cashCrop: null,
   lat: query('lat', 32.8654),
   lon: query('lon', -82.2584),
@@ -117,7 +116,7 @@ const initialState = {
   lign: query('lign', null),
   freshBiomass: '',
   biomass: query('biomass', ''),
-  lwc: (state) => Math.max((+((state.freshBiomass - state.biomass) / state.biomass).toFixed(2)), 0) || 4,
+  lwc: (state) => Math.max(+((state.freshBiomass - state.biomass) / state.biomass).toFixed(2), 0) || 4,
   mapZoom: 13,
   mapType: 'hybrid',
   mapPolygon: [],
@@ -131,7 +130,7 @@ const initialState = {
   maxZoom: 20,
   model: {},
   OM: 3,
-  BD: 1.30,
+  BD: 1.3,
   yield: 150,
   residue: 'surface',
   NContent: '',
@@ -157,7 +156,7 @@ const initialState = {
   sites: [],
   data: '',
   dates: [],
-  biomassCalcMode: 'satellite', // 'sampled' or 'satellite'
+  biomassCalcMode: 'sampled', // 'sampled' or 'satellite'
   dataFetchStatus: 'idle',
   openFeedbackModal: false,
   openAboutModal: false,

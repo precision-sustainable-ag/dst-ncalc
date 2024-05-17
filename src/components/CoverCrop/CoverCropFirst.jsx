@@ -27,8 +27,7 @@ import Required from '../../shared/Required';
 import NavButton from '../../shared/Navigate/NavButton';
 import { useFetchPlantFactors } from '../../hooks/useFetchApi';
 
-const UGA_LINK =
-  'https://extension.uga.edu/publications/detail.html?number=C1077';
+const UGA_LINK = 'https://extension.uga.edu/publications/detail.html?number=C1077';
 
 const CustomInputText = styled(Typography)({
   fontSize: '1.2rem',
@@ -47,7 +46,7 @@ const CoverCropFirst = ({ barebone = false }) => {
   // eslint-disable-next-line no-nested-ternary
   const max = isSatelliteMode
     ? maxBiomass[coverCrop]
-    : coverCrop.length && Array.isArray(coverCrop)
+    : coverCrop && coverCrop.length && Array.isArray(coverCrop)
     ? coverCrop.map((s) => maxBiomass[s]).sort((a, b) => b - a)[0] || 15000
     : 15000;
   const freshMax = max * 4 || 30000;
@@ -57,9 +56,7 @@ const CoverCropFirst = ({ barebone = false }) => {
   const biomassTotalValue = useSelector(get.biomassTotalValue);
   // const mapPolygon = useSelector(get.mapPolygon);
   // const [open, setOpen] = useState(true);
-  const [biomassNotExist, setBiomassNotExist] = useState(
-    !isSatelliteMode ? false : !biomassTotalValue,
-  );
+  const [biomassNotExist, setBiomassNotExist] = useState(!isSatelliteMode ? false : !biomassTotalValue);
   const coverCropGrowthStage = useSelector(get.coverCropGrowthStage);
   const coverCropTerminationDate = useSelector(get.coverCropTerminationDate);
   const lwc = useSelector(get.lwc);
@@ -81,23 +78,11 @@ const CoverCropFirst = ({ barebone = false }) => {
   /// Desc: Set the disableNextButton state
   useEffect(() => {
     if (isSatelliteMode) {
-      setDisableNextButton(
-        !biomassTotalValue || !coverCrop || !coverCropGrowthStage,
-      );
+      setDisableNextButton(!biomassTotalValue || !coverCrop || !coverCropGrowthStage);
     } else {
-      setDisableNextButton(
-        !biomass || coverCrop.length === 0 || !coverCropTerminationDate || !lwc,
-      );
+      setDisableNextButton(!biomass || coverCrop.length === 0 || !coverCropTerminationDate || !lwc);
     }
-  }, [
-    isSatelliteMode,
-    biomass,
-    coverCrop,
-    coverCropGrowthStage,
-    coverCropTerminationDate,
-    lwc,
-    biomassTotalValue,
-  ]);
+  }, [isSatelliteMode, biomass, coverCrop, coverCropGrowthStage, coverCropTerminationDate, lwc, biomassTotalValue]);
 
   return (
     <Box
@@ -132,7 +117,7 @@ const CoverCropFirst = ({ barebone = false }) => {
         )}
         <Stack direction="column" spacing={2} mt={2}>
           <Stack direction="row" alignItems="center">
-            <CustomInputText>Cover Crop Species:</CustomInputText>
+            {/* <CustomInputText>Cover Crop Species:</CustomInputText> */}
             {(!coverCrop || coverCrop.length === 0) && <Required />}
           </Stack>
           <CoverCropsInput isSatelliteMode={isSatelliteMode} />
@@ -149,12 +134,7 @@ const CoverCropFirst = ({ barebone = false }) => {
             <Paper mt={2}>
               <Stack m={2} direction="row" alignItems="center">
                 <Typography>Biomass Unit: &nbsp;</Typography>
-                <RadioGroup
-                  row
-                  aria-label="position"
-                  name="position"
-                  style={{ display: 'inline-block', marginLeft: '1em' }}
-                >
+                <RadioGroup row aria-label="position" name="position" style={{ display: 'inline-block', marginLeft: '1em' }}>
                   <FormControlLabel
                     value="lb/ac"
                     control={<Radio id="unit" checked={unit === 'lb/ac'} />}
@@ -195,19 +175,10 @@ const CoverCropFirst = ({ barebone = false }) => {
                 <Stack direction="row" alignItems="center">
                   <CustomInputText>Dry Biomass </CustomInputText>
                   <Help>
+                    <p>The amount of cover crop biomass on a dry weight basis.</p>
                     <p>
-                      The amount of cover crop biomass on a dry weight basis.
-                    </p>
-                    <p>
-                      For details on cover crop biomass sampling and taking a
-                      representative sub-sample for quality analysis, please
-                      refer to
-                      <a
-                        tabIndex="-1"
-                        target="_blank"
-                        rel="noreferrer"
-                        href={UGA_LINK}
-                      >
+                      For details on cover crop biomass sampling and taking a representative sub-sample for quality analysis, please refer to
+                      <a tabIndex="-1" target="_blank" rel="noreferrer" href={UGA_LINK}>
                         here
                       </a>
                       .
@@ -216,12 +187,7 @@ const CoverCropFirst = ({ barebone = false }) => {
                   {!biomass && <Required />}
                 </Stack>
                 :
-                <RadioGroup
-                  row
-                  aria-label="position"
-                  name="position"
-                  style={{ display: 'inline-block', marginLeft: '1em' }}
-                >
+                <RadioGroup row aria-label="position" name="position" style={{ display: 'inline-block', marginLeft: '1em' }}>
                   <FormControlLabel
                     value="lb/ac"
                     control={<Radio id="unit" checked={unit === 'lb/ac'} />}
@@ -254,8 +220,7 @@ const CoverCropFirst = ({ barebone = false }) => {
                   {warningText}
                   .
                   <br />
-                  Please make sure the biomass entered is on a fresh matter
-                  basis.
+                  Please make sure the biomass entered is on a fresh matter basis.
                 </p>
               )}
 
@@ -268,18 +233,10 @@ const CoverCropFirst = ({ barebone = false }) => {
                 }}
               >
                 <Stack direction="row" alignItems="center">
-                  <CustomInputText>
-                    Cover Crop Water Content at Termination (g water/g dry
-                    biomass)
-                  </CustomInputText>
+                  <CustomInputText>Cover Crop Water Content at Termination (g water/g dry biomass)</CustomInputText>
                   <Help>
-                    <p>
-                      Use the following calculation to adjust default values:
-                    </p>
-                    <p>
-                      Cover Crop Water Content = (Total fresh weight - Total dry
-                      weight)/(Total dry weight)
-                    </p>
+                    <p>Use the following calculation to adjust default values:</p>
+                    <p>Cover Crop Water Content = (Total fresh weight - Total dry weight)/(Total dry weight)</p>
                   </Help>
                   {!lwc && <Required />}
                 </Stack>
@@ -301,10 +258,7 @@ const CoverCropFirst = ({ barebone = false }) => {
             mt={4}
           >
             <NavButton onClick={() => navigate('/soil')}>BACK</NavButton>
-            <NavButton
-              onClick={() => navigate('/covercrop2')}
-              disabled={disableNextButton}
-            >
+            <NavButton onClick={() => navigate('/covercrop2')} disabled={disableNextButton}>
               NEXT
             </NavButton>
             <Snackbar
@@ -323,9 +277,7 @@ const CoverCropFirst = ({ barebone = false }) => {
                 variant="filled"
                 sx={{ width: '100%' }}
               >
-                <Typography variant="subtitle1">
-                  Biomass value need to be calculated first
-                </Typography>
+                <Typography variant="subtitle1">Biomass value need to be calculated first</Typography>
               </Alert>
             </Snackbar>
           </Box>

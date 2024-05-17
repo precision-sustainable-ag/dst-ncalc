@@ -44,7 +44,7 @@ const Init = ({ handleCloseUserMenu }) => {
       dispatch(set.OM(0.75));
       dispatch(set.BD(1.62));
       dispatch(set.InorganicN(10));
-      dispatch(set.coverCrop('cereal rye'));
+      dispatch(set.coverCrop(['cereal rye']));
       dispatch(set.coverCropGrowthStage('stemming'));
       dispatch(set.coverCropPlantingDate('2018-09-01'));
       dispatch(set.coverCropTerminationDate('2019-03-21'));
@@ -92,7 +92,6 @@ const Init = ({ handleCloseUserMenu }) => {
         setDownloadCSVFailed(true);
       }
     } else {
-      console.log('loadField', fieldVal);
       const newFieldVal = 'ncalc-'.concat(fieldVal);
       const inputs = JSON.parse(localStorage[newFieldVal]);
       Object.keys(inputs).forEach((key) => {

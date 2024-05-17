@@ -15,91 +15,75 @@ const CoverCropsInput = ({ isSatelliteMode }) => {
     return null;
   }
 
-  return (
-    isSatelliteMode
-      ? (
-        <Autocomplete
-          placeholder="Select a cover crop"
-          disablePortal
-          id="combo-box-demo"
-          autoFocus
-          groupBy={
-            (option) => {
-              let out;
-              if (species.brassica.includes(option)) {
-                out = 'Brassica';
-              } else if (species.broadleaf.includes(option)) {
-                out = 'Broadleaf';
-              } else if (species.grass.includes(option)) {
-                out = 'Grass';
-              } else if (species.legume.includes(option)) {
-                out = 'Legume';
-              } else {
-                out = 'ERROR';
-              }
-              return out;
-            }
-          }
-          options={[
-            ...species.grass,
-            ...species.legume,
-            ...species.brassica,
-            ...species.broadleaf,
-          ]}
-          sx={{ width: '100%' }}
-          // defaultValue={coverCrop ? coverCrop : ''}
-          value={coverCrop}
-          renderInput={(params) => <TextField {...params} label="Select a cover crop" />}
-          onChange={(el, va) => {
-            dispatch(set.coverCrop(va));
-            dispatch(set.coverCropGrowthStage(null));
-            if (species) {
-              dispatch(set.coverCropSpecieGroup(
-                species.brassica.includes(va)
-                  ? 'brassica'
-                  : species.broadleaf.includes(va)
-                    ? 'broadleaf'
-                    : species.grass.includes(va)
-                      ? 'grass'
-                      : species.legume.includes(va)
-                        ? 'legume'
-                        : 'ERROR',
-              ));
-            }
-          }}
-        />
-      )
-      : (
-        <Input
-          id="coverCrop"
-          multiple
-          autoFocus
-          groupBy={
-            (option) => {
-              let out;
-              if (species.brassica.includes(option)) {
-                out = 'Brassica';
-              } else if (species.broadleaf.includes(option)) {
-                out = 'Broadleaf';
-              } else if (species.grass.includes(option)) {
-                out = 'Grass';
-              } else if (species.legume.includes(option)) {
-                out = 'Legume';
-              } else {
-                out = 'ERROR';
-              }
-              return out;
-            }
-          }
-          options={[
-            ...species.grass,
-            ...species.legume,
-            ...species.brassica,
-            ...species.broadleaf,
-          ]}
-          placeholder="Select one or more cover crops"
-        />
-      )
+  return isSatelliteMode ? (
+    <Autocomplete
+      placeholder="Select a cover crop"
+      disablePortal
+      id="combo-box-demo"
+      autoFocus
+      groupBy={(option) => {
+        let out;
+        if (species.brassica.includes(option)) {
+          out = 'Brassica';
+        } else if (species.broadleaf.includes(option)) {
+          out = 'Broadleaf';
+        } else if (species.grass.includes(option)) {
+          out = 'Grass';
+        } else if (species.legume.includes(option)) {
+          out = 'Legume';
+        } else {
+          out = 'ERROR';
+        }
+        return out;
+      }}
+      options={[...species.grass, ...species.legume, ...species.brassica, ...species.broadleaf]}
+      sx={{ width: '100%' }}
+      // defaultValue={coverCrop ? coverCrop : ''}
+      value={coverCrop}
+      renderInput={(params) => <TextField {...params} label="Select a cover crop" />}
+      onChange={(el, va) => {
+        dispatch(set.coverCrop(va));
+        dispatch(set.coverCropGrowthStage(null));
+        if (species) {
+          dispatch(
+            set.coverCropSpecieGroup(
+              species.brassica.includes(va)
+                ? 'brassica'
+                : species.broadleaf.includes(va)
+                ? 'broadleaf'
+                : species.grass.includes(va)
+                ? 'grass'
+                : species.legume.includes(va)
+                ? 'legume'
+                : 'ERROR',
+            ),
+          );
+        }
+      }}
+    />
+  ) : (
+    <Input
+      id="coverCrop"
+      multiple
+      autoFocus
+      groupBy={(option) => {
+        let out;
+        if (species.brassica.includes(option)) {
+          out = 'Brassica';
+        } else if (species.broadleaf.includes(option)) {
+          out = 'Broadleaf';
+        } else if (species.grass.includes(option)) {
+          out = 'Grass';
+        } else if (species.legume.includes(option)) {
+          out = 'Legume';
+        } else {
+          out = 'ERROR';
+        }
+        return out;
+      }}
+      options={[...species.grass, ...species.legume, ...species.brassica, ...species.broadleaf]}
+      placeholder="Select one or more cover crops"
+    />
   );
 }; // CoverCropsInput
 
