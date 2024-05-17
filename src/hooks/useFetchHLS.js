@@ -29,9 +29,11 @@ const useFetchHLS = () => {
   const mapPolygon = useSelector(get.mapPolygon);
   const activeExample = useSelector(get.activeExample);
   const dispatch = useDispatch();
+  // eslint-disable-next-line no-unneeded-ternary
+  const isSatelliteMode = useSelector(get.biomassCalcMode) === 'satellite' ? true : false;
 
   useEffect(() => {
-    if (mapPolygon.length > 0 && !activeExample && !biomassTaskId) {
+    if (isSatelliteMode && mapPolygon.length > 0 && !activeExample && !biomassTaskId) {
       dispatch(set.biomassTaskResults({}));
       dispatch(set.biomassTaskIsDone(false));
       // setData(null);
@@ -39,18 +41,14 @@ const useFetchHLS = () => {
       area = 0;
       // reverse order of vertices
       if (mapPolygon.length > 0) {
-        area =
-          0.000247105 *
-          turf.area(turf.polygon(mapPolygon[0].geometry.coordinates));
+        area = 0.000247105 * turf.area(turf.polygon(mapPolygon[0].geometry.coordinates));
       }
 
       if (area > 10000) {
         dispatch(set.polyDrawTooBig(true));
         dispatch(set.mapPolygon([]));
       } else {
-        const revertedCoords = [
-          ...mapPolygon[0].geometry.coordinates[0],
-        ].reverse();
+        const revertedCoords = [...mapPolygon[0].geometry.coordinates[0]].reverse();
         const payload = {
           maxCloudCover: 5,
           startDate: coverCropPlantingDate,
@@ -77,17 +75,13 @@ const useFetchHLS = () => {
           });
       }
     }
-  }, [mapPolygon]);
+  }, [mapPolygon, isSatelliteMode]);
 
   const fetchTask = () => {
     axios
       .get(`https://covercrop-imagery.org/tasks/${biomassTaskId}`)
       .then((response) => {
-        if (
-          response.data &&
-          response.data.task_result &&
-          response.data.task_result.message
-        ) {
+        if (response.data && response.data.task_result && response.data.task_result.message) {
           dispatch(set.dataFetchStatus(response.data.task_result.message));
         } else {
           dispatch(set.dataFetchStatus('idle'));
@@ -112,24 +106,22 @@ const useFetchHLS = () => {
   };
 
   useEffect(() => {
-    if (data && data.task_result) {
+    if (isSatelliteMode && data && data.task_result) {
       const values = JSON.parse(data.task_result.replace(/\bNaN\b/g, 'null'));
       // eslint-disable-next-line no-console
       const rasterObject = { data_array: values.data_array, bbox: values.bbox };
       dispatch(set.biomassTaskResults(rasterObject));
     }
-  }, [data]);
+  }, [data, isSatelliteMode]);
   // .data_array.map(row => row.map(el => el*0.001))
   useEffect(() => {
-    if (biomassTaskResults && biomassTaskResults.data_array) {
-      const flattenedBiomass = biomassTaskResults.data_array
-        .flat(1)
-        .filter((el) => el !== 0);
+    if (isSatelliteMode && biomassTaskResults && biomassTaskResults.data_array) {
+      const flattenedBiomass = biomassTaskResults.data_array.flat(1).filter((el) => el !== 0);
       const factor = unit === 'lb/ac' ? 1.12085 : 1;
       const biomassAVG = arrayAverage(flattenedBiomass) * factor;
       dispatch(set.biomassTotalValue(Math.round(biomassAVG, 0)));
     }
-  }, [biomassTaskResults, unit]);
+  }, [biomassTaskResults, unit, isSatelliteMode]);
 
   // useEffect(() => {
   //   dispatch(set.coverCropPlantingDate(coverCropPlantingDate));
