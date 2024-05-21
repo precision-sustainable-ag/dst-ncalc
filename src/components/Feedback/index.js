@@ -48,50 +48,60 @@ const Feedback = () => {
 
     e.target.disabled = true;
 
-    fetch(
-      'https://api.precisionsustainableag.org/cc-ncalc/feedback',
-      {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-          feedback: `
-Name: ${name.replace(/"/g, '')}
-Email: ${email.replace(/"/g, '')}
-Feedback:
-${feedback.replace(/"/g, '')}
-__________________________________
-field        : ${field.replace(/"/g, '')}
-targetN      : ${targetN}
-coverCrop    : ${coverCrop}
-killDate     : ${killDate}
-cashCrop     : ${cashCrop}
-plantingDate : ${plantingDate}
-lat          : ${lat}
-lon          : ${lon}
-N            : ${N}
-InorganicN   : ${InorganicN}
-carb         : ${carb}
-cell         : ${cell}
-lign         : ${lign}
-lwc          : ${lwc}
-biomass      : ${biomass}
-OM           : ${OM}
-BD           : ${BD}
-yield        : ${Yield}
-__________________________________
-          `,
-        }),
+    const requestPayload = {
+      repository: 'dst-feedback',
+      title: 'Feedback',
+      name,
+      email,
+      comments: `
+        ${feedback}
+        __________________________________
+        field        : ${field}
+        targetN      : ${targetN}
+        coverCrop    : ${coverCrop}
+        killDate     : ${killDate}
+        cashCrop     : ${cashCrop}
+        plantingDate : ${plantingDate}
+        lat          : ${lat}
+        lon          : ${lon}
+        N            : ${N}
+        InorganicN   : ${InorganicN}
+        carb         : ${carb}
+        cell         : ${cell}
+        lign         : ${lign}
+        lwc          : ${lwc}
+        biomass      : ${biomass}
+        OM           : ${OM}
+        BD           : ${BD}
+        yield        : ${Yield}
+        __________________________________
+      `,
+      labels: ['cc-ncalc'],
+    };
+
+    fetch('https://developfeedback.covercrop-data.org/v1/issues', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
       },
-    )
+      body: JSON.stringify(requestPayload),
+    })
       .then((response) => response.json())
-      .then(() => {
-        e.target.disabled = false;
-        alert(`
-          Thank you for the feedback!
-          We will contact you if we have any updates or questions.
-        `);
+      .then((body) => {
+        if (body.data.status === 'success') {
+          e.target.disabled = false;
+          alert(`
+            Thank you for the feedback!
+            We will contact you if we have any updates or questions.
+          `);
+        } else {
+          alert('Failed to send Feedback to Github.');
+        }
+      })
+      .catch((error) => {
+        // eslint-disable-next-line no-console
+        console.log(error);
+        alert('Failed to send Feedback to Github.');
       });
   }; // submit
 
