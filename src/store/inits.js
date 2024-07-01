@@ -3,58 +3,57 @@ import { query } from '../hooks/helpers';
 
 const now = dayjs();
 
-const coverCropPlantingDate = now.month() < 6
-  ? now.subtract(2, 'year').startOf('month').month(10)
-  : now.subtract(1, 'year').startOf('month').month(10);
+const coverCropPlantingDate =
+  now.month() < 6 ? now.subtract(2, 'year').startOf('month').month(10) : now.subtract(1, 'year').startOf('month').month(10);
 const coverCropTerminationDate = coverCropPlantingDate.add(6, 'month');
 const cashCropPlantingDate = coverCropTerminationDate.add(1, 'week');
 
-const initSpecies = {
-  Brassica: [
-    'Brassica, Forage',
-    'Mustard',
-    'Radish, Forage',
-    'Radish, Oilseed',
-    'Rape, Oilseed',
-    'Rapeseed, Forage',
-    'Turnip, Forage',
-    'Turnip, Purple Top',
-  ],
-  Broadleaf: [
-    'Phacelia',
-    'Sunflower',
-  ],
-  Grass: [
-    'Barley',
-    'Cereal Rye',
-    'Millet, Foxtail',
-    'Millet, Japanese',
-    'Millet, Pearl',
-    'Oats',
-    'Ryegrass, Annual',
-    'Ryegrass, Perennial',
-    'Sorghum',
-    'Sorghum-sudangrass',
-    'Sudangrass',
-    'Teff',
-    'Triticale',
-    'Wheat',
-  ],
-  Legume: [
-    'Alfalfa, Dormant',
-    'Clover, Alsike',
-    'Clover, Balansa',
-    'Clover, Berseem',
-    'Clover, Crimson',
-    'Clover, Red',
-    'Clover, White',
-    'Cowpea',
-    'Pea',
-    'Sunn Hemp',
-    'Sweetclover, Yellow',
-    'Vetch, Hairy',
-  ],
-};
+// const initSpecies = {
+//   Brassica: [
+//     'Brassica, Forage',
+//     'Mustard',
+//     'Radish, Forage',
+//     'Radish, Oilseed',
+//     'Rape, Oilseed',
+//     'Rapeseed, Forage',
+//     'Turnip, Forage',
+//     'Turnip, Purple Top',
+//   ],
+//   Broadleaf: [
+//     'Phacelia',
+//     'Sunflower',
+//   ],
+//   Grass: [
+//     'Barley',
+//     'Cereal Rye',
+//     'Millet, Foxtail',
+//     'Millet, Japanese',
+//     'Millet, Pearl',
+//     'Oats',
+//     'Ryegrass, Annual',
+//     'Ryegrass, Perennial',
+//     'Sorghum',
+//     'Sorghum-sudangrass',
+//     'Sudangrass',
+//     'Teff',
+//     'Triticale',
+//     'Wheat',
+//   ],
+//   Legume: [
+//     'Alfalfa, Dormant',
+//     'Clover, Alsike',
+//     'Clover, Balansa',
+//     'Clover, Berseem',
+//     'Clover, Crimson',
+//     'Clover, Red',
+//     'Clover, White',
+//     'Cowpea',
+//     'Pea',
+//     'Sunn Hemp',
+//     'Sweetclover, Yellow',
+//     'Vetch, Hairy',
+//   ],
+// };
 
 const initMaxBiomass = {
   'Brassica, Forage': 2000,
@@ -107,17 +106,17 @@ const initialState = {
   field: query('field', ''),
   targetN: '150',
   coverCrop: query('covercrop', []),
-  cashCrop: '',
+  cashCrop: null,
   lat: query('lat', 32.8654),
   lon: query('lon', -82.2584),
   InorganicN: 10,
-  N: query('N', ''),
-  carb: query('carb', ''),
-  cell: query('cell', ''),
-  lign: query('lign', ''),
+  N: query('N', null),
+  carb: query('carb', null),
+  cell: query('cell', null),
+  lign: query('lign', null),
   freshBiomass: '',
   biomass: query('biomass', ''),
-  lwc: (state) => Math.max((+((state.freshBiomass - state.biomass) / state.biomass).toFixed(2)), 0) || 4,
+  lwc: (state) => Math.max(+((state.freshBiomass - state.biomass) / state.biomass).toFixed(2), 0) || 4,
   mapZoom: 13,
   mapType: 'hybrid',
   mapPolygon: [],
@@ -126,11 +125,12 @@ const initialState = {
   coverCropTerminationDate: coverCropTerminationDate.format('YYYY-MM-DD'),
   cashCropPlantingDate: cashCropPlantingDate.format('YYYY-MM-DD'),
   biomassTaskResults: null,
+  nitrogenTaskResults: null,
   biomassTotalValue: null,
   maxZoom: 20,
   model: {},
   OM: 3,
-  BD: 1.30,
+  BD: 1.3,
   yield: 150,
   residue: 'surface',
   NContent: '',
@@ -157,11 +157,21 @@ const initialState = {
   data: '',
   dates: [],
   biomassCalcMode: 'sampled', // 'sampled' or 'satellite'
+  dataFetchStatus: 'idle',
   openFeedbackModal: false,
   openAboutModal: false,
   incorporatedData: [],
-  species: initSpecies,
+  species: null,
+  plantGrowthStages: null,
+  coverCropSpecieGroup: null,
+  coverCropGrowthStage: null,
   maxBiomass: initMaxBiomass,
+  biomassFetchIsFailed: false,
+  biomassFetchIsLoading: false,
+  biomassTaskIsDone: true,
+  biomassTaskId: null,
+  polyDrawTooBig: false,
+  nitrogenTaskIsDone: true,
 };
 
 export default initialState;
