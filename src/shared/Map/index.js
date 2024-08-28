@@ -18,7 +18,7 @@ const MapComp = () => {
   const mapAddress = useSelector(get.mapAddress);
   const mapZoom = useSelector(get.mapZoom);
   const mapPolygon = useSelector(get.mapPolygon);
-  const [features, setFeatures] = useState(mapPolygon);
+  // const [features, setFeatures] = useState(mapPolygon);
   const [drawEvent, setDrawEvent] = useState({});
   // const [removedShapes, setRemovedShapes] = useState(new Set());
   // mapAddress
@@ -26,10 +26,10 @@ const MapComp = () => {
     if (drawEvent.mode === 'delete') {
       removedShapes = removedShapes.add(drawEvent.e.features[0].id);
     }
-    const ids = new Set(mapPolygon.map((d) => d.id));
+    // const ids = new Set(mapPolygon.map((d) => d.id));
     const merged = [
       ...mapPolygon.filter((d) => !removedShapes.has(d.id)),
-      ...features.filter((d) => !ids.has(d.id) && !removedShapes.has(d.id)),
+      // ...features.filter((d) => !ids.has(d.id) && !removedShapes.has(d.id)),
     ];
     dispatch(set.mapPolygon(merged));
   }, [drawEvent]);
@@ -53,7 +53,7 @@ const MapComp = () => {
     <div className="map">
       <Map
         setAddress={setAddress}
-        setFeatures={setFeatures}
+        // setFeatures={setFeatures}
         setZoom={setZoom}
         onDraw={setDrawEvent}
         initFeatures={mapPolygon}
