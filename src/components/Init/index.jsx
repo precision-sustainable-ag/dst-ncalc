@@ -16,6 +16,7 @@ import { set, get } from '../../store/redux-autosetters';
 
 const examples = {};
 
+// TODO: component for the fields list at the right top corner of the page
 const Init = ({ handleCloseUserMenu }) => {
   /// ///// VARIABLES ///// ////
   const dispatch = useDispatch();
@@ -207,6 +208,7 @@ const Init = ({ handleCloseUserMenu }) => {
 
   const myFields = Object.keys(localStorage).sort().filter((v) => !v.includes('mapbox.eventData'));
   const showUtilities = pathname.includes('output') || myFields.length;
+  console.log('myFields', myFields)
 
   /// ///// JSX RENDER ///// ////
   return (
