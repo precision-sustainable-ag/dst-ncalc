@@ -127,7 +127,7 @@ const ResponsiveNavBar = ({ screens }) => {
         },
       }}
     >
-      <Box sx={navBarBackDropStyles} />
+      {/* <Box sx={navBarBackDropStyles} /> */}
       <Stack
         direction="row"
         justifyContent="space-around"

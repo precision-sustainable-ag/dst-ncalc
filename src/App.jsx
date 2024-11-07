@@ -1,7 +1,7 @@
 /* eslint-disable no-console */
 import React from 'react';
-import { useSelector } from 'react-redux';
-import { useLocation } from 'react-router-dom';
+import { useDispatch, useSelector } from 'react-redux';
+import { useLocation, useNavigate } from 'react-router-dom';
 import { ThemeProvider, createTheme } from '@mui/material/styles';
 import { Container } from '@mui/material';
 import ResponsiveNavBar from './components/ResponsiveNavBar';
@@ -9,6 +9,10 @@ import Body from './components/Body';
 import './App.scss';
 import 'react-datepicker/dist/react-datepicker.css';
 import { get } from './store/Store';
+import { PSATheme, PSAHeader } from 'shared-react-components/src';
+import { deepmerge } from '@mui/utils';
+import ChatBubbleOutlineIcon from '@mui/icons-material/ChatBubbleOutline';
+import { set } from './store/Store';
 
 const screens = {
   init: () => null,
@@ -35,7 +39,7 @@ if (screens.feedback) {
 }
 
 Object.keys(screens).forEach((key) => {
-  screens[key].desc = screens[key].desc || (key[0].toUpperCase() + key.slice(1));
+  screens[key].desc = screens[key].desc || key[0].toUpperCase() + key.slice(1);
 });
 
 const holdWarn = console.warn;
@@ -62,13 +66,32 @@ const theme = createTheme({
   },
 });
 
+const dstTheme = createTheme(deepmerge(PSATheme, theme));
+
 const App = () => {
   useSelector(get.screen); // force render
   // eslint-disable-next-line no-unused-vars
   const location = useLocation();
+  const navigate = useNavigate();
+  const dispatch = useDispatch();
+
+  const navButtons = [
+    {
+      variant: 'text',
+      text: 'Feedback',
+      icon: <ChatBubbleOutlineIcon />,
+      rightIcon: true,
+      style: { fontSize: '1rem' },
+      textSx: { fontSize: '1rem' },
+      onClick: () => {
+        dispatch(set.openFeedbackModal(true));
+      },
+    },
+  ];
 
   return (
-    <ThemeProvider theme={theme}>
+    <ThemeProvider theme={dstTheme}>
+      <PSAHeader title="Cover Crop Nitrogen Calculator" onLogoClick={() => navigate('/')} navButtons={navButtons} />
       <Container
         // py={50}
         id="app-container"
