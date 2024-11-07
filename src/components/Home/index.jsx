@@ -118,7 +118,9 @@ const Home = () => {
             }
             if (biomassCalcMode === 'satellite') {
               console.log('satellite path');
-              navigate('/satpath');
+              // TODO: satpath will not being used in the future
+              // navigate('/satpath');
+              navigate('/location');
             }
             return null;
           }}

@@ -38,7 +38,7 @@ const nextButtonBadgeContent = () => (
     <Typography>?</Typography>
   </Tooltip>
 );
-
+// TODO: barebone is a var to decide if this view is showed as a widget, same in other pages
 const Location = ({ barebone = false }) => {
   const navigate = useNavigate();
   const isSatelliteMode = useSelector(get.biomassCalcMode) === 'satellite';
@@ -148,7 +148,7 @@ const Location = ({ barebone = false }) => {
                 badgeContent={nextButtonBadgeContent()}
               >
                 <NavButton
-                  disabled={isSatelliteMode}
+                  // disabled={isSatelliteMode}
                   onClick={() => {
                     if (isSatelliteMode) {
                       // calcBiomass();

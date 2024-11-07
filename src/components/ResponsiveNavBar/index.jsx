@@ -74,12 +74,13 @@ const ResponsiveNavBar = ({ screens }) => {
   const [userIsOpen, setUserIsOpen] = useState(false);
   // eslint-disable-next-line no-unused-vars
   const [navModalOpen, setNavModalOpen] = useState(false);
-  const isSatelliteMode = useSelector(get.biomassCalcMode) === 'satellite';
+  // const isSatelliteMode = useSelector(get.biomassCalcMode) === 'satellite';
 
   const location = useLocation();
   const dispatch = useDispatch();
 
-  const showNavbarMenu = location.pathname.replace('/', '') !== 'home' && !isSatelliteMode;
+  // const showNavbarMenu = location.pathname.replace('/', '') !== 'home' && !isSatelliteMode;
+  const showNavbarMenu = true;
 
   const handleOpenNavMenu = (event) => {
     setAnchorElNav(event.currentTarget);
