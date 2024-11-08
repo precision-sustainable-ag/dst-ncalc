@@ -12,6 +12,7 @@ import { get } from './store/Store';
 import { PSATheme, PSAHeader } from 'shared-react-components/src';
 import { deepmerge } from '@mui/utils';
 import ChatBubbleOutlineIcon from '@mui/icons-material/ChatBubbleOutline';
+import Init from './components/Init';
 import { set } from './store/Store';
 
 const screens = {
@@ -75,8 +76,9 @@ const App = () => {
   const navigate = useNavigate();
   const dispatch = useDispatch();
 
-  const navButtons = [
+  const navContent = [
     {
+      type: 'button',
       variant: 'text',
       text: 'Feedback',
       icon: <ChatBubbleOutlineIcon />,
@@ -87,11 +89,15 @@ const App = () => {
         dispatch(set.openFeedbackModal(true));
       },
     },
+    {
+      type: 'component',
+      component: <Init />,
+    },
   ];
 
   return (
     <ThemeProvider theme={dstTheme}>
-      <PSAHeader title="Cover Crop Nitrogen Calculator" onLogoClick={() => navigate('/')} navButtons={navButtons} />
+      <PSAHeader title="Cover Crop Nitrogen Calculator" onLogoClick={() => navigate('/')} navContent={navContent} />
       <Container
         // py={50}
         id="app-container"

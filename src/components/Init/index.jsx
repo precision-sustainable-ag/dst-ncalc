@@ -206,129 +206,105 @@ const Init = ({ handleCloseUserMenu }) => {
     }
   }; // changeField
 
-  const myFields = Object.keys(localStorage).sort().filter((v) => !v.includes('mapbox.eventData'));
+  const myFields = Object.keys(localStorage)
+    .sort()
+    .filter((v) => !v.includes('mapbox.eventData'));
   const showUtilities = pathname.includes('output') || myFields.length;
-  console.log('myFields', myFields)
 
   /// ///// JSX RENDER ///// ////
   return (
     <div className="Init desktop">
-      {
-        PSA
-        && (
-          <select
-            className="fields"
-            onChange={changePSA}
-            value={field}
-          >
-            <option>examples</option>
-            <optgroup label="PSA">
-              {
-                Object.keys(examples)
-                  .filter((site) => examples[site].category === 'PSA')
-                  .sort().map((site) => <option key={site}>{site}</option>)
-              }
+      {PSA && (
+        <select className="fields" onChange={changePSA} value={field}>
+          <option>examples</option>
+          <optgroup label="PSA">
+            {Object.keys(examples)
+              .filter((site) => examples[site].category === 'PSA')
+              .sort()
+              .map((site) => (
+                <option key={site}>{site}</option>
+              ))}
+          </optgroup>
+          <optgroup label="Resham">
+            {Object.keys(examples)
+              .filter((site) => examples[site].category === 'Resham')
+              .sort()
+              .map((site) => (
+                <option key={site}>{site}</option>
+              ))}
+          </optgroup>
+        </select>
+      )}
+
+      {!PSA && (
+        <select className="fields" onChange={changeField} value={field}>
+          <option>&nbsp;</option>
+          {myFields.length && (
+            <>
+              <optgroup label="My fields">
+                {
+                  // additional field names in example dropdown
+                  myFields.map((fld, idx) => (
+                    // eslint-disable-next-line max-len
+                    <option key={idx} checked={fld === field}>
+                      {fld.replace('ncalc-', '')}
+                    </option> // eslint-disable-line react/no-unknown-property
+                  ))
+                }
+              </optgroup>
+              <option disabled>____________________</option>
+            </>
+          )}
+
+          {!myFields.length && <option>&nbsp;</option>}
+
+          <optgroup label="Example data">
+            <option>Example: Grass</option>
+            <option>Example: Legume</option>
+          </optgroup>
+          <option disabled>____________________</option>
+
+          {showUtilities && (
+            <optgroup label="Utilities">
+              {pathname.includes('output') && (
+                <option
+                  onClick={() => {
+                    console.log('bhhvhg');
+                  }}
+                >
+                  Download data
+                </option>
+              )}
+              {myFields.length && <option>Clear previous runs</option>}
             </optgroup>
-            <optgroup label="Resham">
-              {
-                Object.keys(examples)
-                  .filter((site) => examples[site].category === 'Resham')
-                  .sort().map((site) => <option key={site}>{site}</option>)
-              }
-            </optgroup>
-          </select>
-        )
-      }
-
-      {
-        (!PSA)
-        && (
-          <select
-            className="fields"
-            onChange={changeField}
-            value={field}
-          >
-            <option>&nbsp;</option>
-            {
-              myFields.length && (
-                <>
-                  <optgroup label="My fields">
-                    { // additional field names in example dropdown
-                      myFields.map((fld, idx) => (
-                        // eslint-disable-next-line max-len
-                        <option key={idx} checked={fld === field}>{fld.replace('ncalc-', '')}</option> // eslint-disable-line react/no-unknown-property
-                      ))
-                    }
-                  </optgroup>
-                  <option disabled>____________________</option>
-                </>
-              )
-            }
-
-            {
-              !myFields.length && (
-                <option>&nbsp;</option>
-              )
-            }
-
-            <optgroup label="Example data">
-              <option>Example: Grass</option>
-              <option>Example: Legume</option>
-            </optgroup>
-            <option disabled>____________________</option>
-
-            {
-              showUtilities && (
-                <optgroup label="Utilities">
-                  {
-                    pathname.includes('output') && (
-                      <option onClick={() => {
-                        console.log('bhhvhg');
-                      }}
-                      >
-                        Download data
-                      </option>
-                    )
-                  }
-                  {
-                    myFields.length && (
-                      <option>Clear previous runs</option>
-                    )
-                  }
-                </optgroup>
-              )
-            }
-          </select>
-        )
-      }
-      {downloadCSVFailed
-        && (
-          <Dialog
-            open={downloadCSVFailed}
-            onClose={() => {
-              setDownloadCSVFailed(false);
-            }}
-            aria-labelledby="alert-dialog-title"
-            aria-describedby="alert-dialog-description"
-          >
-            <DialogTitle id="alert-dialog-title">Download Failed</DialogTitle>
-            <DialogContent>
-              <DialogContentText id="alert-dialog-description">
-                Download of CSV Failed. Please try again.
-              </DialogContentText>
-            </DialogContent>
-            <DialogActions>
-              <Button
-                onClick={() => {
-                  setDownloadCSVFailed(false);
-                }}
-                autoFocus
-              >
-                close
-              </Button>
-            </DialogActions>
-          </Dialog>
-        )}
+          )}
+        </select>
+      )}
+      {downloadCSVFailed && (
+        <Dialog
+          open={downloadCSVFailed}
+          onClose={() => {
+            setDownloadCSVFailed(false);
+          }}
+          aria-labelledby="alert-dialog-title"
+          aria-describedby="alert-dialog-description"
+        >
+          <DialogTitle id="alert-dialog-title">Download Failed</DialogTitle>
+          <DialogContent>
+            <DialogContentText id="alert-dialog-description">Download of CSV Failed. Please try again.</DialogContentText>
+          </DialogContent>
+          <DialogActions>
+            <Button
+              onClick={() => {
+                setDownloadCSVFailed(false);
+              }}
+              autoFocus
+            >
+              close
+            </Button>
+          </DialogActions>
+        </Dialog>
+      )}
     </div>
   );
 };
