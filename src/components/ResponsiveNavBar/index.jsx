@@ -106,10 +106,9 @@ const ResponsiveNavBar = ({ screens }) => {
 
   // // useSelector(get.screen); // force render
   useEffect(() => {
-    setActiveMenu(
-      location.pathname.replace('/', '').replace('2', ''),
-    );
+    setActiveMenu(location.pathname.replace('/', '').replace('2', ''));
   }, [location]);
+  console.log('123', screens);
 
   return (
     <AppBar
@@ -128,11 +127,7 @@ const ResponsiveNavBar = ({ screens }) => {
       }}
     >
       {/* <Box sx={navBarBackDropStyles} /> */}
-      <Stack
-        direction="row"
-        justifyContent="space-around"
-        flexGrow={2}
-      >
+      <Stack direction="row" justifyContent="space-around" flexGrow={2}>
         <Toolbar disableGutters>
           {/* Menu Button Box */}
           <Box
@@ -156,10 +151,7 @@ const ResponsiveNavBar = ({ screens }) => {
           </Box>
         </Toolbar>
         {/* Menu vertical list */}
-        <Toolbar
-          disableGutters
-          sx={{ display: { xs: 'flex', md: 'none' } }}
-        >
+        <Toolbar disableGutters sx={{ display: { xs: 'flex', md: 'none' } }}>
           <Box
             sx={{
               flexGrow: 1,
@@ -174,7 +166,6 @@ const ResponsiveNavBar = ({ screens }) => {
               justifyContent: 'center',
             }}
           >
-
             <IconButton
               size="large"
               aria-label="icon of vertical menu"
@@ -184,12 +175,13 @@ const ResponsiveNavBar = ({ screens }) => {
               color="inherit"
               sx={{ padding: '0px' }}
             >
-              <Box sx={{
-                display: 'flex',
-                flexDirection: 'column',
-                alignItems: 'center',
-                justifyContent: 'center',
-              }}
+              <Box
+                sx={{
+                  display: 'flex',
+                  flexDirection: 'column',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                }}
               >
                 <Typography
                   sx={{
@@ -201,9 +193,7 @@ const ResponsiveNavBar = ({ screens }) => {
                 >
                   Menu
                 </Typography>
-                {menuIsOpen
-                  ? (<KeyboardDoubleArrowUpIcon fontSize="small" />)
-                  : (<KeyboardDoubleArrowDownIcon fontSize="small" />)}
+                {menuIsOpen ? <KeyboardDoubleArrowUpIcon fontSize="small" /> : <KeyboardDoubleArrowDownIcon fontSize="small" />}
               </Box>
             </IconButton>
             <Menu
@@ -226,11 +216,7 @@ const ResponsiveNavBar = ({ screens }) => {
               {Object.keys(screens)
                 .filter((scr) => screens[scr].showInMenu !== false)
                 .map((scr) => (
-                  <NavLink
-                    key={`${scr}-navlink`}
-                    to={`/${scr.toLowerCase()}`}
-                    style={{ textDecoration: 'none' }}
-                  >
+                  <NavLink key={`${scr}-navlink`} to={`/${scr.toLowerCase()}`} style={{ textDecoration: 'none' }}>
                     <NavBarButtonText2
                       key={`${scr}-navlink-text-str`}
                       onClick={() => handleClickNavMenu(scr)}
@@ -272,10 +258,7 @@ const ResponsiveNavBar = ({ screens }) => {
             />
           </Box>
         </Toolbar>
-        <Toolbar
-          disableGutters
-          sx={{ display: { xs: 'none', md: 'flex' } }}
-        >
+        <Toolbar disableGutters sx={{ display: { xs: 'none', md: 'flex' } }}>
           {/* Menu horizontal list */}
           <Box
             alignItems="center"
@@ -285,23 +268,20 @@ const ResponsiveNavBar = ({ screens }) => {
               color: 'white',
             }}
           >
-            {showNavbarMenu && Object.keys(screens)
-              .filter((scr) => screens[scr].showInMenu !== false)
-              .map((scr) => (
-                <NavLink
-                  key={`${scr}-navlink`}
-                  to={`/${scr.toLowerCase()}`}
-                  style={{ textDecoration: 'none' }}
-                >
-                  <NavBarButtonText1
-                    key={`${scr}-navlink-text-str`}
-                    onClick={() => handleClickNavMenu(scr)}
-                    isactive={activeMenu === scr ? 'true' : 'false'}
-                  >
-                    {screens[scr].desc || scr}
-                  </NavBarButtonText1>
-                </NavLink>
-              ))}
+            {showNavbarMenu &&
+              Object.keys(screens)
+                .filter((scr) => screens[scr].showInMenu !== false)
+                .map((scr) => (
+                  <NavLink key={`${scr}-navlink`} to={`/${scr.toLowerCase()}`} style={{ textDecoration: 'none' }}>
+                    <NavBarButtonText1
+                      key={`${scr}-navlink-text-str`}
+                      onClick={() => handleClickNavMenu(scr)}
+                      isactive={activeMenu === scr ? 'true' : 'false'}
+                    >
+                      {screens[scr].desc || scr}
+                    </NavBarButtonText1>
+                  </NavLink>
+                ))}
           </Box>
         </Toolbar>
         <Toolbar disableGutters>

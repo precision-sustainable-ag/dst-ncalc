@@ -2,14 +2,7 @@
 import React from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { useNavigate } from 'react-router-dom';
-import {
-  Autocomplete,
-  Box,
-  Stack,
-  TextField,
-  Typography,
-  styled,
-} from '@mui/material';
+import { Autocomplete, Box, Stack, TextField, Typography, styled } from '@mui/material';
 import { get, set } from '../../store/Store';
 import Myslider from '../../shared/Slider';
 import Input from '../../shared/Inputs';
@@ -50,9 +43,7 @@ const CashCrops = () => {
         sx={{ width: '100%' }}
         // defaultValue={coverCrop ? coverCrop : ''}
         value={cashCrop}
-        renderInput={(params) => (
-          <TextField {...params} label="Select a cash crop" />
-        )}
+        renderInput={(params) => <TextField {...params} label="Select a cash crop" />}
         onChange={(el, va) => {
           dispatch(set.cashCrop(va));
         }}
@@ -68,6 +59,7 @@ const CashCrop = ({ barebone = false }) => {
   const Yield = useSelector(get.yield);
   const cashCropPlantingDate = useSelector(get.cashCropPlantingDate);
   const navigate = useNavigate();
+  const dispatch = useDispatch();
 
   return (
     <Box
@@ -128,10 +120,7 @@ const CashCrop = ({ barebone = false }) => {
             </Box>
           )}
 
-          <Box
-            mt={2}
-            sx={{ display: 'flex', flexDirection: 'row', alignItems: 'center' }}
-          >
+          <Box mt={2} sx={{ display: 'flex', flexDirection: 'row', alignItems: 'center' }}>
             <Stack direction="row" alignItems="center">
               <CustomInputText>
                 What is your Target Nitrogen Fertilizer Rate? ({unit}
@@ -154,17 +143,20 @@ const CashCrop = ({ barebone = false }) => {
               }}
               mt={6}
             >
-              <NavButton onClick={() => navigate('/covercrop')}>BACK</NavButton>
               <NavButton
-                onClick={() => navigate('/output')}
-                disabled={
-                  !cashCrop ||
-                  !cashCropPlantingDate ||
-                  !targetN ||
-                  targetN < 0 ||
-                  !Yield ||
-                  Yield < 0
-                }
+                onClick={() => {
+                  dispatch(set.activeStep(3));
+                  navigate('/covercrop');
+                }}
+              >
+                BACK
+              </NavButton>
+              <NavButton
+                onClick={() => {
+                  dispatch(set.activeStep(5));
+                  navigate('/output');
+                }}
+                disabled={!cashCrop || !cashCropPlantingDate || !targetN || targetN < 0 || !Yield || Yield < 0}
               >
                 NEXT
               </NavButton>

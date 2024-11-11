@@ -14,6 +14,7 @@ import { deepmerge } from '@mui/utils';
 import ChatBubbleOutlineIcon from '@mui/icons-material/ChatBubbleOutline';
 import Init from './components/Init';
 import { set } from './store/Store';
+import NcalcStepper from './shared/Stepper';
 
 const screens = {
   init: () => null,
@@ -98,6 +99,7 @@ const App = () => {
   return (
     <ThemeProvider theme={dstTheme}>
       <PSAHeader title="Cover Crop Nitrogen Calculator" onLogoClick={() => navigate('/')} navContent={navContent} />
+      <NcalcStepper />
       <Container
         // py={50}
         id="app-container"

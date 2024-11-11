@@ -1,9 +1,9 @@
 /* eslint-disable no-nested-ternary */
 import React from 'react';
-import { useSelector } from 'react-redux';
+import { useDispatch, useSelector } from 'react-redux';
 import { useNavigate } from 'react-router-dom';
 import { Box, Stack, Typography } from '@mui/material';
-import { get } from '../../store/Store';
+import { get, set } from '../../store/Store';
 import Myslider from '../../shared/Slider';
 import Help from '../../shared/Help';
 import { useFetchSSURGO } from '../../hooks/useFetchApi';
@@ -13,6 +13,7 @@ import NavButton from '../../shared/Navigate/NavButton';
 const Soil = ({ barebone = false }) => {
   /// /// /// VARIABLES /// /// ///
   const navigate = useNavigate();
+  const dispatch = useDispatch();
   const ssurgo = useSelector(get.SSURGO);
   const isSatelliteMode = useSelector(get.biomassCalcMode) === 'satellite';
   /// /// /// HOOKS /// /// ///
@@ -41,16 +42,13 @@ const Soil = ({ barebone = false }) => {
       }}
     >
       <Box p={3} pb={0}>
-        {!barebone && (
-          <Typography variant="h4">Tell us about your Soil</Typography>
-        )}
+        {!barebone && <Typography variant="h4">Tell us about your Soil</Typography>}
         {ssurgo ? (
           isSatelliteMode ? (
             <Box>
               <Typography variant="h6" my={2}>
-                This model will use the NRCS&apos;s Soil Survey Geographic
-                database (SSURGO) soil data from your field to estimate cover
-                crop decompostition
+                This model will use the NRCS&apos;s Soil Survey Geographic database (SSURGO) soil data from your field to estimate cover crop
+                decompostition
               </Typography>
               <Stack direction="row" spacing={6}>
                 <Stack direction="column" spacing={3}>
@@ -75,16 +73,12 @@ const Soil = ({ barebone = false }) => {
                 <Stack direction="column" spacing={3}>
                   <Stack direction="row" spacing={1}>
                     <Typography variant="h6" my={2}>
-                      {ssurgo &&
-                        Object.keys(ssurgo).length > 0 &&
-                        ssurgo[0].om_r}
+                      {ssurgo && Object.keys(ssurgo).length > 0 && ssurgo[0].om_r}
                     </Typography>
                   </Stack>
                   <Stack direction="row" spacing={1}>
                     <Typography variant="h6" my={2}>
-                      {ssurgo &&
-                        Object.keys(ssurgo).length > 0 &&
-                        ssurgo[0].dbthirdbar_r}
+                      {ssurgo && Object.keys(ssurgo).length > 0 && ssurgo[0].dbthirdbar_r}
                     </Typography>
                   </Stack>
                   <Stack direction="row" spacing={1}>
@@ -98,9 +92,8 @@ const Soil = ({ barebone = false }) => {
           ) : (
             <Box>
               <Typography variant="h6" my={2}>
-                The data below was pulled from NRCS&apos;s Soil Survey
-                Geographic database (SSURGO) based on your field&apos;s
-                latitude/longitude coordinates.
+                The data below was pulled from NRCS&apos;s Soil Survey Geographic database (SSURGO) based on your field&apos;s latitude/longitude
+                coordinates.
               </Typography>
               <Typography variant="h6" my={2}>
                 You can adjust them if you have lab results.
@@ -146,8 +139,22 @@ const Soil = ({ barebone = false }) => {
           }}
           mt={6}
         >
-          <NavButton onClick={() => navigate('/location')}>BACK</NavButton>
-          <NavButton onClick={() => navigate('/covercrop')}>NEXT</NavButton>
+          <NavButton
+            onClick={() => {
+              dispatch(set.activeStep(1));
+              navigate('/location');
+            }}
+          >
+            BACK
+          </NavButton>
+          <NavButton
+            onClick={() => {
+              dispatch(set.activeStep(3));
+              navigate('/covercrop');
+            }}
+          >
+            NEXT
+          </NavButton>
         </Box>
       )}
     </Box>

@@ -258,7 +258,14 @@ const CoverCropFirst = ({ barebone = false }) => {
             }}
             mt={4}
           >
-            <NavButton onClick={() => navigate('/soil')}>BACK</NavButton>
+            <NavButton
+              onClick={() => {
+                dispatch(set.activeStep(2));
+                navigate('/soil');
+              }}
+            >
+              BACK
+            </NavButton>
             <NavButton onClick={() => navigate('/covercrop2')} disabled={disableNextButton}>
               NEXT
             </NavButton>
