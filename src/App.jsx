@@ -111,7 +111,7 @@ const App = () => {
           backgroundRepeat: 'no-repeat',
         }}
       >
-        <ResponsiveNavBar screens={screens} />
+        {/* <ResponsiveNavBar screens={screens} /> */}
         <Body screens={screens} />
       </Container>
     </ThemeProvider>

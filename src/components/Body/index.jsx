@@ -1,10 +1,6 @@
 import React from 'react';
-import {
-  Route, Routes,
-} from 'react-router-dom';
-import {
-  Box,
-} from '@mui/material';
+import { Route, Routes } from 'react-router-dom';
+import { Box } from '@mui/material';
 
 import SnackbarMessage from '../../shared/SnackbarMessage';
 import Feedback from '../Feedback';
@@ -16,6 +12,7 @@ const wrapperStyles = {
   // left: 0,
   display: 'flex',
   justifyContent: 'center',
+  paddingTop: '1rem',
 };
 
 export default function index({ screens }) {
@@ -25,19 +22,10 @@ export default function index({ screens }) {
   return (
     <Box sx={wrapperStyles} id="body-wrapper">
       <Routes>
-        {
-          Object.keys(screens).map((scr) => (
-            <Route
-              key={scr}
-              path={scr.toLowerCase()}
-              element={<Screen />}
-            />
-          ))
-        }
-        <Route
-          path=""
-          element={<Screen />}
-        />
+        {Object.keys(screens).map((scr) => (
+          <Route key={scr} path={scr.toLowerCase()} element={<Screen />} />
+        ))}
+        <Route path="" element={<Screen />} />
       </Routes>
       <Feedback />
       <About />
