@@ -7,7 +7,7 @@ import { useDispatch, useSelector } from 'react-redux';
 import { get, set } from '../store/Store';
 import { weightedAverage } from './helpers';
 
-const NCAL_API_URL = 'https://api.precisionsustainableag.org/cc-ncalc/surface';
+const NCAL_API_URL = 'https://api.covercrop-ncalc.org/surface';
 const SSURGO_API_URL = 'https://ssurgo.covercrop-data.org';
 const WEATHER_API_URL = 'https://weather.covercrop-data.org';
 const PLANTFACTORS_API_URL = 'https://api.covercrop-imagery.org';
