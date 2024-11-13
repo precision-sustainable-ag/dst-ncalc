@@ -136,7 +136,7 @@ const useFetchHLS = () => {
 
   useEffect(() => {
     if (biomassTaskId && !data && !taskIsDone) {
-      interval = setInterval(fetchTask, 200);
+      interval = setInterval(fetchTask, 1000);
     }
     return () => {
       clearInterval(interval);

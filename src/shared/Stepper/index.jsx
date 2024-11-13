@@ -76,15 +76,15 @@ const NcalcStepper = () => {
               <Typography
                 fontFamily="IBM Plex Sans"
                 color="additional.greydark"
-                sx={
-                  step === i && {
+                sx={{
+                  ...(step === i && {
                     color: 'main.text',
                     fontWeight: 700,
                     textDecoration: 'underline',
                     textDecorationThickness: '1.5px',
                     textUnderlinePosition: 'from-font',
-                  }
-                }
+                  }),
+                }}
               >
                 {titles[i]}
               </Typography>

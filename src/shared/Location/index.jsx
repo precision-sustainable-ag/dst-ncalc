@@ -38,7 +38,7 @@ const nextButtonBadgeContent = () => (
     <Typography>?</Typography>
   </Tooltip>
 );
-// TODO: barebone is a var to decide if this view is showed as a widget, same in other pages
+  // TODO: barebone is a var to decide if this view is showed as a widget, same in other pages
 const Location = ({ barebone = false }) => {
   const navigate = useNavigate();
   const dispatch = useDispatch();
@@ -46,6 +46,7 @@ const Location = ({ barebone = false }) => {
   const biomassFetchIsLoading = useSelector(get.biomassFetchIsLoading);
   const biomassTaskResults = useSelector(get.biomassTaskResults);
 
+  // api for getting biomass map
   useFetchHLS();
 
   return (

@@ -2,7 +2,9 @@
 import React from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { useNavigate } from 'react-router-dom';
-import { Autocomplete, Box, Stack, TextField, Typography, styled } from '@mui/material';
+import {
+  Autocomplete, Box, Stack, TextField, Typography, styled,
+} from '@mui/material';
 import { get, set } from '../../store/Store';
 import Myslider from '../../shared/Slider';
 import Input from '../../shared/Inputs';
@@ -123,7 +125,8 @@ const CashCrop = ({ barebone = false }) => {
           <Box mt={2} sx={{ display: 'flex', flexDirection: 'row', alignItems: 'center' }}>
             <Stack direction="row" alignItems="center">
               <CustomInputText>
-                What is your Target Nitrogen Fertilizer Rate? ({unit}
+                What is your Target Nitrogen Fertilizer Rate? (
+                {unit}
                 ):
               </CustomInputText>
               <Help>Specify the target N rate for your region.</Help>
