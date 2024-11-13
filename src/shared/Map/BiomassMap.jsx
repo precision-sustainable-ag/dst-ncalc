@@ -3,7 +3,7 @@
 import React, { useState, useEffect } from 'react';
 // import mapboxgl from 'mapbox-gl';
 import { useSelector, useDispatch } from 'react-redux';
-import { NcalcMap } from '@psa/dst.ui.ncalc-map';
+import { NcalcMap } from 'shared-react-components/src';
 import { Paper } from '@mui/material';
 // import { NcalcMap } from './mock/ncalc-map';
 import { get, set } from '../../store/Store';
@@ -30,6 +30,8 @@ const BiomassMapComp = ({ variant }) => {
   const unit = useSelector(get.unit);
   const [features, setFeatures] = useState(mapPolygon);
   const [drawEvent, setDrawEvent] = useState({});
+
+  const mapboxToken = import.meta.env.VITE_MAPBOX_TOKEN;
 
   // mapAddress
   useEffect(() => {
@@ -100,6 +102,7 @@ const BiomassMapComp = ({ variant }) => {
         keyboard
         doubleClickZoom={false}
         touchZoomRotate
+        mapboxToken={mapboxToken}
       />
     </Paper>
   );
