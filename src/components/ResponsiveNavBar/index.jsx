@@ -66,6 +66,7 @@ const navBarBackDropStyles = {
   background: 'linear-gradient(#111, #333)',
 };
 
+// TODO: not used now
 const ResponsiveNavBar = ({ screens }) => {
   const [anchorElNav, setAnchorElNav] = useState(null);
   const [anchorElUser, setAnchorElUser] = useState(null);
