@@ -16,14 +16,14 @@ import AccordionSummary from '@mui/material/AccordionSummary';
 import AccordionDetails from '@mui/material/AccordionDetails';
 import { useDispatch, useSelector } from 'react-redux';
 import { LinearProgress } from '@mui/material';
-import BiomassMap from '../Map/BiomassMap';
+import BiomassMap from '../../shared/Map/BiomassMap';
 // import NitrogenMap from '../Map/NitrogenMap';
-import Input from '../Inputs';
-import Help from '../Help';
+import Input from '../../shared/Inputs';
+import Help from '../../shared/Help';
 import { get, set } from '../../store/Store';
-import NavButton from '../Navigate/NavButton';
+import NavButton from '../../shared/Navigate/NavButton';
 import useFetchHLS from '../../hooks/useFetchHLS';
-import Datebox from '../Biomass/Datebox';
+import Datebox from '../../shared/Biomass/Datebox';
 
 const CustomizedAccordion = styled(Accordion)(() => ({
   '&.MuiPaper-root': {
