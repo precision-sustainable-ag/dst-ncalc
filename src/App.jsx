@@ -16,14 +16,14 @@ import SnackbarMessage from './shared/SnackbarMessage';
 import './App.scss';
 import 'react-datepicker/dist/react-datepicker.css';
 import { get, set } from './store/Store';
-import Init from './components/Init';
+import FieldDropdown from './components/FieldDropdown';
 import NcalcStepper from './shared/Stepper';
 
 const screens = {
   init: () => null,
 };
 
-screens.init = require('./components/Init').default;
+screens.init = require('./components/FieldDropdown').default;
 screens.home = require('./components/Home').default;
 screens.about = require('./components/About').default;
 screens.location = require('./components/Location').default;
@@ -98,7 +98,7 @@ const App = () => {
     },
     {
       type: 'component',
-      component: <Init />,
+      component: <FieldDropdown />,
     },
   ];
 

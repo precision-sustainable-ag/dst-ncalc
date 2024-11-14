@@ -17,20 +17,26 @@ import { set, get } from '../../store/redux-autosetters';
 const examples = {};
 
 // TODO: component for the fields list at the right top corner of the page
-const Init = ({ handleCloseUserMenu }) => {
+const FieldDropdown = () => {
   /// ///// VARIABLES ///// ////
   const dispatch = useDispatch();
   const navigate = useNavigate();
   const { pathname } = useLocation();
 
   const PSA = useSelector(get.PSA);
+  // In Home page:
+  // if (window.location.toString().includes('PSA')) {
+  //   dispatch(set.PSA(true));
+  // }
+  // TODO: PSA is always false currently in prod and devs
+
   const field = useSelector(get.field);
   const model = useSelector(get.model);
   const dates = useSelector(get.dates);
   const [downloadCSVFailed, setDownloadCSVFailed] = useState(false);
 
-  // eslint-disable-next-line no-unused-vars
-  const [samplePolygon, sampleBiomass] = useFetchSampleBiomass();
+  // TODO: Load static data from examples here
+  useFetchSampleBiomass();
 
   /// ///// FUNCTIONS ///// ////
   const loadField = (fieldVal) => {
@@ -61,7 +67,6 @@ const Init = ({ handleCloseUserMenu }) => {
       dispatch(set.cashCrop('Corn'));
       dispatch(set.yield(150));
       dispatch(set.targetN(150));
-      handleCloseUserMenu();
     } else if (fieldVal === 'Example: Legume') {
       // navigate('location');
       dispatch(set.mapPolygon([]));
@@ -89,7 +94,6 @@ const Init = ({ handleCloseUserMenu }) => {
       dispatch(set.cashCrop('Corn'));
       dispatch(set.yield(150));
       dispatch(set.targetN(100));
-      handleCloseUserMenu();
     } else if (fieldVal === 'Download data') {
       if (model && dates) {
         downloadOutputCSV(model, dates);
@@ -245,7 +249,6 @@ const Init = ({ handleCloseUserMenu }) => {
                 {
                   // additional field names in example dropdown
                   myFields.map((fld, idx) => (
-                    // eslint-disable-next-line max-len
                     <option key={idx} checked={fld === field}>
                       {fld.replace('ncalc-', '')}
                     </option> // eslint-disable-line react/no-unknown-property
@@ -309,4 +312,4 @@ const Init = ({ handleCloseUserMenu }) => {
   );
 };
 
-export default Init;
+export default FieldDropdown;
