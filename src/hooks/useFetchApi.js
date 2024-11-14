@@ -12,6 +12,8 @@ const SSURGO_API_URL = 'https://ssurgo.covercrop-data.org';
 const WEATHER_API_URL = 'https://weather.covercrop-data.org';
 const PLANTFACTORS_API_URL = 'https://api.covercrop-imagery.org';
 
+// TODO: hooks for fetching data from different apis
+
 /// Desc: useFetchCornN
 /// ..............................................................................
 /// ..............................................................................

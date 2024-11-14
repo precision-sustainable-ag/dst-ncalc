@@ -22,7 +22,7 @@ import GrowthStageInput from './GrowthStageInput';
 import Input from '../../shared/Inputs';
 import Myslider from '../../shared/Slider';
 import Help from '../../shared/Help';
-import Biomass from '../../shared/Biomass';
+import BiomassData from '../../shared/BiomassData';
 import Required from '../../shared/Required';
 import NavButton from '../../shared/Navigate/NavButton';
 import { useFetchPlantFactors } from '../../hooks/useFetchApi';
@@ -149,7 +149,7 @@ const CoverCropFirst = ({ barebone = false }) => {
                   />
                 </RadioGroup>
               </Stack>
-              {!barebone && <Biomass minified={false} />}
+              {!barebone && <BiomassData minified={false} />}
             </Paper>
           ) : (
             <>

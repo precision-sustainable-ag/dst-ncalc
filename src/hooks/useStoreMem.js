@@ -4,6 +4,7 @@ import React from 'react';
 import { useSelector } from 'react-redux';
 import { get } from '../store/redux-autosetters';
 
+/** save current field data into localStorage */
 const useStoreMem = () => {
   /// //////////////////////////////////////////////
   const field = useSelector(get.field);

@@ -23,7 +23,7 @@ import Help from '../../shared/Help';
 import { get, set } from '../../store/Store';
 import NavButton from '../../shared/Navigate/NavButton';
 import useFetchHLS from '../../hooks/useFetchHLS';
-import Datebox from '../../shared/Biomass/Datebox';
+import Datebox from '../../shared/BiomassData/Datebox';
 
 const CustomizedAccordion = styled(Accordion)(() => ({
   '&.MuiPaper-root': {

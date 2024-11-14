@@ -16,6 +16,7 @@ const HLS_API_URL = 'https://covercrop-imagery.org';
 /// ..............................................................................
 /// ..............................................................................
 //
+/** hook for fetching biomass raster data */
 const useFetchHLS = () => {
   const [data, setData] = useState(null);
   // const [taskId, setTaskId] = useState(null);

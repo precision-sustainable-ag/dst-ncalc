@@ -9,10 +9,13 @@ const POLYGON_FILE_NAME = 'sample_polygon.json';
 const BIOMASS_FILE_NAME = 'sample_biomass_result.json';
 const CROPNAMES_FILE_NAME = 'crops.json';
 
+// TODO: hooks for fetching static data like field example and crop names.
+
 /// Desc: useFetchSampleBiomass
 /// ..............................................................................
 /// ..............................................................................
 //
+/** Fetch example biomass raster polygon from static files */
 const useFetchSampleBiomass = () => {
   const dispatch = useDispatch();
   const [polygon, setPolygon] = useState(null);
@@ -58,6 +61,7 @@ const useFetchSampleBiomass = () => {
 /// ..............................................................................
 /// ..............................................................................
 //
+/** Fetch all cash crop names from a static file */
 const useFetchCropNames = () => {
   const dispatch = useDispatch();
   const [cropNames, setCropNames] = useState(null);

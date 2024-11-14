@@ -8,7 +8,7 @@ import {
   Typography,
 } from '@mui/material';
 import Map from '../../../shared/Map/NitrogenMap';
-import Biomass from '../../../shared/Biomass';
+import BiomassData from '../../../shared/BiomassData';
 
 /// /// /// STYLES /// /// ///
 const CardStyles = {
@@ -39,7 +39,7 @@ const BiomassMapWidget = ({ refVal }) => (
       >
         Biomass Map
       </Typography>
-      <Biomass />
+      <BiomassData />
       <Box sx={{ height: '90%', width: '100%', marginBottom: 5 }}>
         <Map variant="biomass" />
       </Box>

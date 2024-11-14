@@ -14,6 +14,10 @@ import {
 const NITROGEN_SURFACE_API_URL = 'https://api.covercrop-ncalc.org/surface';
 let arrayFlat;
 
+// FIXME:
+// not sure what this hook doing, it's similar to useFetchModel() in useFetchApi.js,
+// but not returning result, only setting nitrogenTaskIsDone which is not being used anywhere
+
 /// Desc: useFetchNitrogen
 /// ..............................................................................
 /// ..............................................................................
