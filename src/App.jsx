@@ -24,7 +24,7 @@ const screens = {
 };
 
 screens.init = require('./components/Init').default;
-screens.home = require('./pages/Home').default;
+screens.home = require('./components/Home').default;
 screens.about = require('./components/About').default;
 screens.location = require('./shared/Location').default;
 screens.soil = require('./components/Soil').default;
