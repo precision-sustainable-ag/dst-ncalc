@@ -1,14 +1,18 @@
 /* eslint-disable no-console */
 import React from 'react';
 import { useDispatch, useSelector } from 'react-redux';
-import { useLocation, useNavigate } from 'react-router-dom';
+import {
+  useLocation, useNavigate, Route, Routes,
+} from 'react-router-dom';
 import { ThemeProvider, createTheme } from '@mui/material/styles';
-import { Container } from '@mui/material';
+import { Container, Box } from '@mui/material';
 import { PSATheme, PSAHeader } from 'shared-react-components/src';
 import { deepmerge } from '@mui/utils';
 import ChatBubbleOutlineIcon from '@mui/icons-material/ChatBubbleOutline';
 // import ResponsiveNavBar from './components/ResponsiveNavBar';
-import Body from './components/Body';
+import Feedback from './components/Feedback';
+import About from './components/About';
+import SnackbarMessage from './shared/SnackbarMessage';
 import './App.scss';
 import 'react-datepicker/dist/react-datepicker.css';
 import { get, set } from './store/Store';
@@ -76,6 +80,9 @@ const App = () => {
   const navigate = useNavigate();
   const dispatch = useDispatch();
 
+  const path = window.location.toString().split('/').pop().toLowerCase() || 'home';
+  const Screen = screens[path] || screens.home;
+
   const navContent = [
     {
       type: 'button',
@@ -111,7 +118,24 @@ const App = () => {
         }}
       >
         {/* <ResponsiveNavBar screens={screens} /> */}
-        <Body screens={screens} />
+        <Box
+          sx={{
+            display: 'flex',
+            justifyContent: 'center',
+            paddingTop: '1rem',
+          }}
+          id="body-wrapper"
+        >
+          <Routes>
+            {Object.keys(screens).map((scr) => (
+              <Route key={scr} path={scr.toLowerCase()} element={<Screen />} />
+            ))}
+            <Route path="" element={<Screen />} />
+          </Routes>
+          <Feedback />
+          <About />
+          <SnackbarMessage />
+        </Box>
       </Container>
     </ThemeProvider>
   );
