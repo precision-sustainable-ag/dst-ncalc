@@ -34,6 +34,7 @@ const NitrogenMapComp = ({ variant }) => {
   const mapboxToken = import.meta.env.VITE_MAPBOX_TOKEN;
 
   // mapAddress
+  // TODO: only difference between two maps
   useEffect(() => {
     if (drawEvent.mode === 'delete') {
       removedShapes = removedShapes.add(drawEvent.e.features[0].id);

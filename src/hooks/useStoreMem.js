@@ -12,8 +12,8 @@ const useStoreMem = () => {
   const lon = useSelector(get.lon);
   const BD = useSelector(get.BD);
   const N = useSelector(get.N);
-  const killDate = useSelector(get.coverCropTerminationDate);
-  const plantingDate = useSelector(get.coverCropPlantingDate);
+  const coverCropTerminationDate = useSelector(get.coverCropTerminationDate);
+  const coverCropPlantingDate = useSelector(get.coverCropPlantingDate);
   const InorganicN = useSelector(get.InorganicN);
   const cashCrop = useSelector(get.cashCrop);
   const Yield = useSelector(get.yield);
@@ -42,8 +42,8 @@ const useStoreMem = () => {
           lon,
           BD,
           N,
-          killDate,
-          plantingDate,
+          coverCropTerminationDate,
+          coverCropPlantingDate,
           carb,
           cell,
           lign,

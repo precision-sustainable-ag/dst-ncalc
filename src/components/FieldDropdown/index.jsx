@@ -23,12 +23,12 @@ const FieldDropdown = () => {
   const navigate = useNavigate();
   const { pathname } = useLocation();
 
-  const PSA = useSelector(get.PSA);
-  // In Home page:
-  // if (window.location.toString().includes('PSA')) {
-  //   dispatch(set.PSA(true));
-  // }
   // TODO: PSA is always false currently in prod and devs
+  // In Home page: if (window.location.toString().includes('PSA'))dispatch(set.PSA(true));
+  const PSA = useSelector(get.PSA);
+
+  // get all fields from localStorage
+  const myFields = Object.keys(localStorage).filter((key) => key.startsWith('ncalc-'));
 
   const field = useSelector(get.field);
   const model = useSelector(get.model);
@@ -101,8 +101,10 @@ const FieldDropdown = () => {
         setDownloadCSVFailed(true);
       }
     } else {
+      // load field from localStorage
       const newFieldVal = 'ncalc-'.concat(fieldVal);
       const inputs = JSON.parse(localStorage[newFieldVal]);
+      console.log(inputs);
       Object.keys(inputs).forEach((key) => {
         try {
           if (/Date/.test(key)) {
@@ -197,8 +199,13 @@ const FieldDropdown = () => {
     });
   }; // changePSA
 
-  const changeField = (e) => {
+  const handleDropdown = (e) => {
     const fieldStr = e.target.value;
+    if (fieldStr === 'placeholder') {
+      // TODO: maybe add functions to clean previous field data
+      dispatch(set.field(''));
+      return;
+    }
     if (fieldStr === 'Clear previous runs') {
       // eslint-disable-next-line no-alert
       if (window.confirm('Clear all previous runs?')) {
@@ -208,12 +215,7 @@ const FieldDropdown = () => {
     } else {
       loadField(fieldStr);
     }
-  }; // changeField
-
-  const myFields = Object.keys(localStorage)
-    .sort()
-    .filter((v) => !v.includes('mapbox.eventData'));
-  const showUtilities = pathname.includes('output') || myFields.length;
+  };
 
   /// ///// JSX RENDER ///// ////
   return (
@@ -241,25 +243,17 @@ const FieldDropdown = () => {
       )}
 
       {!PSA && (
-        <select className="fields" onChange={changeField} value={field}>
-          <option>&nbsp;</option>
-          {myFields.length && (
-            <>
-              <optgroup label="My fields">
-                {
-                  // additional field names in example dropdown
-                  myFields.map((fld, idx) => (
-                    <option key={idx} checked={fld === field}>
-                      {fld.replace('ncalc-', '')}
-                    </option> // eslint-disable-line react/no-unknown-property
-                  ))
-                }
-              </optgroup>
-              <option disabled>____________________</option>
-            </>
-          )}
-
-          {!myFields.length && <option>&nbsp;</option>}
+        <select className="fields" onChange={handleDropdown} value={field}>
+          <option value="placeholder">&nbsp;</option>
+          <optgroup label="My fields">
+            {myFields.map((fld, idx) => (
+              // eslint-disable-next-line react/no-unknown-property
+              <option key={idx} checked={fld === field}>
+                {fld.replace('ncalc-', '')}
+              </option>
+            ))}
+          </optgroup>
+          <option disabled>____________________</option>
 
           <optgroup label="Example data">
             <option>Example: Grass</option>
@@ -267,17 +261,9 @@ const FieldDropdown = () => {
           </optgroup>
           <option disabled>____________________</option>
 
-          {showUtilities && (
+          {(pathname.includes('output') || myFields.length) && (
             <optgroup label="Utilities">
-              {pathname.includes('output') && (
-                <option
-                  onClick={() => {
-                    console.log('bhhvhg');
-                  }}
-                >
-                  Download data
-                </option>
-              )}
+              <option>Download data</option>
               {myFields.length && <option>Clear previous runs</option>}
             </optgroup>
           )}

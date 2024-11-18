@@ -126,6 +126,7 @@ const LeftSideBar = ({ sidebarListData, refs }) => {
           {
             sidebarListData.map((el, index) => {
               if (!isSatelliteMode && el.label === 'Map Visualization') return;
+              if (el.label === 'Biomass Map' || el.label === 'Nitrogen Map') return;
               return (
                 <ListItem
                   label={el.label}
