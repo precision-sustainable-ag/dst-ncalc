@@ -169,7 +169,6 @@ const initialState = {
   biomassFetchIsFailed: false,
   biomassFetchIsLoading: false,
   biomassTaskIsDone: true,
-  biomassTaskId: null,
   polyDrawTooBig: false,
   nitrogenTaskIsDone: true,
   activeStep: 0,
