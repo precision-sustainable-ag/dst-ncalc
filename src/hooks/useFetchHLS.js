@@ -34,6 +34,7 @@ const useFetchHLS = () => {
   const isSatelliteMode = useSelector(get.biomassCalcMode) === 'satellite' ? true : false;
 
   useEffect(() => {
+    // FIXME: need to update biomassTaskId if we want to do multiple calculations
     if (isSatelliteMode && mapPolygon.length > 0 && !activeExample && !biomassTaskId) {
       dispatch(set.biomassTaskResults({}));
       dispatch(set.biomassTaskIsDone(false));
@@ -44,8 +45,10 @@ const useFetchHLS = () => {
       if (mapPolygon.length > 0) {
         area = 0.000247105 * turf.area(turf.polygon(mapPolygon[0].geometry.coordinates));
       }
+      console.log('area', area);
 
       if (area > 10000) {
+        // if area too large, not do calculation
         dispatch(set.polyDrawTooBig(true));
         dispatch(set.mapPolygon([]));
       } else {
@@ -63,6 +66,7 @@ const useFetchHLS = () => {
         const headers = {
           'Content-Type': 'application/json',
         };
+        // TODO: post task api, will return a task id
         axios
           .post(`${HLS_API_URL}/tasks`, payload, { headers })
           .then((response) => {
@@ -78,6 +82,7 @@ const useFetchHLS = () => {
     }
   }, [mapPolygon, isSatelliteMode]);
 
+  // TODO: call api with task id, return task status
   const fetchTask = () => {
     axios
       .get(`https://covercrop-imagery.org/tasks/${biomassTaskId}`)
@@ -106,6 +111,18 @@ const useFetchHLS = () => {
       });
   };
 
+  // set interval for fetching task status
+  useEffect(() => {
+    // TODO: create a loop
+    if (biomassTaskId && !data && !taskIsDone) {
+      interval = setInterval(fetchTask, 1000);
+    }
+    return () => {
+      clearInterval(interval);
+    };
+  }, [biomassTaskId]);
+
+  // set raster object
   useEffect(() => {
     if (isSatelliteMode && data && data.task_result) {
       const values = JSON.parse(data.task_result.replace(/\bNaN\b/g, 'null'));
@@ -114,7 +131,10 @@ const useFetchHLS = () => {
       dispatch(set.biomassTaskResults(rasterObject));
     }
   }, [data, isSatelliteMode]);
+
   // .data_array.map(row => row.map(el => el*0.001))
+
+  // set biomass value
   useEffect(() => {
     if (isSatelliteMode && biomassTaskResults && biomassTaskResults.data_array) {
       const flattenedBiomass = biomassTaskResults.data_array.flat(1).filter((el) => el !== 0);
@@ -135,14 +155,6 @@ const useFetchHLS = () => {
     }
   }, [biomassTotalValue, unit]);
 
-  useEffect(() => {
-    if (biomassTaskId && !data && !taskIsDone) {
-      interval = setInterval(fetchTask, 1000);
-    }
-    return () => {
-      clearInterval(interval);
-    };
-  }, [biomassTaskId]);
   return null;
 }; // useFetchHLS
 

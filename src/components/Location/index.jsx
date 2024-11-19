@@ -24,6 +24,7 @@ import { get, set } from '../../store/Store';
 import NavButton from '../../shared/Navigate/NavButton';
 import useFetchHLS from '../../hooks/useFetchHLS';
 import Datebox from '../../shared/BiomassData/Datebox';
+import { AreaErrorModal, TaskFailModal } from '../../shared/BiomassData/Warnings';
 
 const CustomizedAccordion = styled(Accordion)(() => ({
   '&.MuiPaper-root': {
@@ -45,6 +46,8 @@ const Location = ({ barebone = false }) => {
   const isSatelliteMode = useSelector(get.biomassCalcMode) === 'satellite';
   const biomassFetchIsLoading = useSelector(get.biomassFetchIsLoading);
   const biomassTaskResults = useSelector(get.biomassTaskResults);
+  const polyDrawTooBig = useSelector(get.polyDrawTooBig);
+  const biomassFetchIsFailed = useSelector(get.biomassFetchIsFailed);
 
   // api for getting biomass map
   useFetchHLS();
@@ -94,6 +97,9 @@ const Location = ({ barebone = false }) => {
               <Stack>
                 <LinearProgress />
               </Stack>
+              <Typography variant="h6" fontWeight="bold" gutterBottom textAlign="center">
+                Calculating Biomass ...
+              </Typography>
             </Box>
           )}
           {biomassTaskResults && !biomassFetchIsLoading && (
@@ -103,12 +109,11 @@ const Location = ({ barebone = false }) => {
               </Typography>
             </Box>
           )}
-          {biomassFetchIsLoading && (
-            <Box justifyContent="center" alignItems="center">
-              <Typography variant="h6" fontWeight="bold" gutterBottom textAlign="center">
-                Calculating Biomass ...
-              </Typography>
-            </Box>
+          {polyDrawTooBig && (
+            <AreaErrorModal />
+          )}
+          {biomassFetchIsFailed && (
+          <TaskFailModal task="biomass" />
           )}
           <BiomassMap variant="biomass" />
           {!barebone && (
