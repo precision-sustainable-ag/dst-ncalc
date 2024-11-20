@@ -1,10 +1,13 @@
 /* eslint-disable react-hooks/exhaustive-deps */
-import React, { useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
-import { Box, Card, Stack, ToggleButton, ToggleButtonGroup, Typography, styled } from '@mui/material';
+import {
+  Box, Card, Stack, ToggleButton, ToggleButtonGroup, Typography, styled,
+} from '@mui/material';
 import { useNavigate } from 'react-router-dom';
 import { get, set } from '../../store/Store';
 import NavButton from '../../shared/Navigate/NavButton';
+import About from '../About';
 
 const BiomassMethodButton = styled(ToggleButton)(() => ({
   '&.Mui-selected': {
@@ -31,6 +34,7 @@ const BiomassMethodButton = styled(ToggleButton)(() => ({
 }));
 
 const Home = () => {
+  const [aboutOpen, setAboutOpen] = useState(false);
   const dispatch = useDispatch();
   // const privacy = useSelector(get.privacy);
   const biomassCalcMode = useSelector(get.biomassCalcMode);
@@ -88,7 +92,7 @@ const Home = () => {
       </Stack>
       <Box sx={{ height: 100 }} />
       <Stack spacing={2} direction="row" justifyContent="space-around">
-        <NavButton onClick={() => dispatch(set.openAboutModal(true))} fontSize="1rem">
+        <NavButton onClick={() => setAboutOpen(true)} fontSize="1rem">
           About
         </NavButton>
         <NavButton
@@ -104,13 +108,13 @@ const Home = () => {
               navigate('/location');
             }
             dispatch(set.activeStep(1));
-            return null;
           }}
           fontSize="1rem"
         >
           Get Started
         </NavButton>
       </Stack>
+      <About open={aboutOpen} setOpen={setAboutOpen} />
     </Card>
   );
 }; // Home

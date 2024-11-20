@@ -11,7 +11,6 @@ import { deepmerge } from '@mui/utils';
 import ChatBubbleOutlineIcon from '@mui/icons-material/ChatBubbleOutline';
 // import ResponsiveNavBar from './components/ResponsiveNavBar';
 import Feedback from './components/Feedback';
-import About from './components/About';
 import SnackbarMessage from './shared/SnackbarMessage';
 import './App.scss';
 import 'react-datepicker/dist/react-datepicker.css';
@@ -133,7 +132,6 @@ const App = () => {
             <Route path="" element={<Screen />} />
           </Routes>
           <Feedback />
-          <About />
           <SnackbarMessage />
         </Box>
       </Container>
