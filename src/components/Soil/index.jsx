@@ -98,34 +98,31 @@ const Soil = ({ barebone = false }) => {
               <Typography variant="h6" my={2}>
                 You can adjust them if you have lab results.
               </Typography>
+              <Box sx={{ color: '#4f6b14' }}>
+                <Box my={5}>
+                  Organic Matter (%):
+                  <Help>Soil organic matter in the surface (0-10cm) soil</Help>
+                  <Myslider id="OM" min={0.1} max={5} step={0.1} />
+                </Box>
+                <Box my={5}>
+                  Bulk Density (g/cm
+                  <sup>3</sup>
+                  ):
+                  <Help>Soil bulk density in the surface (0-10cm) soil</Help>
+                  <Myslider id="BD" min={0.8} max={1.8} step={0.1} />
+                </Box>
+                <Box my={5}>
+                  Soil Inorganic N (ppm or mg/kg):
+                  <Help>Soil inorganic nitrogen in the surface (0-10cm) soil</Help>
+                  <Myslider id="InorganicN" min={0} max={25} />
+                </Box>
+              </Box>
             </Box>
           )
         ) : (
           <Typography variant="h6" my={6}>
             LOADING FROM SSURGO SERVER ...
           </Typography>
-        )}
-
-        {!isSatelliteMode && ssurgo && (
-          <Box sx={{ color: '#4f6b14' }}>
-            <Box my={5}>
-              Organic Matter (%):
-              <Help>Soil organic matter in the surface (0-10cm) soil</Help>
-              <Myslider id="OM" min={0.1} max={5} step={0.1} />
-            </Box>
-            <Box my={5}>
-              Bulk Density (g/cm
-              <sup>3</sup>
-              ):
-              <Help>Soil bulk density in the surface (0-10cm) soil</Help>
-              <Myslider id="BD" min={0.8} max={1.8} step={0.1} />
-            </Box>
-            <Box my={5}>
-              Soil Inorganic N (ppm or mg/kg):
-              <Help>Soil inorganic nitrogen in the surface (0-10cm) soil</Help>
-              <Myslider id="InorganicN" min={0} max={25} />
-            </Box>
-          </Box>
         )}
       </Box>
       {!barebone && (

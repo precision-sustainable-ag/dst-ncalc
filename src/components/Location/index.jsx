@@ -113,7 +113,7 @@ const Location = ({ barebone = false }) => {
             <AreaErrorModal />
           )}
           {biomassFetchIsFailed && (
-          <TaskFailModal task="biomass" />
+            <TaskFailModal task="biomass" />
           )}
           <BiomassMap variant="biomass" />
           {!barebone && (

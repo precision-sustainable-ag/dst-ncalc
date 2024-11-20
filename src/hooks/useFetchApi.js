@@ -166,7 +166,7 @@ const useFetchModel = ({
 /// ..............................................................................
 /// ..............................................................................
 //
-
+/** Fetch soil data from ssurgo api */
 const useFetchSSURGO = () => {
   const dispatch = useDispatch();
   const updateSSURGO = useSelector(get.updateSSURGO);
@@ -174,9 +174,15 @@ const useFetchSSURGO = () => {
   const lat = useSelector(get.lat);
   const lon = useSelector(get.lon);
   const field = useSelector(get.field);
+  console.log('usefetch ssurgo');
 
   useEffect(() => {
-    if (!field.includes('Mockup')) {
+    // if ssurgo data need to be updated(map location change), set ssurgo to null
+    if (updateSSURGO) {
+      dispatch(set.SSURGO(null));
+    }
+    // exclude example fields
+    if (!field.includes('Example') && (!SSURGO || updateSSURGO)) {
       const url = `${SSURGO_API_URL}/?lat=${lat}&lon=${lon}&component=major`;
       axios
         .get(url)

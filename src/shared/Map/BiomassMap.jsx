@@ -63,6 +63,7 @@ const BiomassMapComp = ({ variant }) => {
   }, [address.latitude, address.longitude, address.address]);
 
   useEffect(() => {
+    // FIXME: this is updating zoom for a lot of times everytime the map zooms
     if (zoom) dispatch(set.mapZoom(zoom));
   }, [zoom]);
 
