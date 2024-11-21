@@ -23,6 +23,7 @@ const NitrogenMapComp = ({ variant }) => {
   const dispatch = useDispatch();
   const lat = useSelector(get.lat);
   const lon = useSelector(get.lon);
+  const biomassTaskResults = useSelector(get.biomassTaskResults);
   const nitrogenTaskResults = useSelector(get.nitrogenTaskResults);
   const mapAddress = useSelector(get.mapAddress);
   const mapZoom = useSelector(get.mapZoom);
@@ -75,7 +76,7 @@ const NitrogenMapComp = ({ variant }) => {
         setZoom={setZoom}
         setMap={() => { }}
         onDraw={setDrawEvent}
-        initRasterObject={nitrogenTaskResults}
+        initRasterObject={variant === 'biomass' ? biomassTaskResults : nitrogenTaskResults}
         initFeatures={mapPolygon}
         unit={unit}
         material={variant}

@@ -158,12 +158,6 @@ const CoverCropFirst = ({ barebone = false }) => {
                 {!coverCropTerminationDate && <Required />}
               </Stack>
               <Input type="date" id="coverCropTerminationDate" />
-            </>
-          )}
-          {isSatelliteMode ? (
-            ''
-          ) : (
-            <>
               <Box
                 mt={1}
                 sx={{
