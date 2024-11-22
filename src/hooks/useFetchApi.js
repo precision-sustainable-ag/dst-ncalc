@@ -174,7 +174,6 @@ const useFetchSSURGO = () => {
   const lat = useSelector(get.lat);
   const lon = useSelector(get.lon);
   const field = useSelector(get.field);
-  console.log('usefetch ssurgo');
 
   useEffect(() => {
     // if ssurgo data need to be updated(map location change), set ssurgo to null
@@ -278,7 +277,7 @@ const useFetchPlantFactors = () => {
 /// ..............................................................................
 /// ..............................................................................
 //
-
+/** Fetch nitrogen task result ( will only work in satellite mode and will generate raster for the nitrogen map) */
 const useFetchNitrogenArray = () => {
   const dispatch = useDispatch();
   const N = useSelector(get.N);

@@ -50,18 +50,19 @@ const CoverCropsInput = ({ isSatelliteMode }) => {
               species.brassica.includes(va)
                 ? 'brassica'
                 : species.broadleaf.includes(va)
-                ? 'broadleaf'
-                : species.grass.includes(va)
-                ? 'grass'
-                : species.legume.includes(va)
-                ? 'legume'
-                : 'ERROR',
+                  ? 'broadleaf'
+                  : species.grass.includes(va)
+                    ? 'grass'
+                    : species.legume.includes(va)
+                      ? 'legume'
+                      : 'ERROR',
             ),
           );
         }
       }}
     />
   ) : (
+    // TODO: note: this input is a custom component
     <Input
       id="coverCrop"
       multiple

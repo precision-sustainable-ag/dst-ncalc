@@ -1,6 +1,10 @@
-import React, { useEffect, useState, useRef, useCallback } from 'react';
+import React, {
+  useEffect, useState, useRef, useCallback,
+} from 'react';
 import { useSelector, useDispatch } from 'react-redux';
-import { TextField, Radio, RadioGroup, FormControlLabel, FormLabel, Autocomplete as MUIAutocomplete } from '@mui/material';
+import {
+  TextField, Radio, RadioGroup, FormControlLabel, FormLabel, Autocomplete as MUIAutocomplete,
+} from '@mui/material';
 
 import { get, set } from '../../store/Store';
 
@@ -26,7 +30,9 @@ const keyPress = (event) => {
   }
 }; // keyPress
 
-const Input = ({ type, id, options, isOptionEqualToValue, renderInput, index = '', value, onChange, onInput, immediate, ...props }) => {
+const Input = ({
+  type, id, options, isOptionEqualToValue, renderInput, index = '', value, onChange, onInput, immediate, ...props
+}) => {
   const dispatch = useDispatch();
 
   let obj = id;

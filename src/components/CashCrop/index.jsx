@@ -21,47 +21,15 @@ const CustomInputText = styled(Typography)({
   marginBottom: '0.2rem',
 });
 
-const CashCrops = () => {
-  /// Desc: Fetch the crop names
-  const dispatch = useDispatch();
-  const crops = useFetchCropNames();
-  const cashCrop = useSelector(get.cashCrop);
-
-  /// Desc: Return the input component with the crops
-  return (
-    // <Input
-    //   id="cashCrop"
-    //   options={crops}
-    //   autoFocus
-    //   placeholder="Start typing your crop, then select from the list"
-    // />
-    crops && (
-      <Autocomplete
-        placeholder="Start typing your crop, then select from the list"
-        disablePortal
-        id="combo-box-demo"
-        autoFocus
-        options={[...crops]}
-        sx={{ width: '100%' }}
-        // defaultValue={coverCrop ? coverCrop : ''}
-        value={cashCrop}
-        renderInput={(params) => <TextField {...params} label="Select a cash crop" />}
-        onChange={(el, va) => {
-          dispatch(set.cashCrop(va));
-        }}
-      />
-    )
-  );
-}; // CashCrops
-
 const CashCrop = ({ barebone = false }) => {
+  const navigate = useNavigate();
+  const dispatch = useDispatch();
   const unit = useSelector(get.unit);
   const cashCrop = useSelector(get.cashCrop);
   const targetN = useSelector(get.targetN);
   const Yield = useSelector(get.yield);
   const cashCropPlantingDate = useSelector(get.cashCropPlantingDate);
-  const navigate = useNavigate();
-  const dispatch = useDispatch();
+  const crops = useFetchCropNames();
 
   return (
     <Box
@@ -105,7 +73,22 @@ const CashCrop = ({ barebone = false }) => {
             <CustomInputText>Cash Crop: </CustomInputText>
             {!cashCrop && <Required />}
           </Stack>
-          <CashCrops />
+          {crops && (
+            <Autocomplete
+              placeholder="Start typing your crop, then select from the list"
+              disablePortal
+              id="combo-box-demo"
+              autoFocus
+              options={[...crops]}
+              sx={{ width: '100%' }}
+              // defaultValue={coverCrop ? coverCrop : ''}
+              value={cashCrop}
+              renderInput={(params) => <TextField {...params} label="Select a cash crop" />}
+              onChange={(el, va) => {
+                dispatch(set.cashCrop(va));
+              }}
+            />
+          )}
           <Stack direction="row" alignItems="center">
             <CustomInputText>Cash Crop Planting Date: </CustomInputText>
             {!cashCropPlantingDate && <Required />}

@@ -34,6 +34,7 @@ const useStoreMem = () => {
   const cornN = useSelector(get.cornN);
   const coverCrop = useSelector(get.coverCrop);
 
+  // TODO: what if field don't have a name?
   if (field) {
     if (!field.includes('Example') && !field.includes('Mockup')) {
       try {
