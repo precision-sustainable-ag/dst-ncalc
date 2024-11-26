@@ -1,8 +1,10 @@
+/* eslint-disable no-nested-ternary */
 /* eslint-disable react-hooks/exhaustive-deps */
 import React, { useEffect, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
+import Autocomplete from '@mui/material/Autocomplete';
+import { TextField } from '@mui/material';
 import { get, set } from '../../store/Store';
-import { PSADropdown } from 'shared-react-components/src';
 
 const GrowthStageInput = ({ isSatelliteMode }) => {
   const dispatch = useDispatch();
@@ -31,29 +33,27 @@ const GrowthStageInput = ({ isSatelliteMode }) => {
     }
   }, [coverCrop, field, dispatch, species]);
 
-  const growthStageOptions = 
-  plantGrowthStages && 
-  plantGrowthStages[coverCropSpecieGroup] 
-    ? plantGrowthStages[coverCropSpecieGroup].map(stage => ({
-        label: stage,
-        value: stage,
-      }))
-    : []
-
   return (
-    isSatelliteMode && coverCrop && coverCropSpecieGroup && plantGrowthStages && coverCropSpecieGroup !== 'ERROR' && (
-      <PSADropdown
-        label="Select a cover crop growth stage"
-        items={growthStageOptions}
-        formSx={{ width: '100%' }}
-        SelectProps={{
-          value: coverCropGrowthStage,
-          onChange: (e) => dispatch(set.coverCropGrowthStage(e.target.value)),
-          variant: 'outlined',
+    isSatelliteMode && coverCrop && coverCropSpecieGroup && plantGrowthStages && coverCropSpecieGroup !== 'ERROR'
+    && (
+      <Autocomplete
+        key={updateGrowthStage}
+        placeholder="Select a cover crop Growth Stage"
+        disablePortal
+        id="combo-box-demo"
+        options={[
+          ...plantGrowthStages[coverCropSpecieGroup],
+        ]}
+        sx={{ width: '100%' }}
+        // defaultValue={coverCropGrowthStage}
+        value={coverCropGrowthStage}
+        renderInput={(params) => <TextField {...params} label="Select a cover crop growing stage" />}
+        onChange={(el, va) => {
+          dispatch(set.coverCropGrowthStage(va));
         }}
       />
     )
   );
-};
+}; // GrowthStageInput
 
 export default GrowthStageInput;

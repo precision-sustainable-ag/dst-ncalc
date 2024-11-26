@@ -12,7 +12,6 @@ import Help from '../../shared/Help';
 import Required from '../../shared/Required';
 import NavButton from '../../shared/Navigate/NavButton';
 import { useFetchCropNames } from '../../hooks/useFetchStatic';
-import { PSADropdown } from 'shared-react-components/src';
 
 const CustomInputText = styled(Typography)({
   fontSize: '1.2rem',
@@ -30,10 +29,7 @@ const CashCrop = ({ barebone = false }) => {
   const targetN = useSelector(get.targetN);
   const Yield = useSelector(get.yield);
   const cashCropPlantingDate = useSelector(get.cashCropPlantingDate);
-  const crops = useFetchCropNames()?.map((crop) => ({
-    label: crop,
-    value: crop,
-  }));
+  const crops = useFetchCropNames();
 
   return (
     <Box
@@ -78,17 +74,18 @@ const CashCrop = ({ barebone = false }) => {
             {!cashCrop && <Required />}
           </Stack>
           {crops && (
-            <PSADropdown
-              label="Start typing your crop, then select from the list"
-              items={crops}
-              formSx={{ width: '100%' }}
-              SelectProps={{
-                value: cashCrop || '',
-                onChange: (event) => {
-                  const selectedValue = event.target.value;
-                  dispatch(set.cashCrop(selectedValue));
-                },
-                variant: 'outlined',
+            <Autocomplete
+              placeholder="Start typing your crop, then select from the list"
+              disablePortal
+              id="combo-box-demo"
+              autoFocus
+              options={[...crops]}
+              sx={{ width: '100%' }}
+              // defaultValue={coverCrop ? coverCrop : ''}
+              value={cashCrop}
+              renderInput={(params) => <TextField {...params} label="Select a cash crop" />}
+              onChange={(el, va) => {
+                dispatch(set.cashCrop(va));
               }}
             />
           )}
