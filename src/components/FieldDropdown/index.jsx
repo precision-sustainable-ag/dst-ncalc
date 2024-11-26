@@ -24,13 +24,19 @@ const FieldDropdown = () => {
   const navigate = useNavigate();
   const { pathname } = useLocation();
 
+
+  // TODO: PSA is always false currently in prod and devs
+  // In Home page: if (window.location.toString().includes('PSA'))dispatch(set.PSA(true));
   const PSA = useSelector(get.PSA);
   const field = useSelector(get.field);
   const model = useSelector(get.model);
   const dates = useSelector(get.dates);
   const [downloadCSVFailed, setDownloadCSVFailed] = useState(false);
 
+  // get all fields from localStorage
   const myFields = Object.keys(localStorage).filter((key) => key.startsWith('ncalc-'));
+
+  // TODO: Load static data from examples here
 
   useFetchSampleBiomass();
 
@@ -50,6 +56,7 @@ const FieldDropdown = () => {
 
   const loadField = (fieldVal) => {
     if (fieldVal === 'Example: Grass') {
+      // navigate('location');
       dispatch(set.mapPolygon([]));
       dispatch(set.biomassTaskResults(null));
       dispatch(set.edited(true));
@@ -76,6 +83,7 @@ const FieldDropdown = () => {
       dispatch(set.yield(150));
       dispatch(set.targetN(150));
     } else if (fieldVal === 'Example: Legume') {
+      // navigate('location');
       dispatch(set.mapPolygon([]));
       dispatch(set.biomassTaskResults(null));
       dispatch(set.edited(true));
@@ -108,6 +116,7 @@ const FieldDropdown = () => {
         setDownloadCSVFailed(true);
       }
     } else {
+      // load field from localStorage
       const newFieldVal = 'ncalc-'.concat(fieldVal);
       const inputs = JSON.parse(localStorage[newFieldVal]);
       Object.keys(inputs).forEach((key) => {
@@ -126,13 +135,80 @@ const FieldDropdown = () => {
     }
   };
 
+  // useEffect(() => {
+  //   const base = new Airtable({ apiKey: 'keySO0dHQzGVaSZp2' }).base('appOEj4Ag9MgTTrMg');
+
+  //   const airtable = (table, callback, wrapup) => {
+  //     base(table).select({
+  //       view: 'Grid view',
+  //     }).eachPage((records, fetchNextPage) => {
+  //       records.forEach((record) => {
+  //         callback(record.fields);
+  //       });
+
+  //       fetchNextPage();
+  //     }, (err) => {
+  //       if (!err && wrapup) {
+  //         wrapup();
+  //       }
+  //     });
+  //   }; // airtable
+
+  //   airtable('PSA', (site) => {
+  //     localStorage.removeItem(site.ID);
+  //     if (site.Hour === 0) {
+  //       examples[site.ID] = {
+  //         field: site.ID,
+  //         lat: site.Lat,
+  //         lon: site.Lon,
+  //         location: '',
+  //         BD: site.BD,
+  //         coverCrop: [site['Cover Crop']],
+  //         cashCrop: site['Cash Crop'],
+  //         coverCropTerminationDate: new Date(site.Date),
+  //         lwc: site.LitterWaterContent,
+  //         biomass: Math.round(site.FOM),
+  //         unit: 'kg/ha',
+  //         N: +(site.FOMpctN.toFixed(2)),
+  //         carb: +(site.Carb.toFixed(2)),
+  //         cell: +(site.Cell.toFixed(2)),
+  //         lign: +(site.Lign.toFixed(2)),
+  //         targetN: 150,
+  //         category: site.Category,
+  //       };
+  //     } else {
+  //       examples[site.ID].cashCropPlantingDate = new Date(moment(site.Date).add(-111, 'days'));
+  //     }
+  //   });
+
+  //   const mb = {};
+  //   const species = {};
+
+  //   airtable(
+  //     'CoverCrops',
+  //     (crop) => {
+  //       species[crop.Category] = species[crop.Category] || [];
+  //       species[crop.Category].push(crop.Crop);
+  //       mb[crop.Crop] = crop.MaxBiomass;
+  //     },
+  //     () => {
+  //       dispatch(set.maxBiomass(mb));
+  //       dispatch(set.species(species));
+  //     },
+  //   );
+  //   // /// temporary to load example
+  //   // loadField('Example: Grass');
+  // }, [dispatch]);
+
   const handleDropdown = (e) => {
     const fieldStr = e.target.value;
     if (fieldStr === 'placeholder') {
+      // TODO: maybe add functions to clean previous field data
       dispatch(set.field(''));
       return;
     }
     if (fieldStr === 'Clear previous runs') {
+      // eslint-disable-next-line no-alert
       if (window.confirm('Clear all previous runs?')) {
         localStorage.clear();
         navigate('home');
@@ -176,13 +252,17 @@ const FieldDropdown = () => {
               { value: '', label: '' },
               { value: 'Example: Grass', label: 'Example: Grass' },
               { value: 'Example: Legume', label: 'Example: Legume' },
-              (pathname.includes('output') || myFields.length) && (
-                {
-                  label: 'Utilities',
-                  isHeader: true,
-                },
-                { value: '', label: '' },
-                { value: 'Download data', label: 'Download data' }),
+              ...(pathname.includes('output') || myFields.length
+                ? [
+                  {
+                    label: 'Utilities',
+                    isHeader: true,
+                  },
+                  { value: '', label: '' },
+                  { value: 'Download data', label: 'Download data' },
+                ]
+                : []),
+
               ...(myFields.length ? [{ value: 'Clear previous runs', label: 'Clear previous runs' }] : []),
             ]
         }
