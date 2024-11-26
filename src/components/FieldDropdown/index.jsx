@@ -13,6 +13,7 @@ import DialogContentText from '@mui/material/DialogContentText';
 import { useFetchSampleBiomass } from '../../hooks/useFetchStatic';
 import { downloadOutputCSV } from '../../hooks/helpers';
 import { set, get } from '../../store/redux-autosetters';
+import { PSADropdown } from 'shared-react-components/src';
 
 const examples = {};
 
@@ -23,25 +24,32 @@ const FieldDropdown = () => {
   const navigate = useNavigate();
   const { pathname } = useLocation();
 
-  // TODO: PSA is always false currently in prod and devs
-  // In Home page: if (window.location.toString().includes('PSA'))dispatch(set.PSA(true));
   const PSA = useSelector(get.PSA);
-
-  // get all fields from localStorage
-  const myFields = Object.keys(localStorage).filter((key) => key.startsWith('ncalc-'));
-
   const field = useSelector(get.field);
   const model = useSelector(get.model);
   const dates = useSelector(get.dates);
   const [downloadCSVFailed, setDownloadCSVFailed] = useState(false);
 
-  // TODO: Load static data from examples here
+  const myFields = Object.keys(localStorage).filter((key) => key.startsWith('ncalc-'));
+
   useFetchSampleBiomass();
 
   /// ///// FUNCTIONS ///// ////
+  const changePSA = (e) => {
+    const PSAval = examples[e.target.value];
+
+    Object.keys(PSAval).forEach((key) => {
+      try {
+        dispatch(set[key](PSAval[key]));
+      } catch (ee) {
+        console.log(ee);
+        console.log(key);
+      }
+    });
+  }; // changePSA
+
   const loadField = (fieldVal) => {
     if (fieldVal === 'Example: Grass') {
-      // navigate('location');
       dispatch(set.mapPolygon([]));
       dispatch(set.biomassTaskResults(null));
       dispatch(set.edited(true));
@@ -68,7 +76,6 @@ const FieldDropdown = () => {
       dispatch(set.yield(150));
       dispatch(set.targetN(150));
     } else if (fieldVal === 'Example: Legume') {
-      // navigate('location');
       dispatch(set.mapPolygon([]));
       dispatch(set.biomassTaskResults(null));
       dispatch(set.edited(true));
@@ -101,10 +108,8 @@ const FieldDropdown = () => {
         setDownloadCSVFailed(true);
       }
     } else {
-      // load field from localStorage
       const newFieldVal = 'ncalc-'.concat(fieldVal);
       const inputs = JSON.parse(localStorage[newFieldVal]);
-      console.log(inputs);
       Object.keys(inputs).forEach((key) => {
         try {
           if (/Date/.test(key)) {
@@ -119,95 +124,15 @@ const FieldDropdown = () => {
       });
       dispatch(set.lwc(inputs.lwc)); // avoid calculation
     }
-  }; // loadfield
-
-  // useEffect(() => {
-  //   const base = new Airtable({ apiKey: 'keySO0dHQzGVaSZp2' }).base('appOEj4Ag9MgTTrMg');
-
-  //   const airtable = (table, callback, wrapup) => {
-  //     base(table).select({
-  //       view: 'Grid view',
-  //     }).eachPage((records, fetchNextPage) => {
-  //       records.forEach((record) => {
-  //         callback(record.fields);
-  //       });
-
-  //       fetchNextPage();
-  //     }, (err) => {
-  //       if (!err && wrapup) {
-  //         wrapup();
-  //       }
-  //     });
-  //   }; // airtable
-
-  //   airtable('PSA', (site) => {
-  //     localStorage.removeItem(site.ID);
-  //     if (site.Hour === 0) {
-  //       examples[site.ID] = {
-  //         field: site.ID,
-  //         lat: site.Lat,
-  //         lon: site.Lon,
-  //         location: '',
-  //         BD: site.BD,
-  //         coverCrop: [site['Cover Crop']],
-  //         cashCrop: site['Cash Crop'],
-  //         coverCropTerminationDate: new Date(site.Date),
-  //         lwc: site.LitterWaterContent,
-  //         biomass: Math.round(site.FOM),
-  //         unit: 'kg/ha',
-  //         N: +(site.FOMpctN.toFixed(2)),
-  //         carb: +(site.Carb.toFixed(2)),
-  //         cell: +(site.Cell.toFixed(2)),
-  //         lign: +(site.Lign.toFixed(2)),
-  //         targetN: 150,
-  //         category: site.Category,
-  //       };
-  //     } else {
-  //       examples[site.ID].cashCropPlantingDate = new Date(moment(site.Date).add(-111, 'days'));
-  //     }
-  //   });
-
-  //   const mb = {};
-  //   const species = {};
-
-  //   airtable(
-  //     'CoverCrops',
-  //     (crop) => {
-  //       species[crop.Category] = species[crop.Category] || [];
-  //       species[crop.Category].push(crop.Crop);
-  //       mb[crop.Crop] = crop.MaxBiomass;
-  //     },
-  //     () => {
-  //       dispatch(set.maxBiomass(mb));
-  //       dispatch(set.species(species));
-  //     },
-  //   );
-  //   // /// temporary to load example
-  //   // loadField('Example: Grass');
-  // }, [dispatch]);
-
-  const changePSA = (e) => {
-    const PSAval = examples[e.target.value];
-
-    Object.keys(PSAval).forEach((key) => {
-      try {
-        dispatch(set[key](PSAval[key]));
-      } catch (ee) {
-        console.log(ee);
-        console.log(key);
-      }
-    });
-  }; // changePSA
+  };
 
   const handleDropdown = (e) => {
     const fieldStr = e.target.value;
     if (fieldStr === 'placeholder') {
-      // TODO: maybe add functions to clean previous field data
       dispatch(set.field(''));
       return;
     }
     if (fieldStr === 'Clear previous runs') {
-      // eslint-disable-next-line no-alert
       if (window.confirm('Clear all previous runs?')) {
         localStorage.clear();
         navigate('home');
@@ -220,76 +145,72 @@ const FieldDropdown = () => {
   /// ///// JSX RENDER ///// ////
   return (
     <div className="Init desktop">
-      {PSA && (
-        <select className="fields" onChange={changePSA} value={field}>
-          <option>examples</option>
-          <optgroup label="PSA">
-            {Object.keys(examples)
-              .filter((site) => examples[site].category === 'PSA')
-              .sort()
-              .map((site) => (
-                <option key={site}>{site}</option>
-              ))}
-          </optgroup>
-          <optgroup label="Resham">
-            {Object.keys(examples)
-              .filter((site) => examples[site].category === 'Resham')
-              .sort()
-              .map((site) => (
-                <option key={site}>{site}</option>
-              ))}
-          </optgroup>
-        </select>
-      )}
+      <PSADropdown
+        label={PSA ? "examples" : ""}
+        items={
+          PSA
+            ? [
+              {
+                label: 'Examples',
+                isHeader: true,
+              },
+              ...Object.keys(examples)
+                .filter((site) => examples[site].category === 'PSA')
+                .sort()
+                .map((site) => ({ value: site, label: site })),
+            ]
+            : [
+              {
+                label: 'My fields',
+                isHeader: true,
+              },
+              { value: '', label: '' },
+              ...myFields.map((fld) => ({
+                value: fld.replace('ncalc-', ''),
+                label: fld.replace('ncalc-', ''),
+              })),
+              {
+                label: 'Example data',
+                isHeader: true,
+              },
+              { value: '', label: '' },
+              { value: 'Example: Grass', label: 'Example: Grass' },
+              { value: 'Example: Legume', label: 'Example: Legume' },
+              (pathname.includes('output') || myFields.length) && (
+                {
+                  label: 'Utilities',
+                  isHeader: true,
+                },
+                { value: '', label: '' },
+                { value: 'Download data', label: 'Download data' }),
+              ...(myFields.length ? [{ value: 'Clear previous runs', label: 'Clear previous runs' }] : []),
+            ]
+        }
+        SelectProps={{
+          value: field,
+          onChange: PSA ? changePSA : handleDropdown,
+          'data-test': 'dropdown-fields',
+        }}
+        formSx={{ minWidth: 200 }}
+        menuSx={{ fontWeight: "bold", color: "white", backgroundColor: "green", }}
+      />
 
-      {!PSA && (
-        <select className="fields" onChange={handleDropdown} value={field}>
-          <option value="placeholder">&nbsp;</option>
-          <optgroup label="My fields">
-            {myFields.map((fld, idx) => (
-              // eslint-disable-next-line react/no-unknown-property
-              <option key={idx} checked={fld === field}>
-                {fld.replace('ncalc-', '')}
-              </option>
-            ))}
-          </optgroup>
-          <option disabled>____________________</option>
-
-          <optgroup label="Example data">
-            <option>Example: Grass</option>
-            <option>Example: Legume</option>
-          </optgroup>
-          <option disabled>____________________</option>
-
-          {(pathname.includes('output') || myFields.length) && (
-            <optgroup label="Utilities">
-              <option>Download data</option>
-              {myFields.length && <option>Clear previous runs</option>}
-            </optgroup>
-          )}
-        </select>
-      )}
       {downloadCSVFailed && (
         <Dialog
           open={downloadCSVFailed}
-          onClose={() => {
-            setDownloadCSVFailed(false);
-          }}
+          onClose={() => setDownloadCSVFailed(false)}
           aria-labelledby="alert-dialog-title"
           aria-describedby="alert-dialog-description"
         >
           <DialogTitle id="alert-dialog-title">Download Failed</DialogTitle>
           <DialogContent>
-            <DialogContentText id="alert-dialog-description">Download of CSV Failed. Please try again.</DialogContentText>
+            <DialogContentText id="alert-dialog-description">
+              Download of CSV Failed. Please try again.
+            </DialogContentText>
           </DialogContent>
           <DialogActions>
-            <Button
-              onClick={() => {
-                setDownloadCSVFailed(false);
-              }}
-              autoFocus
-            >
-              close
+            <Button onClick={() => setDownloadCSVFailed(false)} autoFocus>
+              Close
             </Button>
           </DialogActions>
         </Dialog>
