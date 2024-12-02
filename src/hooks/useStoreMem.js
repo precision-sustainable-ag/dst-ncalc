@@ -7,15 +7,19 @@ import { get } from '../store/redux-autosetters';
 /** save current field data into localStorage */
 const useStoreMem = () => {
   /// //////////////////////////////////////////////
+  // Location
   const field = useSelector(get.field);
   const lat = useSelector(get.lat);
   const lon = useSelector(get.lon);
   const mapPolygon = useSelector(get.mapPolygon);
-  const BD = useSelector(get.BD);
-  const N = useSelector(get.N);
   const coverCropTerminationDate = useSelector(get.coverCropTerminationDate);
   const coverCropPlantingDate = useSelector(get.coverCropPlantingDate);
+  // Soil
+  const SSURGO = useSelector(get.SSURGO);
+  const BD = useSelector(get.BD);
+  const N = useSelector(get.N);
   const InorganicN = useSelector(get.InorganicN);
+  //
   const cashCrop = useSelector(get.cashCrop);
   const Yield = useSelector(get.yield);
   const outputN = useSelector(get.outputN);
@@ -39,17 +43,18 @@ const useStoreMem = () => {
     lat,
     lon,
     mapPolygon,
-    BD,
-    N,
     coverCropTerminationDate,
     coverCropPlantingDate,
+    SSURGO,
+    BD,
+    N,
+    InorganicN,
     carb,
     cell,
     lign,
     lwc,
     biomass,
     unit,
-    InorganicN,
     coverCrop,
     field,
     gotModel,

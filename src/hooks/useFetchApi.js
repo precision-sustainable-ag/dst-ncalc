@@ -6,6 +6,7 @@ import moment from 'moment';
 import { useDispatch, useSelector } from 'react-redux';
 import { get, set } from '../store/Store';
 import { weightedAverage } from './helpers';
+import { historyStates } from '../store/inits';
 
 const NCAL_API_URL = 'https://api.covercrop-ncalc.org/surface';
 const SSURGO_API_URL = 'https://ssurgo.covercrop-data.org';
@@ -174,8 +175,10 @@ const useFetchSSURGO = () => {
   const lat = useSelector(get.lat);
   const lon = useSelector(get.lon);
   const field = useSelector(get.field);
+  const historyState = useSelector(get.user.historyState);
 
   useEffect(() => {
+    if (historyState === historyStates.imported) return;
     // if ssurgo data need to be updated(map location change), set ssurgo to null
     if (updateSSURGO) {
       dispatch(set.SSURGO(null));

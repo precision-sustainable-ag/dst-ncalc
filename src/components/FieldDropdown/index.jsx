@@ -13,6 +13,7 @@ import DialogContentText from '@mui/material/DialogContentText';
 import { useFetchSampleBiomass } from '../../hooks/useFetchStatic';
 import { downloadOutputCSV } from '../../hooks/helpers';
 import { set, get } from '../../store/redux-autosetters';
+import { historyStates } from '../../store/inits';
 
 const examples = {};
 
@@ -118,6 +119,9 @@ const FieldDropdown = () => {
         }
       });
       dispatch(set.lwc(inputs.lwc)); // avoid calculation
+      // set user history name and state
+      dispatch(set.user.selectedHistory(fieldVal));
+      dispatch(set.user.historyState(historyStates.imported));
     }
   }; // loadfield
 
