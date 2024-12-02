@@ -41,15 +41,13 @@ const NitrogenMapComp = ({ variant }) => {
       removedShapes = removedShapes.add(drawEvent.e.features[0].id);
     }
     const ids = new Set(mapPolygon.map((d) => d.id));
-    const merged = [
-      ...mapPolygon.filter((d) => !removedShapes.has(d.id)),
-      ...features.filter((d) => !ids.has(d.id) && !removedShapes.has(d.id)),
-    ];
+    const merged = [...mapPolygon.filter((d) => !removedShapes.has(d.id)), ...features.filter((d) => !ids.has(d.id) && !removedShapes.has(d.id))];
     dispatch(set.mapPolygon(merged));
   }, [drawEvent]);
 
   useEffect(() => {
-    dispatch(set.mapType('satellite'));
+    // FIXME: the mapType seems not being used except for the map itself
+    // dispatch(set.mapType('satellite'));
     if (address.latitude && address.latitude !== lat) {
       dispatch(set.lat(address.latitude));
       dispatch(set.updateSSURGO(true));
@@ -74,7 +72,7 @@ const NitrogenMapComp = ({ variant }) => {
         setAddress={setAddress}
         setFeatures={setFeatures}
         setZoom={setZoom}
-        setMap={() => { }}
+        setMap={() => {}}
         onDraw={setDrawEvent}
         initRasterObject={variant === 'biomass' ? biomassTaskResults : nitrogenTaskResults}
         initFeatures={mapPolygon}

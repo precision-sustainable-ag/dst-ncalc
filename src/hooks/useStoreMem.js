@@ -10,6 +10,7 @@ const useStoreMem = () => {
   const field = useSelector(get.field);
   const lat = useSelector(get.lat);
   const lon = useSelector(get.lon);
+  const mapPolygon = useSelector(get.mapPolygon);
   const BD = useSelector(get.BD);
   const N = useSelector(get.N);
   const coverCropTerminationDate = useSelector(get.coverCropTerminationDate);
@@ -34,38 +35,41 @@ const useStoreMem = () => {
   const cornN = useSelector(get.cornN);
   const coverCrop = useSelector(get.coverCrop);
 
+  const userHistory = {
+    lat,
+    lon,
+    mapPolygon,
+    BD,
+    N,
+    coverCropTerminationDate,
+    coverCropPlantingDate,
+    carb,
+    cell,
+    lign,
+    lwc,
+    biomass,
+    unit,
+    InorganicN,
+    coverCrop,
+    field,
+    gotModel,
+    errorModel,
+    errorCorn,
+    model,
+    mockup,
+    cornN,
+    cashCrop,
+    yield: Yield,
+    outputN,
+    nweeks,
+    targetN,
+  };
+
   // TODO: what if field don't have a name?
   if (field) {
     if (!field.includes('Example') && !field.includes('Mockup')) {
       try {
-        localStorage.setItem('ncalc-'.concat(field), JSON.stringify({
-          lat,
-          lon,
-          BD,
-          N,
-          coverCropTerminationDate,
-          coverCropPlantingDate,
-          carb,
-          cell,
-          lign,
-          lwc,
-          biomass,
-          unit,
-          InorganicN,
-          coverCrop,
-          field,
-          gotModel,
-          errorModel,
-          errorCorn,
-          model,
-          mockup,
-          cornN,
-          cashCrop,
-          yield: Yield,
-          outputN,
-          nweeks,
-          targetN,
-        }));
+        localStorage.setItem('ncalc-'.concat(field), JSON.stringify(userHistory));
       } catch (ee) {
         console.log(ee);
       }

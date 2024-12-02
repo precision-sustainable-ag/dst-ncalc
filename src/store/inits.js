@@ -3,7 +3,8 @@ import { query } from '../hooks/helpers';
 
 const now = dayjs();
 
-const coverCropPlantingDate = now.month() < 6 ? now.subtract(2, 'year').startOf('month').month(10) : now.subtract(1, 'year').startOf('month').month(10);
+const coverCropPlantingDate =
+  now.month() < 6 ? now.subtract(2, 'year').startOf('month').month(10) : now.subtract(1, 'year').startOf('month').month(10);
 const coverCropTerminationDate = coverCropPlantingDate.add(6, 'month');
 const cashCropPlantingDate = coverCropTerminationDate.add(1, 'week');
 
@@ -94,6 +95,13 @@ const initMaxBiomass = {
   'Vetch, Hairy': 6300,
 };
 
+export const historyStates = {
+  none: 'none',
+  new: 'new',
+  imported: 'imported',
+  updated: 'updated',
+};
+
 const initialState = {
   focus: '',
   name: '',
@@ -117,7 +125,8 @@ const initialState = {
   biomass: query('biomass', ''),
   lwc: (state) => Math.max(+((state.freshBiomass - state.biomass) / state.biomass).toFixed(2), 0) || 4,
   mapZoom: 13,
-  mapType: 'hybrid',
+  // FIXME: the mapType seems not being used except for the map itself
+  // mapType: 'hybrid',
   mapPolygon: [],
   biomassCropType: 'Wheat',
   coverCropPlantingDate: coverCropPlantingDate.format('YYYY-MM-DD'),
@@ -170,6 +179,10 @@ const initialState = {
   polyDrawTooBig: false,
   nitrogenTaskIsDone: true,
   activeStep: 0,
+  user: {
+    historyState: historyStates.none,
+    selectedHistory: null,
+  },
 };
 
 export default initialState;

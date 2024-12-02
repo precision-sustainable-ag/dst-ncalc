@@ -39,7 +39,7 @@ const nextButtonBadgeContent = () => (
     <Typography>?</Typography>
   </Tooltip>
 );
-  // TODO: barebone is a var to decide if this view is showed as a widget, same in other pages
+// TODO: barebone is a var to decide if this view is showed as a widget, same in other pages
 const Location = ({ barebone = false }) => {
   const navigate = useNavigate();
   const dispatch = useDispatch();
@@ -109,12 +109,8 @@ const Location = ({ barebone = false }) => {
               </Typography>
             </Box>
           )}
-          {polyDrawTooBig && (
-            <AreaErrorModal />
-          )}
-          {biomassFetchIsFailed && (
-            <TaskFailModal task="biomass" />
-          )}
+          {polyDrawTooBig && <AreaErrorModal />}
+          {biomassFetchIsFailed && <TaskFailModal task="biomass" />}
           <BiomassMap variant="biomass" />
           {!barebone && (
             <Box

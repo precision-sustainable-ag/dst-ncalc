@@ -19,13 +19,12 @@ const biomassRasterColors = ['red', 'orange', 'lime', 'green', 'white'];
 
 const BiomassMapComp = ({ variant }) => {
   const [address, setAddress] = useState({});
-  const [zoom, setZoom] = useState(null);
+  const [zoom, setZoom] = useState(13);
   const dispatch = useDispatch();
   const lat = useSelector(get.lat);
   const lon = useSelector(get.lon);
   const biomassTaskResults = useSelector(get.biomassTaskResults);
   const mapAddress = useSelector(get.mapAddress);
-  const mapZoom = useSelector(get.mapZoom);
   const mapPolygon = useSelector(get.mapPolygon);
   const unit = useSelector(get.unit);
   const [features, setFeatures] = useState(mapPolygon);
@@ -39,33 +38,23 @@ const BiomassMapComp = ({ variant }) => {
       removedShapes = removedShapes.add(drawEvent.e.features[0].id);
     }
     const ids = new Set(mapPolygon.map((d) => d.id));
-    const merged = [
-      ...mapPolygon.filter((d) => !removedShapes.has(d.id)),
-      ...features.filter((d) => !ids.has(d.id) && !removedShapes.has(d.id)),
-    ];
+    const merged = [...mapPolygon.filter((d) => !removedShapes.has(d.id)), ...features.filter((d) => !ids.has(d.id) && !removedShapes.has(d.id))];
     dispatch(set.mapPolygon(merged));
   }, [drawEvent]);
 
   useEffect(() => {
-    dispatch(set.mapType('satellite'));
-    if (address.latitude && address.latitude !== lat) {
+    // FIXME: the mapType seems not being used except for the map itself
+    // dispatch(set.mapType('satellite'));
+    if (address.latitude && address.longitude && (address.latitude !== lat || address.longitude !== lon)) {
       dispatch(set.lat(address.latitude));
-      dispatch(set.updateSSURGO(true));
-    }
-    if (address.longitude && address.longitude !== lon) {
       dispatch(set.lon(address.longitude));
+      if (address.address) {
+        dispatch(set.mapAddress(address.address));
+      }
       dispatch(set.updateSSURGO(true));
+      dispatch(set.mapZoom(zoom));
     }
-    if (address.address) {
-      dispatch(set.mapAddress(address.address));
-      // dispatch(set.updateSSURGO(true));
-    }
-  }, [address.latitude, address.longitude, address.address]);
-
-  useEffect(() => {
-    // FIXME: this is updating zoom for a lot of times everytime the map zooms
-    if (zoom) dispatch(set.mapZoom(zoom));
-  }, [zoom]);
+  }, [address]);
 
   return (
     <Paper>
@@ -73,7 +62,7 @@ const BiomassMapComp = ({ variant }) => {
         setAddress={setAddress}
         setFeatures={setFeatures}
         setZoom={setZoom}
-        setMap={() => { }}
+        setMap={() => {}}
         onDraw={setDrawEvent}
         initRasterObject={biomassTaskResults}
         initFeatures={mapPolygon}
@@ -85,7 +74,7 @@ const BiomassMapComp = ({ variant }) => {
         initAddress={mapAddress}
         initLon={lon}
         initLat={lat}
-        initStartZoom={mapZoom}
+        initStartZoom={zoom}
         initMinZoom={5}
         initMaxZoom={16}
         hasSearchBar
