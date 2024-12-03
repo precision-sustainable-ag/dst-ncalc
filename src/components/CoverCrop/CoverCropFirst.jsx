@@ -141,7 +141,7 @@ const CoverCropFirst = ({ barebone = false }) => {
                   onChange={(value) => dispatch(set.unit(value))}
                   row
                   sx={{ marginLeft: '1em', display: 'inline-block' }}
-                  aria-label="position" 
+                  aria-label="position"
                   name="position"
                 />
               </Stack>
@@ -186,7 +186,7 @@ const CoverCropFirst = ({ barebone = false }) => {
                   onChange={(value) => dispatch(set.unit(value))}
                   row
                   sx={{ marginLeft: '1em', display: 'inline-block' }}
-                  aria-label="position" 
+                  aria-label="position"
                   name="position"
                 />
               </Box>

@@ -68,6 +68,7 @@ const FieldDropdown = () => {
       dispatch(set.cashCrop('Corn'));
       dispatch(set.yield(150));
       dispatch(set.targetN(150));
+      dispatch(set.user.historyState(historyStates.imported));
     } else if (fieldVal === 'Example: Legume') {
       // navigate('location');
       dispatch(set.mapPolygon([]));
@@ -95,6 +96,7 @@ const FieldDropdown = () => {
       dispatch(set.cashCrop('Corn'));
       dispatch(set.yield(150));
       dispatch(set.targetN(100));
+      dispatch(set.user.historyState(historyStates.imported));
     } else if (fieldVal === 'Download data') {
       if (model && dates) {
         downloadOutputCSV(model, dates);

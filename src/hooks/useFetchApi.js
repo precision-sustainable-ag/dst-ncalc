@@ -19,6 +19,7 @@ const PLANTFACTORS_API_URL = 'https://api.covercrop-imagery.org';
 /// ..............................................................................
 /// ..............................................................................
 //
+/** fetch cornN data(used for model calculation in Released Nitrogen chart) */
 const useFetchCornN = () => {
   const [endDate, setEndDate] = useState(null);
   const [cornData, setCornData] = useState(null);
@@ -26,8 +27,14 @@ const useFetchCornN = () => {
   const lat = useSelector(get.lat);
   const lon = useSelector(get.lon);
   const cashCropPlantingDate = useSelector(get.cashCropPlantingDate);
+  const cornN = useSelector(get.cornN);
+  const historyState = useSelector(get.user.historyState);
 
   useEffect(() => {
+    if (historyState === historyStates.imported) {
+      setCornData(cornN);
+      return;
+    }
     const end = moment(cashCropPlantingDate)
       .add(110, 'days')
       .add(1, 'hour')
@@ -81,6 +88,8 @@ const useFetchModel = ({
   const [isDatesValid, setIsDatesValid] = useState(null);
   const [model, setModel] = useState(null);
   const dispatch = useDispatch();
+  const historyState = useSelector(get.user.historyState);
+  const savedModel = useSelector(get.model);
 
   const start = moment(coverCropTerminationDate)
     .add(1, 'hour')
@@ -90,7 +99,15 @@ const useFetchModel = ({
     .add(1, 'hour')
     .format('yyyy-MM-DD');
 
+  // const modelCalc = (data) => {
+
+  // }
+
   useEffect(() => {
+    // if (historyState === historyStates.imported) {
+    //   setModel(savedModel);
+    //   return;
+    // }
     const validity = start !== 'Invalid date'
       && end !== 'Invalid date'
       && moment(end) > moment(start);
@@ -280,7 +297,7 @@ const useFetchPlantFactors = () => {
 /// ..............................................................................
 /// ..............................................................................
 //
-/** Fetch nitrogen task result ( will only work in satellite mode and will generate raster for the nitrogen map) */
+/** only work in satellite mode */
 const useFetchNitrogenArray = () => {
   const dispatch = useDispatch();
   const N = useSelector(get.N);

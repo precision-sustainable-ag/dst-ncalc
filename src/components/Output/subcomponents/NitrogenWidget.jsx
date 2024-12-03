@@ -21,7 +21,7 @@ import {
 import { modelCalc } from './helpers';
 import { get, set } from '../../../store/redux-autosetters';
 import { useFetchCornN, useFetchModel } from '../../../hooks/useFetchApi';
-import useFetchNitrogen from '../../../hooks/useFetchNitrogen';
+// import useFetchNitrogen from '../../../hooks/useFetchNitrogen';
 
 /// /// /// STYLES /// /// ///
 const CardStyles = {
@@ -83,7 +83,8 @@ const NitrogenCard = ({ refVal }) => {
 
   // /// /// HOOKS /// ///
   cornN = useFetchCornN();
-  useFetchNitrogen();
+  // FIXME: not sure what the following hook does
+  // useFetchNitrogen();
 
   const model = useFetchModel({
     lat,
