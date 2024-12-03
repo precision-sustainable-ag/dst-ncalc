@@ -15,7 +15,6 @@ const useStoreMem = () => {
   const coverCropTerminationDate = useSelector(get.coverCropTerminationDate);
   const coverCropPlantingDate = useSelector(get.coverCropPlantingDate);
   // Soil
-  const SSURGO = useSelector(get.SSURGO);
   const OM = useSelector(get.OM);
   const BD = useSelector(get.BD);
   const N = useSelector(get.N);
@@ -36,8 +35,6 @@ const useStoreMem = () => {
   const targetN = useSelector(get.targetN);
   // Summary
   //    Releaed Nitrogen
-  const cornN = useSelector(get.cornN);
-  const model = useSelector(get.model);
   const unit = useSelector(get.unit);
   const Yield = useSelector(get.yield);
   const nweeks = useSelector(get.nweeks);
@@ -55,7 +52,6 @@ const useStoreMem = () => {
     coverCropTerminationDate,
     coverCropPlantingDate,
     //
-    SSURGO,
     OM,
     BD,
     N,
@@ -78,30 +74,22 @@ const useStoreMem = () => {
     field,
     errorModel,
     errorCorn,
-    model,
     mockup,
-    cornN,
     yield: Yield,
     outputN,
     nweeks,
   };
 
-  // save to localStorage after the model is fetched(should be updated to after model is calculated)
-  useEffect(() => {
-    if (model) {
-      console.log('save history');
-      // TODO: what if field don't have a name?
-      if (field) {
-        if (!field.includes('Example') && !field.includes('Mockup')) {
-          try {
-            localStorage.setItem('ncalc-'.concat(field), JSON.stringify(userHistory));
-          } catch (ee) {
-            console.log(ee);
-          }
-        }
+  // TODO: what if field don't have a name?
+  if (field) {
+    if (!field.includes('Example') && !field.includes('Mockup')) {
+      try {
+        localStorage.setItem('ncalc-'.concat(field), JSON.stringify(userHistory));
+      } catch (ee) {
+        console.log(ee);
       }
     }
-  }, [model]);
+  }
 
   return null;
 };

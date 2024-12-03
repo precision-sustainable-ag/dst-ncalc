@@ -6,7 +6,6 @@ import moment from 'moment';
 import { useDispatch, useSelector } from 'react-redux';
 import { get, set } from '../store/Store';
 import { weightedAverage } from './helpers';
-import { historyStates } from '../store/inits';
 
 const NCAL_API_URL = 'https://api.covercrop-ncalc.org/surface';
 const SSURGO_API_URL = 'https://ssurgo.covercrop-data.org';
@@ -21,25 +20,17 @@ const PLANTFACTORS_API_URL = 'https://api.covercrop-imagery.org';
 //
 /** fetch cornN data(used for model calculation in Released Nitrogen chart) */
 const useFetchCornN = () => {
-  const [endDate, setEndDate] = useState(null);
   const [cornData, setCornData] = useState(null);
   const dispatch = useDispatch();
   const lat = useSelector(get.lat);
   const lon = useSelector(get.lon);
   const cashCropPlantingDate = useSelector(get.cashCropPlantingDate);
-  const cornN = useSelector(get.cornN);
-  const historyState = useSelector(get.user.historyState);
 
   useEffect(() => {
-    if (historyState === historyStates.imported) {
-      setCornData(cornN);
-      return;
-    }
     const end = moment(cashCropPlantingDate)
       .add(110, 'days')
       .add(1, 'hour')
       .format('yyyy-MM-DD');
-    setEndDate(end);
     dispatch(set.errorCorn(false));
     // eslint-disable-next-line max-len
     const url = `${WEATHER_API_URL}/hourly?lat=${lat}&lon=${lon}&start=${moment(
@@ -60,7 +51,7 @@ const useFetchCornN = () => {
       .catch((error) => {
         console.log(error);
       });
-  }, [cashCropPlantingDate, endDate]);
+  }, []);
   return cornData;
 }; // fetchCornN
 
@@ -88,8 +79,6 @@ const useFetchModel = ({
   const [isDatesValid, setIsDatesValid] = useState(null);
   const [model, setModel] = useState(null);
   const dispatch = useDispatch();
-  const historyState = useSelector(get.user.historyState);
-  const savedModel = useSelector(get.model);
 
   const start = moment(coverCropTerminationDate)
     .add(1, 'hour')
@@ -99,15 +88,7 @@ const useFetchModel = ({
     .add(1, 'hour')
     .format('yyyy-MM-DD');
 
-  // const modelCalc = (data) => {
-
-  // }
-
   useEffect(() => {
-    // if (historyState === historyStates.imported) {
-    //   setModel(savedModel);
-    //   return;
-    // }
     const validity = start !== 'Invalid date'
       && end !== 'Invalid date'
       && moment(end) > moment(start);
@@ -175,7 +156,7 @@ const useFetchModel = ({
           console.log(error);
         });
     }
-  }, [cashCropPlantingDate, coverCropTerminationDate, end, start]);
+  }, []);
 
   return model;
 };
@@ -192,10 +173,8 @@ const useFetchSSURGO = () => {
   const lat = useSelector(get.lat);
   const lon = useSelector(get.lon);
   const field = useSelector(get.field);
-  const historyState = useSelector(get.user.historyState);
 
   useEffect(() => {
-    if (historyState === historyStates.imported) return;
     // if ssurgo data need to be updated(map location change), set ssurgo to null
     if (updateSSURGO) {
       dispatch(set.SSURGO(null));

@@ -16,7 +16,6 @@ const afterChange = {
   lign: (state) => { state.model = null; state.edited = true; },
   lat: (state) => { state.model = null; },
   lon: (state) => { state.model = null; },
-  // FIXME: this set model to null when importing
   lwc: (state) => { state.model = null; },
   // coverCropTerminationDate: (state) => { state.model = null; },
   // cashCropPlantingDate: (state) => { state.model = null; },
