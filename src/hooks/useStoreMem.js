@@ -7,6 +7,8 @@ import { get } from '../store/redux-autosetters';
 /** save current field data into localStorage */
 const useStoreMem = () => {
   /// //////////////////////////////////////////////
+  // Home
+  const biomassCalcMode = useSelector(get.biomassCalcMode);
   // Location
   const field = useSelector(get.field);
   const lat = useSelector(get.lat);
@@ -14,6 +16,7 @@ const useStoreMem = () => {
   const mapPolygon = useSelector(get.mapPolygon);
   const coverCropTerminationDate = useSelector(get.coverCropTerminationDate);
   const coverCropPlantingDate = useSelector(get.coverCropPlantingDate);
+  const biomassTaskResults = useSelector(get.biomassTaskResults);
   // Soil
   const OM = useSelector(get.OM);
   const BD = useSelector(get.BD);
@@ -22,6 +25,7 @@ const useStoreMem = () => {
   // Cover Crop 1
   const coverCrop = useSelector(get.coverCrop);
   const biomass = useSelector(get.biomass);
+  const coverCropGrowthStage = useSelector(get.coverCropGrowthStage);
   //    coverCropTerminationDate(included in Location)
   const lwc = useSelector(get.lwc);
   // Cover Crop 2
@@ -46,11 +50,14 @@ const useStoreMem = () => {
   const errorCorn = useSelector(get.errorCorn);
 
   const userHistory = {
+    biomassCalcMode,
+    //
     lat,
     lon,
     mapPolygon,
     coverCropTerminationDate,
     coverCropPlantingDate,
+    biomassTaskResults,
     //
     OM,
     BD,
@@ -59,6 +66,7 @@ const useStoreMem = () => {
     //
     coverCrop,
     biomass,
+    coverCropGrowthStage,
     lwc,
     //
     carb,
