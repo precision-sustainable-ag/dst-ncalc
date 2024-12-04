@@ -7,6 +7,7 @@ import { NcalcMap } from 'shared-react-components/src';
 import { Paper } from '@mui/material';
 // import { NcalcMap } from './mock/ncalc-map';
 import { get, set } from '../../store/Store';
+import { mapboxToken } from '../../utils/keys';
 
 // eslint-disable-next-line import/no-webpack-loader-syntax, import/no-unresolved
 // mapboxgl.workerClass = require('worker-loader!mapbox-gl/dist/mapbox-gl-csp-worker').default;
@@ -29,8 +30,6 @@ const BiomassMapComp = ({ variant }) => {
   const unit = useSelector(get.unit);
   const [features, setFeatures] = useState(mapPolygon);
   const [drawEvent, setDrawEvent] = useState({});
-
-  const mapboxToken = import.meta.env.VITE_MAPBOX_TOKEN;
 
   // mapAddress
   useEffect(() => {
