@@ -3,8 +3,7 @@ import { query } from '../hooks/helpers';
 
 const now = dayjs();
 
-const coverCropPlantingDate =
-  now.month() < 6 ? now.subtract(2, 'year').startOf('month').month(10) : now.subtract(1, 'year').startOf('month').month(10);
+const coverCropPlantingDate = now.month() < 6 ? now.subtract(2, 'year').startOf('month').month(10) : now.subtract(1, 'year').startOf('month').month(10);
 const coverCropTerminationDate = coverCropPlantingDate.add(6, 'month');
 const cashCropPlantingDate = coverCropTerminationDate.add(1, 'week');
 
@@ -182,6 +181,7 @@ const initialState = {
   user: {
     historyState: historyStates.none,
     selectedHistory: null,
+    userHistoryList: [],
   },
 };
 

@@ -1,5 +1,5 @@
 /* eslint-disable no-console */
-import React, { useEffect } from 'react';
+import React from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import {
   useLocation, useNavigate, Route, Routes,
@@ -9,7 +9,6 @@ import { Container, Box } from '@mui/material';
 import { PSATheme, PSAHeader, PSAAuthButton } from 'shared-react-components/src';
 import { deepmerge } from '@mui/utils';
 import ChatBubbleOutlineIcon from '@mui/icons-material/ChatBubbleOutline';
-import { useAuth0 } from '@auth0/auth0-react';
 // import ResponsiveNavBar from './components/ResponsiveNavBar';
 import Feedback from './components/Feedback';
 import SnackbarMessage from './shared/SnackbarMessage';
@@ -19,7 +18,6 @@ import { get, set } from './store/Store';
 import FieldDropdown from './components/FieldDropdown';
 import NcalcStepper from './shared/Stepper';
 import Auth0ProviderWithNavigate from './shared/AuthProvider';
-import { setAuthToken } from './utils/authToken';
 
 const screens = {
   init: () => null,
@@ -81,7 +79,6 @@ const App = () => {
   const location = useLocation();
   const navigate = useNavigate();
   const dispatch = useDispatch();
-  const { isAuthenticated, getAccessTokenSilently } = useAuth0();
 
   const path = window.location.toString().split('/').pop().toLowerCase() || 'home';
   const Screen = screens[path] || screens.home;
@@ -108,16 +105,6 @@ const App = () => {
       component: <PSAAuthButton />,
     },
   ];
-
-  useEffect(() => {
-    const fetchToken = async () => {
-      const t = await getAccessTokenSilently();
-      setAuthToken(t);
-    };
-    if (isAuthenticated) {
-      fetchToken();
-    }
-  }, [isAuthenticated]);
 
   return (
     <ThemeProvider theme={dstTheme}>

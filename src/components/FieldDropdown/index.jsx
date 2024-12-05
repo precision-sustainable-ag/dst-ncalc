@@ -1,6 +1,6 @@
 /* eslint-disable jsx-a11y/control-has-associated-label */
 /* eslint-disable no-console */
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { useLocation, useNavigate } from 'react-router-dom';
 import moment from 'moment';
@@ -10,10 +10,13 @@ import DialogTitle from '@mui/material/DialogTitle';
 import DialogActions from '@mui/material/DialogActions';
 import DialogContent from '@mui/material/DialogContent';
 import DialogContentText from '@mui/material/DialogContentText';
+import { useAuth0 } from '@auth0/auth0-react';
 import { useFetchSampleBiomass } from '../../hooks/useFetchStatic';
 import { downloadOutputCSV } from '../../hooks/helpers';
 import { set, get } from '../../store/redux-autosetters';
 import { historyStates } from '../../store/inits';
+import { setAuthToken } from '../../utils/authToken';
+import { loadHistory } from '../../utils/userHistory';
 
 const examples = {};
 
@@ -23,10 +26,12 @@ const FieldDropdown = () => {
   const dispatch = useDispatch();
   const navigate = useNavigate();
   const { pathname } = useLocation();
+  const { isAuthenticated, getAccessTokenSilently } = useAuth0();
 
   // TODO: PSA is always false currently in prod and devs
   // In Home page: if (window.location.toString().includes('PSA'))dispatch(set.PSA(true));
   const PSA = useSelector(get.PSA);
+  const userHistoryList = useSelector(get.user.userHistoryList);
 
   // get all fields from localStorage
   const myFields = Object.keys(localStorage).filter((key) => key.startsWith('ncalc-'));
@@ -39,94 +44,24 @@ const FieldDropdown = () => {
   // TODO: Load static data from examples here
   useFetchSampleBiomass();
 
-  /// ///// FUNCTIONS ///// ////
-  const loadField = (fieldVal) => {
-    if (fieldVal === 'Example: Grass') {
-      // navigate('location');
-      dispatch(set.mapPolygon([]));
-      dispatch(set.biomassTaskResults(null));
-      dispatch(set.edited(true));
-      dispatch(set.activeExample(fieldVal));
-      dispatch(set.lat(32.865389));
-      dispatch(set.lon(-82.258361));
-      dispatch(set.location('Example'));
-      dispatch(set.field('Example: Grass'));
-      dispatch(set.OM(0.75));
-      dispatch(set.BD(1.62));
-      dispatch(set.InorganicN(10));
-      dispatch(set.coverCrop(['cereal rye']));
-      dispatch(set.coverCropGrowthStage('stemming'));
-      dispatch(set.coverCropPlantingDate('2018-09-01'));
-      dispatch(set.coverCropTerminationDate('2019-03-21'));
-      dispatch(set.cashCropPlantingDate('2019-04-01'));
-      dispatch(set.biomass(5000));
-      dispatch(set.lwc(1.486));
-      dispatch(set.N(0.6));
-      dispatch(set.carb(33.45));
-      dispatch(set.cell(57.81));
-      dispatch(set.lign(8.74));
-      dispatch(set.cashCrop('Corn'));
-      dispatch(set.yield(150));
-      dispatch(set.targetN(150));
-      dispatch(set.user.historyState(historyStates.imported));
-    } else if (fieldVal === 'Example: Legume') {
-      // navigate('location');
-      dispatch(set.mapPolygon([]));
-      dispatch(set.biomassTaskResults(null));
-      dispatch(set.edited(true));
-      dispatch(set.activeExample(fieldVal));
-      dispatch(set.lat(32.865389));
-      dispatch(set.lon(-82.258361));
-      dispatch(set.location('Example'));
-      dispatch(set.field('Example: Legume'));
-      dispatch(set.OM(0.75));
-      dispatch(set.BD(1.62));
-      dispatch(set.InorganicN(10));
-      dispatch(set.coverCrop('clover, crimson'));
-      dispatch(set.coverCropGrowthStage('stemming'));
-      dispatch(set.coverCropPlantingDate('2018-10-01'));
-      dispatch(set.coverCropTerminationDate('2019-04-27'));
-      dispatch(set.cashCropPlantingDate('2019-05-15'));
-      dispatch(set.biomass(3500));
-      dispatch(set.lwc(7.4));
-      dispatch(set.N(3.5));
-      dispatch(set.carb(56.18));
-      dispatch(set.cell(36.74));
-      dispatch(set.lign(7.08));
-      dispatch(set.cashCrop('Corn'));
-      dispatch(set.yield(150));
-      dispatch(set.targetN(100));
-      dispatch(set.user.historyState(historyStates.imported));
-    } else if (fieldVal === 'Download data') {
-      if (model && dates) {
-        downloadOutputCSV(model, dates);
-      } else {
-        setDownloadCSVFailed(true);
-      }
-    } else {
-      // load field from localStorage
-      const newFieldVal = 'ncalc-'.concat(fieldVal);
-      const inputs = JSON.parse(localStorage[newFieldVal]);
-      console.log(inputs);
-      Object.keys(inputs).forEach((key) => {
-        try {
-          if (/Date/.test(key)) {
-            const date = moment(inputs[key]).format('yyyy-MM-DD');
-            dispatch(set[key](date));
-          } else {
-            dispatch(set[key](inputs[key]));
-          }
-        } catch (e) {
-          console.log(key, e.message);
-        }
-      });
-      dispatch(set.lwc(inputs.lwc)); // avoid calculation
-      // set user history name and state
-      dispatch(set.user.selectedHistory(fieldVal));
-      dispatch(set.user.historyState(historyStates.imported));
-    }
-  }; // loadfield
+  // fetch user history list
+  useEffect(() => {
+    const fetchUserData = async () => {
+      const token = await getAccessTokenSilently();
+      setAuthToken(token);
+      // get new user histories here
+      loadHistory(token)
+        .then((res) => {
+          dispatch(set.user.userHistoryList(res));
+        })
+        .catch((err) => {
+          console.error(err);
+        });
+    };
+    if (isAuthenticated) fetchUserData();
+  }, [isAuthenticated, getAccessTokenSilently]);
 
+  /// ///// FUNCTIONS ///// ////
   // useEffect(() => {
   //   const base = new Airtable({ apiKey: 'keySO0dHQzGVaSZp2' }).base('appOEj4Ag9MgTTrMg');
 
@@ -207,19 +142,102 @@ const FieldDropdown = () => {
 
   const handleDropdown = (e) => {
     const fieldStr = e.target.value;
+    console.log('fieldStr', fieldStr);
     if (fieldStr === 'placeholder') {
       // TODO: maybe add functions to clean previous field data
       dispatch(set.field(''));
-      return;
-    }
-    if (fieldStr === 'Clear previous runs') {
+    } else if (fieldStr === 'Clear previous runs') {
       // eslint-disable-next-line no-alert
       if (window.confirm('Clear all previous runs?')) {
         localStorage.clear();
         navigate('home');
       }
+    } else if (fieldStr === 'Example: Grass') {
+      // navigate('location');
+      dispatch(set.mapPolygon([]));
+      dispatch(set.biomassTaskResults(null));
+      dispatch(set.edited(true));
+      dispatch(set.activeExample(fieldStr));
+      dispatch(set.lat(32.865389));
+      dispatch(set.lon(-82.258361));
+      dispatch(set.location('Example'));
+      dispatch(set.field('Example: Grass'));
+      dispatch(set.OM(0.75));
+      dispatch(set.BD(1.62));
+      dispatch(set.InorganicN(10));
+      dispatch(set.coverCrop(['cereal rye']));
+      dispatch(set.coverCropGrowthStage('stemming'));
+      dispatch(set.coverCropPlantingDate('2018-09-01'));
+      dispatch(set.coverCropTerminationDate('2019-03-21'));
+      dispatch(set.cashCropPlantingDate('2019-04-01'));
+      dispatch(set.biomass(5000));
+      dispatch(set.lwc(1.486));
+      dispatch(set.N(0.6));
+      dispatch(set.carb(33.45));
+      dispatch(set.cell(57.81));
+      dispatch(set.lign(8.74));
+      dispatch(set.cashCrop('Corn'));
+      dispatch(set.yield(150));
+      dispatch(set.targetN(150));
+      dispatch(set.user.historyState(historyStates.imported));
+    } else if (fieldStr === 'Example: Legume') {
+      // navigate('location');
+      dispatch(set.mapPolygon([]));
+      dispatch(set.biomassTaskResults(null));
+      dispatch(set.edited(true));
+      dispatch(set.activeExample(fieldStr));
+      dispatch(set.lat(32.865389));
+      dispatch(set.lon(-82.258361));
+      dispatch(set.location('Example'));
+      dispatch(set.field('Example: Legume'));
+      dispatch(set.OM(0.75));
+      dispatch(set.BD(1.62));
+      dispatch(set.InorganicN(10));
+      dispatch(set.coverCrop('clover, crimson'));
+      dispatch(set.coverCropGrowthStage('stemming'));
+      dispatch(set.coverCropPlantingDate('2018-10-01'));
+      dispatch(set.coverCropTerminationDate('2019-04-27'));
+      dispatch(set.cashCropPlantingDate('2019-05-15'));
+      dispatch(set.biomass(3500));
+      dispatch(set.lwc(7.4));
+      dispatch(set.N(3.5));
+      dispatch(set.carb(56.18));
+      dispatch(set.cell(36.74));
+      dispatch(set.lign(7.08));
+      dispatch(set.cashCrop('Corn'));
+      dispatch(set.yield(150));
+      dispatch(set.targetN(100));
+      dispatch(set.user.historyState(historyStates.imported));
+    } else if (fieldStr === 'Download data') {
+      if (model && dates) {
+        downloadOutputCSV(model, dates);
+      } else {
+        setDownloadCSVFailed(true);
+      }
     } else {
-      loadField(fieldStr);
+      // Load field from localStorage & user history
+      if (fieldStr.startsWith('ncalc-')) {
+        // load field from localStorage
+        const newFieldVal = (fieldStr);
+        const inputs = JSON.parse(localStorage[newFieldVal]);
+        console.log(inputs);
+        Object.keys(inputs).forEach((key) => {
+          try {
+            if (/Date/.test(key)) {
+              const date = moment(inputs[key]).format('yyyy-MM-DD');
+              dispatch(set[key](date));
+            } else {
+              dispatch(set[key](inputs[key]));
+            }
+          } catch (err) {
+            console.log(key, err.message);
+          }
+        });
+        dispatch(set.lwc(inputs.lwc)); // avoid calculation
+      }
+      // set user history name and state
+      dispatch(set.user.selectedHistory(fieldStr));
+      dispatch(set.user.historyState(historyStates.imported));
     }
   };
 
@@ -249,16 +267,25 @@ const FieldDropdown = () => {
       )}
 
       {!PSA && (
-        <select className="fields" onChange={handleDropdown} value={field}>
+        <select className="fields" onChange={handleDropdown}>
           <option value="placeholder">&nbsp;</option>
           <optgroup label="My fields">
             {myFields.map((fld, idx) => (
-              // eslint-disable-next-line react/no-unknown-property
-              <option key={idx} checked={fld === field}>
+              <option key={idx} value={fld}>
                 {fld.replace('ncalc-', '')}
               </option>
             ))}
           </optgroup>
+          {userHistoryList.length > 0
+          && (
+          <optgroup label="User History">
+            {userHistoryList.map((history, id) => (
+              <option key={id}>
+                {history.label}
+              </option>
+            ))}
+          </optgroup>
+          )}
           <option disabled>____________________</option>
 
           <optgroup label="Example data">
