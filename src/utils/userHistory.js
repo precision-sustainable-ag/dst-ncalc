@@ -1,3 +1,4 @@
+import { getAuthToken } from './authToken';
 import { userHistoryApiUrl, userHistorySchema } from './keys';
 
 const historyApiUrl = `${userHistoryApiUrl}/v1`;
@@ -66,12 +67,12 @@ export const getHistories = async (accessToken) => {
  * This function loads history from user history api.
  * If no param, return a list of name of current history records.
  * If `name` is specified, return relevant history object.
- * @param {string} token - The auth token, default to `null`.
  * @param {string} name - The name of history record, default to `null`.
  */
 // eslint-disable-next-line consistent-return
-export const loadHistory = async (token = null, name = null) => {
+export const loadHistory = async (name = null) => {
   try {
+    const token = getAuthToken();
     if (!token) throw new Error('Access token not available!');
     const res = await getHistories(token);
     if (res.data.length > 0) {
@@ -102,13 +103,13 @@ export const loadHistory = async (token = null, name = null) => {
 * This function saves history by user history api.
 * If no param, create a new history record.
 * If `id` is specified, update relevant history object.
-* @param {string} token - The auth token, default to `null`.
-* @param {number} id - The id of history to update, default to `null`.
 * @param {string} name - The name of history to update, default to `null`.
 * @param {object} data - The data of history to save, default to `null`.
+* @param {number} id - The id of history to update, default to `null`.
 */
-export const saveHistory = async (name, data, token = null, id = null) => {
+export const saveHistory = async (name, data, id = null) => {
   try {
+    const token = getAuthToken();
     if (!token) throw new Error('Access token not available!');
     if (id !== null) {
       // if id is not null, update history with id

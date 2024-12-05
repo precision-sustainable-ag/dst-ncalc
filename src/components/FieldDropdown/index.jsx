@@ -50,7 +50,7 @@ const FieldDropdown = () => {
       const token = await getAccessTokenSilently();
       setAuthToken(token);
       // get new user histories here
-      loadHistory(token)
+      loadHistory()
         .then((res) => {
           dispatch(set.user.userHistoryList(res));
         })
@@ -140,7 +140,7 @@ const FieldDropdown = () => {
     });
   }; // changePSA
 
-  const handleDropdown = (e) => {
+  const handleDropdown = async (e) => {
     const fieldStr = e.target.value;
     console.log('fieldStr', fieldStr);
     if (fieldStr === 'placeholder') {
@@ -216,25 +216,28 @@ const FieldDropdown = () => {
       }
     } else {
       // Load field from localStorage & user history
+      // load field from localStorage
+      let historyObj;
       if (fieldStr.startsWith('ncalc-')) {
-        // load field from localStorage
-        const newFieldVal = (fieldStr);
-        const inputs = JSON.parse(localStorage[newFieldVal]);
-        console.log(inputs);
-        Object.keys(inputs).forEach((key) => {
-          try {
-            if (/Date/.test(key)) {
-              const date = moment(inputs[key]).format('yyyy-MM-DD');
-              dispatch(set[key](date));
-            } else {
-              dispatch(set[key](inputs[key]));
-            }
-          } catch (err) {
-            console.log(key, err.message);
-          }
-        });
-        dispatch(set.lwc(inputs.lwc)); // avoid calculation
+        historyObj = JSON.parse(localStorage[fieldStr]);
       }
+      if (fieldStr.startsWith('history-')) {
+        const history = await loadHistory(fieldStr);
+        historyObj = history.json.history;
+      }
+      Object.keys(historyObj).forEach((key) => {
+        try {
+          if (/Date/.test(key)) {
+            const date = moment(historyObj[key]).format('yyyy-MM-DD');
+            dispatch(set[key](date));
+          } else {
+            dispatch(set[key](historyObj[key]));
+          }
+        } catch (err) {
+          console.log(key, err.message);
+        }
+      });
+      dispatch(set.lwc(historyObj.lwc)); // avoid calculation
       // set user history name and state
       dispatch(set.user.selectedHistory(fieldStr));
       dispatch(set.user.historyState(historyStates.imported));
@@ -280,8 +283,8 @@ const FieldDropdown = () => {
           && (
           <optgroup label="User History">
             {userHistoryList.map((history, id) => (
-              <option key={id}>
-                {history.label}
+              <option key={id} value={history.label}>
+                {history.label.replace('history-', '')}
               </option>
             ))}
           </optgroup>
