@@ -224,6 +224,11 @@ const FieldDropdown = () => {
       if (fieldStr.startsWith('history-')) {
         const history = await loadHistory(fieldStr);
         historyObj = history.json.history;
+        // FIXME: need to resolve history with same name problem
+        const selectedHistory = userHistoryList.find((historyItem) => historyItem.label === fieldStr);
+        // set user history name and state
+        dispatch(set.user.selectedHistory(selectedHistory));
+        dispatch(set.user.historyState(historyStates.imported));
       }
       Object.keys(historyObj).forEach((key) => {
         try {
@@ -238,9 +243,6 @@ const FieldDropdown = () => {
         }
       });
       dispatch(set.lwc(historyObj.lwc)); // avoid calculation
-      // set user history name and state
-      dispatch(set.user.selectedHistory(fieldStr));
-      dispatch(set.user.historyState(historyStates.imported));
     }
   };
 

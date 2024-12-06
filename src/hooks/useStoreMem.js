@@ -3,8 +3,10 @@
 import React, { useEffect } from 'react';
 import { useSelector } from 'react-redux';
 import { get } from '../store/redux-autosetters';
+import { saveHistory } from '../utils/userHistory';
+import { historyStates } from '../store/inits';
 
-/** save current field data into localStorage */
+/** save current field data into localStorage and user history */
 const useStoreMem = () => {
   /// //////////////////////////////////////////////
   // Home
@@ -16,7 +18,6 @@ const useStoreMem = () => {
   const mapPolygon = useSelector(get.mapPolygon);
   const coverCropTerminationDate = useSelector(get.coverCropTerminationDate);
   const coverCropPlantingDate = useSelector(get.coverCropPlantingDate);
-  const biomassTaskResults = useSelector(get.biomassTaskResults);
   // Soil
   const OM = useSelector(get.OM);
   const BD = useSelector(get.BD);
@@ -49,6 +50,8 @@ const useStoreMem = () => {
   const errorModel = useSelector(get.errorModel);
   const errorCorn = useSelector(get.errorCorn);
 
+  const { historyState, selectedHistory, userHistoryList } = useSelector(get.user);
+
   const userHistory = {
     biomassCalcMode,
     //
@@ -57,7 +60,6 @@ const useStoreMem = () => {
     mapPolygon,
     coverCropTerminationDate,
     coverCropPlantingDate,
-    biomassTaskResults,
     //
     OM,
     BD,
@@ -88,16 +90,22 @@ const useStoreMem = () => {
     nweeks,
   };
 
-  // TODO: what if field don't have a name?
-  if (field) {
-    if (!field.includes('Example') && !field.includes('Mockup')) {
+  useEffect(() => {
+    if (field && !field.includes('Example') && !field.includes('Mockup')) {
       try {
         localStorage.setItem('ncalc-'.concat(field), JSON.stringify(userHistory));
-      } catch (ee) {
-        console.log(ee);
+        if (historyState !== historyStates.imported) {
+          const history = {
+            history: userHistory,
+          };
+          const name = 'history-'.concat(field);
+          saveHistory(name, history);
+        }
+      } catch (err) {
+        console.log(err);
       }
     }
-  }
+  }, []);
 
   return null;
 };
