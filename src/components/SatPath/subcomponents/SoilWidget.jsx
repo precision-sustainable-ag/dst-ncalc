@@ -9,12 +9,12 @@ import {
   Grid,
   Stack,
   Typography,
-  Tooltip,
   styled,
   Box,
 } from '@mui/material';
 import { tooltipClasses } from '@mui/material/Tooltip';
 import Soil from '../../Soil';
+import { PSATooltip } from 'shared-react-components/src';
 // import { useSelector } from 'react-redux';
 // import { get } from '../../../store/redux-autosetters';
 
