@@ -9,10 +9,12 @@ import {
   Divider,
   Container,
 } from '@mui/material';
+import ReactDOMServer from 'react-dom/server';
 import Highcharts from 'highcharts';
 import HighchartsReact from 'highcharts-react-official';
 import React, { useEffect, useRef } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
+import { PSALoadingspinner } from 'shared-react-components/src';
 import {
   getGeneralChartOptions,
   getResidueChartOptions,
@@ -126,8 +128,18 @@ const ResidueCard = ({ refVal }) => {
   useEffect(() => {
     if (chartRef1.current && chartRef2.current) {
       if (!surfaceData || surfaceData.length === 0) {
-        chartRef1.current.chart.showLoading();
-        chartRef2.current.chart.showLoading();
+        const spinnerHtml = ReactDOMServer.renderToString(
+          <div style={{
+            display: 'flex',
+            justifyContent: 'center',
+            alignItems: 'center',
+            position: 'abosolute',
+          }}>
+            <PSALoadingspinner />
+          </div>
+        );
+        chartRef1.current.chart.showLoading(spinnerHtml);
+        chartRef2.current.chart.showLoading(spinnerHtml);
       } else {
         chartRef1.current.chart.hideLoading();
         chartRef2.current.chart.hideLoading();

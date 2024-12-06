@@ -4,6 +4,7 @@ import { useNavigate } from 'react-router-dom';
 // import * as turf from '@turf/turf';
 // import axios from 'axios';
 import Box from '@mui/material/Box';
+import { Grid } from '@mui/material';
 import Paper from '@mui/material/Paper';
 import Badge from '@mui/material/Badge';
 import Stack from '@mui/material/Stack';
@@ -15,7 +16,7 @@ import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
 import AccordionSummary from '@mui/material/AccordionSummary';
 import AccordionDetails from '@mui/material/AccordionDetails';
 import { useDispatch, useSelector } from 'react-redux';
-import { LinearProgress } from '@mui/material';
+import { PSALoadingspinner } from 'shared-react-components/src';
 import BiomassMap from '../../shared/Map/BiomassMap';
 // import NitrogenMap from '../Map/NitrogenMap';
 import Input from '../../shared/Inputs';
@@ -39,7 +40,7 @@ const nextButtonBadgeContent = () => (
     <Typography>?</Typography>
   </Tooltip>
 );
-  // TODO: barebone is a var to decide if this view is showed as a widget, same in other pages
+// TODO: barebone is a var to decide if this view is showed as a widget, same in other pages
 const Location = ({ barebone = false }) => {
   const navigate = useNavigate();
   const dispatch = useDispatch();
@@ -94,9 +95,21 @@ const Location = ({ barebone = false }) => {
         <Paper sx={{ padding: '1rem', borderRadius: '1rem' }}>
           {biomassFetchIsLoading && (
             <Box>
-              <Stack>
-                <LinearProgress />
-              </Stack>
+              <Grid
+                item
+                container
+                spacing={1}
+                justifyContent="center"
+                alignItems="center"
+                sx={{
+                  display: 'flex',
+                  justifyContent: 'center',
+                  alignItems: 'center',
+                  minHeight: '100px',
+                }}
+              >
+                <PSALoadingspinner />
+              </Grid>
               <Typography variant="h6" fontWeight="bold" gutterBottom textAlign="center">
                 Calculating Biomass ...
               </Typography>
