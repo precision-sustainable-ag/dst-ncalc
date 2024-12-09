@@ -8,7 +8,6 @@ import { Grid } from '@mui/material';
 import Paper from '@mui/material/Paper';
 import Badge from '@mui/material/Badge';
 import Stack from '@mui/material/Stack';
-import Tooltip from '@mui/material/Tooltip';
 import { styled } from '@mui/material/styles';
 import Accordion from '@mui/material/Accordion';
 import Typography from '@mui/material/Typography';
@@ -16,7 +15,7 @@ import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
 import AccordionSummary from '@mui/material/AccordionSummary';
 import AccordionDetails from '@mui/material/AccordionDetails';
 import { useDispatch, useSelector } from 'react-redux';
-import { PSALoadingspinner } from 'shared-react-components/src';
+import { PSALoadingspinner, PSATooltip } from 'shared-react-components/src';
 import BiomassMap from '../../shared/Map/BiomassMap';
 // import NitrogenMap from '../Map/NitrogenMap';
 import Input from '../../shared/Inputs';
@@ -36,9 +35,10 @@ const CustomizedAccordion = styled(Accordion)(() => ({
 }));
 
 const nextButtonBadgeContent = () => (
-  <Tooltip title="No polygon is drawn">
+  <PSATooltip title="No polygon is drawn" tooltipContent={(
     <Typography>?</Typography>
-  </Tooltip>
+  )}
+  />
 );
 // TODO: barebone is a var to decide if this view is showed as a widget, same in other pages
 const Location = ({ barebone = false }) => {
