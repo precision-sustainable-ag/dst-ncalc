@@ -63,11 +63,12 @@ const SummaryItem = ({ name, value, desc }) => {
       }}
     >
       <Stack direction="row">
-        <CustomWidthTooltip arrow title={desc} placement="top">
+        <CustomWidthTooltip arrow title={desc} placement="top" tooltipContent={(
           <CustomTypography>
             {name}
             :&nbsp;
           </CustomTypography>
+        )} >
         </CustomWidthTooltip>
         {name === 'Species' && value && Array.isArray(value)
           ? (
