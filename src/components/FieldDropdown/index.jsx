@@ -274,22 +274,23 @@ const FieldDropdown = () => {
       {!PSA && (
         <select className="fields" onChange={handleDropdown}>
           <option value="placeholder">&nbsp;</option>
-          <optgroup label="My fields">
-            {myFields.map((fld, idx) => (
-              <option key={idx} value={fld}>
-                {fld.replace('ncalc-', '')}
-              </option>
-            ))}
-          </optgroup>
-          {userHistoryList.length > 0
-          && (
-          <optgroup label="User History">
-            {userHistoryList.map((history, id) => (
-              <option key={id} value={history.label}>
-                {history.label.replace('history-', '')}
-              </option>
-            ))}
-          </optgroup>
+          {!isAuthenticated && (
+            <optgroup label="My fields">
+              {myFields.map((fld, idx) => (
+                <option key={idx} value={fld}>
+                  {fld.replace('ncalc-', '')}
+                </option>
+              ))}
+            </optgroup>
+          )}
+          {userHistoryList.length > 0 && (
+            <optgroup label="User History">
+              {userHistoryList.map((history, id) => (
+                <option key={id} value={history.label}>
+                  {history.label.replace('history-', '')}
+                </option>
+              ))}
+            </optgroup>
           )}
           <option disabled>____________________</option>
 

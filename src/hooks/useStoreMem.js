@@ -96,12 +96,13 @@ const useStoreMem = () => {
     if (field && !field.includes('Example') && !field.includes('Mockup')) {
       try {
         localStorage.setItem('ncalc-'.concat(field), JSON.stringify(userHistory));
-        if (isAuthenticated && historyState !== historyStates.imported) {
+        if (isAuthenticated) {
           const history = {
             history: userHistory,
           };
           const name = 'history-'.concat(field);
-          saveHistory(name, history);
+          if (historyState !== historyStates.imported) saveHistory(name, history);
+          else saveHistory(name, history, selectedHistory.id);
         }
       } catch (err) {
         console.log(err);
