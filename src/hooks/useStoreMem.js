@@ -2,6 +2,7 @@
 /* eslint-disable no-console */
 import React, { useEffect } from 'react';
 import { useSelector } from 'react-redux';
+import { useAuth0 } from '@auth0/auth0-react';
 import { get } from '../store/redux-autosetters';
 import { saveHistory } from '../utils/userHistory';
 import { historyStates } from '../store/inits';
@@ -51,6 +52,7 @@ const useStoreMem = () => {
   const errorCorn = useSelector(get.errorCorn);
 
   const { historyState, selectedHistory, userHistoryList } = useSelector(get.user);
+  const { isAuthenticated } = useAuth0();
 
   const userHistory = {
     biomassCalcMode,
@@ -94,7 +96,7 @@ const useStoreMem = () => {
     if (field && !field.includes('Example') && !field.includes('Mockup')) {
       try {
         localStorage.setItem('ncalc-'.concat(field), JSON.stringify(userHistory));
-        if (historyState !== historyStates.imported) {
+        if (isAuthenticated && historyState !== historyStates.imported) {
           const history = {
             history: userHistory,
           };

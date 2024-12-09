@@ -1,5 +1,5 @@
 /* eslint-disable operator-linebreak */
-import React from 'react';
+import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 // import * as turf from '@turf/turf';
 // import axios from 'axios';
@@ -16,15 +16,16 @@ import AccordionSummary from '@mui/material/AccordionSummary';
 import AccordionDetails from '@mui/material/AccordionDetails';
 import { useDispatch, useSelector } from 'react-redux';
 import { LinearProgress } from '@mui/material';
+import { PSATextField } from 'shared-react-components/src';
 import BiomassMap from '../../shared/Map/BiomassMap';
 // import NitrogenMap from '../Map/NitrogenMap';
-import Input from '../../shared/Inputs';
 import Help from '../../shared/Help';
 import { get, set } from '../../store/Store';
 import NavButton from '../../shared/Navigate/NavButton';
 import useFetchHLS from '../../hooks/useFetchHLS';
 import Datebox from '../../shared/BiomassData/Datebox';
 import { AreaErrorModal, TaskFailModal } from '../../shared/BiomassData/Warnings';
+import { historyStates } from '../../store/inits';
 
 const CustomizedAccordion = styled(Accordion)(() => ({
   '&.MuiPaper-root': {
@@ -48,9 +49,19 @@ const Location = ({ barebone = false }) => {
   const biomassTaskResults = useSelector(get.biomassTaskResults);
   const polyDrawTooBig = useSelector(get.polyDrawTooBig);
   const biomassFetchIsFailed = useSelector(get.biomassFetchIsFailed);
+  const field = useSelector(get.field);
+  const { historyState, userHistoryList } = useSelector(get.user);
+
+  const [fieldName, setFieldName] = useState(field);
 
   // api for getting biomass map
   useFetchHLS();
+
+  const isFieldNameExisted = () => {
+    if (historyState === historyStates.imported) return false;
+    const result = userHistoryList.find((history) => history.label === 'history-'.concat(fieldName));
+    return result !== undefined;
+  };
 
   return (
     <Box sx={{ width: '100%', padding: '0rem' }}>
@@ -76,7 +87,19 @@ const Location = ({ barebone = false }) => {
               )}
             </Stack>
             <Box mb={2}>
-              <Input label="Name your Field (optional)" id="field" autoComplete="off" style={{ height: '2rem', minWidth: '13rem' }} />
+              <PSATextField
+                label="Name your Field (optional)"
+                value={fieldName}
+                onChange={(e) => setFieldName(e.target.value)}
+                error={isFieldNameExisted()}
+                helperText={isFieldNameExisted() ? 'Field name existed!' : null}
+                onBlur={() => {
+                  if (!isFieldNameExisted()) dispatch(set.field(fieldName));
+                }}
+                onKeyDown={(e) => {
+                  if (e.key === 'Enter' && !isFieldNameExisted()) dispatch(set.field(fieldName));
+                }}
+              />
               <Help />
             </Box>
             <Stack mt={5} gap={1}>
