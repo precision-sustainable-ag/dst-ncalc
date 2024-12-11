@@ -1,15 +1,14 @@
 import React, { useEffect, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
-import { Slider, Typography } from '@mui/material';
+import { Slider } from '@mui/material';
 import { PSATextField } from 'shared-react-components/src';
-import Input from '../Inputs';
 
 import { get, set } from '../../store/Store';
 
 import './index.scss';
 
 const Myslider = ({
-  id, min, max, step = 1, autoFocus, onInput, disabled,
+  id, min, max, step = 1, disabled,
 }) => {
   const dispatch = useDispatch();
   const val = +useSelector(get[id]);

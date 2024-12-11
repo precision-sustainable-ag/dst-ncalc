@@ -43,7 +43,6 @@ const FieldDropdown = () => {
   const myFields = Object.keys(localStorage).filter((key) => key.startsWith('ncalc-'));
 
   // TODO: Load static data from examples here
-
   useFetchSampleBiomass();
 
   // fetch user history list
@@ -62,154 +61,6 @@ const FieldDropdown = () => {
     };
     if (isAuthenticated) fetchUserData();
   }, [isAuthenticated, getAccessTokenSilently]);
-
-  /// ///// FUNCTIONS ///// ////
-  const loadField = (fieldVal) => {
-    if (fieldVal === 'Example: Grass') {
-      // navigate('location');
-      dispatch(set.mapPolygon([]));
-      dispatch(set.biomassTaskResults(null));
-      dispatch(set.edited(true));
-      dispatch(set.activeExample(fieldVal));
-      dispatch(set.lat(32.865389));
-      dispatch(set.lon(-82.258361));
-      dispatch(set.location('Example'));
-      dispatch(set.field('Example: Grass'));
-      dispatch(set.OM(0.75));
-      dispatch(set.BD(1.62));
-      dispatch(set.InorganicN(10));
-      dispatch(set.coverCrop(['cereal rye']));
-      dispatch(set.coverCropGrowthStage('stemming'));
-      dispatch(set.coverCropPlantingDate('2018-09-01'));
-      dispatch(set.coverCropTerminationDate('2019-03-21'));
-      dispatch(set.cashCropPlantingDate('2019-04-01'));
-      dispatch(set.biomass(5000));
-      dispatch(set.lwc(1.486));
-      dispatch(set.N(0.6));
-      dispatch(set.carb(33.45));
-      dispatch(set.cell(57.81));
-      dispatch(set.lign(8.74));
-      dispatch(set.cashCrop('Corn'));
-      dispatch(set.yield(150));
-      dispatch(set.targetN(150));
-    } else if (fieldVal === 'Example: Legume') {
-      // navigate('location');
-      dispatch(set.mapPolygon([]));
-      dispatch(set.biomassTaskResults(null));
-      dispatch(set.edited(true));
-      dispatch(set.activeExample(fieldVal));
-      dispatch(set.lat(32.865389));
-      dispatch(set.lon(-82.258361));
-      dispatch(set.location('Example'));
-      dispatch(set.field('Example: Legume'));
-      dispatch(set.OM(0.75));
-      dispatch(set.BD(1.62));
-      dispatch(set.InorganicN(10));
-      dispatch(set.coverCrop('clover, crimson'));
-      dispatch(set.coverCropGrowthStage('stemming'));
-      dispatch(set.coverCropPlantingDate('2018-10-01'));
-      dispatch(set.coverCropTerminationDate('2019-04-27'));
-      dispatch(set.cashCropPlantingDate('2019-05-15'));
-      dispatch(set.biomass(3500));
-      dispatch(set.lwc(7.4));
-      dispatch(set.N(3.5));
-      dispatch(set.carb(56.18));
-      dispatch(set.cell(36.74));
-      dispatch(set.lign(7.08));
-      dispatch(set.cashCrop('Corn'));
-      dispatch(set.yield(150));
-      dispatch(set.targetN(100));
-    } else if (fieldVal === 'Download data') {
-      if (model && dates) {
-        downloadOutputCSV(model, dates);
-      } else {
-        setDownloadCSVFailed(true);
-      }
-    } else {
-      // load field from localStorage
-      const newFieldVal = 'ncalc-'.concat(fieldVal);
-      const inputs = JSON.parse(localStorage[newFieldVal]);
-      console.log(inputs);
-      Object.keys(inputs).forEach((key) => {
-        try {
-          if (/Date/.test(key)) {
-            const date = moment(inputs[key]).format('yyyy-MM-DD');
-            dispatch(set[key](date));
-          } else {
-            dispatch(set[key](inputs[key]));
-          }
-        } catch (e) {
-          console.log(key, e.message);
-        }
-      });
-      dispatch(set.lwc(inputs.lwc)); // avoid calculation
-    }
-  }; // loadfield
-
-  // useEffect(() => {
-  //   const base = new Airtable({ apiKey: 'keySO0dHQzGVaSZp2' }).base('appOEj4Ag9MgTTrMg');
-
-  //   const airtable = (table, callback, wrapup) => {
-  //     base(table).select({
-  //       view: 'Grid view',
-  //     }).eachPage((records, fetchNextPage) => {
-  //       records.forEach((record) => {
-  //         callback(record.fields);
-  //       });
-
-  //       fetchNextPage();
-  //     }, (err) => {
-  //       if (!err && wrapup) {
-  //         wrapup();
-  //       }
-  //     });
-  //   }; // airtable
-
-  //   airtable('PSA', (site) => {
-  //     localStorage.removeItem(site.ID);
-  //     if (site.Hour === 0) {
-  //       examples[site.ID] = {
-  //         field: site.ID,
-  //         lat: site.Lat,
-  //         lon: site.Lon,
-  //         location: '',
-  //         BD: site.BD,
-  //         coverCrop: [site['Cover Crop']],
-  //         cashCrop: site['Cash Crop'],
-  //         coverCropTerminationDate: new Date(site.Date),
-  //         lwc: site.LitterWaterContent,
-  //         biomass: Math.round(site.FOM),
-  //         unit: 'kg/ha',
-  //         N: +(site.FOMpctN.toFixed(2)),
-  //         carb: +(site.Carb.toFixed(2)),
-  //         cell: +(site.Cell.toFixed(2)),
-  //         lign: +(site.Lign.toFixed(2)),
-  //         targetN: 150,
-  //         category: site.Category,
-  //       };
-  //     } else {
-  //       examples[site.ID].cashCropPlantingDate = new Date(moment(site.Date).add(-111, 'days'));
-  //     }
-  //   });
-
-  //   const mb = {};
-  //   const species = {};
-
-  //   airtable(
-  //     'CoverCrops',
-  //     (crop) => {
-  //       species[crop.Category] = species[crop.Category] || [];
-  //       species[crop.Category].push(crop.Crop);
-  //       mb[crop.Crop] = crop.MaxBiomass;
-  //     },
-  //     () => {
-  //       dispatch(set.maxBiomass(mb));
-  //       dispatch(set.species(species));
-  //     },
-  //   );
-  //   // /// temporary to load example
-  //   // loadField('Example: Grass');
-  // }, [dispatch]);
 
   const changePSA = (e) => {
     const PSAval = examples[e.target.value];
@@ -300,7 +151,6 @@ const FieldDropdown = () => {
       }
     } else {
       // Load field from localStorage & user history
-      // load field from localStorage
       let historyObj;
       if (fieldStr.startsWith('ncalc-')) {
         historyObj = JSON.parse(localStorage[fieldStr]);
@@ -322,9 +172,7 @@ const FieldDropdown = () => {
           } else {
             dispatch(set[key](historyObj[key]));
           }
-        } catch (err) {
-          console.log(key, err.message);
-        }
+        } catch (err) { console.log(key, err.message); }
       });
       dispatch(set.lwc(historyObj.lwc)); // avoid calculation
     }
@@ -348,20 +196,25 @@ const FieldDropdown = () => {
                 .map((site) => ({ value: site, label: site })),
             ]
             : [
-              {
-                label: 'My fields',
-                isHeader: true,
-              },
-              { value: '', label: '' },
-              ...myFields.map((fld) => ({
-                value: fld.replace('ncalc-', ''),
-                label: fld.replace('ncalc-', ''),
-              })),
+              ...(isAuthenticated
+                ? [
+                  { label: 'User History', isHeader: true },
+                  ...userHistoryList.map((history) => ({
+                    value: history.label,
+                    label: history.label.replace('history-', ''),
+                  }))]
+                : [
+                  { label: 'My fields', isHeader: true },
+                  ...myFields.map((fld) => ({
+                    value: fld,
+                    label: fld.replace('ncalc-', ''),
+                  })),
+                ]
+              ),
               {
                 label: 'Example data',
                 isHeader: true,
               },
-              { value: '', label: '' },
               { value: 'Example: Grass', label: 'Example: Grass' },
               { value: 'Example: Legume', label: 'Example: Legume' },
               ...(pathname.includes('output') || myFields.length
@@ -370,7 +223,6 @@ const FieldDropdown = () => {
                     label: 'Utilities',
                     isHeader: true,
                   },
-                  { value: '', label: '' },
                   { value: 'Download data', label: 'Download data' },
                 ]
                 : []),
@@ -379,7 +231,7 @@ const FieldDropdown = () => {
             ]
         }
         SelectProps={{
-          value: field,
+          value: field ? (isAuthenticated ? 'history-' : 'ncalc-').concat(field) : '',
           onChange: PSA ? changePSA : handleDropdown,
           'data-test': 'dropdown-fields',
         }}
