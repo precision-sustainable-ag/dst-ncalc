@@ -10,6 +10,8 @@ import { get, set } from '../../store/Store';
 
 import './styles.scss';
 
+// TODO: this component is deprecated and will not be used
+
 const keyPress = (event) => {
   if (event.key === 'Enter') {
     // focus next field

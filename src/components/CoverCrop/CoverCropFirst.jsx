@@ -3,7 +3,7 @@
 import React, { useEffect, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { useNavigate } from 'react-router-dom';
-import { PSARadiobutton } from 'shared-react-components/src';
+import { PSARadiobutton, PSATextField } from 'shared-react-components/src';
 import Typography from '@mui/material/Typography';
 import Box from '@mui/material/Box';
 import Snackbar from '@mui/material/Snackbar';
@@ -17,7 +17,6 @@ import { styled } from '@mui/material';
 import { get, set } from '../../store/Store';
 import CoverCropsInput from './CoverCropsInput';
 import GrowthStageInput from './GrowthStageInput';
-import Input from '../../shared/Inputs';
 import Myslider from '../../shared/Slider';
 import Help from '../../shared/Help';
 import BiomassData from '../../shared/BiomassData';
@@ -59,6 +58,7 @@ const CoverCropFirst = ({ barebone = false }) => {
   const coverCropTerminationDate = useSelector(get.coverCropTerminationDate);
   const lwc = useSelector(get.lwc);
   const [disableNextButton, setDisableNextButton] = useState(true);
+  const [terminationDate, setTerminationDate] = useState(coverCropTerminationDate);
 
   /// Desc: Fetch the plant factors
   useFetchPlantFactors();
@@ -153,7 +153,14 @@ const CoverCropFirst = ({ barebone = false }) => {
                 <CustomInputText>Cover Crop Termination Date:</CustomInputText>
                 {!coverCropTerminationDate && <Required />}
               </Stack>
-              <Input type="date" id="coverCropTerminationDate" />
+              <PSATextField
+                type="date"
+                value={terminationDate}
+                onChange={(e) => {
+                  setTerminationDate(e.target.value);
+                  dispatch(set.coverCropTerminationDate(e.target.value));
+              }}
+              />
               <Box
                 mt={1}
                 sx={{
