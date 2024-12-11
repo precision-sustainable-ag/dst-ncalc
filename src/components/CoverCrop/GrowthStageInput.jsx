@@ -3,7 +3,7 @@
 import React from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import Autocomplete from '@mui/material/Autocomplete';
-import { TextField } from '@mui/material';
+import { PSATextField } from 'shared-react-components/src';
 import { get, set } from '../../store/Store';
 
 // This component will only display on satellite mode
@@ -20,7 +20,7 @@ const GrowthStageInput = () => {
       placeholder="Select a cover crop Growth Stage"
       options={options}
       value={coverCropGrowthStage}
-      renderInput={(params) => <TextField {...params} label="Select a cover crop growing stage" />}
+      renderInput={(params) => <PSATextField {...params} label="Select a cover crop growing stage" />}
       onChange={(el, va) => {
         dispatch(set.coverCropGrowthStage(va));
       }}

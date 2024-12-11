@@ -9,11 +9,11 @@ import {
   Grid,
   Stack,
   Typography,
-  Tooltip,
   styled,
   Box,
 } from '@mui/material';
 import { tooltipClasses } from '@mui/material/Tooltip';
+import { PSATooltip } from 'shared-react-components/src';
 // import { useSelector } from 'react-redux';
 // import { get } from '../../../store/redux-autosetters';
 
@@ -34,7 +34,7 @@ const cardContentStyles = {
 
 /// /// /// COMPONENTS /// /// ///
 const CustomWidthTooltip = styled(({ className, ...props }) => (
-  <Tooltip {...props} classes={{ popper: className }} />
+  <PSATooltip {...props} classes={{ popper: className }} />
 ))({
   [`& .${tooltipClasses.tooltip}`]: {
     maxWidth: 300,
@@ -63,11 +63,12 @@ const SummaryItem = ({ name, value, desc }) => {
       }}
     >
       <Stack direction="row">
-        <CustomWidthTooltip arrow title={desc} placement="top">
+        <CustomWidthTooltip arrow title={desc} placement="top" tooltipContent={(
           <CustomTypography>
             {name}
             :&nbsp;
           </CustomTypography>
+        )} >
         </CustomWidthTooltip>
         {name === 'Species' && value && Array.isArray(value)
           ? (

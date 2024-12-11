@@ -2,7 +2,8 @@
 import React from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { useNavigate } from 'react-router-dom';
-import { Box, Stack, Typography } from '@mui/material';
+import { Box, Stack, Typography, Grid } from '@mui/material';
+import { PSALoadingspinner } from 'shared-react-components/src';
 import { get, set } from '../../store/Store';
 import Myslider from '../../shared/Slider';
 import Help from '../../shared/Help';
@@ -120,9 +121,26 @@ const Soil = ({ barebone = false }) => {
             </Box>
           )
         ) : (
-          <Typography variant="h6" my={6}>
-            LOADING FROM SSURGO SERVER ...
-          </Typography>
+          <Box>
+            <Grid
+              item
+              container
+              spacing={1}
+              justifyContent="center"
+              alignItems="center"
+              sx={{
+                display: 'flex',
+                justifyContent: 'center',
+                alignItems: 'center',
+                minHeight: '100px',
+              }}
+            >
+              <PSALoadingspinner />
+            </Grid>
+            <Typography variant="h6" my={2}>
+              LOADING FROM SSURGO SERVER ...
+            </Typography>
+          </Box>
         )}
       </Box>
       {!barebone && (

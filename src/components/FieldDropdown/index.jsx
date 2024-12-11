@@ -11,6 +11,7 @@ import DialogActions from '@mui/material/DialogActions';
 import DialogContent from '@mui/material/DialogContent';
 import DialogContentText from '@mui/material/DialogContentText';
 import { useAuth0 } from '@auth0/auth0-react';
+import { PSADropdown } from 'shared-react-components/src';
 import { useFetchSampleBiomass } from '../../hooks/useFetchStatic';
 import { downloadOutputCSV } from '../../hooks/helpers';
 import { set, get } from '../../store/redux-autosetters';
@@ -33,15 +34,16 @@ const FieldDropdown = () => {
   const PSA = useSelector(get.PSA);
   const userHistoryList = useSelector(get.user.userHistoryList);
 
-  // get all fields from localStorage
-  const myFields = Object.keys(localStorage).filter((key) => key.startsWith('ncalc-'));
-
   const field = useSelector(get.field);
   const model = useSelector(get.model);
   const dates = useSelector(get.dates);
   const [downloadCSVFailed, setDownloadCSVFailed] = useState(false);
 
+  // get all fields from localStorage
+  const myFields = Object.keys(localStorage).filter((key) => key.startsWith('ncalc-'));
+
   // TODO: Load static data from examples here
+
   useFetchSampleBiomass();
 
   // fetch user history list
@@ -62,6 +64,88 @@ const FieldDropdown = () => {
   }, [isAuthenticated, getAccessTokenSilently]);
 
   /// ///// FUNCTIONS ///// ////
+  const loadField = (fieldVal) => {
+    if (fieldVal === 'Example: Grass') {
+      // navigate('location');
+      dispatch(set.mapPolygon([]));
+      dispatch(set.biomassTaskResults(null));
+      dispatch(set.edited(true));
+      dispatch(set.activeExample(fieldVal));
+      dispatch(set.lat(32.865389));
+      dispatch(set.lon(-82.258361));
+      dispatch(set.location('Example'));
+      dispatch(set.field('Example: Grass'));
+      dispatch(set.OM(0.75));
+      dispatch(set.BD(1.62));
+      dispatch(set.InorganicN(10));
+      dispatch(set.coverCrop(['cereal rye']));
+      dispatch(set.coverCropGrowthStage('stemming'));
+      dispatch(set.coverCropPlantingDate('2018-09-01'));
+      dispatch(set.coverCropTerminationDate('2019-03-21'));
+      dispatch(set.cashCropPlantingDate('2019-04-01'));
+      dispatch(set.biomass(5000));
+      dispatch(set.lwc(1.486));
+      dispatch(set.N(0.6));
+      dispatch(set.carb(33.45));
+      dispatch(set.cell(57.81));
+      dispatch(set.lign(8.74));
+      dispatch(set.cashCrop('Corn'));
+      dispatch(set.yield(150));
+      dispatch(set.targetN(150));
+    } else if (fieldVal === 'Example: Legume') {
+      // navigate('location');
+      dispatch(set.mapPolygon([]));
+      dispatch(set.biomassTaskResults(null));
+      dispatch(set.edited(true));
+      dispatch(set.activeExample(fieldVal));
+      dispatch(set.lat(32.865389));
+      dispatch(set.lon(-82.258361));
+      dispatch(set.location('Example'));
+      dispatch(set.field('Example: Legume'));
+      dispatch(set.OM(0.75));
+      dispatch(set.BD(1.62));
+      dispatch(set.InorganicN(10));
+      dispatch(set.coverCrop('clover, crimson'));
+      dispatch(set.coverCropGrowthStage('stemming'));
+      dispatch(set.coverCropPlantingDate('2018-10-01'));
+      dispatch(set.coverCropTerminationDate('2019-04-27'));
+      dispatch(set.cashCropPlantingDate('2019-05-15'));
+      dispatch(set.biomass(3500));
+      dispatch(set.lwc(7.4));
+      dispatch(set.N(3.5));
+      dispatch(set.carb(56.18));
+      dispatch(set.cell(36.74));
+      dispatch(set.lign(7.08));
+      dispatch(set.cashCrop('Corn'));
+      dispatch(set.yield(150));
+      dispatch(set.targetN(100));
+    } else if (fieldVal === 'Download data') {
+      if (model && dates) {
+        downloadOutputCSV(model, dates);
+      } else {
+        setDownloadCSVFailed(true);
+      }
+    } else {
+      // load field from localStorage
+      const newFieldVal = 'ncalc-'.concat(fieldVal);
+      const inputs = JSON.parse(localStorage[newFieldVal]);
+      console.log(inputs);
+      Object.keys(inputs).forEach((key) => {
+        try {
+          if (/Date/.test(key)) {
+            const date = moment(inputs[key]).format('yyyy-MM-DD');
+            dispatch(set[key](date));
+          } else {
+            dispatch(set[key](inputs[key]));
+          }
+        } catch (e) {
+          console.log(key, e.message);
+        }
+      });
+      dispatch(set.lwc(inputs.lwc)); // avoid calculation
+    }
+  }; // loadfield
+
   // useEffect(() => {
   //   const base = new Airtable({ apiKey: 'keySO0dHQzGVaSZp2' }).base('appOEj4Ag9MgTTrMg');
 
@@ -249,86 +333,76 @@ const FieldDropdown = () => {
   /// ///// JSX RENDER ///// ////
   return (
     <div className="Init desktop">
-      {PSA && (
-        <select className="fields" onChange={changePSA} value={field}>
-          <option>examples</option>
-          <optgroup label="PSA">
-            {Object.keys(examples)
-              .filter((site) => examples[site].category === 'PSA')
-              .sort()
-              .map((site) => (
-                <option key={site}>{site}</option>
-              ))}
-          </optgroup>
-          <optgroup label="Resham">
-            {Object.keys(examples)
-              .filter((site) => examples[site].category === 'Resham')
-              .sort()
-              .map((site) => (
-                <option key={site}>{site}</option>
-              ))}
-          </optgroup>
-        </select>
-      )}
+      <PSADropdown
+        label={PSA ? 'examples' : ''}
+        items={
+          PSA
+            ? [
+              {
+                label: 'Examples',
+                isHeader: true,
+              },
+              ...Object.keys(examples)
+                .filter((site) => examples[site].category === 'PSA')
+                .sort()
+                .map((site) => ({ value: site, label: site })),
+            ]
+            : [
+              {
+                label: 'My fields',
+                isHeader: true,
+              },
+              { value: '', label: '' },
+              ...myFields.map((fld) => ({
+                value: fld.replace('ncalc-', ''),
+                label: fld.replace('ncalc-', ''),
+              })),
+              {
+                label: 'Example data',
+                isHeader: true,
+              },
+              { value: '', label: '' },
+              { value: 'Example: Grass', label: 'Example: Grass' },
+              { value: 'Example: Legume', label: 'Example: Legume' },
+              ...(pathname.includes('output') || myFields.length
+                ? [
+                  {
+                    label: 'Utilities',
+                    isHeader: true,
+                  },
+                  { value: '', label: '' },
+                  { value: 'Download data', label: 'Download data' },
+                ]
+                : []),
 
-      {!PSA && (
-        <select className="fields" onChange={handleDropdown}>
-          <option value="placeholder">&nbsp;</option>
-          {!isAuthenticated && (
-            <optgroup label="My fields">
-              {myFields.map((fld, idx) => (
-                <option key={idx} value={fld}>
-                  {fld.replace('ncalc-', '')}
-                </option>
-              ))}
-            </optgroup>
-          )}
-          {userHistoryList.length > 0 && (
-            <optgroup label="User History">
-              {userHistoryList.map((history, id) => (
-                <option key={id} value={history.label}>
-                  {history.label.replace('history-', '')}
-                </option>
-              ))}
-            </optgroup>
-          )}
-          <option disabled>____________________</option>
+              ...(myFields.length ? [{ value: 'Clear previous runs', label: 'Clear previous runs' }] : []),
+            ]
+        }
+        SelectProps={{
+          value: field,
+          onChange: PSA ? changePSA : handleDropdown,
+          'data-test': 'dropdown-fields',
+        }}
+        formSx={{ minWidth: 200 }}
+        menuSx={{ fontWeight: 'bold', color: 'white', backgroundColor: 'green' }}
+      />
 
-          <optgroup label="Example data">
-            <option>Example: Grass</option>
-            <option>Example: Legume</option>
-          </optgroup>
-          <option disabled>____________________</option>
-
-          {(pathname.includes('output') || myFields.length) && (
-            <optgroup label="Utilities">
-              <option>Download data</option>
-              {myFields.length && <option>Clear previous runs</option>}
-            </optgroup>
-          )}
-        </select>
-      )}
       {downloadCSVFailed && (
         <Dialog
           open={downloadCSVFailed}
-          onClose={() => {
-            setDownloadCSVFailed(false);
-          }}
+          onClose={() => setDownloadCSVFailed(false)}
           aria-labelledby="alert-dialog-title"
           aria-describedby="alert-dialog-description"
         >
           <DialogTitle id="alert-dialog-title">Download Failed</DialogTitle>
           <DialogContent>
-            <DialogContentText id="alert-dialog-description">Download of CSV Failed. Please try again.</DialogContentText>
+            <DialogContentText id="alert-dialog-description">
+              Download of CSV Failed. Please try again.
+            </DialogContentText>
           </DialogContent>
           <DialogActions>
-            <Button
-              onClick={() => {
-                setDownloadCSVFailed(false);
-              }}
-              autoFocus
-            >
-              close
+            <Button onClick={() => setDownloadCSVFailed(false)} autoFocus>
+              Close
             </Button>
           </DialogActions>
         </Dialog>

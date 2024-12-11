@@ -1,7 +1,7 @@
 import React from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import Autocomplete from '@mui/material/Autocomplete';
-import { TextField } from '@mui/material';
+import { PSATextField } from 'shared-react-components/src';
 import { get, set } from '../../store/Store';
 
 const CoverCropsInput = ({ isSatelliteMode }) => {
@@ -40,7 +40,7 @@ const CoverCropsInput = ({ isSatelliteMode }) => {
       }}
       options={species ? [...species.grass, ...species.legume, ...species.brassica, ...species.broadleaf] : []}
       value={(isSatelliteMode ? coverCrop[0] : coverCrop) || null}
-      renderInput={(params) => <TextField {...params} label={isSatelliteMode ? 'Select a cover crop' : 'Select one or more cover crops'} />}
+      renderInput={(params) => <PSATextField {...params} label={isSatelliteMode ? 'Select a cover crop' : 'Select one or more cover crops'} />}
       onChange={(e, val) => {
         // if covercrop is a string(in Autocomplete non multiple mode)
         dispatch(set.coverCrop(typeof val === 'string' ? [val] : val));

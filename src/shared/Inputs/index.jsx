@@ -5,6 +5,7 @@ import { useSelector, useDispatch } from 'react-redux';
 import {
   TextField, Radio, RadioGroup, FormControlLabel, FormLabel, Autocomplete as MUIAutocomplete,
 } from '@mui/material';
+import { PSATextField } from 'shared-react-components/src';
 
 import { get, set } from '../../store/Store';
 
@@ -208,7 +209,7 @@ const Input = ({
 
     if (!renderInput) {
       renderInput = (params) => (
-        <TextField
+        <PSATextField
           autoFocus={props.autoFocus}
           variant={props.variant || 'outlined'}
           sx={{ background: 'white', width: max, padding: 0 }}
@@ -241,7 +242,7 @@ const Input = ({
   }
   return (
     <>
-      <TextField
+      <PSATextField
         {...props}
         id={id}
         value={v === undefined || v === null ? '' : v} // https://github.com/facebook/react/issues/6222
