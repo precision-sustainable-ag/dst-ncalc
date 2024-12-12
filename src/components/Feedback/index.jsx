@@ -1,6 +1,6 @@
 import React from 'react';
 import { useSelector, useDispatch } from 'react-redux';
-import { Modal, Paper, Box, Button, Typography } from '@mui/material';
+import { Paper, Box, Button, Typography } from '@mui/material';
 import { PSAModal } from 'shared-react-components/src';
 import CancelPresentationIcon from '@mui/icons-material/CancelPresentation';
 import { get, set } from '../../store/Store';
