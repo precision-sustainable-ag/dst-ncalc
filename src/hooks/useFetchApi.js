@@ -229,7 +229,6 @@ const useFetchPlantFactors = () => {
       axios
         .get(url, { params: { plant_species: coverCrop, growth_stage: coverCropGrowthStage } })
         .then((data) => {
-          console.log('growth data', data);
           if (data.data) {
             dispatch(set.N(data.data.nitrogen_percentage));
             dispatch(set.carb(data.data.carbohydrates_percentage));
@@ -289,7 +288,6 @@ const useFetchNitrogenArray = () => {
 
   useEffect(() => {
     if (biomassTaskResults && N && carb && cell && lign) {
-      console.log('biomassTaskResults', biomassTaskResults);
       const url = `${PLANTFACTORS_API_URL}/nitrogen`;
       const payload = {
         nitrogen_percentage: N,
@@ -299,7 +297,6 @@ const useFetchNitrogenArray = () => {
         data_array: biomassTaskResults.data_array,
         bbox: biomassTaskResults.bbox,
       };
-      console.log('payload', payload);
       axios
         .post(url, payload)
         .then((response) => {
