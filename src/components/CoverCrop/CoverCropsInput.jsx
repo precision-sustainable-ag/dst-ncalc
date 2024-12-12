@@ -2,7 +2,7 @@
 import React from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import Autocomplete from '@mui/material/Autocomplete';
-import { TextField } from '@mui/material';
+import { PSATextField } from 'shared-react-components/src';
 import { get, set } from '../../store/Store';
 import Input from '../../shared/Inputs';
 
@@ -40,7 +40,7 @@ const CoverCropsInput = ({ isSatelliteMode }) => {
       sx={{ width: '100%' }}
       // defaultValue={coverCrop ? coverCrop : ''}
       value={coverCrop}
-      renderInput={(params) => <TextField {...params} label="Select a cover crop" />}
+      renderInput={(params) => <PSATextField {...params} placeholder="Select a cover crop" />}
       onChange={(el, va) => {
         dispatch(set.coverCrop(va));
         dispatch(set.coverCropGrowthStage(null));

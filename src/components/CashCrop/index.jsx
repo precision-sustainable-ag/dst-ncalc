@@ -3,8 +3,9 @@ import React from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { useNavigate } from 'react-router-dom';
 import {
-  Autocomplete, Box, Stack, TextField, Typography, styled,
+  Autocomplete, Box, Stack, Typography, styled,
 } from '@mui/material';
+import { PSATextField } from 'shared-react-components/src';
 import { get, set } from '../../store/Store';
 import Myslider from '../../shared/Slider';
 import Input from '../../shared/Inputs';
@@ -83,7 +84,7 @@ const CashCrop = ({ barebone = false }) => {
               sx={{ width: '100%' }}
               // defaultValue={coverCrop ? coverCrop : ''}
               value={cashCrop}
-              renderInput={(params) => <TextField {...params} label="Select a cash crop" />}
+              renderInput={(params) => <PSATextField {...params} placeholder="Select a cash crop" />}
               onChange={(el, va) => {
                 dispatch(set.cashCrop(va));
               }}
