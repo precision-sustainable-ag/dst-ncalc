@@ -8,7 +8,6 @@ import { useNavigate } from 'react-router-dom';
 import { get, set } from '../../store/Store';
 import NavButton from '../../shared/Navigate/NavButton';
 import About from '../About';
-import { historyStates } from '../../store/inits';
 
 const BiomassMethodButton = styled(ToggleButton)(() => ({
   '&.Mui-selected': {
@@ -39,7 +38,6 @@ const Home = () => {
   const dispatch = useDispatch();
   // const privacy = useSelector(get.privacy);
   const biomassCalcMode = useSelector(get.biomassCalcMode);
-  const historyState = useSelector(get.user.historyState);
 
   useEffect(() => {
     if (window.location.toString().includes('PSA')) {
@@ -50,11 +48,8 @@ const Home = () => {
   const handleChange = (event, newValue) => {
     if (newValue === null) return;
     dispatch(set.biomassCalcMode(newValue));
+    dispatch(set.coverCrop([]));
   };
-
-  useEffect(() => {
-    if (historyState !== historyStates.imported) dispatch(set.coverCrop([]));
-  }, [biomassCalcMode]);
 
   const navigate = useNavigate();
   // const className = privacy ? 'home background' : 'home';
