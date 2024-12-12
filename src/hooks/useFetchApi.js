@@ -157,7 +157,7 @@ const useFetchSSURGO = () => {
       dispatch(set.SSURGO(null));
     }
     // exclude example fields
-    if (!field.includes('Example') && (!SSURGO || updateSSURGO)) {
+    if ((!SSURGO || updateSSURGO)) {
       const url = `${SSURGO_API_URL}/?lat=${lat}&lon=${lon}&component=major`;
       axios
         .get(url)

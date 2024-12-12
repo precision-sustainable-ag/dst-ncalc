@@ -34,10 +34,10 @@ const FieldDropdown = () => {
   const PSA = useSelector(get.PSA);
   const userHistoryList = useSelector(get.user.userHistoryList);
 
-  const field = useSelector(get.field);
   const model = useSelector(get.model);
   const dates = useSelector(get.dates);
   const [downloadCSVFailed, setDownloadCSVFailed] = useState(false);
+  const [selectedField, setSelectedField] = useState('');
 
   // get all fields from localStorage
   const myFields = Object.keys(localStorage).filter((key) => key.startsWith('ncalc-'));
@@ -78,6 +78,7 @@ const FieldDropdown = () => {
   const handleDropdown = async (e) => {
     const fieldStr = e.target.value;
     console.log('fieldStr', fieldStr);
+    setSelectedField(fieldStr);
     if (fieldStr === 'placeholder') {
       // TODO: maybe add functions to clean previous field data
       dispatch(set.field(''));
@@ -162,8 +163,8 @@ const FieldDropdown = () => {
         const selectedHistory = userHistoryList.find((historyItem) => historyItem.label === fieldStr);
         // set user history name and state
         dispatch(set.user.selectedHistory(selectedHistory));
-        dispatch(set.user.historyState(historyStates.imported));
       }
+      dispatch(set.user.historyState(historyStates.imported));
       Object.keys(historyObj).forEach((key) => {
         try {
           if (/Date/.test(key)) {
@@ -211,10 +212,7 @@ const FieldDropdown = () => {
                   })),
                 ]
               ),
-              {
-                label: 'Example data',
-                isHeader: true,
-              },
+              { label: 'Example data', isHeader: true },
               { value: 'Example: Grass', label: 'Example: Grass' },
               { value: 'Example: Legume', label: 'Example: Legume' },
               ...(pathname.includes('output') || myFields.length
@@ -231,7 +229,7 @@ const FieldDropdown = () => {
             ]
         }
         SelectProps={{
-          value: field ? (isAuthenticated ? 'history-' : 'ncalc-').concat(field) : '',
+          value: selectedField,
           onChange: PSA ? changePSA : handleDropdown,
           'data-test': 'dropdown-fields',
         }}
