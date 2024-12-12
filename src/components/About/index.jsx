@@ -4,7 +4,7 @@ import { Box, Button } from '@mui/material';
 import List from '@mui/material/List';
 import ListItem from '@mui/material/ListItem';
 import ListItemIcon from '@mui/material/ListItemIcon';
-import Modal from '@mui/material/Modal';
+import { PSAModal } from 'shared-react-components/src';
 import Paper from '@mui/material/Paper';
 import Typography from '@mui/material/Typography';
 import LensIcon from '@mui/icons-material/Lens';
@@ -29,7 +29,7 @@ const About = ({ open, setOpen }) => {
   const navigate = useNavigate();
 
   return (
-    <Modal
+    <PSAModal
       open={open}
       onClose={handleCloseModal}
       aria-labelledby="modal-modal-title"
@@ -42,7 +42,7 @@ const About = ({ open, setOpen }) => {
         alignItems: 'center',
         justifyContent: 'center',
       }}
-    >
+      modalContent={
       <Paper>
         <Box
           sx={{
@@ -208,7 +208,8 @@ const About = ({ open, setOpen }) => {
           </Typography>
         </Box>
       </Paper>
-    </Modal>
+      }
+    />
   );
 }; // About
 
