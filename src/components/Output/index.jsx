@@ -29,7 +29,9 @@ const Output = () => {
   const lign = useSelector(get.lign);
   const unit = useSelector(get.unit);
 
+  // TODO: save the current field to localStorage
   useStoreMem();
+  //
   useFetchNitrogenArray();
 
   useEffect(() => {

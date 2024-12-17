@@ -1,16 +1,14 @@
 import React from 'react';
-import { useDispatch, useSelector } from 'react-redux';
 import { useNavigate } from 'react-router-dom';
 import { Box, Button } from '@mui/material';
 import List from '@mui/material/List';
 import ListItem from '@mui/material/ListItem';
 import ListItemIcon from '@mui/material/ListItemIcon';
-import Modal from '@mui/material/Modal';
+import { PSAModal } from 'shared-react-components/src';
 import Paper from '@mui/material/Paper';
 import Typography from '@mui/material/Typography';
 import LensIcon from '@mui/icons-material/Lens';
 import CancelPresentationIcon from '@mui/icons-material/CancelPresentation';
-import { get, set } from '../../store/Store';
 import NavButton from '../../shared/Navigate/NavButton';
 
 const BullettedText = ({ children }) => (
@@ -26,15 +24,13 @@ const BullettedText = ({ children }) => (
   </ListItem>
 );
 
-const About = () => {
-  const dispatch = useDispatch();
-  const openAboutModal = useSelector(get.openAboutModal);
-  const handleCloseModal = () => dispatch(set.openAboutModal(false));
+const About = ({ open, setOpen }) => {
+  const handleCloseModal = () => setOpen(false);
   const navigate = useNavigate();
 
   return (
-    <Modal
-      open={openAboutModal}
+    <PSAModal
+      open={open}
       onClose={handleCloseModal}
       aria-labelledby="modal-modal-title"
       aria-describedby="modal-modal-description"
@@ -46,7 +42,7 @@ const About = () => {
         alignItems: 'center',
         justifyContent: 'center',
       }}
-    >
+      modalContent={
       <Paper>
         <Box
           sx={{
@@ -212,7 +208,8 @@ const About = () => {
           </Typography>
         </Box>
       </Paper>
-    </Modal>
+      }
+    />
   );
 }; // About
 

@@ -12,11 +12,11 @@ import Menu from '@mui/material/Menu';
 import KeyboardDoubleArrowDownIcon from '@mui/icons-material/KeyboardDoubleArrowDown';
 import KeyboardDoubleArrowUpIcon from '@mui/icons-material/KeyboardDoubleArrowUp';
 import Button from '@mui/material/Button';
-import Tooltip from '@mui/material/Tooltip';
 import MenuItem from '@mui/material/MenuItem';
 import Stack from '@mui/material/Stack';
 import MoreVertIcon from '@mui/icons-material/MoreVert';
 import { styled } from '@mui/material';
+import { PSATooltip } from 'shared-react-components/src';
 import Init from '../Init';
 import { get, set } from '../../store/Store';
 
@@ -66,6 +66,7 @@ const navBarBackDropStyles = {
   background: 'linear-gradient(#111, #333)',
 };
 
+// TODO: not used now
 const ResponsiveNavBar = ({ screens }) => {
   const [anchorElNav, setAnchorElNav] = useState(null);
   const [anchorElUser, setAnchorElUser] = useState(null);
@@ -74,12 +75,13 @@ const ResponsiveNavBar = ({ screens }) => {
   const [userIsOpen, setUserIsOpen] = useState(false);
   // eslint-disable-next-line no-unused-vars
   const [navModalOpen, setNavModalOpen] = useState(false);
-  const isSatelliteMode = useSelector(get.biomassCalcMode) === 'satellite';
+  // const isSatelliteMode = useSelector(get.biomassCalcMode) === 'satellite';
 
   const location = useLocation();
   const dispatch = useDispatch();
 
-  const showNavbarMenu = location.pathname.replace('/', '') !== 'home' && !isSatelliteMode;
+  // const showNavbarMenu = location.pathname.replace('/', '') !== 'home' && !isSatelliteMode;
+  const showNavbarMenu = true;
 
   const handleOpenNavMenu = (event) => {
     setAnchorElNav(event.currentTarget);
@@ -105,9 +107,7 @@ const ResponsiveNavBar = ({ screens }) => {
 
   // // useSelector(get.screen); // force render
   useEffect(() => {
-    setActiveMenu(
-      location.pathname.replace('/', '').replace('2', ''),
-    );
+    setActiveMenu(location.pathname.replace('/', '').replace('2', ''));
   }, [location]);
 
   return (
@@ -126,12 +126,8 @@ const ResponsiveNavBar = ({ screens }) => {
         },
       }}
     >
-      <Box sx={navBarBackDropStyles} />
-      <Stack
-        direction="row"
-        justifyContent="space-around"
-        flexGrow={2}
-      >
+      {/* <Box sx={navBarBackDropStyles} /> */}
+      <Stack direction="row" justifyContent="space-around" flexGrow={2}>
         <Toolbar disableGutters>
           {/* Menu Button Box */}
           <Box
@@ -155,10 +151,7 @@ const ResponsiveNavBar = ({ screens }) => {
           </Box>
         </Toolbar>
         {/* Menu vertical list */}
-        <Toolbar
-          disableGutters
-          sx={{ display: { xs: 'flex', md: 'none' } }}
-        >
+        <Toolbar disableGutters sx={{ display: { xs: 'flex', md: 'none' } }}>
           <Box
             sx={{
               flexGrow: 1,
@@ -173,7 +166,6 @@ const ResponsiveNavBar = ({ screens }) => {
               justifyContent: 'center',
             }}
           >
-
             <IconButton
               size="large"
               aria-label="icon of vertical menu"
@@ -183,12 +175,13 @@ const ResponsiveNavBar = ({ screens }) => {
               color="inherit"
               sx={{ padding: '0px' }}
             >
-              <Box sx={{
-                display: 'flex',
-                flexDirection: 'column',
-                alignItems: 'center',
-                justifyContent: 'center',
-              }}
+              <Box
+                sx={{
+                  display: 'flex',
+                  flexDirection: 'column',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                }}
               >
                 <Typography
                   sx={{
@@ -200,9 +193,7 @@ const ResponsiveNavBar = ({ screens }) => {
                 >
                   Menu
                 </Typography>
-                {menuIsOpen
-                  ? (<KeyboardDoubleArrowUpIcon fontSize="small" />)
-                  : (<KeyboardDoubleArrowDownIcon fontSize="small" />)}
+                {menuIsOpen ? <KeyboardDoubleArrowUpIcon fontSize="small" /> : <KeyboardDoubleArrowDownIcon fontSize="small" />}
               </Box>
             </IconButton>
             <Menu
@@ -225,11 +216,7 @@ const ResponsiveNavBar = ({ screens }) => {
               {Object.keys(screens)
                 .filter((scr) => screens[scr].showInMenu !== false)
                 .map((scr) => (
-                  <NavLink
-                    key={`${scr}-navlink`}
-                    to={`/${scr.toLowerCase()}`}
-                    style={{ textDecoration: 'none' }}
-                  >
+                  <NavLink key={`${scr}-navlink`} to={`/${scr.toLowerCase()}`} style={{ textDecoration: 'none' }}>
                     <NavBarButtonText2
                       key={`${scr}-navlink-text-str`}
                       onClick={() => handleClickNavMenu(scr)}
@@ -271,10 +258,7 @@ const ResponsiveNavBar = ({ screens }) => {
             />
           </Box>
         </Toolbar>
-        <Toolbar
-          disableGutters
-          sx={{ display: { xs: 'none', md: 'flex' } }}
-        >
+        <Toolbar disableGutters sx={{ display: { xs: 'none', md: 'flex' } }}>
           {/* Menu horizontal list */}
           <Box
             alignItems="center"
@@ -284,44 +268,44 @@ const ResponsiveNavBar = ({ screens }) => {
               color: 'white',
             }}
           >
-            {showNavbarMenu && Object.keys(screens)
-              .filter((scr) => screens[scr].showInMenu !== false)
-              .map((scr) => (
-                <NavLink
-                  key={`${scr}-navlink`}
-                  to={`/${scr.toLowerCase()}`}
-                  style={{ textDecoration: 'none' }}
-                >
-                  <NavBarButtonText1
-                    key={`${scr}-navlink-text-str`}
-                    onClick={() => handleClickNavMenu(scr)}
-                    isactive={activeMenu === scr ? 'true' : 'false'}
-                  >
-                    {screens[scr].desc || scr}
-                  </NavBarButtonText1>
-                </NavLink>
-              ))}
+            {showNavbarMenu &&
+              Object.keys(screens)
+                .filter((scr) => screens[scr].showInMenu !== false)
+                .map((scr) => (
+                  <NavLink key={`${scr}-navlink`} to={`/${scr.toLowerCase()}`} style={{ textDecoration: 'none' }}>
+                    <NavBarButtonText1
+                      key={`${scr}-navlink-text-str`}
+                      onClick={() => handleClickNavMenu(scr)}
+                      isactive={activeMenu === scr ? 'true' : 'false'}
+                    >
+                      {screens[scr].desc || scr}
+                    </NavBarButtonText1>
+                  </NavLink>
+                ))}
           </Box>
         </Toolbar>
         <Toolbar disableGutters>
           <Box sx={{ flexGrow: 0 }}>
-            <Tooltip title="Open settings">
-              <IconButton
-                onClick={handleOpenUserMenu}
-                sx={{
-                  width: '3rem',
-                  height: '3rem',
-                  borderRadius: '0.5rem',
-                  color: 'black',
-                  backgroundColor: 'white',
-                  '&:hover': {
-                    backgroundColor: '#f5f5f5',
-                  },
-                }}
-              >
-                <MoreVertIcon />
-              </IconButton>
-            </Tooltip>
+            <PSATooltip
+              title="Open settings"
+              tooltipContent={(
+                <IconButton
+                  onClick={handleOpenUserMenu}
+                  sx={{
+                    width: '3rem',
+                    height: '3rem',
+                    borderRadius: '0.5rem',
+                    color: 'black',
+                    backgroundColor: 'white',
+                    '&:hover': {
+                      backgroundColor: '#f5f5f5',
+                    },
+                  }}
+                >
+                  <MoreVertIcon />
+                </IconButton>
+              )}
+            />
             <Menu
               sx={{ mt: '45px' }}
               id="menu-appbar"

@@ -22,6 +22,7 @@ const Myslider = ({
           {val}
         </Typography>
       ) : (
+        // This is a custom input component
         <Input
           id={id}
           autoComplete="off"
@@ -38,6 +39,7 @@ const Myslider = ({
           <Slider
             value={Number.isFinite(val) ? +(val).toFixed(step === 1 ? 0 : 1) : 0}
             onChange={(_, newValue) => {
+              // TODO: this is calling everytime the scroller moves, should be updated to onChangeCommited
               if (onInput) {
                 onInput();
               }

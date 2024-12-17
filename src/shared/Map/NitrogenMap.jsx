@@ -3,7 +3,7 @@
 import React, { useState, useEffect } from 'react';
 // import mapboxgl from 'mapbox-gl';
 import { useSelector, useDispatch } from 'react-redux';
-import { NcalcMap } from '@psa/dst.ui.ncalc-map';
+import { NcalcMap } from 'shared-react-components/src';
 import { Paper } from '@mui/material';
 // import { NcalcMap } from './mock/ncalc-map';
 import { get, set } from '../../store/Store';
@@ -23,6 +23,7 @@ const NitrogenMapComp = ({ variant }) => {
   const dispatch = useDispatch();
   const lat = useSelector(get.lat);
   const lon = useSelector(get.lon);
+  const biomassTaskResults = useSelector(get.biomassTaskResults);
   const nitrogenTaskResults = useSelector(get.nitrogenTaskResults);
   const mapAddress = useSelector(get.mapAddress);
   const mapZoom = useSelector(get.mapZoom);
@@ -31,7 +32,10 @@ const NitrogenMapComp = ({ variant }) => {
   const [features, setFeatures] = useState(mapPolygon);
   const [drawEvent, setDrawEvent] = useState({});
 
+  const mapboxToken = import.meta.env.VITE_MAPBOX_TOKEN;
+
   // mapAddress
+  // TODO: only difference between two maps
   useEffect(() => {
     if (drawEvent.mode === 'delete') {
       removedShapes = removedShapes.add(drawEvent.e.features[0].id);
@@ -72,7 +76,7 @@ const NitrogenMapComp = ({ variant }) => {
         setZoom={setZoom}
         setMap={() => { }}
         onDraw={setDrawEvent}
-        initRasterObject={nitrogenTaskResults}
+        initRasterObject={variant === 'biomass' ? biomassTaskResults : nitrogenTaskResults}
         initFeatures={mapPolygon}
         unit={unit}
         material={variant}
@@ -100,6 +104,7 @@ const NitrogenMapComp = ({ variant }) => {
         keyboard
         doubleClickZoom={false}
         touchZoomRotate
+        mapboxToken={mapboxToken}
       />
     </Paper>
   );

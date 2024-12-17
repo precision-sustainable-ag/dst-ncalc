@@ -1,10 +1,10 @@
 import React from 'react';
-import { useSelector } from 'react-redux';
+import { useDispatch, useSelector } from 'react-redux';
 import { useNavigate } from 'react-router-dom';
 import Box from '@mui/material/Box';
 import Typography from '@mui/material/Typography';
 import { Stack, styled } from '@mui/material';
-import { get } from '../../store/Store';
+import { get, set } from '../../store/Store';
 import Myslider from '../../shared/Slider';
 import Help from '../../shared/Help';
 import Required from '../../shared/Required';
@@ -20,6 +20,7 @@ const CustomInputText = styled(Typography)({
 
 const CoverCropSecond = ({ barebone = false }) => {
   const navigate = useNavigate();
+  const dispatch = useDispatch();
   const N = useSelector(get.N);
   const carb = useSelector(get.carb);
   const cell = useSelector(get.cell);
@@ -59,13 +60,9 @@ const CoverCropSecond = ({ barebone = false }) => {
         }}
       >
         {barebone ? (
-          <Typography variant="h5">
-            Tell us about your Cover Crop Quality
-          </Typography>
+          <Typography variant="h5">Tell us about your Cover Crop Quality</Typography>
         ) : (
-          <Typography variant="h4">
-            Tell us about your Cover Crop Quality
-          </Typography>
+          <Typography variant="h4">Tell us about your Cover Crop Quality</Typography>
         )}
         {isSatelliteMode && (
           <Typography variant="subtitle1" fontWeight={900}>
@@ -73,125 +70,62 @@ const CoverCropSecond = ({ barebone = false }) => {
           </Typography>
         )}
         <Box sx={{ width: '90%' }}>
-          <Box
-            mt={2}
-            sx={{ display: 'flex', flexDirection: 'row', alignItems: 'center' }}
-          >
+          <Box mt={2} sx={{ display: 'flex', flexDirection: 'row', alignItems: 'center' }}>
             <Stack direction="row" alignItems="center">
               <CustomInputText>Nitrogen (%)</CustomInputText>
-              <Help>
-                Cover crop nitrogen concentration based on lab results.
-              </Help>
+              <Help>Cover crop nitrogen concentration based on lab results.</Help>
               {!N && <Required />}
             </Stack>
             :
           </Box>
-          <Myslider
-            id="N"
-            min={0}
-            max={6}
-            step={0.1}
-            disabled={isSatelliteMode}
-          />
-          {!isSatelliteMode && N ? (
-            <p className="note">
-              Adjust default values below based on lab results.
-            </p>
-          ) : (
-            ''
-          )}
-          <Box
-            mt={2}
-            sx={{ display: 'flex', flexDirection: 'row', alignItems: 'center' }}
-          >
+          <Myslider id="N" min={0} max={6} step={0.1} disabled={isSatelliteMode} />
+          {!isSatelliteMode && N ? <p className="note">Adjust default values below based on lab results.</p> : ''}
+          <Box mt={2} sx={{ display: 'flex', flexDirection: 'row', alignItems: 'center' }}>
             <Stack direction="row" alignItems="center">
               <CustomInputText>Carbohydrates (%)</CustomInputText>
               <Help>
                 <p>
-                  Non-structural labile carbohydrate concentration based on lab
-                  results. This represents the most readily decomposable C
-                  constituents in plant materials.
+                  Non-structural labile carbohydrate concentration based on lab results. This represents the most readily decomposable C constituents
+                  in plant materials.
                 </p>
                 <p>The default value is based on the nitrogen concentration.</p>
-                <p>
-                  If you have the raw data from near infra-red reflectance
-                  spectroscopy (NIRS) analysis, use the following equation:
-                </p>
-                <p>
-                  carbohydrates (%) = % crude protein (CP) + % fat + %
-                  non-fibrous carbohydrates (NFC)
-                </p>
+                <p>If you have the raw data from near infra-red reflectance spectroscopy (NIRS) analysis, use the following equation:</p>
+                <p>carbohydrates (%) = % crude protein (CP) + % fat + % non-fibrous carbohydrates (NFC)</p>
               </Help>
               {!carb && <Required />}
             </Stack>
             :
           </Box>
-          <Myslider
-            id="carb"
-            min={20}
-            max={70}
-            step={0.1}
-            disabled={isSatelliteMode}
-          />
-          <Box
-            mt={2}
-            sx={{ display: 'flex', flexDirection: 'row', alignItems: 'center' }}
-          >
+          <Myslider id="carb" min={20} max={70} step={0.1} disabled={isSatelliteMode} />
+          <Box mt={2} sx={{ display: 'flex', flexDirection: 'row', alignItems: 'center' }}>
             <Stack direction="row" alignItems="center">
               <CustomInputText>Holo-cellulose (%)</CustomInputText>
               <Help>
                 <p>
-                  Structural holo-cellulose (i.e., both cellulose and
-                  hemi-cellulose) concentration based on lab results. This
-                  represents the moderately decomposable C constituents in plant
-                  materials.
+                  Structural holo-cellulose (i.e., both cellulose and hemi-cellulose) concentration based on lab results. This represents the
+                  moderately decomposable C constituents in plant materials.
                 </p>
                 <p>The default value is based on the nitrogen concentration.</p>
-                <p>
-                  If you have the raw data from near infra-red reflectance
-                  spectroscopy (NIRS) analysis, use the following equation:
-                </p>
-                <p>
-                  holo-cellulose (%) = % neutral detergent fiber (NDF) – (%
-                  lignin + % ash)
-                </p>
+                <p>If you have the raw data from near infra-red reflectance spectroscopy (NIRS) analysis, use the following equation:</p>
+                <p>holo-cellulose (%) = % neutral detergent fiber (NDF) – (% lignin + % ash)</p>
               </Help>
               {!cell && <Required />}
             </Stack>
             :
           </Box>
-          <Myslider
-            id="cell"
-            min={20}
-            max={70}
-            step={0.1}
-            disabled={isSatelliteMode}
-          />
-          <Box
-            mt={2}
-            sx={{ display: 'flex', flexDirection: 'row', alignItems: 'center' }}
-          >
+          <Myslider id="cell" min={20} max={70} step={0.1} disabled={isSatelliteMode} />
+          <Box mt={2} sx={{ display: 'flex', flexDirection: 'row', alignItems: 'center' }}>
             <Stack direction="row" alignItems="center">
               <CustomInputText>Lignin (%)</CustomInputText>
               <Help>
-                <p>
-                  Structural lignin concentration based on lab results. This
-                  represents the most recalcitrant C constituents in plant
-                  materials.
-                </p>
+                <p>Structural lignin concentration based on lab results. This represents the most recalcitrant C constituents in plant materials.</p>
                 <p>The default value is based on the nitrogen concentration.</p>
               </Help>
               {!lign && <Required />}
             </Stack>
             :
           </Box>
-          <Myslider
-            id="lign"
-            min={1}
-            max={10}
-            step={0.1}
-            disabled={isSatelliteMode}
-          />
+          <Myslider id="lign" min={1} max={10} step={0.1} disabled={isSatelliteMode} />
         </Box>
         {!barebone && (
           <Box
@@ -206,7 +140,10 @@ const CoverCropSecond = ({ barebone = false }) => {
           >
             <NavButton onClick={() => navigate('/covercrop')}>BACK</NavButton>
             <NavButton
-              onClick={() => navigate('/cashcrop')}
+              onClick={() => {
+                dispatch(set.activeStep(4));
+                navigate('/cashcrop');
+              }}
               disabled={!N || !carb || !cell || !lign}
             >
               NEXT

@@ -3,8 +3,7 @@ import { query } from '../hooks/helpers';
 
 const now = dayjs();
 
-const coverCropPlantingDate =
-  now.month() < 6 ? now.subtract(2, 'year').startOf('month').month(10) : now.subtract(1, 'year').startOf('month').month(10);
+const coverCropPlantingDate = now.month() < 6 ? now.subtract(2, 'year').startOf('month').month(10) : now.subtract(1, 'year').startOf('month').month(10);
 const coverCropTerminationDate = coverCropPlantingDate.add(6, 'month');
 const cashCropPlantingDate = coverCropTerminationDate.add(1, 'week');
 
@@ -159,7 +158,6 @@ const initialState = {
   biomassCalcMode: 'sampled', // 'sampled' or 'satellite'
   dataFetchStatus: 'idle',
   openFeedbackModal: false,
-  openAboutModal: false,
   incorporatedData: [],
   species: null,
   plantGrowthStages: null,
@@ -169,9 +167,9 @@ const initialState = {
   biomassFetchIsFailed: false,
   biomassFetchIsLoading: false,
   biomassTaskIsDone: true,
-  biomassTaskId: null,
   polyDrawTooBig: false,
   nitrogenTaskIsDone: true,
+  activeStep: 0,
 };
 
 export default initialState;

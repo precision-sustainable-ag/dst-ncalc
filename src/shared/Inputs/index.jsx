@@ -1,6 +1,11 @@
-import React, { useEffect, useState, useRef, useCallback } from 'react';
+import React, {
+  useEffect, useState, useRef, useCallback,
+} from 'react';
 import { useSelector, useDispatch } from 'react-redux';
-import { TextField, Radio, RadioGroup, FormControlLabel, FormLabel, Autocomplete as MUIAutocomplete } from '@mui/material';
+import {
+  TextField, Radio, RadioGroup, FormControlLabel, FormLabel, Autocomplete as MUIAutocomplete,
+} from '@mui/material';
+import { PSATextField } from 'shared-react-components/src';
 
 import { get, set } from '../../store/Store';
 
@@ -26,7 +31,9 @@ const keyPress = (event) => {
   }
 }; // keyPress
 
-const Input = ({ type, id, options, isOptionEqualToValue, renderInput, index = '', value, onChange, onInput, immediate, ...props }) => {
+const Input = ({
+  type, id, options, isOptionEqualToValue, renderInput, index = '', value, onChange, onInput, immediate, ...props
+}) => {
   const dispatch = useDispatch();
 
   let obj = id;
@@ -200,7 +207,7 @@ const Input = ({ type, id, options, isOptionEqualToValue, renderInput, index = '
 
     if (!renderInput) {
       renderInput = (params) => (
-        <TextField
+        <PSATextField
           autoFocus={props.autoFocus}
           variant={props.variant || 'outlined'}
           sx={{ background: 'white', width: max, padding: 0 }}
@@ -233,7 +240,7 @@ const Input = ({ type, id, options, isOptionEqualToValue, renderInput, index = '
   }
   return (
     <>
-      <TextField
+      <PSATextField
         {...props}
         id={id}
         value={v === undefined || v === null ? '' : v} // https://github.com/facebook/react/issues/6222

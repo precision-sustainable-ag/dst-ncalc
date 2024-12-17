@@ -3,13 +3,9 @@ import React from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { useNavigate } from 'react-router-dom';
 import {
-  Autocomplete,
-  Box,
-  Stack,
-  TextField,
-  Typography,
-  styled,
+  Autocomplete, Box, Stack, Typography, styled,
 } from '@mui/material';
+import { PSATextField } from 'shared-react-components/src';
 import { get, set } from '../../store/Store';
 import Myslider from '../../shared/Slider';
 import Input from '../../shared/Inputs';
@@ -26,48 +22,15 @@ const CustomInputText = styled(Typography)({
   marginBottom: '0.2rem',
 });
 
-const CashCrops = () => {
-  /// Desc: Fetch the crop names
-  const dispatch = useDispatch();
-  const crops = useFetchCropNames();
-  const cashCrop = useSelector(get.cashCrop);
-
-  /// Desc: Return the input component with the crops
-  return (
-    // <Input
-    //   id="cashCrop"
-    //   options={crops}
-    //   autoFocus
-    //   placeholder="Start typing your crop, then select from the list"
-    // />
-    crops && (
-      <Autocomplete
-        placeholder="Start typing your crop, then select from the list"
-        disablePortal
-        id="combo-box-demo"
-        autoFocus
-        options={[...crops]}
-        sx={{ width: '100%' }}
-        // defaultValue={coverCrop ? coverCrop : ''}
-        value={cashCrop}
-        renderInput={(params) => (
-          <TextField {...params} label="Select a cash crop" />
-        )}
-        onChange={(el, va) => {
-          dispatch(set.cashCrop(va));
-        }}
-      />
-    )
-  );
-}; // CashCrops
-
 const CashCrop = ({ barebone = false }) => {
+  const navigate = useNavigate();
+  const dispatch = useDispatch();
   const unit = useSelector(get.unit);
   const cashCrop = useSelector(get.cashCrop);
   const targetN = useSelector(get.targetN);
   const Yield = useSelector(get.yield);
   const cashCropPlantingDate = useSelector(get.cashCropPlantingDate);
-  const navigate = useNavigate();
+  const crops = useFetchCropNames();
 
   return (
     <Box
@@ -111,7 +74,22 @@ const CashCrop = ({ barebone = false }) => {
             <CustomInputText>Cash Crop: </CustomInputText>
             {!cashCrop && <Required />}
           </Stack>
-          <CashCrops />
+          {crops && (
+            <Autocomplete
+              placeholder="Start typing your crop, then select from the list"
+              disablePortal
+              id="combo-box-demo"
+              autoFocus
+              options={[...crops]}
+              sx={{ width: '100%' }}
+              // defaultValue={coverCrop ? coverCrop : ''}
+              value={cashCrop}
+              renderInput={(params) => <PSATextField {...params} placeholder="Select a cash crop" />}
+              onChange={(el, va) => {
+                dispatch(set.cashCrop(va));
+              }}
+            />
+          )}
           <Stack direction="row" alignItems="center">
             <CustomInputText>Cash Crop Planting Date: </CustomInputText>
             {!cashCropPlantingDate && <Required />}
@@ -128,13 +106,11 @@ const CashCrop = ({ barebone = false }) => {
             </Box>
           )}
 
-          <Box
-            mt={2}
-            sx={{ display: 'flex', flexDirection: 'row', alignItems: 'center' }}
-          >
+          <Box mt={2} sx={{ display: 'flex', flexDirection: 'row', alignItems: 'center' }}>
             <Stack direction="row" alignItems="center">
               <CustomInputText>
-                What is your Target Nitrogen Fertilizer Rate? ({unit}
+                What is your Target Nitrogen Fertilizer Rate? (
+                {unit}
                 ):
               </CustomInputText>
               <Help>Specify the target N rate for your region.</Help>
@@ -154,17 +130,20 @@ const CashCrop = ({ barebone = false }) => {
               }}
               mt={6}
             >
-              <NavButton onClick={() => navigate('/covercrop')}>BACK</NavButton>
               <NavButton
-                onClick={() => navigate('/output')}
-                disabled={
-                  !cashCrop ||
-                  !cashCropPlantingDate ||
-                  !targetN ||
-                  targetN < 0 ||
-                  !Yield ||
-                  Yield < 0
-                }
+                onClick={() => {
+                  dispatch(set.activeStep(3));
+                  navigate('/covercrop');
+                }}
+              >
+                BACK
+              </NavButton>
+              <NavButton
+                onClick={() => {
+                  dispatch(set.activeStep(5));
+                  navigate('/output');
+                }}
+                disabled={!cashCrop || !cashCropPlantingDate || !targetN || targetN < 0 || !Yield || Yield < 0}
               >
                 NEXT
               </NavButton>

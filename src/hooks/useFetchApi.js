@@ -7,10 +7,12 @@ import { useDispatch, useSelector } from 'react-redux';
 import { get, set } from '../store/Store';
 import { weightedAverage } from './helpers';
 
-const NCAL_API_URL = 'https://api.precisionsustainableag.org/cc-ncalc/surface';
+const NCAL_API_URL = 'https://api.covercrop-ncalc.org/surface';
 const SSURGO_API_URL = 'https://ssurgo.covercrop-data.org';
 const WEATHER_API_URL = 'https://weather.covercrop-data.org';
 const PLANTFACTORS_API_URL = 'https://api.covercrop-imagery.org';
+
+// TODO: hooks for fetching data from different apis
 
 /// Desc: useFetchCornN
 /// ..............................................................................
@@ -164,7 +166,7 @@ const useFetchModel = ({
 /// ..............................................................................
 /// ..............................................................................
 //
-
+/** Fetch soil data from ssurgo api */
 const useFetchSSURGO = () => {
   const dispatch = useDispatch();
   const updateSSURGO = useSelector(get.updateSSURGO);
@@ -174,7 +176,12 @@ const useFetchSSURGO = () => {
   const field = useSelector(get.field);
 
   useEffect(() => {
-    if (!field.includes('Mockup')) {
+    // if ssurgo data need to be updated(map location change), set ssurgo to null
+    if (updateSSURGO) {
+      dispatch(set.SSURGO(null));
+    }
+    // exclude example fields
+    if (!field.includes('Example') && (!SSURGO || updateSSURGO)) {
       const url = `${SSURGO_API_URL}/?lat=${lat}&lon=${lon}&component=major`;
       axios
         .get(url)
@@ -222,7 +229,6 @@ const useFetchPlantFactors = () => {
       axios
         .get(url, { params: { plant_species: coverCrop, growth_stage: coverCropGrowthStage } })
         .then((data) => {
-          console.log('growth data', data);
           if (data.data) {
             dispatch(set.N(data.data.nitrogen_percentage));
             dispatch(set.carb(data.data.carbohydrates_percentage));
@@ -270,7 +276,7 @@ const useFetchPlantFactors = () => {
 /// ..............................................................................
 /// ..............................................................................
 //
-
+/** Fetch nitrogen task result ( will only work in satellite mode and will generate raster for the nitrogen map) */
 const useFetchNitrogenArray = () => {
   const dispatch = useDispatch();
   const N = useSelector(get.N);
@@ -282,7 +288,6 @@ const useFetchNitrogenArray = () => {
 
   useEffect(() => {
     if (biomassTaskResults && N && carb && cell && lign) {
-      console.log('biomassTaskResults', biomassTaskResults);
       const url = `${PLANTFACTORS_API_URL}/nitrogen`;
       const payload = {
         nitrogen_percentage: N,
@@ -292,7 +297,6 @@ const useFetchNitrogenArray = () => {
         data_array: biomassTaskResults.data_array,
         bbox: biomassTaskResults.bbox,
       };
-      console.log('payload', payload);
       axios
         .post(url, payload)
         .then((response) => {

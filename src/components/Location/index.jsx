@@ -4,26 +4,27 @@ import { useNavigate } from 'react-router-dom';
 // import * as turf from '@turf/turf';
 // import axios from 'axios';
 import Box from '@mui/material/Box';
+import { Grid } from '@mui/material';
 import Paper from '@mui/material/Paper';
 import Badge from '@mui/material/Badge';
 import Stack from '@mui/material/Stack';
-import Tooltip from '@mui/material/Tooltip';
 import { styled } from '@mui/material/styles';
 import Accordion from '@mui/material/Accordion';
 import Typography from '@mui/material/Typography';
 import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
 import AccordionSummary from '@mui/material/AccordionSummary';
 import AccordionDetails from '@mui/material/AccordionDetails';
-import { useSelector } from 'react-redux';
-import { LinearProgress } from '@mui/material';
-import BiomassMap from '../Map/BiomassMap';
+import { useDispatch, useSelector } from 'react-redux';
+import { PSALoadingspinner, PSATooltip } from 'shared-react-components/src';
+import BiomassMap from '../../shared/Map/BiomassMap';
 // import NitrogenMap from '../Map/NitrogenMap';
-import Input from '../Inputs';
-import Help from '../Help';
-import { get } from '../../store/Store';
-import NavButton from '../Navigate/NavButton';
+import Input from '../../shared/Inputs';
+import Help from '../../shared/Help';
+import { get, set } from '../../store/Store';
+import NavButton from '../../shared/Navigate/NavButton';
 import useFetchHLS from '../../hooks/useFetchHLS';
-import Datebox from '../Biomass/Datebox';
+import Datebox from '../../shared/BiomassData/Datebox';
+import { AreaErrorModal, TaskFailModal } from '../../shared/BiomassData/Warnings';
 
 const CustomizedAccordion = styled(Accordion)(() => ({
   '&.MuiPaper-root': {
@@ -34,28 +35,29 @@ const CustomizedAccordion = styled(Accordion)(() => ({
 }));
 
 const nextButtonBadgeContent = () => (
-  <Tooltip title="No polygon is drawn">
+  <PSATooltip title="No polygon is drawn" tooltipContent={(
     <Typography>?</Typography>
-  </Tooltip>
+  )}
+  />
 );
-
+// TODO: barebone is a var to decide if this view is showed as a widget, same in other pages
 const Location = ({ barebone = false }) => {
   const navigate = useNavigate();
+  const dispatch = useDispatch();
   const isSatelliteMode = useSelector(get.biomassCalcMode) === 'satellite';
   const biomassFetchIsLoading = useSelector(get.biomassFetchIsLoading);
   const biomassTaskResults = useSelector(get.biomassTaskResults);
+  const polyDrawTooBig = useSelector(get.polyDrawTooBig);
+  const biomassFetchIsFailed = useSelector(get.biomassFetchIsFailed);
 
+  // api for getting biomass map
   useFetchHLS();
 
   return (
     <Box sx={{ width: '100%', padding: '0rem' }}>
       <Box mb={-2}>
         <CustomizedAccordion defaultExpanded>
-          <AccordionSummary
-            expandIcon={<ExpandMoreIcon />}
-            aria-controls="panel1a-content"
-            id="panel1a-header"
-          >
+          <AccordionSummary expandIcon={<ExpandMoreIcon />} aria-controls="panel1a-content" id="panel1a-header">
             {!barebone && (
               <Typography variant="h5" gutterBottom>
                 Where is your Field located?
@@ -65,25 +67,17 @@ const Location = ({ barebone = false }) => {
           <AccordionDetails>
             <Stack mb={1}>
               <Typography variant="h8" gutterBottom>
-                Enter your address or zip code to determine your field&apos;s
-                location. You can then zoom in and click to pinpoint it on the
-                map. If you know your exact coordinates, you can enter them in
-                search bar separated by comma (ex. 37.7, -80.2 ).
+                Enter your address or zip code to determine your field&apos;s location. You can then zoom in and click to pinpoint it on the map. If
+                you know your exact coordinates, you can enter them in search bar separated by comma (ex. 37.7, -80.2 ).
               </Typography>
               {isSatelliteMode && (
                 <Typography variant="h8" gutterBottom pt={1}>
-                  Specify your field&apos;s boundary on the map using the
-                  drawing tool.
+                  Specify your field&apos;s boundary on the map using the drawing tool.
                 </Typography>
               )}
             </Stack>
             <Box mb={2}>
-              <Input
-                label="Name your Field (optional)"
-                id="field"
-                autoComplete="off"
-                style={{ height: '2rem', minWidth: '13rem' }}
-              />
+              <Input label="Name your Field (optional)" id="field" autoComplete="off" style={{ height: '2rem', minWidth: '13rem' }} />
               <Help />
             </Box>
             <Stack mt={5} gap={1}>
@@ -99,33 +93,40 @@ const Location = ({ barebone = false }) => {
       </Box>
       <Box sx={{ margin: '2rem 0rem' }}>
         <Paper sx={{ padding: '1rem', borderRadius: '1rem' }}>
-          {biomassFetchIsLoading
-            && (
-              <Box>
-                <Stack>
-                  <LinearProgress />
-                </Stack>
-              </Box>
-            )}
+          {biomassFetchIsLoading && (
+            <Box>
+              <Grid
+                item
+                container
+                spacing={1}
+                justifyContent="center"
+                alignItems="center"
+                sx={{
+                  display: 'flex',
+                  justifyContent: 'center',
+                  alignItems: 'center',
+                  minHeight: '100px',
+                }}
+              >
+                <PSALoadingspinner />
+              </Grid>
+              <Typography variant="h6" fontWeight="bold" gutterBottom textAlign="center">
+                Calculating Biomass ...
+              </Typography>
+            </Box>
+          )}
           {biomassTaskResults && !biomassFetchIsLoading && (
-            <Box
-              justifyContent="center"
-              alignItems="center"
-            >
+            <Box justifyContent="center" alignItems="center">
               <Typography variant="h6" fontWeight="bold" gutterBottom textAlign="center">
                 Biomass Map
               </Typography>
             </Box>
           )}
-          { biomassFetchIsLoading && (
-            <Box
-              justifyContent="center"
-              alignItems="center"
-            >
-              <Typography variant="h6" fontWeight="bold" gutterBottom textAlign="center">
-                Calculating Biomass ...
-              </Typography>
-            </Box>
+          {polyDrawTooBig && (
+            <AreaErrorModal />
+          )}
+          {biomassFetchIsFailed && (
+            <TaskFailModal task="biomass" />
           )}
           <BiomassMap variant="biomass" />
           {!barebone && (
@@ -139,21 +140,24 @@ const Location = ({ barebone = false }) => {
                 flexDirection: 'row',
               }}
             >
-              <NavButton onClick={() => navigate('/home')}>BACK</NavButton>
-              <Badge
-                color="primary"
-                invisible={
-                  !isSatelliteMode || (isSatelliteMode)
-                }
-                badgeContent={nextButtonBadgeContent()}
+              <NavButton
+                onClick={() => {
+                  dispatch(set.activeStep(0));
+                  navigate('/home');
+                }}
               >
+                BACK
+              </NavButton>
+              <Badge color="primary" invisible={!isSatelliteMode || isSatelliteMode} badgeContent={nextButtonBadgeContent()}>
                 <NavButton
-                  disabled={isSatelliteMode}
+                  // disabled={isSatelliteMode}
                   onClick={() => {
                     if (isSatelliteMode) {
                       // calcBiomass();
+                      dispatch(set.activeStep(3));
                       navigate('/covercrop');
                     } else {
+                      dispatch(set.activeStep(2));
                       navigate('/soil');
                     }
                     return null;

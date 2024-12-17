@@ -17,6 +17,7 @@ const wrapperStyles = {
   width: '100%',
 };
 
+// TODO: this view will not be used
 const Index = () => {
   const [summaryData, setSummaryData] = useState(summaryDataDefaults);
   const field = useSelector(get.field);

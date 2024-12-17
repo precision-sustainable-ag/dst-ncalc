@@ -1,23 +1,31 @@
 /* eslint-disable no-console */
 import React from 'react';
-import { useSelector } from 'react-redux';
-import { useLocation } from 'react-router-dom';
+import { useDispatch, useSelector } from 'react-redux';
+import {
+  useLocation, useNavigate, Route, Routes,
+} from 'react-router-dom';
 import { ThemeProvider, createTheme } from '@mui/material/styles';
-import { Container } from '@mui/material';
-import ResponsiveNavBar from './components/ResponsiveNavBar';
-import Body from './components/Body';
+import { Container, Box } from '@mui/material';
+import { PSATheme, PSAHeader } from 'shared-react-components/src';
+import { deepmerge } from '@mui/utils';
+import ChatBubbleOutlineIcon from '@mui/icons-material/ChatBubbleOutline';
+// import ResponsiveNavBar from './components/ResponsiveNavBar';
+import Feedback from './components/Feedback';
+import SnackbarMessage from './shared/SnackbarMessage';
 import './App.scss';
 import 'react-datepicker/dist/react-datepicker.css';
-import { get } from './store/Store';
+import { get, set } from './store/Store';
+import FieldDropdown from './components/FieldDropdown';
+import NcalcStepper from './shared/Stepper';
 
 const screens = {
   init: () => null,
 };
 
-screens.init = require('./components/Init').default;
+screens.init = require('./components/FieldDropdown').default;
 screens.home = require('./components/Home').default;
 screens.about = require('./components/About').default;
-screens.location = require('./shared/Location').default;
+screens.location = require('./components/Location').default;
 screens.soil = require('./components/Soil').default;
 screens.covercrop = require('./components/CoverCrop').CoverCropFirst;
 screens.covercrop2 = require('./components/CoverCrop').CoverCropSecond;
@@ -35,7 +43,7 @@ if (screens.feedback) {
 }
 
 Object.keys(screens).forEach((key) => {
-  screens[key].desc = screens[key].desc || (key[0].toUpperCase() + key.slice(1));
+  screens[key].desc = screens[key].desc || key[0].toUpperCase() + key.slice(1);
 });
 
 const holdWarn = console.warn;
@@ -62,13 +70,41 @@ const theme = createTheme({
   },
 });
 
+const dstTheme = createTheme(deepmerge(PSATheme, theme));
+
 const App = () => {
   useSelector(get.screen); // force render
   // eslint-disable-next-line no-unused-vars
   const location = useLocation();
+  const navigate = useNavigate();
+  const dispatch = useDispatch();
+
+  const path = window.location.toString().split('/').pop().toLowerCase() || 'home';
+  const Screen = screens[path] || screens.home;
+
+  const navContent = [
+    {
+      type: 'button',
+      variant: 'text',
+      text: 'Feedback',
+      icon: <ChatBubbleOutlineIcon />,
+      rightIcon: true,
+      style: { fontSize: '1rem' },
+      textSx: { fontSize: '1rem' },
+      onClick: () => {
+        dispatch(set.openFeedbackModal(true));
+      },
+    },
+    {
+      type: 'component',
+      component: <FieldDropdown />,
+    },
+  ];
 
   return (
-    <ThemeProvider theme={theme}>
+    <ThemeProvider theme={dstTheme}>
+      <PSAHeader title="Cover Crop Nitrogen Calculator" onLogoClick={() => navigate('/')} navContent={navContent} />
+      <NcalcStepper />
       <Container
         // py={50}
         id="app-container"
@@ -80,8 +116,24 @@ const App = () => {
           backgroundRepeat: 'no-repeat',
         }}
       >
-        <ResponsiveNavBar screens={screens} />
-        <Body screens={screens} />
+        {/* <ResponsiveNavBar screens={screens} /> */}
+        <Box
+          sx={{
+            display: 'flex',
+            justifyContent: 'center',
+            paddingTop: '1rem',
+          }}
+          id="body-wrapper"
+        >
+          <Routes>
+            {Object.keys(screens).map((scr) => (
+              <Route key={scr} path={scr.toLowerCase()} element={<Screen />} />
+            ))}
+            <Route path="" element={<Screen />} />
+          </Routes>
+          <Feedback />
+          <SnackbarMessage />
+        </Box>
       </Container>
     </ThemeProvider>
   );

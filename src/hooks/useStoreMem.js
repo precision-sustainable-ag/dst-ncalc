@@ -4,6 +4,7 @@ import React from 'react';
 import { useSelector } from 'react-redux';
 import { get } from '../store/redux-autosetters';
 
+/** save current field data into localStorage */
 const useStoreMem = () => {
   /// //////////////////////////////////////////////
   const field = useSelector(get.field);
@@ -11,8 +12,8 @@ const useStoreMem = () => {
   const lon = useSelector(get.lon);
   const BD = useSelector(get.BD);
   const N = useSelector(get.N);
-  const killDate = useSelector(get.coverCropTerminationDate);
-  const plantingDate = useSelector(get.coverCropPlantingDate);
+  const coverCropTerminationDate = useSelector(get.coverCropTerminationDate);
+  const coverCropPlantingDate = useSelector(get.coverCropPlantingDate);
   const InorganicN = useSelector(get.InorganicN);
   const cashCrop = useSelector(get.cashCrop);
   const Yield = useSelector(get.yield);
@@ -33,6 +34,7 @@ const useStoreMem = () => {
   const cornN = useSelector(get.cornN);
   const coverCrop = useSelector(get.coverCrop);
 
+  // TODO: what if field don't have a name?
   if (field) {
     if (!field.includes('Example') && !field.includes('Mockup')) {
       try {
@@ -41,8 +43,8 @@ const useStoreMem = () => {
           lon,
           BD,
           N,
-          killDate,
-          plantingDate,
+          coverCropTerminationDate,
+          coverCropPlantingDate,
           carb,
           cell,
           lign,

@@ -12,7 +12,7 @@ import {
 // import { useSelector } from 'react-redux';
 // import { get } from '../../../store/redux-autosetters';
 // import Datebox from '../../../shared/Biomass/Datebox';
-import Location from '../../../shared/Location';
+import Location from '../../Location';
 
 /// /// /// STYLES /// /// ///
 const CardStyles = {

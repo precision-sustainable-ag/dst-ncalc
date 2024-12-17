@@ -1,3 +1,4 @@
+/* eslint-disable camelcase */
 /* eslint-disable operator-linebreak */
 /* eslint-disable react-hooks/exhaustive-deps */
 /* eslint-disable no-console */
@@ -8,21 +9,20 @@ import { useDispatch, useSelector } from 'react-redux';
 import { get, set } from '../store/Store';
 // import { map } from 'lodash';
 
-let interval;
 const arrayAverage = (arr) => arr.reduce((p, c) => p + c, 0) / arr.length;
 const HLS_API_URL = 'https://covercrop-imagery.org';
+const fetchTimeout = 500;
 
 /// Desc: useFetchHLS
 /// ..............................................................................
 /// ..............................................................................
 //
+/** hook for fetching biomass raster data */
 const useFetchHLS = () => {
   const [data, setData] = useState(null);
   // const [taskId, setTaskId] = useState(null);
-  const [taskIsDone, setTaskIsDone] = useState(false);
   const biomassTotalValue = useSelector(get.biomassTotalValue);
   const biomassTaskResults = useSelector(get.biomassTaskResults);
-  const biomassTaskId = useSelector(get.biomassTaskId);
   const unit = useSelector(get.unit);
   const coverCropPlantingDate = useSelector(get.coverCropPlantingDate);
   const coverCropTerminationDate = useSelector(get.coverCropTerminationDate);
@@ -32,8 +32,9 @@ const useFetchHLS = () => {
   // eslint-disable-next-line no-unneeded-ternary
   const isSatelliteMode = useSelector(get.biomassCalcMode) === 'satellite' ? true : false;
 
+  // initiate calculation of biomass
   useEffect(() => {
-    if (isSatelliteMode && mapPolygon.length > 0 && !activeExample && !biomassTaskId) {
+    if (isSatelliteMode && mapPolygon.length > 0 && !activeExample && !biomassTaskResults) {
       dispatch(set.biomassTaskResults({}));
       dispatch(set.biomassTaskIsDone(false));
       // setData(null);
@@ -45,6 +46,7 @@ const useFetchHLS = () => {
       }
 
       if (area > 10000) {
+        // if area too large, not do calculation
         dispatch(set.polyDrawTooBig(true));
         dispatch(set.mapPolygon([]));
       } else {
@@ -58,53 +60,58 @@ const useFetchHLS = () => {
             coordinates: [revertedCoords],
           },
         };
-        dispatch(set.biomassFetchIsLoading(true));
         const headers = {
           'Content-Type': 'application/json',
         };
+        // post task api, will return a task id
         axios
           .post(`${HLS_API_URL}/tasks`, payload, { headers })
           .then((response) => {
             if (response.status === 200 && response.data) {
-              dispatch(set.biomassTaskId(response.data.task_id));
+              dispatch(set.biomassFetchIsLoading(true));
+              const { task_id } = response.data;
+              // eslint-disable-next-line no-use-before-define
+              fetchTask(task_id);
             }
           })
           .catch((error) => {
-            // eslint-disable-next-line no-console
+            dispatch(set.biomassFetchIsFailed(true));
             console.log(error);
           });
       }
     }
   }, [mapPolygon, isSatelliteMode]);
 
-  const fetchTask = () => {
+  /** Call api with task id, return task status, if task success, set data with response */
+  const fetchTask = (taskId) => {
     axios
-      .get(`https://covercrop-imagery.org/tasks/${biomassTaskId}`)
+      .get(`https://covercrop-imagery.org/tasks/${taskId}`)
       .then((response) => {
+        // set snackbar message for task status
         if (response.data && response.data.task_result && response.data.task_result.message) {
           dispatch(set.dataFetchStatus(response.data.task_result.message));
         } else {
           dispatch(set.dataFetchStatus('idle'));
         }
-        if (response.data.task_status === 'SUCCESS') {
+
+        const { task_status } = response.data;
+        if (task_status === 'PENDING') {
+          setTimeout(() => fetchTask(taskId), fetchTimeout);
+        } else if (task_status === 'SUCCESS') {
           setData(response.data);
-          setTaskIsDone(true);
-          clearInterval(interval);
           dispatch(set.biomassFetchIsLoading(false));
-        } else if (response.data.task_status === 'FAILURE') {
-          setTaskIsDone(true);
-          clearInterval(interval);
+        } else if (task_status === 'FAILURE') {
           dispatch(set.biomassFetchIsLoading(false));
           dispatch(set.biomassFetchIsFailed(true));
         }
       })
       .catch(() => {
-        setTaskIsDone(true);
         dispatch(set.biomassFetchIsLoading(false));
-        clearInterval(interval);
+        dispatch(set.biomassFetchIsFailed(true));
       });
   };
 
+  // set raster object
   useEffect(() => {
     if (isSatelliteMode && data && data.task_result) {
       const values = JSON.parse(data.task_result.replace(/\bNaN\b/g, 'null'));
@@ -113,7 +120,10 @@ const useFetchHLS = () => {
       dispatch(set.biomassTaskResults(rasterObject));
     }
   }, [data, isSatelliteMode]);
+
   // .data_array.map(row => row.map(el => el*0.001))
+
+  // set biomass value
   useEffect(() => {
     if (isSatelliteMode && biomassTaskResults && biomassTaskResults.data_array) {
       const flattenedBiomass = biomassTaskResults.data_array.flat(1).filter((el) => el !== 0);
@@ -134,14 +144,6 @@ const useFetchHLS = () => {
     }
   }, [biomassTotalValue, unit]);
 
-  useEffect(() => {
-    if (biomassTaskId && !data && !taskIsDone) {
-      interval = setInterval(fetchTask, 200);
-    }
-    return () => {
-      clearInterval(interval);
-    };
-  }, [biomassTaskId]);
   return null;
 }; // useFetchHLS
 

@@ -1,5 +1,5 @@
 /* eslint-disable react-hooks/exhaustive-deps */
-import React, { useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import {
   Box, Card, Stack, ToggleButton, ToggleButtonGroup, Typography, styled,
@@ -7,6 +7,7 @@ import {
 import { useNavigate } from 'react-router-dom';
 import { get, set } from '../../store/Store';
 import NavButton from '../../shared/Navigate/NavButton';
+import About from '../About';
 
 const BiomassMethodButton = styled(ToggleButton)(() => ({
   '&.Mui-selected': {
@@ -33,6 +34,7 @@ const BiomassMethodButton = styled(ToggleButton)(() => ({
 }));
 
 const Home = () => {
+  const [aboutOpen, setAboutOpen] = useState(false);
   const dispatch = useDispatch();
   // const privacy = useSelector(get.privacy);
   const biomassCalcMode = useSelector(get.biomassCalcMode);
@@ -72,8 +74,8 @@ const Home = () => {
         </Box>
         <Box>
           <Typography variant="h6">
-            This calculator aids farmers with decision support regarding
-            cover crop residue persistence, as well as the amount and timing of nitrogen availability.
+            This calculator aids farmers with decision support regarding cover crop residue persistence, as well as the amount and timing of nitrogen
+            availability.
           </Typography>
         </Box>
       </Stack>
@@ -81,52 +83,29 @@ const Home = () => {
       <Stack spacing={2} direction="column">
         <Stack justifyContent="space-around" alignItems="center" sx={{ flexDirection: { sm: 'column', md: 'row' } }}>
           <Typography variant="h6"> Select biomass calculation method </Typography>
-          <ToggleButtonGroup
-            color="primary"
-            value={biomassCalcMode}
-            exclusive
-            onChange={handleChange}
-            aria-label="biomassCalcMode"
-          >
-            <BiomassMethodButton
-              value="sampled"
-            >
-              User Sampled
-            </BiomassMethodButton>
+          <ToggleButtonGroup color="primary" value={biomassCalcMode} exclusive onChange={handleChange} aria-label="biomassCalcMode">
+            <BiomassMethodButton value="sampled">User Sampled</BiomassMethodButton>
             {/* <Box sx={{ width: 10, borderRight: '2px solid black' }} /> */}
-            <BiomassMethodButton
-              value="satellite"
-            >
-              Satellite
-            </BiomassMethodButton>
+            <BiomassMethodButton value="satellite">Satellite</BiomassMethodButton>
           </ToggleButtonGroup>
         </Stack>
       </Stack>
       <Box sx={{ height: 100 }} />
       <Stack spacing={2} direction="row" justifyContent="space-around">
-        <NavButton
-          onClick={() => dispatch(set.openAboutModal(true))}
-          fontSize="1rem"
-        >
+        <NavButton onClick={() => setAboutOpen(true)} fontSize="1rem">
           About
         </NavButton>
         <NavButton
           onClick={() => {
-            if (biomassCalcMode === 'sampled') {
-              console.log('sampled path');
-              navigate('/location');
-            }
-            if (biomassCalcMode === 'satellite') {
-              console.log('satellite path');
-              navigate('/satpath');
-            }
-            return null;
+            navigate('/location');
+            dispatch(set.activeStep(1));
           }}
           fontSize="1rem"
         >
           Get Started
         </NavButton>
       </Stack>
+      <About open={aboutOpen} setOpen={setAboutOpen} />
     </Card>
   );
 }; // Home

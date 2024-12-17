@@ -13,7 +13,7 @@ import { AreaErrorModal, TaskFailModal } from './Warnings';
 import Datebox from './Datebox';
 // import useFetchHLS from '../../hooks/useFetchHLS';
 
-const Biomass = () => {
+const BiomassData = () => {
   const mapPolygon = useSelector(get.mapPolygon);
   const biomassTotalValue = useSelector(get.biomassTotalValue);
   const biomassFetchIsFailed = useSelector(get.biomassFetchIsFailed);
@@ -94,4 +94,4 @@ const Biomass = () => {
     </Box>
   ); // Biomass
 };
-export default Biomass;
+export default BiomassData;

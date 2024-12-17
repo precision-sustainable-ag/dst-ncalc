@@ -1,22 +1,14 @@
-/* eslint-disable no-alert */
 import React from 'react';
-import {
-  Box,
-  Button,
-  Modal,
-  Paper,
-  Typography,
-} from '@mui/material';
 import { useSelector, useDispatch } from 'react-redux';
+import { Paper, Box, Button, Typography } from '@mui/material';
+import { PSAModal } from 'shared-react-components/src';
 import CancelPresentationIcon from '@mui/icons-material/CancelPresentation';
-import Input from '../../shared/Inputs';
 import { get, set } from '../../store/Store';
-import NavButton from '../../shared/Navigate/NavButton';
-
-import './styles.scss';
+import { PSAForm } from 'shared-react-components/src';
 
 const Feedback = () => {
   const dispatch = useDispatch();
+
   const BD = useSelector(get.BD);
   const OM = useSelector(get.OM);
   const lat = useSelector(get.lat);
@@ -45,108 +37,115 @@ const Feedback = () => {
   const openFeedbackModal = useSelector(get.openFeedbackModal);
   const handleCloseModal = () => dispatch(set.openFeedbackModal(false));
 
-  const submit = (e) => {
-    if (!feedback.trim()) {
-      alert('Please enter Feedback before submitting.');
-      return;
-    } if (!name.trim()) {
-      alert('Please enter Name before submitting.');
-      return;
-    } if (!email.trim()) {
-      alert('Please enter Email before submitting.');
-      return;
-    }
-
-    e.target.disabled = true;
-
-    fetch(
-      'https://api.precisionsustainableag.org/cc-ncalc/feedback',
-      {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-          feedback: `
-Name: ${name.replace(/"/g, '')}
-Email: ${email.replace(/"/g, '')}
-Feedback:
-${feedback.replace(/"/g, '')}
-__________________________________
-field        : ${field.replace(/"/g, '')}
-targetN      : ${targetN}
-coverCrop    : ${coverCrop}
-killDate     : ${coverCropTerminationDate}
-cashCrop     : ${cashCrop}
-plantingDate : ${cashCropPlantingDate}
-lat          : ${lat}
-lon          : ${lon}
-N            : ${N}
-InorganicN   : ${InorganicN}
-carb         : ${carb}
-cell         : ${cell}
-lign         : ${lign}
-lwc          : ${lwc}
-biomass      : ${biomass}
-OM           : ${OM}
-BD           : ${BD}
-yield        : ${Yield}
-__________________________________
-          `,
-        }),
+  const fields = [
+    {
+      name: 'feedback',
+      label: 'Feedback',
+      type: 'text',
+      required: true,
+      description: 'Enter your feedback or suggestions.',
+      props: {
+        placeholder: 'Provide your feedback here',
+        multiline: true,
+        rows: 4,
+        fullWidth: true
       },
-    )
+    },
+    {
+      name: 'name',
+      label: 'Name',
+      type: 'text',
+      required: true,
+      description: 'Enter your name.',
+      props: { placeholder: 'Your name' },
+    },
+    {
+      name: 'email',
+      label: 'Email',
+      type: 'text',
+      required: true,
+      description: 'Enter your email address.',
+      props: { placeholder: 'Your email' },
+    },
+  ];
+
+  const submitFeedback = (formData) => {
+    const comments = `
+      ${formData.feedback}
+      __________________________________
+      field        : ${field}
+      targetN      : ${targetN}
+      coverCrop    : ${coverCrop}
+      killDate     : ${coverCropTerminationDate}
+      cashCrop     : ${cashCrop}
+      plantingDate : ${cashCropPlantingDate}
+      lat          : ${lat}
+      lon          : ${lon}
+      N            : ${N}
+      InorganicN   : ${InorganicN}
+      carb         : ${carb}
+      cell         : ${cell}
+      lign         : ${lign}
+      lwc          : ${lwc}
+      biomass      : ${biomass}
+      OM           : ${OM}
+      BD           : ${BD}
+      yield        : ${Yield}
+      __________________________________
+    `;
+
+    const requestPayload = {
+      repository: 'dst-feedback',
+      title: 'Feedback',
+      name: formData.name,
+      email: formData.email,
+      comments,
+      labels: ['cc-ncalc'],
+    };
+
+    fetch('https://developfeedback.covercrop-data.org/v1/issues', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify(requestPayload),
+    })
       .then((response) => response.json())
-      .then(() => {
-        e.target.disabled = false;
-        alert(`
-          Thank you for the feedback!
-          We will contact you if we have any updates or questions.
-        `);
-      });
-  }; // submit
+      .then((body) => {
+        if (body.data.status === 'success') {
+          alert(`
+            Thank you for the feedback!
+            We will contact you if we have any updates or questions.
+          `);
+        } else {
+          alert('Failed to send Feedback to Github.');
+        }
+      })
+      .catch(() => alert('Failed to send Feedback to Github.'));
+  };
 
   return (
-    <Modal
+    <PSAModal
       open={openFeedbackModal}
       onClose={handleCloseModal}
       aria-labelledby="modal-modal-title"
       aria-describedby="modal-modal-description"
       style={{
         display: 'flex',
-        top: '0%',
-        left: '10%',
-        width: '80vw',
         alignItems: 'center',
         justifyContent: 'center',
       }}
-    >
-      <Paper>
-        <Box
-          sx={{
-            padding: '0rem 2rem',
-            overflow: 'auto',
-            fontFamily: 'monospace !important',
-          }}
-        >
-          <Box
-            sx={{
-              display: 'flex',
-              flexDirection: 'row',
-              minWidth: '100%',
-              justifyContent: 'flex-end',
-              maxHeight: 'auto',
-              p: 0,
-              m: 0,
-              marginLeft: '2rem',
-            }}
-          >
+      modalContent={
+      <Paper style={{ width: '80vw', maxHeight: '90vh', overflow: 'auto' }}>
+        <Box sx={{ padding: '2rem', fontFamily: 'monospace !important' }}>
+          <Box sx={{ display: 'flex', justifyContent: 'flex-end' }}>
             <Button size="small" onClick={handleCloseModal}>
               <CancelPresentationIcon sx={{ fontSize: '2rem' }} />
             </Button>
           </Box>
-          <Typography pb="1rem" sx={{ fontSize: '1.2rem', fontWeight: 700 }}>CC-NCALC Feedback</Typography>
-
+          <Typography pb="1rem" sx={{ fontSize: '1.2rem', fontWeight: 700 }}>
+            CC-NCALC Feedback
+          </Typography>
           <Typography variant="feedback">
             Please provide any comments or suggestions that will help us improve the tool.
           </Typography>
@@ -159,31 +158,24 @@ __________________________________
             Please delete any personal information that you do not wish to share with us.
             <span style={{ display: 'none' }}>You can attach a screenshot of your feedback below.</span>
           </Typography>
-          <div
-            id="Feedback"
-            contentEditable
-            placeholder="Enter comments here"
-            // eslint-disable-next-line react/no-danger
-            dangerouslySetInnerHTML={{ __html: feedback }}
-            onBlur={(e) => dispatch(set.feedback(e.currentTarget.innerText.replace(/[\n\r]/g, '<br>')))}
+          <PSAForm
+            submitMessage="Thank you for the feedback! We will contact you if we have any updates or questions."
+            repository="dst-feedback"
+            fields={fields}
+            buttons={[
+              {
+                action: "submit",
+                props: { title: 'Submit', variant: 'contained', color: 'primary', children: 'Submit' }, 
+              },
+            ]}
+            handleSubmit={submitFeedback}
           />
-          <Box>
-            <Typography>Name</Typography>
-            <Input id="name" />
-            <Typography>Email</Typography>
-            <Input type="email" id="email" />
-            <Box py="1rem">
-              <NavButton onClick={(e) => submit(e)}>
-                Submit
-              </NavButton>
-            </Box>
-          </Box>
         </Box>
       </Paper>
-    </Modal>
-  );
-}; // Feedback
+      }
+    />
 
-Feedback.desc = 'FEEDBACK';
+  );
+};
 
 export default Feedback;

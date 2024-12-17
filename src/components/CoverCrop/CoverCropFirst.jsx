@@ -3,9 +3,7 @@
 import React, { useEffect, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { useNavigate } from 'react-router-dom';
-import Radio from '@mui/material/Radio';
-import RadioGroup from '@mui/material/RadioGroup';
-import FormControlLabel from '@mui/material/FormControlLabel';
+import { PSARadiobutton } from 'shared-react-components/src';
 import Typography from '@mui/material/Typography';
 import Box from '@mui/material/Box';
 import Snackbar from '@mui/material/Snackbar';
@@ -22,7 +20,7 @@ import GrowthStageInput from './GrowthStageInput';
 import Input from '../../shared/Inputs';
 import Myslider from '../../shared/Slider';
 import Help from '../../shared/Help';
-import Biomass from '../../shared/Biomass';
+import BiomassData from '../../shared/BiomassData';
 import Required from '../../shared/Required';
 import NavButton from '../../shared/Navigate/NavButton';
 import { useFetchPlantFactors } from '../../hooks/useFetchApi';
@@ -47,8 +45,8 @@ const CoverCropFirst = ({ barebone = false }) => {
   const max = isSatelliteMode
     ? maxBiomass[coverCrop]
     : coverCrop && coverCrop.length && Array.isArray(coverCrop)
-    ? coverCrop.map((s) => maxBiomass[s]).sort((a, b) => b - a)[0] || 15000
-    : 15000;
+      ? coverCrop.map((s) => maxBiomass[s]).sort((a, b) => b - a)[0] || 15000
+      : 15000;
   const freshMax = max * 4 || 30000;
   const biomass = useSelector(get.biomass);
   const unit = useSelector(get.unit);
@@ -134,22 +132,20 @@ const CoverCropFirst = ({ barebone = false }) => {
             <Paper mt={2}>
               <Stack m={2} direction="row" alignItems="center">
                 <Typography>Biomass Unit: &nbsp;</Typography>
-                <RadioGroup row aria-label="position" name="position" style={{ display: 'inline-block', marginLeft: '1em' }}>
-                  <FormControlLabel
-                    value="lb/ac"
-                    control={<Radio id="unit" checked={unit === 'lb/ac'} />}
-                    onChange={() => dispatch(set.unit('lb/ac'))}
-                    label="lb/ac"
-                  />
-                  <FormControlLabel
-                    value="kg/ha"
-                    control={<Radio id="unit" checked={unit === 'kg/ha'} />}
-                    onChange={() => dispatch(set.unit('kg/ha'))}
-                    label="kg/ha"
-                  />
-                </RadioGroup>
+                <PSARadiobutton
+                  options={[
+                    { label: 'lb/ac', value: 'lb/ac' },
+                    { label: 'kg/ha', value: 'kg/ha' },
+                  ]}
+                  selectedValue={unit}
+                  onChange={(value) => dispatch(set.unit(value))}
+                  row
+                  sx={{ marginLeft: '1em', display: 'inline-block' }}
+                  aria-label="position" 
+                  name="position"
+                />
               </Stack>
-              {!barebone && <Biomass minified={false} />}
+              {!barebone && <BiomassData minified={false} />}
             </Paper>
           ) : (
             <>
@@ -158,12 +154,6 @@ const CoverCropFirst = ({ barebone = false }) => {
                 {!coverCropTerminationDate && <Required />}
               </Stack>
               <Input type="date" id="coverCropTerminationDate" />
-            </>
-          )}
-          {isSatelliteMode ? (
-            ''
-          ) : (
-            <>
               <Box
                 mt={1}
                 sx={{
@@ -187,20 +177,18 @@ const CoverCropFirst = ({ barebone = false }) => {
                   {!biomass && <Required />}
                 </Stack>
                 :
-                <RadioGroup row aria-label="position" name="position" style={{ display: 'inline-block', marginLeft: '1em' }}>
-                  <FormControlLabel
-                    value="lb/ac"
-                    control={<Radio id="unit" checked={unit === 'lb/ac'} />}
-                    onChange={() => dispatch(set.unit('lb/ac'))}
-                    label="lb/ac"
-                  />
-                  <FormControlLabel
-                    value="kg/ha"
-                    control={<Radio id="unit" checked={unit === 'kg/ha'} />}
-                    onChange={() => dispatch(set.unit('kg/ha'))}
-                    label="kg/ha"
-                  />
-                </RadioGroup>
+                <PSARadiobutton
+                  options={[
+                    { label: 'lb/ac', value: 'lb/ac' },
+                    { label: 'kg/ha', value: 'kg/ha' },
+                  ]}
+                  selectedValue={unit}
+                  onChange={(value) => dispatch(set.unit(value))}
+                  row
+                  sx={{ marginLeft: '1em', display: 'inline-block' }}
+                  aria-label="position" 
+                  name="position"
+                />
               </Box>
 
               <Myslider id="biomass" min={0} max={max} />
@@ -257,7 +245,14 @@ const CoverCropFirst = ({ barebone = false }) => {
             }}
             mt={4}
           >
-            <NavButton onClick={() => navigate('/soil')}>BACK</NavButton>
+            <NavButton
+              onClick={() => {
+                dispatch(set.activeStep(2));
+                navigate('/soil');
+              }}
+            >
+              BACK
+            </NavButton>
             <NavButton onClick={() => navigate('/covercrop2')} disabled={disableNextButton}>
               NEXT
             </NavButton>
