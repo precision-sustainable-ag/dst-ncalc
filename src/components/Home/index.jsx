@@ -48,11 +48,8 @@ const Home = () => {
   const handleChange = (event, newValue) => {
     if (newValue === null) return;
     dispatch(set.biomassCalcMode(newValue));
-  };
-
-  useEffect(() => {
     dispatch(set.coverCrop([]));
-  }, [biomassCalcMode]);
+  };
 
   const navigate = useNavigate();
   // const className = privacy ? 'home background' : 'home';

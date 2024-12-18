@@ -44,7 +44,7 @@ const CustomTypography = styled(Typography)(() => ({
   borderRadius: 0,
   padding: '0 5px 0 2px',
   fontWeight: 300,
-  fontSize: 14,
+  fontSize: 16,
   '&:hover': {
     cursor: 'help',
   },
@@ -55,11 +55,7 @@ const CustomTypography = styled(Typography)(() => ({
 
 const SummaryItem = ({ name, value, desc }) => {
   return (
-    <Box
-      sx={{
-        padding: 1,
-      }}
-    >
+    <Box>
       <Stack direction="row">
         <CustomWidthTooltip
           arrow
@@ -77,7 +73,7 @@ const SummaryItem = ({ name, value, desc }) => {
             <Stack direction="column">
               {
                 value.map((k, ix) => (
-                  <Typography key={'summItem'.concat(String(ix))} sx={{ fontWeight: 600, fontSize: 11 }}>
+                  <Typography key={'summItem'.concat(String(ix))} sx={{ fontWeight: 600, fontSize: 16 }}>
                     {k}
                   </Typography>
                 ))
@@ -85,7 +81,7 @@ const SummaryItem = ({ name, value, desc }) => {
             </Stack>
           )
           : (
-            <Typography sx={{ fontWeight: 600, fontSize: 13 }}>
+            <Typography sx={{ fontWeight: 600, fontSize: 16 }}>
               {value}
             </Typography>
           )}

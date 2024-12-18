@@ -1,5 +1,5 @@
 /* eslint-disable operator-linebreak */
-import React from 'react';
+import React, { useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { useNavigate } from 'react-router-dom';
 import {
@@ -8,7 +8,6 @@ import {
 import { PSATextField } from 'shared-react-components/src';
 import { get, set } from '../../store/Store';
 import Myslider from '../../shared/Slider';
-import Input from '../../shared/Inputs';
 import Help from '../../shared/Help';
 import Required from '../../shared/Required';
 import NavButton from '../../shared/Navigate/NavButton';
@@ -31,6 +30,8 @@ const CashCrop = ({ barebone = false }) => {
   const Yield = useSelector(get.yield);
   const cashCropPlantingDate = useSelector(get.cashCropPlantingDate);
   const crops = useFetchCropNames();
+
+  const [plantingDate, setPlantingDate] = useState(cashCropPlantingDate);
 
   return (
     <Box
@@ -94,8 +95,14 @@ const CashCrop = ({ barebone = false }) => {
             <CustomInputText>Cash Crop Planting Date: </CustomInputText>
             {!cashCropPlantingDate && <Required />}
           </Stack>
-          <Input type="date" id="cashCropPlantingDate" />
-
+          <PSATextField
+            type="date"
+            value={plantingDate}
+            onChange={(e) => {
+              setPlantingDate(e.target.value);
+              dispatch(set.cashCropPlantingDate(e.target.value));
+            }}
+          />
           {cashCrop === 'Corn' && (
             <Box mt={2}>
               <Stack direction="row" alignItems="center">
