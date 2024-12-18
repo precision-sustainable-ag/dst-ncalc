@@ -1,13 +1,7 @@
 import React from 'react';
-import {
-  Button,
-  Dialog,
-  DialogActions,
-  DialogContent,
-  DialogContentText,
-  DialogTitle,
-} from '@mui/material';
+import { Dialog, DialogActions, DialogContent, DialogContentText, DialogTitle } from '@mui/material';
 import { useSelector, useDispatch } from 'react-redux';
+import { PSAButton } from 'shared-react-components/src';
 import { get, set } from '../../store/Store';
 
 const AreaErrorModal = () => {
@@ -26,19 +20,18 @@ const AreaErrorModal = () => {
       <DialogTitle id="alert-dialog-title">Large Area Warning!</DialogTitle>
       <DialogContent>
         <DialogContentText id="alert-dialog-description">
-          The area selected is too large to calculate. Please select a smaller region under
-          10000 Acres. Please delete the current polygon and draw a new one.
+          The area selected is too large to calculate. Please select a smaller region under 10000 Acres. Please delete the current polygon and draw a
+          new one.
         </DialogContentText>
       </DialogContent>
       <DialogActions>
-        <Button
+        <PSAButton
+          title="Close"
           onClick={() => {
             dispatch(set.polyDrawTooBig(false));
           }}
           autoFocus
-        >
-          close
-        </Button>
+        />
       </DialogActions>
     </Dialog>
   );
@@ -61,21 +54,18 @@ const TaskFailModal = ({ task }) => {
     >
       <DialogTitle id="alert-dialog-title">Server Failed</DialogTitle>
       <DialogContent>
-        <DialogContentText id="alert-dialog-description">
-          Task failed to complete. Please try again.
-        </DialogContentText>
+        <DialogContentText id="alert-dialog-description">Task failed to complete. Please try again.</DialogContentText>
       </DialogContent>
       <DialogActions>
-        <Button
+        <PSAButton
+          title="Close"
           onClick={() => {
             if (task === 'biomass') {
               dispatch(set.biomassFetchIsFailed(false));
             }
           }}
           autoFocus
-        >
-          close
-        </Button>
+        />
       </DialogActions>
     </Dialog>
   );

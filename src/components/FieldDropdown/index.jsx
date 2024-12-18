@@ -4,16 +4,15 @@ import React, { useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { useLocation, useNavigate } from 'react-router-dom';
 import moment from 'moment';
-import Button from '@mui/material/Button';
 import Dialog from '@mui/material/Dialog';
 import DialogTitle from '@mui/material/DialogTitle';
 import DialogActions from '@mui/material/DialogActions';
 import DialogContent from '@mui/material/DialogContent';
 import DialogContentText from '@mui/material/DialogContentText';
+import { PSAButton, PSADropdown } from 'shared-react-components/src';
 import { useFetchSampleBiomass } from '../../hooks/useFetchStatic';
 import { downloadOutputCSV } from '../../hooks/helpers';
 import { set, get } from '../../store/redux-autosetters';
-import { PSADropdown } from 'shared-react-components/src';
 
 const examples = {};
 
@@ -23,7 +22,6 @@ const FieldDropdown = () => {
   const dispatch = useDispatch();
   const navigate = useNavigate();
   const { pathname } = useLocation();
-
 
   // TODO: PSA is always false currently in prod and devs
   // In Home page: if (window.location.toString().includes('PSA'))dispatch(set.PSA(true));
@@ -222,7 +220,7 @@ const FieldDropdown = () => {
   return (
     <div className="Init desktop">
       <PSADropdown
-        label={PSA ? "examples" : ""}
+        label={PSA ? 'examples' : ''}
         items={
           PSA
             ? [
@@ -272,7 +270,7 @@ const FieldDropdown = () => {
           'data-test': 'dropdown-fields',
         }}
         formSx={{ minWidth: 200 }}
-        menuSx={{ fontWeight: "bold", color: "white", backgroundColor: "green", }}
+        menuSx={{ fontWeight: 'bold', color: 'white', backgroundColor: 'green' }}
       />
 
       {downloadCSVFailed && (
@@ -284,14 +282,10 @@ const FieldDropdown = () => {
         >
           <DialogTitle id="alert-dialog-title">Download Failed</DialogTitle>
           <DialogContent>
-            <DialogContentText id="alert-dialog-description">
-              Download of CSV Failed. Please try again.
-            </DialogContentText>
+            <DialogContentText id="alert-dialog-description">Download of CSV Failed. Please try again.</DialogContentText>
           </DialogContent>
           <DialogActions>
-            <Button onClick={() => setDownloadCSVFailed(false)} autoFocus>
-              Close
-            </Button>
+            <PSAButton buttonType="LightButton" title="Close" onClick={() => setDownloadCSVFailed(false)} autoFocus />
           </DialogActions>
         </Dialog>
       )}

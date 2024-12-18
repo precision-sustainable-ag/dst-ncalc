@@ -1,10 +1,11 @@
 import React from 'react';
 import { useSelector, useDispatch } from 'react-redux';
-import { Paper, Box, Button, Typography } from '@mui/material';
-import { PSAModal } from 'shared-react-components/src';
+import {
+  Paper, Box, Typography,
+} from '@mui/material';
+import { PSAModal, PSAForm, PSAFigmaButton } from 'shared-react-components/src';
 import CancelPresentationIcon from '@mui/icons-material/CancelPresentation';
 import { get, set } from '../../store/Store';
-import { PSAForm } from 'shared-react-components/src';
 
 const Feedback = () => {
   const dispatch = useDispatch();
@@ -48,7 +49,7 @@ const Feedback = () => {
         placeholder: 'Provide your feedback here',
         multiline: true,
         rows: 4,
-        fullWidth: true
+        fullWidth: true,
       },
     },
     {
@@ -135,44 +136,44 @@ const Feedback = () => {
         alignItems: 'center',
         justifyContent: 'center',
       }}
-      modalContent={
-      <Paper style={{ width: '80vw', maxHeight: '90vh', overflow: 'auto' }}>
-        <Box sx={{ padding: '2rem', fontFamily: 'monospace !important' }}>
-          <Box sx={{ display: 'flex', justifyContent: 'flex-end' }}>
-            <Button size="small" onClick={handleCloseModal}>
-              <CancelPresentationIcon sx={{ fontSize: '2rem' }} />
-            </Button>
-          </Box>
-          <Typography pb="1rem" sx={{ fontSize: '1.2rem', fontWeight: 700 }}>
-            CC-NCALC Feedback
-          </Typography>
-          <Typography variant="feedback">
-            Please provide any comments or suggestions that will help us improve the tool.
-          </Typography>
-          <Typography variant="feedback" pb="1rem">
-            Include any difficulties you may have encountered while running the program.
-          </Typography>
+      modalContent={(
+        <Paper style={{ width: '80vw', maxHeight: '90vh', overflow: 'auto' }}>
+          <Box sx={{ padding: '2rem', fontFamily: 'monospace !important' }}>
+            <Box sx={{ display: 'flex', justifyContent: 'flex-end' }}>
+              <PSAFigmaButton variant="color" onClick={handleCloseModal} leftIcon text="" icon={<CancelPresentationIcon />} />
+            </Box>
+            <Typography pb="1rem" sx={{ fontSize: '1.2rem', fontWeight: 700 }}>
+              CC-NCALC Feedback
+            </Typography>
+            <Typography variant="feedback">
+              Please provide any comments or suggestions that will help us improve the tool.
+            </Typography>
+            <Typography variant="feedback" pb="1rem">
+              Include any difficulties you may have encountered while running the program.
+            </Typography>
 
-          <Typography variant="feedback">
-            Note that your inputs will be sent to us along with your feedback, in order to help us troubleshoot.
-            Please delete any personal information that you do not wish to share with us.
-            <span style={{ display: 'none' }}>You can attach a screenshot of your feedback below.</span>
-          </Typography>
-          <PSAForm
-            submitMessage="Thank you for the feedback! We will contact you if we have any updates or questions."
-            repository="dst-feedback"
-            fields={fields}
-            buttons={[
-              {
-                action: "submit",
-                props: { title: 'Submit', variant: 'contained', color: 'primary', children: 'Submit' }, 
-              },
-            ]}
-            handleSubmit={submitFeedback}
-          />
-        </Box>
-      </Paper>
-      }
+            <Typography variant="feedback">
+              Note that your inputs will be sent to us along with your feedback, in order to help us troubleshoot.
+              Please delete any personal information that you do not wish to share with us.
+              <span style={{ display: 'none' }}>You can attach a screenshot of your feedback below.</span>
+            </Typography>
+            <PSAForm
+              submitMessage="Thank you for the feedback! We will contact you if we have any updates or questions."
+              repository="dst-feedback"
+              fields={fields}
+              buttons={[
+                {
+                  action: 'submit',
+                  props: {
+                    title: 'Submit', variant: 'contained', color: 'primary', children: 'Submit',
+                  },
+                },
+              ]}
+              handleSubmit={submitFeedback}
+            />
+          </Box>
+        </Paper>
+    )}
     />
 
   );
