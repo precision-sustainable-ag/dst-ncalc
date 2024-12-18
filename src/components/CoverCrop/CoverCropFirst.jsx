@@ -3,7 +3,7 @@
 import React, { useEffect, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { useNavigate } from 'react-router-dom';
-import { PSARadiobutton, PSATextField } from 'shared-react-components/src';
+import { PSARadioButton, PSATextField } from 'shared-react-components/src';
 import Typography from '@mui/material/Typography';
 import Box from '@mui/material/Box';
 import Snackbar from '@mui/material/Snackbar';
@@ -132,7 +132,7 @@ const CoverCropFirst = ({ barebone = false }) => {
             <Paper mt={2}>
               <Stack m={2} direction="row" alignItems="center">
                 <Typography>Biomass Unit: &nbsp;</Typography>
-                <PSARadiobutton
+                <PSARadioButton
                   options={[
                     { label: 'lb/ac', value: 'lb/ac' },
                     { label: 'kg/ha', value: 'kg/ha' },
@@ -184,7 +184,7 @@ const CoverCropFirst = ({ barebone = false }) => {
                   {!biomass && <Required />}
                 </Stack>
                 :
-                <PSARadiobutton
+                <PSARadioButton
                   options={[
                     { label: 'lb/ac', value: 'lb/ac' },
                     { label: 'kg/ha', value: 'kg/ha' },

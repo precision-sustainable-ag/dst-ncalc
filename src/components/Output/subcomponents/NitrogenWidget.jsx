@@ -15,7 +15,7 @@ import {
 import Highcharts from 'highcharts';
 import HighchartsReact from 'highcharts-react-official';
 import { useDispatch, useSelector } from 'react-redux';
-import { PSALoadingspinner } from 'shared-react-components/src';
+import { PSALoadingSpinner } from 'shared-react-components/src';
 import {
   getGeneralChartOptions,
   getNitrogenChartOptions,
@@ -147,7 +147,7 @@ const NitrogenCard = ({ refVal }) => {
             alignItems: 'center',
             position: 'abosolute',
           }}>
-            <PSALoadingspinner />
+            <PSALoadingSpinner />
           </div>
         );
         chartRef1.current.chart.showLoading(spinnerHtml);

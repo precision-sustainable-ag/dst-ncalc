@@ -15,7 +15,7 @@ import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
 import AccordionSummary from '@mui/material/AccordionSummary';
 import AccordionDetails from '@mui/material/AccordionDetails';
 import { useDispatch, useSelector } from 'react-redux';
-import { PSALoadingspinner, PSATooltip, PSATextField } from 'shared-react-components/src';
+import { PSALoadingSpinner, PSATooltip, PSATextField } from 'shared-react-components/src';
 import BiomassMap from '../../shared/Map/BiomassMap';
 // import NitrogenMap from '../Map/NitrogenMap';
 import Help from '../../shared/Help';
@@ -132,7 +132,7 @@ const Location = ({ barebone = false }) => {
                   minHeight: '100px',
                 }}
               >
-                <PSALoadingspinner />
+                <PSALoadingSpinner />
               </Grid>
               <Typography variant="h6" fontWeight="bold" gutterBottom textAlign="center">
                 Calculating Biomass ...
