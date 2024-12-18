@@ -1,6 +1,7 @@
 import React from 'react';
 import { useSelector, useDispatch } from 'react-redux';
-import { Modal, Paper, Box, Button, Typography } from '@mui/material';
+import { Paper, Box, Button, Typography } from '@mui/material';
+import { PSAModal } from 'shared-react-components/src';
 import CancelPresentationIcon from '@mui/icons-material/CancelPresentation';
 import { get, set } from '../../store/Store';
 import { PSAForm } from 'shared-react-components/src';
@@ -124,7 +125,7 @@ const Feedback = () => {
   };
 
   return (
-    <Modal
+    <PSAModal
       open={openFeedbackModal}
       onClose={handleCloseModal}
       aria-labelledby="modal-modal-title"
@@ -134,7 +135,7 @@ const Feedback = () => {
         alignItems: 'center',
         justifyContent: 'center',
       }}
-    >
+      modalContent={
       <Paper style={{ width: '80vw', maxHeight: '90vh', overflow: 'auto' }}>
         <Box sx={{ padding: '2rem', fontFamily: 'monospace !important' }}>
           <Box sx={{ display: 'flex', justifyContent: 'flex-end' }}>
@@ -171,7 +172,8 @@ const Feedback = () => {
           />
         </Box>
       </Paper>
-    </Modal>
+      }
+    />
 
   );
 };

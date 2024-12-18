@@ -109,7 +109,6 @@ const ResponsiveNavBar = ({ screens }) => {
   useEffect(() => {
     setActiveMenu(location.pathname.replace('/', '').replace('2', ''));
   }, [location]);
-  console.log('123', screens);
 
   return (
     <AppBar
@@ -287,22 +286,24 @@ const ResponsiveNavBar = ({ screens }) => {
         </Toolbar>
         <Toolbar disableGutters>
           <Box sx={{ flexGrow: 0 }}>
-            <PSATooltip title="Open settings" tooltipContent={(
-              <IconButton
-                onClick={handleOpenUserMenu}
-                sx={{
-                  width: '3rem',
-                  height: '3rem',
-                  borderRadius: '0.5rem',
-                  color: 'black',
-                  backgroundColor: 'white',
-                  '&:hover': {
-                    backgroundColor: '#f5f5f5',
-                  },
-                }}
-              >
-                <MoreVertIcon />
-              </IconButton> 
+            <PSATooltip
+              title="Open settings"
+              tooltipContent={(
+                <IconButton
+                  onClick={handleOpenUserMenu}
+                  sx={{
+                    width: '3rem',
+                    height: '3rem',
+                    borderRadius: '0.5rem',
+                    color: 'black',
+                    backgroundColor: 'white',
+                    '&:hover': {
+                      backgroundColor: '#f5f5f5',
+                    },
+                  }}
+                >
+                  <MoreVertIcon />
+                </IconButton>
               )}
             />
             <Menu
