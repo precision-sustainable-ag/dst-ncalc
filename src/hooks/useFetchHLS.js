@@ -11,7 +11,7 @@ import { get, set } from '../store/Store';
 
 const arrayAverage = (arr) => arr.reduce((p, c) => p + c, 0) / arr.length;
 const HLS_API_URL = 'https://covercrop-imagery.org';
-const fetchTimeout = 500;
+const fetchTimeout = 750;
 
 /// Desc: useFetchHLS
 /// ..............................................................................

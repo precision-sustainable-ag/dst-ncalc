@@ -6,6 +6,7 @@ import moment from 'moment';
 import { useDispatch, useSelector } from 'react-redux';
 import { get, set } from '../store/Store';
 import { weightedAverage } from './helpers';
+import { historyStates } from '../store/inits';
 
 const NCAL_API_URL = 'https://api.covercrop-ncalc.org/surface';
 const SSURGO_API_URL = 'https://ssurgo.covercrop-data.org';
@@ -18,8 +19,8 @@ const PLANTFACTORS_API_URL = 'https://api.covercrop-imagery.org';
 /// ..............................................................................
 /// ..............................................................................
 //
+/** fetch cornN data(used for model calculation in Released Nitrogen chart) */
 const useFetchCornN = () => {
-  const [endDate, setEndDate] = useState(null);
   const [cornData, setCornData] = useState(null);
   const dispatch = useDispatch();
   const lat = useSelector(get.lat);
@@ -27,16 +28,10 @@ const useFetchCornN = () => {
   const cashCropPlantingDate = useSelector(get.cashCropPlantingDate);
 
   useEffect(() => {
-    const end = moment(cashCropPlantingDate)
-      .add(110, 'days')
-      .add(1, 'hour')
-      .format('yyyy-MM-DD');
-    setEndDate(end);
+    const end = moment(cashCropPlantingDate).add(110, 'days').add(1, 'hour').format('yyyy-MM-DD');
     dispatch(set.errorCorn(false));
     // eslint-disable-next-line max-len
-    const url = `${WEATHER_API_URL}/hourly?lat=${lat}&lon=${lon}&start=${moment(
-      cashCropPlantingDate,
-    ).format(
+    const url = `${WEATHER_API_URL}/hourly?lat=${lat}&lon=${lon}&start=${moment(cashCropPlantingDate).format(
       'yyyy-MM-DD',
     )}&end=${end}&attributes=air_temperature&options=predicted`;
     axios
@@ -52,7 +47,7 @@ const useFetchCornN = () => {
       .catch((error) => {
         console.log(error);
       });
-  }, [cashCropPlantingDate, endDate]);
+  }, []);
   return cornData;
 }; // fetchCornN
 
@@ -61,38 +56,18 @@ const useFetchCornN = () => {
 /// ..............................................................................
 //
 const useFetchModel = ({
-  lat,
-  lon,
-  N,
-  OM,
-  BD,
-  unit,
-  coverCropTerminationDate,
-  cashCropPlantingDate,
-  carb,
-  cell,
-  lign,
-  biomass,
-  lwc,
-  InorganicN,
+  lat, lon, N, OM, BD, unit, coverCropTerminationDate, cashCropPlantingDate, carb, cell, lign, biomass, lwc, InorganicN,
 }) => {
   // eslint-disable-next-line no-unused-vars
   const [isDatesValid, setIsDatesValid] = useState(null);
   const [model, setModel] = useState(null);
   const dispatch = useDispatch();
 
-  const start = moment(coverCropTerminationDate)
-    .add(1, 'hour')
-    .format('yyyy-MM-DD');
-  const end = moment(cashCropPlantingDate)
-    .add(110, 'days')
-    .add(1, 'hour')
-    .format('yyyy-MM-DD');
+  const start = moment(coverCropTerminationDate).add(1, 'hour').format('yyyy-MM-DD');
+  const end = moment(cashCropPlantingDate).add(110, 'days').add(1, 'hour').format('yyyy-MM-DD');
 
   useEffect(() => {
-    const validity = start !== 'Invalid date'
-      && end !== 'Invalid date'
-      && moment(end) > moment(start);
+    const validity = start !== 'Invalid date' && end !== 'Invalid date' && moment(end) > moment(start);
     setIsDatesValid(validity);
     if (!validity) {
       console.log('invalid dates for fetch Model'); // eslint-disable-line no-console
@@ -157,7 +132,7 @@ const useFetchModel = ({
           console.log(error);
         });
     }
-  }, [cashCropPlantingDate, coverCropTerminationDate, end, start]);
+  }, []);
 
   return model;
 };
@@ -174,6 +149,7 @@ const useFetchSSURGO = () => {
   const lat = useSelector(get.lat);
   const lon = useSelector(get.lon);
   const field = useSelector(get.field);
+  const { historyState } = useSelector(get.user);
 
   useEffect(() => {
     // if ssurgo data need to be updated(map location change), set ssurgo to null
@@ -181,7 +157,7 @@ const useFetchSSURGO = () => {
       dispatch(set.SSURGO(null));
     }
     // exclude example fields
-    if (!field.includes('Example') && (!SSURGO || updateSSURGO)) {
+    if ((!SSURGO || updateSSURGO)) {
       const url = `${SSURGO_API_URL}/?lat=${lat}&lon=${lon}&component=major`;
       axios
         .get(url)
@@ -194,8 +170,10 @@ const useFetchSSURGO = () => {
             let filteredData = data.data.filter((d) => d.desgnmaster !== 'O');
             const minhzdept = Math.min(...filteredData.map((d) => d.hzdept_r));
             filteredData = filteredData.filter((d) => +d.hzdept_r === +minhzdept);
-            dispatch(set.BD(weightedAverage(filteredData, 'dbthirdbar_r')));
-            dispatch(set.OM(weightedAverage(filteredData, 'om_r')));
+            if (historyState !== historyStates.imported) {
+              dispatch(set.BD(weightedAverage(filteredData, 'dbthirdbar_r')));
+              dispatch(set.OM(weightedAverage(filteredData, 'om_r')));
+            }
             dispatch(set.SSURGO(filteredData));
             dispatch(set.updateSSURGO(false));
           }
@@ -276,7 +254,7 @@ const useFetchPlantFactors = () => {
 /// ..............................................................................
 /// ..............................................................................
 //
-/** Fetch nitrogen task result ( will only work in satellite mode and will generate raster for the nitrogen map) */
+/** only work in satellite mode */
 const useFetchNitrogenArray = () => {
   const dispatch = useDispatch();
   const N = useSelector(get.N);
@@ -312,9 +290,5 @@ const useFetchNitrogenArray = () => {
 }; // useFetchNitrogenArray
 
 export {
-  useFetchModel,
-  useFetchSSURGO,
-  useFetchCornN,
-  useFetchPlantFactors,
-  useFetchNitrogenArray,
+  useFetchModel, useFetchSSURGO, useFetchCornN, useFetchPlantFactors, useFetchNitrogenArray,
 };

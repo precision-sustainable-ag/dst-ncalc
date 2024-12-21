@@ -14,7 +14,7 @@ import Highcharts from 'highcharts';
 import HighchartsReact from 'highcharts-react-official';
 import React, { useEffect, useRef } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
-import { PSALoadingspinner } from 'shared-react-components/src';
+import { PSALoadingSpinner } from 'shared-react-components/src';
 import {
   getGeneralChartOptions,
   getResidueChartOptions,
@@ -135,7 +135,7 @@ const ResidueCard = ({ refVal }) => {
             alignItems: 'center',
             position: 'abosolute',
           }}>
-            <PSALoadingspinner />
+            <PSALoadingSpinner />
           </div>
         );
         chartRef1.current.chart.showLoading(spinnerHtml);
