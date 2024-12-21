@@ -69,7 +69,17 @@ const About = ({ open, setOpen }) => {
                 m: 0,
               }}
             >
-              <PSAFigmaButton variant="color" onClick={handleCloseModal} leftIcon text="" icon={<CancelPresentationIcon />} />
+              <PSAFigmaButton
+                sx={{
+                  color: 'red',
+                  padding: '12px 24px',
+                }}
+                variant="color"
+                onClick={handleCloseModal}
+                leftIcon
+                text=""
+                icon={<CancelPresentationIcon />}
+              />
             </Box>
             <Typography sx={{ paddingBottom: '1rem', fontSize: '1.2rem', fontWeight: 700 }} id="modal-modal-title" variant="h5" component="h2">
               CC-NCALC estimates:
