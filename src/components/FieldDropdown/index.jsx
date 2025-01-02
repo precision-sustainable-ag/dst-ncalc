@@ -4,14 +4,13 @@ import React, { useEffect, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { useLocation, useNavigate } from 'react-router-dom';
 import moment from 'moment';
-import Button from '@mui/material/Button';
 import Dialog from '@mui/material/Dialog';
 import DialogTitle from '@mui/material/DialogTitle';
 import DialogActions from '@mui/material/DialogActions';
 import DialogContent from '@mui/material/DialogContent';
 import DialogContentText from '@mui/material/DialogContentText';
 import { useAuth0 } from '@auth0/auth0-react';
-import { PSADropdown } from 'shared-react-components/src';
+import { PSAButton, PSADropdown } from 'shared-react-components/src';
 import { useFetchSampleBiomass } from '../../hooks/useFetchStatic';
 import { downloadOutputCSV } from '../../hooks/helpers';
 import { set, get } from '../../store/redux-autosetters';
@@ -246,14 +245,10 @@ const FieldDropdown = () => {
         >
           <DialogTitle id="alert-dialog-title">Download Failed</DialogTitle>
           <DialogContent>
-            <DialogContentText id="alert-dialog-description">
-              Download of CSV Failed. Please try again.
-            </DialogContentText>
+            <DialogContentText id="alert-dialog-description">Download of CSV Failed. Please try again.</DialogContentText>
           </DialogContent>
           <DialogActions>
-            <Button onClick={() => setDownloadCSVFailed(false)} autoFocus>
-              Close
-            </Button>
+            <PSAButton buttonType="LightButton" title="Close" onClick={() => setDownloadCSVFailed(false)} autoFocus />
           </DialogActions>
         </Dialog>
       )}
