@@ -15,7 +15,7 @@ import {
 import Highcharts from 'highcharts';
 import HighchartsReact from 'highcharts-react-official';
 import { useDispatch, useSelector } from 'react-redux';
-import { PSALoadingspinner } from 'shared-react-components/src';
+import { PSALoadingSpinner } from 'shared-react-components/src';
 import {
   getGeneralChartOptions,
   getNitrogenChartOptions,
@@ -23,7 +23,7 @@ import {
 import { modelCalc } from './helpers';
 import { get, set } from '../../../store/redux-autosetters';
 import { useFetchCornN, useFetchModel } from '../../../hooks/useFetchApi';
-import useFetchNitrogen from '../../../hooks/useFetchNitrogen';
+// import useFetchNitrogen from '../../../hooks/useFetchNitrogen';
 
 /// /// /// STYLES /// /// ///
 const CardStyles = {
@@ -85,7 +85,8 @@ const NitrogenCard = ({ refVal }) => {
 
   // /// /// HOOKS /// ///
   cornN = useFetchCornN();
-  useFetchNitrogen();
+  // FIXME: not sure what the following hook does
+  // useFetchNitrogen();
 
   const model = useFetchModel({
     lat,
@@ -146,7 +147,7 @@ const NitrogenCard = ({ refVal }) => {
             alignItems: 'center',
             position: 'abosolute',
           }}>
-            <PSALoadingspinner />
+            <PSALoadingSpinner />
           </div>
         );
         chartRef1.current.chart.showLoading(spinnerHtml);

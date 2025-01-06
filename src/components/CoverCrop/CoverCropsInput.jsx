@@ -1,26 +1,28 @@
-/* eslint-disable no-nested-ternary */
 import React from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import Autocomplete from '@mui/material/Autocomplete';
-import { TextField } from '@mui/material';
+import { PSATextField } from 'shared-react-components/src';
 import { get, set } from '../../store/Store';
-import Input from '../../shared/Inputs';
 
 const CoverCropsInput = ({ isSatelliteMode }) => {
   const dispatch = useDispatch();
   const species = useSelector(get.species);
   const coverCrop = useSelector(get.coverCrop);
 
-  if (!species) {
-    return null;
-  }
+  const getCoverCropSpeciesGroup = (crop) => {
+    if (!species) return null;
+    if (species.brassica.includes(crop)) { return 'brassica'; }
+    if (species.broadleaf.includes(crop)) { return 'broadleaf'; }
+    if (species.grass.includes(crop)) { return 'grass'; }
+    if (species.legume.includes(crop)) { return 'legume'; }
+    return 'ERROR';
+  };
 
-  return isSatelliteMode ? (
+  return (
     <Autocomplete
-      placeholder="Select a cover crop"
-      disablePortal
-      id="combo-box-demo"
+      placeholder={isSatelliteMode ? 'Select a cover crop' : 'Select one or more cover crops'}
       autoFocus
+      multiple={!isSatelliteMode}
       groupBy={(option) => {
         let out;
         if (species.brassica.includes(option)) {
@@ -36,54 +38,17 @@ const CoverCropsInput = ({ isSatelliteMode }) => {
         }
         return out;
       }}
-      options={[...species.grass, ...species.legume, ...species.brassica, ...species.broadleaf]}
-      sx={{ width: '100%' }}
-      // defaultValue={coverCrop ? coverCrop : ''}
-      value={coverCrop}
-      renderInput={(params) => <TextField {...params} label="Select a cover crop" />}
-      onChange={(el, va) => {
-        dispatch(set.coverCrop(va));
+      options={species ? [...species.grass, ...species.legume, ...species.brassica, ...species.broadleaf] : []}
+      value={(isSatelliteMode ? coverCrop[0] : coverCrop) || null}
+      renderInput={(params) => <PSATextField {...params} label={isSatelliteMode ? 'Select a cover crop' : 'Select one or more cover crops'} />}
+      onChange={(e, val) => {
+        // if covercrop is a string(in Autocomplete non multiple mode)
+        dispatch(set.coverCrop(typeof val === 'string' ? [val] : val));
+        if (!isSatelliteMode) return;
         dispatch(set.coverCropGrowthStage(null));
-        if (species) {
-          dispatch(
-            set.coverCropSpecieGroup(
-              species.brassica.includes(va)
-                ? 'brassica'
-                : species.broadleaf.includes(va)
-                  ? 'broadleaf'
-                  : species.grass.includes(va)
-                    ? 'grass'
-                    : species.legume.includes(va)
-                      ? 'legume'
-                      : 'ERROR',
-            ),
-          );
-        }
+        const group = getCoverCropSpeciesGroup(val);
+        dispatch(set.coverCropSpecieGroup(group));
       }}
-    />
-  ) : (
-    // TODO: note: this input is a custom component
-    <Input
-      id="coverCrop"
-      multiple
-      autoFocus
-      groupBy={(option) => {
-        let out;
-        if (species.brassica.includes(option)) {
-          out = 'Brassica';
-        } else if (species.broadleaf.includes(option)) {
-          out = 'Broadleaf';
-        } else if (species.grass.includes(option)) {
-          out = 'Grass';
-        } else if (species.legume.includes(option)) {
-          out = 'Legume';
-        } else {
-          out = 'ERROR';
-        }
-        return out;
-      }}
-      options={[...species.grass, ...species.legume, ...species.brassica, ...species.broadleaf]}
-      placeholder="Select one or more cover crops"
     />
   );
 }; // CoverCropsInput

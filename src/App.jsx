@@ -6,7 +6,7 @@ import {
 } from 'react-router-dom';
 import { ThemeProvider, createTheme } from '@mui/material/styles';
 import { Container, Box } from '@mui/material';
-import { PSATheme, PSAHeader } from 'shared-react-components/src';
+import { PSATheme, PSAHeader, PSAAuthButton } from 'shared-react-components/src';
 import { deepmerge } from '@mui/utils';
 import ChatBubbleOutlineIcon from '@mui/icons-material/ChatBubbleOutline';
 // import ResponsiveNavBar from './components/ResponsiveNavBar';
@@ -17,6 +17,7 @@ import 'react-datepicker/dist/react-datepicker.css';
 import { get, set } from './store/Store';
 import FieldDropdown from './components/FieldDropdown';
 import NcalcStepper from './shared/Stepper';
+import Auth0ProviderWithNavigate from './shared/AuthProvider';
 
 const screens = {
   init: () => null,
@@ -99,42 +100,48 @@ const App = () => {
       type: 'component',
       component: <FieldDropdown />,
     },
+    {
+      type: 'component',
+      component: <PSAAuthButton />,
+    },
   ];
 
   return (
     <ThemeProvider theme={dstTheme}>
-      <PSAHeader title="Cover Crop Nitrogen Calculator" onLogoClick={() => navigate('/')} navContent={navContent} />
-      <NcalcStepper />
-      <Container
+      <Auth0ProviderWithNavigate>
+        <PSAHeader title="Cover Crop Nitrogen Calculator" onLogoClick={() => navigate('/')} navContent={navContent} />
+        <NcalcStepper />
+        <Container
         // py={50}
-        id="app-container"
-        sx={{
-          minHeight: '99.7vh',
-          minWidth: '100%',
-          backgroundImage: `url(${'/background_0.jpg'})`,
-          backgroundSize: 'cover',
-          backgroundRepeat: 'no-repeat',
-        }}
-      >
-        {/* <ResponsiveNavBar screens={screens} /> */}
-        <Box
+          id="app-container"
           sx={{
-            display: 'flex',
-            justifyContent: 'center',
-            paddingTop: '1rem',
+            minHeight: '99.7vh',
+            minWidth: '100%',
+            backgroundImage: `url(${'/background_0.jpg'})`,
+            backgroundSize: 'cover',
+            backgroundRepeat: 'no-repeat',
           }}
-          id="body-wrapper"
         >
-          <Routes>
-            {Object.keys(screens).map((scr) => (
-              <Route key={scr} path={scr.toLowerCase()} element={<Screen />} />
-            ))}
-            <Route path="" element={<Screen />} />
-          </Routes>
-          <Feedback />
-          <SnackbarMessage />
-        </Box>
-      </Container>
+          {/* <ResponsiveNavBar screens={screens} /> */}
+          <Box
+            sx={{
+              display: 'flex',
+              justifyContent: 'center',
+              paddingTop: '1rem',
+            }}
+            id="body-wrapper"
+          >
+            <Routes>
+              {Object.keys(screens).map((scr) => (
+                <Route key={scr} path={scr.toLowerCase()} element={<Screen />} />
+              ))}
+              <Route path="" element={<Screen />} />
+            </Routes>
+            <Feedback />
+            <SnackbarMessage />
+          </Box>
+        </Container>
+      </Auth0ProviderWithNavigate>
     </ThemeProvider>
   );
 }; // App

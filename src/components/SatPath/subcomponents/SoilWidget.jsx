@@ -9,7 +9,6 @@ import {
   Grid,
   Stack,
   Typography,
-  Tooltip,
   styled,
   Box,
 } from '@mui/material';

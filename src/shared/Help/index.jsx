@@ -1,7 +1,7 @@
 import React, { useRef, useState } from 'react';
 import Box from '@mui/material/Box';
 import Icon from '@mui/material/Icon';
-import Modal from '@mui/material/Modal';
+import { PSAModal } from 'shared-react-components/src';
 import Typography from '@mui/material/Typography';
 
 import './styles.scss';
@@ -20,11 +20,11 @@ const Help = () => {
       >
         help
       </Icon>
-      <Modal
+      <PSAModal
         open={open}
         onClose={() => setOpen(false)}
         closeAfterTransition
-      >
+        modalContent={
         <Box className="modal">
           <Stack>
             <Typography>
@@ -64,7 +64,8 @@ const Help = () => {
             </List>
           </Stack>
         </Box>
-      </Modal>
+        }
+      />
     </>
   );
 }; // Help

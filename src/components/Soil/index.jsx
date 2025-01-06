@@ -3,7 +3,7 @@ import React from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { useNavigate } from 'react-router-dom';
 import { Box, Stack, Typography, Grid } from '@mui/material';
-import { PSALoadingspinner } from 'shared-react-components/src';
+import { PSALoadingSpinner } from 'shared-react-components/src';
 import { get, set } from '../../store/Store';
 import Myslider from '../../shared/Slider';
 import Help from '../../shared/Help';
@@ -135,7 +135,7 @@ const Soil = ({ barebone = false }) => {
                 minHeight: '100px',
               }}
             >
-              <PSALoadingspinner />
+              <PSALoadingSpinner />
             </Grid>
             <Typography variant="h6" my={2}>
               LOADING FROM SSURGO SERVER ...

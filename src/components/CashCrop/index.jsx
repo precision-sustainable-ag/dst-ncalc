@@ -1,13 +1,13 @@
 /* eslint-disable operator-linebreak */
-import React from 'react';
+import React, { useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { useNavigate } from 'react-router-dom';
 import {
-  Autocomplete, Box, Stack, TextField, Typography, styled,
+  Autocomplete, Box, Stack, Typography, styled,
 } from '@mui/material';
+import { PSATextField } from 'shared-react-components/src';
 import { get, set } from '../../store/Store';
 import Myslider from '../../shared/Slider';
-import Input from '../../shared/Inputs';
 import Help from '../../shared/Help';
 import Required from '../../shared/Required';
 import NavButton from '../../shared/Navigate/NavButton';
@@ -30,6 +30,8 @@ const CashCrop = ({ barebone = false }) => {
   const Yield = useSelector(get.yield);
   const cashCropPlantingDate = useSelector(get.cashCropPlantingDate);
   const crops = useFetchCropNames();
+
+  const [plantingDate, setPlantingDate] = useState(cashCropPlantingDate);
 
   return (
     <Box
@@ -83,7 +85,7 @@ const CashCrop = ({ barebone = false }) => {
               sx={{ width: '100%' }}
               // defaultValue={coverCrop ? coverCrop : ''}
               value={cashCrop}
-              renderInput={(params) => <TextField {...params} label="Select a cash crop" />}
+              renderInput={(params) => <PSATextField {...params} placeholder="Select a cash crop" />}
               onChange={(el, va) => {
                 dispatch(set.cashCrop(va));
               }}
@@ -93,8 +95,14 @@ const CashCrop = ({ barebone = false }) => {
             <CustomInputText>Cash Crop Planting Date: </CustomInputText>
             {!cashCropPlantingDate && <Required />}
           </Stack>
-          <Input type="date" id="cashCropPlantingDate" />
-
+          <PSATextField
+            type="date"
+            value={plantingDate}
+            onChange={(e) => {
+              setPlantingDate(e.target.value);
+              dispatch(set.cashCropPlantingDate(e.target.value));
+            }}
+          />
           {cashCrop === 'Corn' && (
             <Box mt={2}>
               <Stack direction="row" alignItems="center">

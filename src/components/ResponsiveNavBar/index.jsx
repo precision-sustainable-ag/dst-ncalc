@@ -12,11 +12,11 @@ import Menu from '@mui/material/Menu';
 import KeyboardDoubleArrowDownIcon from '@mui/icons-material/KeyboardDoubleArrowDown';
 import KeyboardDoubleArrowUpIcon from '@mui/icons-material/KeyboardDoubleArrowUp';
 import Button from '@mui/material/Button';
-import Tooltip from '@mui/material/Tooltip';
 import MenuItem from '@mui/material/MenuItem';
 import Stack from '@mui/material/Stack';
 import MoreVertIcon from '@mui/icons-material/MoreVert';
 import { styled } from '@mui/material';
+import { PSATooltip } from 'shared-react-components/src';
 import Init from '../Init';
 import { get, set } from '../../store/Store';
 
@@ -109,7 +109,6 @@ const ResponsiveNavBar = ({ screens }) => {
   useEffect(() => {
     setActiveMenu(location.pathname.replace('/', '').replace('2', ''));
   }, [location]);
-  console.log('123', screens);
 
   return (
     <AppBar
@@ -287,23 +286,26 @@ const ResponsiveNavBar = ({ screens }) => {
         </Toolbar>
         <Toolbar disableGutters>
           <Box sx={{ flexGrow: 0 }}>
-            <Tooltip title="Open settings">
-              <IconButton
-                onClick={handleOpenUserMenu}
-                sx={{
-                  width: '3rem',
-                  height: '3rem',
-                  borderRadius: '0.5rem',
-                  color: 'black',
-                  backgroundColor: 'white',
-                  '&:hover': {
-                    backgroundColor: '#f5f5f5',
-                  },
-                }}
-              >
-                <MoreVertIcon />
-              </IconButton>
-            </Tooltip>
+            <PSATooltip
+              title="Open settings"
+              tooltipContent={(
+                <IconButton
+                  onClick={handleOpenUserMenu}
+                  sx={{
+                    width: '3rem',
+                    height: '3rem',
+                    borderRadius: '0.5rem',
+                    color: 'black',
+                    backgroundColor: 'white',
+                    '&:hover': {
+                      backgroundColor: '#f5f5f5',
+                    },
+                  }}
+                >
+                  <MoreVertIcon />
+                </IconButton>
+              )}
+            />
             <Menu
               sx={{ mt: '45px' }}
               id="menu-appbar"

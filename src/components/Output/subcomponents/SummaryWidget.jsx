@@ -2,18 +2,17 @@
 /* eslint-disable arrow-body-style */
 import React from 'react';
 import {
-  Button,
   Card,
   CardActions,
   CardContent,
   Grid,
   Stack,
   Typography,
-  Tooltip,
   styled,
   Box,
 } from '@mui/material';
 import { tooltipClasses } from '@mui/material/Tooltip';
+import { PSAButton, PSATooltip } from 'shared-react-components/src';
 // import { useSelector } from 'react-redux';
 // import { get } from '../../../store/redux-autosetters';
 
@@ -34,7 +33,7 @@ const cardContentStyles = {
 
 /// /// /// COMPONENTS /// /// ///
 const CustomWidthTooltip = styled(({ className, ...props }) => (
-  <Tooltip {...props} classes={{ popper: className }} />
+  <PSATooltip {...props} classes={{ popper: className }} />
 ))({
   [`& .${tooltipClasses.tooltip}`]: {
     maxWidth: 300,
@@ -45,7 +44,7 @@ const CustomTypography = styled(Typography)(() => ({
   borderRadius: 0,
   padding: '0 5px 0 2px',
   fontWeight: 300,
-  fontSize: 14,
+  fontSize: 16,
   '&:hover': {
     cursor: 'help',
   },
@@ -56,24 +55,25 @@ const CustomTypography = styled(Typography)(() => ({
 
 const SummaryItem = ({ name, value, desc }) => {
   return (
-    <Box
-      sx={{
-        padding: 1,
-      }}
-    >
+    <Box>
       <Stack direction="row">
-        <CustomWidthTooltip arrow title={desc} placement="top">
-          <CustomTypography>
-            {name}
-            :&nbsp;
-          </CustomTypography>
-        </CustomWidthTooltip>
+        <CustomWidthTooltip
+          arrow
+          title={desc}
+          placement="top"
+          tooltipContent={(
+            <CustomTypography>
+              {name}
+              :&nbsp;
+            </CustomTypography>
+        )}
+        />
         {name === 'Species' && value && Array.isArray(value)
           ? (
             <Stack direction="column">
               {
                 value.map((k, ix) => (
-                  <Typography key={'summItem'.concat(String(ix))} sx={{ fontWeight: 600, fontSize: 11 }}>
+                  <Typography key={'summItem'.concat(String(ix))} sx={{ fontWeight: 600, fontSize: 16 }}>
                     {k}
                   </Typography>
                 ))
@@ -81,7 +81,7 @@ const SummaryItem = ({ name, value, desc }) => {
             </Stack>
           )
           : (
-            <Typography sx={{ fontWeight: 600, fontSize: 13 }}>
+            <Typography sx={{ fontWeight: 600, fontSize: 16 }}>
               {value}
             </Typography>
           )}
@@ -131,7 +131,7 @@ const OtherCard = ({ refVal }) => (
       <Typography variant="body2">lorem ipsum</Typography>
     </CardContent>
     <CardActions>
-      <Button size="small">Learn More</Button>
+      <PSAButton size="small" title="Learn More" />
     </CardActions>
   </Card>
 );

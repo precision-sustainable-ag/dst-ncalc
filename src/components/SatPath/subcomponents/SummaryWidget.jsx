@@ -2,18 +2,17 @@
 /* eslint-disable arrow-body-style */
 import React from 'react';
 import {
-  Button,
   Card,
   CardActions,
   CardContent,
   Grid,
   Stack,
   Typography,
-  Tooltip,
   styled,
   Box,
 } from '@mui/material';
 import { tooltipClasses } from '@mui/material/Tooltip';
+import { PSAButton, PSATooltip } from 'shared-react-components/src';
 // import { useSelector } from 'react-redux';
 // import { get } from '../../../store/redux-autosetters';
 
@@ -34,7 +33,7 @@ const cardContentStyles = {
 
 /// /// /// COMPONENTS /// /// ///
 const CustomWidthTooltip = styled(({ className, ...props }) => (
-  <Tooltip {...props} classes={{ popper: className }} />
+  <PSATooltip {...props} classes={{ popper: className }} />
 ))({
   [`& .${tooltipClasses.tooltip}`]: {
     maxWidth: 300,
@@ -63,12 +62,17 @@ const SummaryItem = ({ name, value, desc }) => {
       }}
     >
       <Stack direction="row">
-        <CustomWidthTooltip arrow title={desc} placement="top">
-          <CustomTypography>
-            {name}
-            :&nbsp;
-          </CustomTypography>
-        </CustomWidthTooltip>
+        <CustomWidthTooltip
+          arrow
+          title={desc}
+          placement="top"
+          tooltipContent={(
+            <CustomTypography>
+              {name}
+              :&nbsp;
+            </CustomTypography>
+        )}
+        />
         {name === 'Species' && value && Array.isArray(value)
           ? (
             <Stack direction="column">
@@ -132,7 +136,7 @@ const OtherCard = ({ refVal }) => (
       <Typography variant="body2">lorem ipsum</Typography>
     </CardContent>
     <CardActions>
-      <Button size="small">Learn More</Button>
+      <PSAButton size="small" title="Learn More" />
     </CardActions>
   </Card>
 );

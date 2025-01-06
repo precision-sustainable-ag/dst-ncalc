@@ -1,14 +1,11 @@
-import { Button } from '@mui/material';
 import React from 'react';
+import { PSAButton } from 'shared-react-components/src';
 
-const NavButton = ({
-  children,
-  onClick,
-  disabled = false,
-  fontSize = '1rem',
-}) => (
-  <Button
+const NavButton = ({ children, onClick, disabled = false, fontSize = '1rem' }) => (
+  <PSAButton
+    title={children}
     sx={{
+      color: 'white',
       padding: '0.8rem 1.5rem',
       // fontWeight: 'bold',
       textAlign: 'center',
@@ -25,8 +22,6 @@ const NavButton = ({
     variant="contained"
     onClick={onClick}
     disabled={disabled}
-  >
-    {children}
-  </Button>
+  />
 );
 export default NavButton;

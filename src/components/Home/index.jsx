@@ -48,11 +48,8 @@ const Home = () => {
   const handleChange = (event, newValue) => {
     if (newValue === null) return;
     dispatch(set.biomassCalcMode(newValue));
-  };
-
-  useEffect(() => {
     dispatch(set.coverCrop([]));
-  }, [biomassCalcMode]);
+  };
 
   const navigate = useNavigate();
   // const className = privacy ? 'home background' : 'home';
@@ -97,16 +94,7 @@ const Home = () => {
         </NavButton>
         <NavButton
           onClick={() => {
-            if (biomassCalcMode === 'sampled') {
-              console.log('sampled path');
-              navigate('/location');
-            }
-            if (biomassCalcMode === 'satellite') {
-              console.log('satellite path');
-              // TODO: satpath will not being used in the future
-              // navigate('/satpath');
-              navigate('/location');
-            }
+            navigate('/location');
             dispatch(set.activeStep(1));
           }}
           fontSize="1rem"
