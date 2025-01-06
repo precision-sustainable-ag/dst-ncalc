@@ -1,7 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
-import { Slider } from '@mui/material';
-import { PSATextField } from 'shared-react-components/src';
+import { PSATextField, PSASlider } from 'shared-react-components/src';
 
 import { get, set } from '../../store/Store';
 
@@ -34,7 +33,7 @@ const Myslider = ({
       <span>
         <div style={{ display: 'flex', gap: '10px' }}>
           <span className="tiny">{min}</span>
-          <Slider
+          <PSASlider
             value={Number(value)}
             onChange={(_, newValue) => {
               setValue(newValue);
