@@ -1,19 +1,22 @@
 /* eslint-disable jsx-a11y/control-has-associated-label */
 /* eslint-disable no-console */
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { useLocation, useNavigate } from 'react-router-dom';
 import moment from 'moment';
-import Button from '@mui/material/Button';
 import Dialog from '@mui/material/Dialog';
 import DialogTitle from '@mui/material/DialogTitle';
 import DialogActions from '@mui/material/DialogActions';
 import DialogContent from '@mui/material/DialogContent';
 import DialogContentText from '@mui/material/DialogContentText';
+import { useAuth0 } from '@auth0/auth0-react';
+import { PSAButton, PSADropdown } from 'shared-react-components/src';
 import { useFetchSampleBiomass } from '../../hooks/useFetchStatic';
 import { downloadOutputCSV } from '../../hooks/helpers';
 import { set, get } from '../../store/redux-autosetters';
-import { PSADropdown } from 'shared-react-components/src';
+import { historyStates } from '../../store/inits';
+import { setAuthToken } from '../../utils/authToken';
+import { loadHistory } from '../../utils/userHistory';
 
 const examples = {};
 
@@ -23,24 +26,41 @@ const FieldDropdown = () => {
   const dispatch = useDispatch();
   const navigate = useNavigate();
   const { pathname } = useLocation();
-
+  const { isAuthenticated, getAccessTokenSilently } = useAuth0();
 
   // TODO: PSA is always false currently in prod and devs
   // In Home page: if (window.location.toString().includes('PSA'))dispatch(set.PSA(true));
   const PSA = useSelector(get.PSA);
-  const field = useSelector(get.field);
+  const userHistoryList = useSelector(get.user.userHistoryList);
+
   const model = useSelector(get.model);
   const dates = useSelector(get.dates);
   const [downloadCSVFailed, setDownloadCSVFailed] = useState(false);
+  const [selectedField, setSelectedField] = useState('');
 
   // get all fields from localStorage
   const myFields = Object.keys(localStorage).filter((key) => key.startsWith('ncalc-'));
 
   // TODO: Load static data from examples here
-
   useFetchSampleBiomass();
 
-  /// ///// FUNCTIONS ///// ////
+  // fetch user history list
+  useEffect(() => {
+    const fetchUserData = async () => {
+      const token = await getAccessTokenSilently();
+      setAuthToken(token);
+      // get new user histories here
+      loadHistory()
+        .then((res) => {
+          dispatch(set.user.userHistoryList(res));
+        })
+        .catch((err) => {
+          console.error(err);
+        });
+    };
+    if (isAuthenticated) fetchUserData();
+  }, [isAuthenticated, getAccessTokenSilently]);
+
   const changePSA = (e) => {
     const PSAval = examples[e.target.value];
 
@@ -54,13 +74,25 @@ const FieldDropdown = () => {
     });
   }; // changePSA
 
-  const loadField = (fieldVal) => {
-    if (fieldVal === 'Example: Grass') {
+  const handleDropdown = async (e) => {
+    const fieldStr = e.target.value;
+    console.log('fieldStr', fieldStr);
+    setSelectedField(fieldStr);
+    if (fieldStr === 'placeholder') {
+      // TODO: maybe add functions to clean previous field data
+      dispatch(set.field(''));
+    } else if (fieldStr === 'Clear previous runs') {
+      // eslint-disable-next-line no-alert
+      if (window.confirm('Clear all previous runs?')) {
+        localStorage.clear();
+        navigate('home');
+      }
+    } else if (fieldStr === 'Example: Grass') {
       // navigate('location');
       dispatch(set.mapPolygon([]));
       dispatch(set.biomassTaskResults(null));
       dispatch(set.edited(true));
-      dispatch(set.activeExample(fieldVal));
+      dispatch(set.activeExample(fieldStr));
       dispatch(set.lat(32.865389));
       dispatch(set.lon(-82.258361));
       dispatch(set.location('Example'));
@@ -82,12 +114,13 @@ const FieldDropdown = () => {
       dispatch(set.cashCrop('Corn'));
       dispatch(set.yield(150));
       dispatch(set.targetN(150));
-    } else if (fieldVal === 'Example: Legume') {
+      dispatch(set.user.historyState(historyStates.imported));
+    } else if (fieldStr === 'Example: Legume') {
       // navigate('location');
       dispatch(set.mapPolygon([]));
       dispatch(set.biomassTaskResults(null));
       dispatch(set.edited(true));
-      dispatch(set.activeExample(fieldVal));
+      dispatch(set.activeExample(fieldStr));
       dispatch(set.lat(32.865389));
       dispatch(set.lon(-82.258361));
       dispatch(set.location('Example'));
@@ -109,112 +142,39 @@ const FieldDropdown = () => {
       dispatch(set.cashCrop('Corn'));
       dispatch(set.yield(150));
       dispatch(set.targetN(100));
-    } else if (fieldVal === 'Download data') {
+      dispatch(set.user.historyState(historyStates.imported));
+    } else if (fieldStr === 'Download data') {
       if (model && dates) {
         downloadOutputCSV(model, dates);
       } else {
         setDownloadCSVFailed(true);
       }
     } else {
-      // load field from localStorage
-      const newFieldVal = 'ncalc-'.concat(fieldVal);
-      const inputs = JSON.parse(localStorage[newFieldVal]);
-      Object.keys(inputs).forEach((key) => {
+      // Load field from localStorage & user history
+      let historyObj;
+      if (fieldStr.startsWith('ncalc-')) {
+        historyObj = JSON.parse(localStorage[fieldStr]);
+      }
+      if (fieldStr.startsWith('history-')) {
+        const history = await loadHistory(fieldStr);
+        historyObj = history.json.history;
+        // FIXME: need to resolve history with same name problem
+        const selectedHistory = userHistoryList.find((historyItem) => historyItem.label === fieldStr);
+        // set user history name and state
+        dispatch(set.user.selectedHistory(selectedHistory));
+      }
+      dispatch(set.user.historyState(historyStates.imported));
+      Object.keys(historyObj).forEach((key) => {
         try {
           if (/Date/.test(key)) {
-            const date = moment(inputs[key]).format('yyyy-MM-DD');
+            const date = moment(historyObj[key]).format('yyyy-MM-DD');
             dispatch(set[key](date));
           } else {
-            dispatch(set[key](inputs[key]));
+            dispatch(set[key](historyObj[key]));
           }
-        } catch (e) {
-          console.log(key, e.message);
-        }
+        } catch (err) { console.log(key, err.message); }
       });
-      dispatch(set.lwc(inputs.lwc)); // avoid calculation
-    }
-  };
-
-  // useEffect(() => {
-  //   const base = new Airtable({ apiKey: 'keySO0dHQzGVaSZp2' }).base('appOEj4Ag9MgTTrMg');
-
-  //   const airtable = (table, callback, wrapup) => {
-  //     base(table).select({
-  //       view: 'Grid view',
-  //     }).eachPage((records, fetchNextPage) => {
-  //       records.forEach((record) => {
-  //         callback(record.fields);
-  //       });
-
-  //       fetchNextPage();
-  //     }, (err) => {
-  //       if (!err && wrapup) {
-  //         wrapup();
-  //       }
-  //     });
-  //   }; // airtable
-
-  //   airtable('PSA', (site) => {
-  //     localStorage.removeItem(site.ID);
-  //     if (site.Hour === 0) {
-  //       examples[site.ID] = {
-  //         field: site.ID,
-  //         lat: site.Lat,
-  //         lon: site.Lon,
-  //         location: '',
-  //         BD: site.BD,
-  //         coverCrop: [site['Cover Crop']],
-  //         cashCrop: site['Cash Crop'],
-  //         coverCropTerminationDate: new Date(site.Date),
-  //         lwc: site.LitterWaterContent,
-  //         biomass: Math.round(site.FOM),
-  //         unit: 'kg/ha',
-  //         N: +(site.FOMpctN.toFixed(2)),
-  //         carb: +(site.Carb.toFixed(2)),
-  //         cell: +(site.Cell.toFixed(2)),
-  //         lign: +(site.Lign.toFixed(2)),
-  //         targetN: 150,
-  //         category: site.Category,
-  //       };
-  //     } else {
-  //       examples[site.ID].cashCropPlantingDate = new Date(moment(site.Date).add(-111, 'days'));
-  //     }
-  //   });
-
-  //   const mb = {};
-  //   const species = {};
-
-  //   airtable(
-  //     'CoverCrops',
-  //     (crop) => {
-  //       species[crop.Category] = species[crop.Category] || [];
-  //       species[crop.Category].push(crop.Crop);
-  //       mb[crop.Crop] = crop.MaxBiomass;
-  //     },
-  //     () => {
-  //       dispatch(set.maxBiomass(mb));
-  //       dispatch(set.species(species));
-  //     },
-  //   );
-  //   // /// temporary to load example
-  //   // loadField('Example: Grass');
-  // }, [dispatch]);
-
-  const handleDropdown = (e) => {
-    const fieldStr = e.target.value;
-    if (fieldStr === 'placeholder') {
-      // TODO: maybe add functions to clean previous field data
-      dispatch(set.field(''));
-      return;
-    }
-    if (fieldStr === 'Clear previous runs') {
-      // eslint-disable-next-line no-alert
-      if (window.confirm('Clear all previous runs?')) {
-        localStorage.clear();
-        navigate('home');
-      }
-    } else {
-      loadField(fieldStr);
+      dispatch(set.lwc(historyObj.lwc)); // avoid calculation
     }
   };
 
@@ -222,7 +182,7 @@ const FieldDropdown = () => {
   return (
     <div className="Init desktop">
       <PSADropdown
-        label={PSA ? "examples" : ""}
+        label={PSA ? 'examples' : ''}
         items={
           PSA
             ? [
@@ -236,20 +196,22 @@ const FieldDropdown = () => {
                 .map((site) => ({ value: site, label: site })),
             ]
             : [
-              {
-                label: 'My fields',
-                isHeader: true,
-              },
-              { value: '', label: '' },
-              ...myFields.map((fld) => ({
-                value: fld.replace('ncalc-', ''),
-                label: fld.replace('ncalc-', ''),
-              })),
-              {
-                label: 'Example data',
-                isHeader: true,
-              },
-              { value: '', label: '' },
+              ...(isAuthenticated
+                ? [
+                  { label: 'User History', isHeader: true },
+                  ...userHistoryList.map((history) => ({
+                    value: history.label,
+                    label: history.label.replace('history-', ''),
+                  }))]
+                : [
+                  { label: 'My fields', isHeader: true },
+                  ...myFields.map((fld) => ({
+                    value: fld,
+                    label: fld.replace('ncalc-', ''),
+                  })),
+                ]
+              ),
+              { label: 'Example data', isHeader: true },
               { value: 'Example: Grass', label: 'Example: Grass' },
               { value: 'Example: Legume', label: 'Example: Legume' },
               ...(pathname.includes('output') || myFields.length
@@ -258,7 +220,6 @@ const FieldDropdown = () => {
                     label: 'Utilities',
                     isHeader: true,
                   },
-                  { value: '', label: '' },
                   { value: 'Download data', label: 'Download data' },
                 ]
                 : []),
@@ -267,12 +228,12 @@ const FieldDropdown = () => {
             ]
         }
         SelectProps={{
-          value: field,
+          value: selectedField,
           onChange: PSA ? changePSA : handleDropdown,
           'data-test': 'dropdown-fields',
         }}
         formSx={{ minWidth: 200 }}
-        menuSx={{ fontWeight: "bold", color: "white", backgroundColor: "green", }}
+        menuSx={{ fontWeight: 'bold', color: 'white', backgroundColor: 'green' }}
       />
 
       {downloadCSVFailed && (
@@ -284,14 +245,10 @@ const FieldDropdown = () => {
         >
           <DialogTitle id="alert-dialog-title">Download Failed</DialogTitle>
           <DialogContent>
-            <DialogContentText id="alert-dialog-description">
-              Download of CSV Failed. Please try again.
-            </DialogContentText>
+            <DialogContentText id="alert-dialog-description">Download of CSV Failed. Please try again.</DialogContentText>
           </DialogContent>
           <DialogActions>
-            <Button onClick={() => setDownloadCSVFailed(false)} autoFocus>
-              Close
-            </Button>
+            <PSAButton buttonType="LightButton" title="Close" onClick={() => setDownloadCSVFailed(false)} autoFocus />
           </DialogActions>
         </Dialog>
       )}
