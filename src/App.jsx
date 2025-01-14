@@ -1,12 +1,14 @@
 /* eslint-disable no-console */
-import React from 'react';
+import React, { useEffect } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import {
   useLocation, useNavigate, Route, Routes,
 } from 'react-router-dom';
 import { ThemeProvider, createTheme } from '@mui/material/styles';
-import { Container, Box } from '@mui/material';
-import { PSATheme, PSAHeader, PSAAuthButton } from 'shared-react-components/src';
+import { Container, Box, Button } from '@mui/material';
+import {
+  PSATheme, PSAHeader, PSAAuthButton, FadeAlert,
+} from 'shared-react-components/src';
 import { deepmerge } from '@mui/utils';
 import ChatBubbleOutlineIcon from '@mui/icons-material/ChatBubbleOutline';
 // import ResponsiveNavBar from './components/ResponsiveNavBar';
@@ -83,6 +85,8 @@ const App = () => {
   const path = window.location.toString().split('/').pop().toLowerCase() || 'home';
   const Screen = screens[path] || screens.home;
 
+  const { showAlert, alertSeverity, alertMessage } = useSelector(get.user);
+
   const navContent = [
     {
       type: 'button',
@@ -112,17 +116,16 @@ const App = () => {
         <PSAHeader title="Cover Crop Nitrogen Calculator" onLogoClick={() => navigate('/')} navContent={navContent} />
         <NcalcStepper />
         <Container
-        // py={50}
+          // py={50}
           id="app-container"
           sx={{
-            minHeight: '99.7vh',
+            minHeight: 'calc(99.7vh - 255px)',
             minWidth: '100%',
             backgroundImage: `url(${'/background_0.jpg'})`,
             backgroundSize: 'cover',
             backgroundRepeat: 'no-repeat',
           }}
         >
-          {/* <ResponsiveNavBar screens={screens} /> */}
           <Box
             sx={{
               display: 'flex',
@@ -139,6 +142,14 @@ const App = () => {
             </Routes>
             <Feedback />
             <SnackbarMessage />
+            <Box sx={{ position: 'fixed', bottom: 0, zIndex: 1000 }}>
+              <FadeAlert
+                showAlert={showAlert}
+                severity={alertSeverity}
+                message={alertMessage}
+                action={<Button onClick={() => dispatch(set.user.showAlert(false))}>CLOSE</Button>}
+              />
+            </Box>
           </Box>
         </Container>
       </Auth0ProviderWithNavigate>

@@ -11,6 +11,7 @@ import Help from '../../shared/Help';
 import NavButton from '../../shared/Navigate/NavButton';
 import About from '../About';
 import { historyStates } from '../../store/inits';
+import HistoryDropdown from '../HistoryDropdown';
 
 const BiomassMethodButton = styled(ToggleButton)(() => ({
   '&.Mui-selected': {
@@ -107,8 +108,9 @@ const Home = () => {
             textAlign: 'center',
           }}
         >
-          <Typography variant="h6" mb={2}>
-            Would you like to save your selection history? Simply give it a name, and your selections will be stored after you've made all your selections. You can easily retrieve them later from the dropdown in the header.
+          <Typography mb={2}>
+            Would you like to save your selection history? Simply give it a name, and your selections will be stored after you've made all your
+            selections.
           </Typography>
           <PSATextField
             label="Name your Field (optional)"
@@ -124,9 +126,11 @@ const Home = () => {
             }}
           />
           <Help />
+          <Typography mb={2}>Retrieve your previous selections here:</Typography>
+          <HistoryDropdown />
         </Box>
       </Box>
-      <Box sx={{ height: 60 }} />
+      <Box sx={{ height: '2rem' }} />
       <Stack spacing={2} direction="column">
         <Stack justifyContent="space-around" alignItems="center" sx={{ flexDirection: { sm: 'column', md: 'row' } }}>
           <Typography variant="h6"> Select biomass calculation method </Typography>
@@ -137,7 +141,7 @@ const Home = () => {
           </ToggleButtonGroup>
         </Stack>
       </Stack>
-      <Box sx={{ height: 100 }} />
+      <Box sx={{ height: '2rem' }} />
       <Stack spacing={2} direction="row" justifyContent="space-around">
         <NavButton onClick={() => setAboutOpen(true)} fontSize="1rem">
           About
