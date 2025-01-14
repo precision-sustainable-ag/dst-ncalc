@@ -30,8 +30,8 @@ const RightSideBar = ({ summaryData, refs }) => {
   /// /// RETURN JSX /// ///
   return (
     <Box sx={wrapperStyles} flex={4} justifyContent="center" id="rightside-wrapper">
-      <Grid container spacing={5}>
-        <Grid item sm={12} width="100%">
+      <Grid container spacing={3}>
+        <Grid item sm={12} width="100%" mt="1rem">
           <SummaryCard refVal={refs[0]} data={summaryData} />
         </Grid>
         <Grid item sm={12} lg={6} width="100%">

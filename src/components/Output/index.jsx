@@ -12,10 +12,6 @@ import useStoreMem from '../../hooks/useStoreMem';
 import { useFetchNitrogenArray } from '../../hooks/useFetchApi';
 import { sidebarListData, summaryDataDefaults } from '../../constants';
 
-const wrapperStyles = {
-  width: '100%',
-};
-
 const Output = () => {
   const [summaryData, setSummaryData] = useState(summaryDataDefaults);
   const refs = sidebarListData.map(() => useRef(null));
@@ -48,12 +44,10 @@ const Output = () => {
   }, [field, biomass]);
 
   return (
-    <Box sx={wrapperStyles} id="gfdgdd">
-      <Stack direction="row" justifyContent="space-between">
-        <LeftSideBar sidebarListData={sidebarListData} refs={refs} />
-        <RightSideBar sidebarListData={sidebarListData} summaryData={summaryData} refs={refs} />
-      </Stack>
-    </Box>
+    <Stack direction="row" justifyContent="space-between">
+      <LeftSideBar sidebarListData={sidebarListData} refs={refs} />
+      <RightSideBar sidebarListData={sidebarListData} summaryData={summaryData} refs={refs} />
+    </Stack>
   );
 };
 export default Output;

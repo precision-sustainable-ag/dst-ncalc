@@ -13,7 +13,7 @@ import Stack from '@mui/material/Stack';
 // import Modal from '@mui/material/Modal';
 import Alert from '@mui/material/Alert';
 import Slide from '@mui/material/Slide';
-import { styled } from '@mui/material';
+import { Grid, styled } from '@mui/material';
 import { get, set } from '../../store/Store';
 import CoverCropsInput from './CoverCropsInput';
 import GrowthStageInput from './GrowthStageInput';
@@ -34,7 +34,7 @@ const CustomInputText = styled(Typography)({
   marginBottom: '0.2rem',
 });
 
-const CoverCropFirst = ({ barebone = false }) => {
+const CoverCropFirst = () => {
   const dispatch = useDispatch();
   const navigate = useNavigate();
   const maxBiomass = useSelector(get.maxBiomass);
@@ -83,36 +83,24 @@ const CoverCropFirst = ({ barebone = false }) => {
   }, [isSatelliteMode, biomass, coverCrop, coverCropGrowthStage, coverCropTerminationDate, lwc, biomassTotalValue]);
 
   return (
-    <Box
-      sx={{
-        justifyContent: 'center',
-        margin: '0% 5% 0% 5%',
-        display: 'flex',
-        alignItems: 'center',
-        backgroundColor: '#fff',
-        padding: '1rem',
-        borderRadius: '1rem',
-        flexDirection: 'column',
-        width: '100%',
-        marginBottom: '2rem',
-      }}
-    >
-      <Box
-        style={{
+    <Grid container justifyContent="center">
+      <Grid
+        item
+        xs={12}
+        lg={10}
+        sx={{
+          marginTop: '1rem',
+          padding: '2rem 4rem',
+          boxShadow: 5,
+          borderRadius: 5,
+          opacity: 0.9,
+          backgroundColor: 'white',
           display: 'flex',
           flexDirection: 'column',
           alignItems: 'center',
-          backgroundColor: '#fff',
-          padding: '1rem',
-          borderRadius: '1rem',
-          width: '100%',
         }}
       >
-        {barebone ? (
-          <Typography variant="h5">Tell us about your Cover Crop</Typography>
-        ) : (
-          <Typography variant="h4">Tell us about your Cover Crop</Typography>
-        )}
+        <Typography variant="h4">Tell us about your Cover Crop</Typography>
         <Stack direction="column" spacing={2} mt={2}>
           <Stack direction="row" alignItems="center">
             {/* <CustomInputText>Cover Crop Species:</CustomInputText> */}
@@ -127,7 +115,7 @@ const CoverCropFirst = ({ barebone = false }) => {
               </Stack>
               <GrowthStageInput isSatelliteMode={isSatelliteMode} />
             </Box>
-          )}
+        )}
           {isSatelliteMode ? (
             <Paper mt={2}>
               <Stack m={2} direction="row" alignItems="center">
@@ -145,7 +133,7 @@ const CoverCropFirst = ({ barebone = false }) => {
                   name="position"
                 />
               </Stack>
-              {!barebone && <BiomassData minified={false} />}
+              <BiomassData minified={false} />
             </Paper>
           ) : (
             <>
@@ -241,51 +229,51 @@ const CoverCropFirst = ({ barebone = false }) => {
             </>
           )}
         </Stack>
-        {!barebone && (
-          <Box
-            sx={{
+
+        <Box
+          sx={{
               justifyContent: 'space-around',
               alignItems: 'space-between',
               width: '100%',
               display: 'flex',
               flexDirection: 'row',
             }}
-            mt={4}
-          >
-            <NavButton
-              onClick={() => {
+          mt={4}
+        >
+          <NavButton
+            onClick={() => {
                 dispatch(set.activeStep(2));
                 navigate('/soil');
               }}
-            >
-              BACK
-            </NavButton>
-            <NavButton onClick={() => navigate('/covercrop2')} disabled={disableNextButton}>
-              NEXT
-            </NavButton>
-            <Snackbar
-              open={biomassNotExist}
-              TransitionComponent={Slide}
-              autoHideDuration={5000}
-              onClose={() => {
+          >
+            BACK
+          </NavButton>
+          <NavButton onClick={() => navigate('/covercrop2')} disabled={disableNextButton}>
+            NEXT
+          </NavButton>
+          <Snackbar
+            open={biomassNotExist}
+            TransitionComponent={Slide}
+            autoHideDuration={5000}
+            onClose={() => {
                 setBiomassNotExist(false);
               }}
-            >
-              <Alert
-                onClose={() => {
+          >
+            <Alert
+              onClose={() => {
                   setBiomassNotExist(false);
                 }}
-                severity="warning"
-                variant="filled"
-                sx={{ width: '100%' }}
-              >
-                <Typography variant="subtitle1">Biomass value need to be calculated first</Typography>
-              </Alert>
-            </Snackbar>
-          </Box>
-        )}
-      </Box>
-    </Box>
+              severity="warning"
+              variant="filled"
+              sx={{ width: '100%' }}
+            >
+              <Typography variant="subtitle1">Biomass value need to be calculated first</Typography>
+            </Alert>
+          </Snackbar>
+        </Box>
+      </Grid>
+    </Grid>
+
   );
 }; // CoverCropFirst
 CoverCropFirst.desc = 'Cover Crop';

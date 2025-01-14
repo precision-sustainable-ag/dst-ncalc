@@ -2,7 +2,7 @@
 import React, { useEffect, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import {
-  Box, Card, Stack, ToggleButton, ToggleButtonGroup, Typography, styled,
+  Box, Grid, Stack, ToggleButton, ToggleButtonGroup, Typography, styled,
 } from '@mui/material';
 import { useNavigate } from 'react-router-dom';
 import { PSATextField } from 'shared-react-components/src';
@@ -70,94 +70,100 @@ const Home = () => {
   // const className = privacy ? 'home background' : 'home';
 
   return (
-    <Card
-      maxwidth="lg"
-      sx={{
-        margin: '0% 5% 0% 5%',
-        padding: '5%',
-        boxShadow: 5,
-        borderRadius: 5,
-        opacity: 0.9,
-      }}
-    >
-      <Stack spacing={2} direction="column">
-        <Box>
-          <Typography variant="h4">Welcome to the Cover Crop Nitrogen Calculator (CC-NCALC)</Typography>
-        </Box>
-        <Box>
-          <Typography variant="h6">
-            This calculator aids farmers with decision support regarding cover crop residue persistence, as well as the amount and timing of nitrogen
-            availability.
-          </Typography>
-        </Box>
-      </Stack>
-      <Box
+    <Grid container justifyContent="center">
+      <Grid
+        item
+        xs={12}
+        lg={10}
         sx={{
-          marginTop: 3,
-          display: 'flex',
-          justifyContent: 'center',
-          alignItems: 'center',
+          marginTop: '1rem',
+          padding: '2rem 4rem',
+          boxShadow: 5,
+          borderRadius: 5,
+          opacity: 0.9,
+          backgroundColor: 'white',
         }}
       >
+        <Stack spacing={2} direction="column">
+          <Box>
+            <Typography variant="h4" align="center">Welcome to the Cover Crop Nitrogen Calculator (CC-NCALC)</Typography>
+          </Box>
+          <Box>
+            <Typography variant="h6" align="center">
+              This calculator aids farmers with decision support regarding cover crop residue persistence,
+              as well as the amount and timing of nitrogen availability.
+            </Typography>
+          </Box>
+        </Stack>
         <Box
           sx={{
-            backgroundColor: '#fff',
-            padding: 4,
-            borderRadius: 2,
-            boxShadow: 5,
-            textAlign: 'center',
+            marginTop: 3,
+            display: 'flex',
+            justifyContent: 'center',
+            alignItems: 'center',
           }}
         >
-          <Typography mb={2}>
-            Would you like to save your selection history? Simply give it a name, and your selections will be stored after you've made all your
-            selections.
-          </Typography>
-          <PSATextField
-            label="Name your Field (optional)"
-            value={fieldName}
-            onChange={(e) => setFieldName(e.target.value)}
-            error={isFieldNameExisted()}
-            helperText={isFieldNameExisted() ? 'Field name existed!' : null}
-            onBlur={() => {
-              if (!isFieldNameExisted()) dispatch(set.field(fieldName));
+          <Box
+            sx={{
+              backgroundColor: '#fff',
+              padding: 4,
+              borderRadius: 2,
+              boxShadow: 5,
+              textAlign: 'center',
             }}
-            onKeyDown={(e) => {
-              if (e.key === 'Enter' && !isFieldNameExisted()) dispatch(set.field(fieldName));
-            }}
-          />
-          <Help />
-          <Typography mb={2}>Retrieve your previous selections here:</Typography>
-          <HistoryDropdown />
+          >
+            <Typography mb={2}>
+              Would you like to save your selection history? Simply give it a name, and your selections will be stored after you&apos;ve made all your
+              selections.
+            </Typography>
+            <PSATextField
+              label="Name your Field (optional)"
+              value={fieldName}
+              onChange={(e) => setFieldName(e.target.value)}
+              error={isFieldNameExisted()}
+              helperText={isFieldNameExisted() ? 'Field name existed!' : null}
+              onBlur={() => {
+                if (!isFieldNameExisted()) dispatch(set.field(fieldName));
+              }}
+              onKeyDown={(e) => {
+                if (e.key === 'Enter' && !isFieldNameExisted()) dispatch(set.field(fieldName));
+              }}
+            />
+            <Help />
+            <Typography mb={2}>Retrieve your previous selections here:</Typography>
+            <HistoryDropdown />
+          </Box>
         </Box>
-      </Box>
-      <Box sx={{ height: '2rem' }} />
-      <Stack spacing={2} direction="column">
-        <Stack justifyContent="space-around" alignItems="center" sx={{ flexDirection: { sm: 'column', md: 'row' } }}>
-          <Typography variant="h6"> Select biomass calculation method </Typography>
-          <ToggleButtonGroup color="primary" value={biomassCalcMode} exclusive onChange={handleChange} aria-label="biomassCalcMode">
-            <BiomassMethodButton value="sampled">User Sampled</BiomassMethodButton>
-            {/* <Box sx={{ width: 10, borderRight: '2px solid black' }} /> */}
-            <BiomassMethodButton value="satellite">Satellite</BiomassMethodButton>
-          </ToggleButtonGroup>
+        <Box sx={{ height: '2rem' }} />
+        <Stack spacing={2} direction="column">
+          <Stack justifyContent="space-around" alignItems="center" sx={{ flexDirection: { sm: 'column', md: 'row' } }}>
+            <Typography variant="h6"> Select biomass calculation method </Typography>
+            <ToggleButtonGroup color="primary" value={biomassCalcMode} exclusive onChange={handleChange} aria-label="biomassCalcMode">
+              <BiomassMethodButton value="sampled">User Sampled</BiomassMethodButton>
+              {/* <Box sx={{ width: 10, borderRight: '2px solid black' }} /> */}
+              <BiomassMethodButton value="satellite">Satellite</BiomassMethodButton>
+            </ToggleButtonGroup>
+          </Stack>
         </Stack>
-      </Stack>
-      <Box sx={{ height: '2rem' }} />
-      <Stack spacing={2} direction="row" justifyContent="space-around">
-        <NavButton onClick={() => setAboutOpen(true)} fontSize="1rem">
-          About
-        </NavButton>
-        <NavButton
-          onClick={() => {
-            navigate('/location');
-            dispatch(set.activeStep(1));
-          }}
-          fontSize="1rem"
-        >
-          Get Started
-        </NavButton>
-      </Stack>
-      <About open={aboutOpen} setOpen={setAboutOpen} />
-    </Card>
+        <Box sx={{ height: '2rem' }} />
+        <Stack spacing={2} direction="row" justifyContent="space-around">
+          <NavButton onClick={() => setAboutOpen(true)} fontSize="1rem">
+            About
+          </NavButton>
+          <NavButton
+            onClick={() => {
+              navigate('/location');
+              dispatch(set.activeStep(1));
+            }}
+            fontSize="1rem"
+          >
+            Get Started
+          </NavButton>
+        </Stack>
+        <About open={aboutOpen} setOpen={setAboutOpen} />
+      </Grid>
+    </Grid>
+
   );
 }; // Home
 

@@ -3,7 +3,7 @@ import React, { useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { useNavigate } from 'react-router-dom';
 import {
-  Autocomplete, Box, Stack, Typography, styled,
+  Autocomplete, Box, Stack, Typography, styled, Grid,
 } from '@mui/material';
 import { PSATextField } from 'shared-react-components/src';
 import { get, set } from '../../store/Store';
@@ -21,7 +21,7 @@ const CustomInputText = styled(Typography)({
   marginBottom: '0.2rem',
 });
 
-const CashCrop = ({ barebone = false }) => {
+const CashCrop = () => {
   const navigate = useNavigate();
   const dispatch = useDispatch();
   const unit = useSelector(get.unit);
@@ -34,42 +34,24 @@ const CashCrop = ({ barebone = false }) => {
   const [plantingDate, setPlantingDate] = useState(cashCropPlantingDate);
 
   return (
-    <Box
-      sx={{
-        justifyContent: 'center',
-        margin: '0% 5% 0% 5%',
-        display: 'flex',
-        alignItems: 'center',
-        backgroundColor: '#fff',
-        padding: '1rem',
-        borderRadius: '1rem',
-        flexDirection: 'column',
-        width: '100%',
-        // width: {
-        //   xs: '100%',
-        //   sm: '100%',
-        //   md: '90%',
-        //   lg: '70%',
-        //   xl: '60%',
-        // },
-      }}
-    >
-      <Box
-        style={{
+    <Grid container justifyContent="center">
+      <Grid
+        item
+        xs={12}
+        lg={10}
+        sx={{
+          marginTop: '1rem',
+          padding: '2rem 4rem',
+          boxShadow: 5,
+          borderRadius: 5,
+          opacity: 0.9,
+          backgroundColor: 'white',
           display: 'flex',
           flexDirection: 'column',
           alignItems: 'center',
-          backgroundColor: '#fff',
-          padding: '1rem',
-          borderRadius: '1rem',
-          width: '100%',
         }}
       >
-        {barebone ? (
-          <Typography variant="h5">Tell us about your Cash Crop</Typography>
-        ) : (
-          <Typography variant="h4">Tell us about your Cash Crop</Typography>
-        )}
+        <Typography variant="h4">Tell us about your Cash Crop</Typography>
         <Box mt={2}>
           <Stack direction="row" alignItems="center">
             <CustomInputText>Cash Crop: </CustomInputText>
@@ -126,39 +108,38 @@ const CashCrop = ({ barebone = false }) => {
           </Box>
 
           <Myslider id="targetN" min={0} max={300} />
-          {!barebone && (
-            <Box
-              sx={{
-                justifyContent: 'space-around',
-                alignItems: 'space-between',
-                width: '100%',
-                display: 'flex',
-                flexDirection: 'row',
+          <Box
+            sx={{
+              justifyContent: 'space-around',
+              alignItems: 'space-between',
+              width: '100%',
+              display: 'flex',
+              flexDirection: 'row',
+            }}
+            mt={6}
+          >
+            <NavButton
+              onClick={() => {
+                dispatch(set.activeStep(3));
+                navigate('/covercrop');
               }}
-              mt={6}
             >
-              <NavButton
-                onClick={() => {
-                  dispatch(set.activeStep(3));
-                  navigate('/covercrop');
-                }}
-              >
-                BACK
-              </NavButton>
-              <NavButton
-                onClick={() => {
-                  dispatch(set.activeStep(5));
-                  navigate('/output');
-                }}
-                disabled={!cashCrop || !cashCropPlantingDate || !targetN || targetN < 0 || !Yield || Yield < 0}
-              >
-                NEXT
-              </NavButton>
-            </Box>
-          )}
+              BACK
+            </NavButton>
+            <NavButton
+              onClick={() => {
+                dispatch(set.activeStep(5));
+                navigate('/output');
+              }}
+              disabled={!cashCrop || !cashCropPlantingDate || !targetN || targetN < 0 || !Yield || Yield < 0}
+            >
+              NEXT
+            </NavButton>
+          </Box>
         </Box>
-      </Box>
-    </Box>
+      </Grid>
+    </Grid>
+
   );
 }; // CashCrop
 

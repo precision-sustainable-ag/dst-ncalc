@@ -3,7 +3,7 @@ import { useDispatch, useSelector } from 'react-redux';
 import { useNavigate } from 'react-router-dom';
 import Box from '@mui/material/Box';
 import Typography from '@mui/material/Typography';
-import { Stack, styled } from '@mui/material';
+import { Stack, styled, Grid } from '@mui/material';
 import { get, set } from '../../store/Store';
 import Myslider from '../../shared/Slider';
 import Help from '../../shared/Help';
@@ -18,7 +18,7 @@ const CustomInputText = styled(Typography)({
   marginBottom: '0.2rem',
 });
 
-const CoverCropSecond = ({ barebone = false }) => {
+const CoverCropSecond = () => {
   const navigate = useNavigate();
   const dispatch = useDispatch();
   const N = useSelector(get.N);
@@ -28,48 +28,30 @@ const CoverCropSecond = ({ barebone = false }) => {
   const isSatelliteMode = useSelector(get.biomassCalcMode) === 'satellite';
 
   return (
-    <Box
-      sx={{
-        justifyContent: 'center',
-        margin: '0% 5% 0% 5%',
-        display: 'flex',
-        alignItems: 'center',
-        backgroundColor: '#fff',
-        padding: '1rem',
-        borderRadius: '1rem',
-        flexDirection: 'column',
-        width: '100%',
-        // width: {
-        //   xs: '100%',
-        //   sm: '100%',
-        //   md: '90%',
-        //   lg: '70%',
-        //   xl: '60%',
-        // },
-      }}
-    >
-      <Box
-        style={{
+    <Grid container justifyContent="center">
+      <Grid
+        item
+        xs={12}
+        lg={10}
+        sx={{
+          marginTop: '1rem',
+          padding: '2rem 4rem',
+          boxShadow: 5,
+          borderRadius: 5,
+          opacity: 0.9,
+          backgroundColor: 'white',
           display: 'flex',
           flexDirection: 'column',
           alignItems: 'center',
-          backgroundColor: '#fff',
-          padding: '1rem',
-          borderRadius: '1rem',
-          width: '100%',
         }}
       >
-        {barebone ? (
-          <Typography variant="h5">Tell us about your Cover Crop Quality</Typography>
-        ) : (
-          <Typography variant="h4">Tell us about your Cover Crop Quality</Typography>
-        )}
+        <Typography variant="h4">Tell us about your Cover Crop Quality</Typography>
         {isSatelliteMode && (
-          <Typography variant="subtitle1" fontWeight={900}>
-            These values are estimated based on plant species and growth satge
-          </Typography>
+        <Typography variant="subtitle1" fontWeight={900}>
+          These values are estimated based on plant species and growth satge
+        </Typography>
         )}
-        <Box sx={{ width: '90%' }}>
+        <Box sx={{ width: '50%' }}>
           <Box mt={2} sx={{ display: 'flex', flexDirection: 'row', alignItems: 'center' }}>
             <Stack direction="row" alignItems="center">
               <CustomInputText>Nitrogen (%)</CustomInputText>
@@ -85,8 +67,8 @@ const CoverCropSecond = ({ barebone = false }) => {
               <CustomInputText>Carbohydrates (%)</CustomInputText>
               <Help>
                 <p>
-                  Non-structural labile carbohydrate concentration based on lab results. This represents the most readily decomposable C constituents
-                  in plant materials.
+                  Non-structural labile carbohydrate concentration based on lab results.
+                  This represents the most readily decomposable C constituents in plant materials.
                 </p>
                 <p>The default value is based on the nitrogen concentration.</p>
                 <p>If you have the raw data from near infra-red reflectance spectroscopy (NIRS) analysis, use the following equation:</p>
@@ -118,7 +100,10 @@ const CoverCropSecond = ({ barebone = false }) => {
             <Stack direction="row" alignItems="center">
               <CustomInputText>Lignin (%)</CustomInputText>
               <Help>
-                <p>Structural lignin concentration based on lab results. This represents the most recalcitrant C constituents in plant materials.</p>
+                <p>
+                  Structural lignin concentration based on lab results.
+                  This represents the most recalcitrant C constituents in plant materials.
+                </p>
                 <p>The default value is based on the nitrogen concentration.</p>
               </Help>
               {!lign && <Required />}
@@ -127,31 +112,31 @@ const CoverCropSecond = ({ barebone = false }) => {
           </Box>
           <Myslider id="lign" min={1} max={10} step={0.1} disabled={isSatelliteMode} />
         </Box>
-        {!barebone && (
-          <Box
-            sx={{
-              justifyContent: 'space-around',
-              alignItems: 'space-between',
-              width: '100%',
-              display: 'flex',
-              flexDirection: 'row',
+
+        <Box
+          sx={{
+            justifyContent: 'space-around',
+            alignItems: 'space-between',
+            width: '100%',
+            display: 'flex',
+            flexDirection: 'row',
+          }}
+          mt={6}
+        >
+          <NavButton onClick={() => navigate('/covercrop')}>BACK</NavButton>
+          <NavButton
+            onClick={() => {
+              dispatch(set.activeStep(4));
+              navigate('/cashcrop');
             }}
-            mt={6}
+            disabled={!N || !carb || !cell || !lign}
           >
-            <NavButton onClick={() => navigate('/covercrop')}>BACK</NavButton>
-            <NavButton
-              onClick={() => {
-                dispatch(set.activeStep(4));
-                navigate('/cashcrop');
-              }}
-              disabled={!N || !carb || !cell || !lign}
-            >
-              NEXT
-            </NavButton>
-          </Box>
-        )}
-      </Box>
-    </Box>
+            NEXT
+          </NavButton>
+        </Box>
+      </Grid>
+    </Grid>
+
   );
 }; // CoverCropSecond
 CoverCropSecond.showInMenu = false;

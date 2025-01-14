@@ -2,10 +2,12 @@
 import React, { useEffect } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import {
-  useLocation, useNavigate, Route, Routes,
+  useNavigate, Route, Routes,
 } from 'react-router-dom';
 import { ThemeProvider, createTheme } from '@mui/material/styles';
-import { Container, Box, Button } from '@mui/material';
+import {
+  Container, Box, Button, Grid,
+} from '@mui/material';
 import {
   PSATheme, PSAHeader, PSAAuthButton, FadeAlert,
 } from 'shared-react-components/src';
@@ -36,10 +38,8 @@ screens.cashcrop = require('./components/CashCrop').default;
 screens.output = require('./components/Output').default;
 screens.feedback = require('./components/Feedback').default;
 screens.advanced = require('./components/Advanced').default;
-screens.satpath = require('./components/SatPath').default;
 
 screens.init.showInMenu = false;
-screens.satpath.showInMenu = false;
 
 if (screens.feedback) {
   screens.feedback.showInMenu = false;
@@ -77,8 +77,6 @@ const dstTheme = createTheme(deepmerge(PSATheme, theme));
 
 const App = () => {
   useSelector(get.screen); // force render
-  // eslint-disable-next-line no-unused-vars
-  const location = useLocation();
   const navigate = useNavigate();
   const dispatch = useDispatch();
 
@@ -110,14 +108,21 @@ const App = () => {
     },
   ];
 
+  // auto close alert in fixed time
+  useEffect(() => {
+    if (showAlert) {
+      setTimeout(() => {
+        dispatch(set.user.showAlert(false));
+      }, 3000);
+    }
+  }, [showAlert]);
+
   return (
     <ThemeProvider theme={dstTheme}>
       <Auth0ProviderWithNavigate>
         <PSAHeader title="Cover Crop Nitrogen Calculator" onLogoClick={() => navigate('/')} navContent={navContent} />
         <NcalcStepper />
         <Container
-          // py={50}
-          id="app-container"
           sx={{
             minHeight: 'calc(99.7vh - 255px)',
             minWidth: '100%',
@@ -126,30 +131,21 @@ const App = () => {
             backgroundRepeat: 'no-repeat',
           }}
         >
-          <Box
-            sx={{
-              display: 'flex',
-              justifyContent: 'center',
-              paddingTop: '1rem',
-            }}
-            id="body-wrapper"
-          >
-            <Routes>
-              {Object.keys(screens).map((scr) => (
-                <Route key={scr} path={scr.toLowerCase()} element={<Screen />} />
-              ))}
-              <Route path="" element={<Screen />} />
-            </Routes>
-            <Feedback />
-            <SnackbarMessage />
-            <Box sx={{ position: 'fixed', bottom: 0, zIndex: 1000 }}>
-              <FadeAlert
-                showAlert={showAlert}
-                severity={alertSeverity}
-                message={alertMessage}
-                action={<Button onClick={() => dispatch(set.user.showAlert(false))}>CLOSE</Button>}
-              />
-            </Box>
+          <Routes>
+            {Object.keys(screens).map((scr) => (
+              <Route key={scr} path={scr.toLowerCase()} element={<Screen />} />
+            ))}
+            <Route path="" element={<Screen />} />
+          </Routes>
+          <Feedback />
+          <SnackbarMessage />
+          <Box sx={{ position: 'fixed', bottom: 0, zIndex: 1000 }}>
+            <FadeAlert
+              showAlert={showAlert}
+              severity={alertSeverity}
+              message={alertMessage}
+              action={<Button onClick={() => dispatch(set.user.showAlert(false))}>CLOSE</Button>}
+            />
           </Box>
         </Container>
       </Auth0ProviderWithNavigate>

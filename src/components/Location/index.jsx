@@ -1,7 +1,9 @@
-import React, { useState } from 'react';
+import React from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useDispatch, useSelector } from 'react-redux';
-import { Box, Stack, Typography, Badge, Paper, Grid } from '@mui/material';
+import {
+  Box, Stack, Typography, Badge, Grid,
+} from '@mui/material';
 import { PSALoadingSpinner, PSATooltip } from 'shared-react-components/src';
 import BiomassMap from '../../shared/Map/BiomassMap';
 import { get, set } from '../../store/Store';
@@ -11,14 +13,15 @@ import Datebox from '../../shared/BiomassData/Datebox';
 import { AreaErrorModal, TaskFailModal } from '../../shared/BiomassData/Warnings';
 
 const nextButtonBadgeContent = () => (
-  <PSATooltip title="No polygon is drawn" tooltipContent={(
-    <Typography>?</Typography>
+  <PSATooltip
+    title="No polygon is drawn"
+    tooltipContent={(
+      <Typography>?</Typography>
   )}
   />
 );
 
-// TODO: barebone is a var to decide if this view is showed as a widget, same in other pages
-const Location = ({ barebone = false }) => {
+const Location = () => {
   const navigate = useNavigate();
   const dispatch = useDispatch();
   const isSatelliteMode = useSelector(get.biomassCalcMode) === 'satellite';
@@ -31,33 +34,35 @@ const Location = ({ barebone = false }) => {
   useFetchHLS();
 
   return (
-    <Box sx={{ width: '100%', padding: '0rem' }}>
-      <Box sx={{ margin: '2rem 0rem' }}>
-        <Paper sx={{ padding: '1rem', borderRadius: '1rem' }}>
-          {!barebone && (
-            <Typography variant="h5" gutterBottom>
-              Where is your Field located?
+    <Grid container justifyContent="center">
+      <Grid
+        item
+        xs={12}
+        lg={10}
+        sx={{
+          marginTop: '1rem',
+          padding: '2rem 4rem',
+          boxShadow: 5,
+          borderRadius: 5,
+          opacity: 0.9,
+          backgroundColor: 'white',
+        }}
+      >
+        <Stack spacing="1rem">
+          <Typography variant="h4" align="center">
+            Where is your Field located?
+          </Typography>
+          <Typography variant="h6" align="center">
+            Enter your address or zip code to determine your field&apos;s location. You can then zoom in and click to pinpoint it on the map. If
+            you know your exact coordinates, you can enter them in search bar separated by comma (ex. 37.7, -80.2 ).
+          </Typography>
+          {isSatelliteMode && (
+            <Typography variant="h8" align="center" pt={1}>
+              Specify your crop&apos;s planting and termination dates, anc your field&apos;s boundary on the map using the drawing tool.
             </Typography>
           )}
-          <Stack mb={1}>
-            <Typography variant="h8" gutterBottom>
-              Enter your address or zip code to determine your field&apos;s location. You can then zoom in and click to pinpoint it on the map. If
-              you know your exact coordinates, you can enter them in search bar separated by comma (ex. 37.7, -80.2 ).
-            </Typography>
-            {isSatelliteMode && (
-              <Typography variant="h8" gutterBottom pt={1}>
-                Specify your field&apos;s boundary on the map using the drawing tool.
-              </Typography>
-            )}
-          </Stack>
-          <Stack mt={5} gap={1} margin={5}>
-            {isSatelliteMode && (
-              <Typography variant="h8" gutterBottom>
-                Specify your crop&apos;s planting and termination dates.
-              </Typography>
-            )}
-            <Datebox />
-          </Stack>
+          <Datebox />
+
           {biomassFetchIsLoading && (
             <Box>
               <Grid
@@ -87,55 +92,50 @@ const Location = ({ barebone = false }) => {
               </Typography>
             </Box>
           )}
-          {polyDrawTooBig && (
-            <AreaErrorModal />
-          )}
-          {biomassFetchIsFailed && (
-            <TaskFailModal task="biomass" />
-          )}
+          {polyDrawTooBig && <AreaErrorModal />}
+          {biomassFetchIsFailed && <TaskFailModal task="biomass" /> }
           <BiomassMap variant="biomass" />
-          {!barebone && (
-            <Box
-              mt={2}
-              sx={{
-                justifyContent: 'space-around',
-                alignItems: 'space-between',
-                width: '100%',
-                display: 'flex',
-                flexDirection: 'row',
+        </Stack>
+        <Box
+          mt={2}
+          sx={{
+            justifyContent: 'space-around',
+            alignItems: 'space-between',
+            width: '100%',
+            display: 'flex',
+            flexDirection: 'row',
+          }}
+        >
+          <NavButton
+            onClick={() => {
+              dispatch(set.activeStep(0));
+              navigate('/home');
+            }}
+          >
+            BACK
+          </NavButton>
+          <Badge color="primary" invisible={!isSatelliteMode || isSatelliteMode} badgeContent={nextButtonBadgeContent()}>
+            <NavButton
+                  // disabled={isSatelliteMode}
+              onClick={() => {
+                if (isSatelliteMode) {
+                  // calcBiomass();
+                  dispatch(set.activeStep(3));
+                  navigate('/covercrop');
+                } else {
+                  dispatch(set.activeStep(2));
+                  navigate('/soil');
+                }
+                return null;
               }}
             >
-              <NavButton
-                onClick={() => {
-                  dispatch(set.activeStep(0));
-                  navigate('/home');
-                }}
-              >
-                BACK
-              </NavButton>
-              <Badge color="primary" invisible={!isSatelliteMode || isSatelliteMode} badgeContent={nextButtonBadgeContent()}>
-                <NavButton
-                  // disabled={isSatelliteMode}
-                  onClick={() => {
-                    if (isSatelliteMode) {
-                      // calcBiomass();
-                      dispatch(set.activeStep(3));
-                      navigate('/covercrop');
-                    } else {
-                      dispatch(set.activeStep(2));
-                      navigate('/soil');
-                    }
-                    return null;
-                  }}
-                >
-                  NEXT
-                </NavButton>
-              </Badge>
-            </Box>
-          )}
-        </Paper>
-      </Box>
-    </Box>
+              NEXT
+            </NavButton>
+          </Badge>
+        </Box>
+      </Grid>
+    </Grid>
+
   );
 }; // Location
 
