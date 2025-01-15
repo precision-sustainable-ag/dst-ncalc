@@ -1,14 +1,15 @@
 /* eslint-disable no-console */
 import React from 'react';
 import { Box, Grid } from '@mui/material';
-import { useSelector } from 'react-redux';
+import { useDispatch, useSelector } from 'react-redux';
+import { useNavigate } from 'react-router-dom';
 import NitrogenCard from './NitrogenWidget';
 import ResidueCard from './ResidueWidget';
 import BiomassMapWidget from './BiomassMapWidget';
 import { SummaryCard } from './SummaryWidget';
 import NitrogenMapWidget from './NitrogenMapWidget';
-import { get } from '../../../store/redux-autosetters';
-import NavigateButtons from '../../../shared/Navigate';
+import { get, set } from '../../../store/redux-autosetters';
+import NavigateBar from '../../../shared/Navigate';
 
 /// /// /// STYLES /// /// ///
 const wrapperStyles = {
@@ -26,6 +27,9 @@ const RightSideBar = ({ summaryData, refs }) => {
   useSelector(get.screen); // force render
   useSelector(get.biomassTaskResults); // force render
   useSelector(get.nitrogenTaskResults); // force render
+
+  const navigate = useNavigate();
+  const dispatch = useDispatch();
 
   /// /// RETURN JSX /// ///
   return (
@@ -51,11 +55,14 @@ const RightSideBar = ({ summaryData, refs }) => {
           </Grid>
         )}
         <Grid item sm={12} lg={12} width="100%">
-          <NavigateButtons
-            backRoute="/cashcrop"
-            nextRoute="/advanced"
-            backText="BACK"
-            nextText="ADVANCED"
+          <NavigateBar
+            next="ADVANCED"
+            nextOnClick={() => { navigate('/advanced'); }}
+            back="back"
+            backOnClick={() => {
+              dispatch(set.activeStep(4));
+              navigate('/cashcrop');
+            }}
           />
         </Grid>
       </Grid>

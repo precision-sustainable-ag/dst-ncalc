@@ -10,7 +10,7 @@ import { get, set } from '../../store/Store';
 import Myslider from '../../shared/Slider';
 import Help from '../../shared/Help';
 import { useFetchSSURGO } from '../../hooks/useFetchApi';
-import NavButton from '../../shared/Navigate/NavButton';
+import NavigateBar from '../../shared/Navigate';
 
 /// /// /// ROOT COMPONENT /// /// ///
 const Soil = () => {
@@ -38,7 +38,7 @@ const Soil = () => {
           backgroundColor: 'white',
         }}
       >
-        <Stack spacing="1rem">
+        <Stack spacing="1rem" sx={{ marginBottom: '1rem' }}>
           <Typography variant="h4" align="center">Tell us about your Soil</Typography>
           {ssurgo ? (
             isSatelliteMode ? (
@@ -126,33 +126,18 @@ const Soil = () => {
 
         </Stack>
 
-        <Box
-          sx={{
-            justifyContent: 'space-around',
-            alignItems: 'space-between',
-            width: '100%',
-            display: 'flex',
-            flexDirection: 'row',
+        <NavigateBar
+          next="next"
+          nextOnClick={() => {
+            dispatch(set.activeStep(3));
+            navigate('/covercrop');
           }}
-          mt={6}
-        >
-          <NavButton
-            onClick={() => {
-              dispatch(set.activeStep(1));
-              navigate('/location');
-            }}
-          >
-            BACK
-          </NavButton>
-          <NavButton
-            onClick={() => {
-              dispatch(set.activeStep(3));
-              navigate('/covercrop');
-            }}
-          >
-            NEXT
-          </NavButton>
-        </Box>
+          back="back"
+          backOnClick={() => {
+            dispatch(set.activeStep(1));
+            navigate('/location');
+          }}
+        />
       </Grid>
     </Grid>
 

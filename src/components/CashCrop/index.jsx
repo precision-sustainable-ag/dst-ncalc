@@ -12,6 +12,7 @@ import Help from '../../shared/Help';
 import Required from '../../shared/Required';
 import NavButton from '../../shared/Navigate/NavButton';
 import { useFetchCropNames } from '../../hooks/useFetchStatic';
+import NavigateBar from '../../shared/Navigate';
 
 const CustomInputText = styled(Typography)({
   fontSize: '1.2rem',
@@ -52,7 +53,7 @@ const CashCrop = () => {
         }}
       >
         <Typography variant="h4">Tell us about your Cash Crop</Typography>
-        <Box mt={2}>
+        <Box m={2}>
           <Stack direction="row" alignItems="center">
             <CustomInputText>Cash Crop: </CustomInputText>
             {!cashCrop && <Required />}
@@ -108,35 +109,22 @@ const CashCrop = () => {
           </Box>
 
           <Myslider id="targetN" min={0} max={300} />
-          <Box
-            sx={{
-              justifyContent: 'space-around',
-              alignItems: 'space-between',
-              width: '100%',
-              display: 'flex',
-              flexDirection: 'row',
-            }}
-            mt={6}
-          >
-            <NavButton
-              onClick={() => {
-                dispatch(set.activeStep(3));
-                navigate('/covercrop');
-              }}
-            >
-              BACK
-            </NavButton>
-            <NavButton
-              onClick={() => {
-                dispatch(set.activeStep(5));
-                navigate('/output');
-              }}
-              disabled={!cashCrop || !cashCropPlantingDate || !targetN || targetN < 0 || !Yield || Yield < 0}
-            >
-              NEXT
-            </NavButton>
-          </Box>
+
         </Box>
+
+        <NavigateBar
+          next="next"
+          nextOnClick={() => {
+            dispatch(set.activeStep(5));
+            navigate('/output');
+          }}
+          nextDisabled={!cashCrop || !cashCropPlantingDate || !targetN || targetN < 0 || !Yield || Yield < 0}
+          back="back"
+          backOnClick={() => {
+            dispatch(set.activeStep(3));
+            navigate('/covercrop');
+          }}
+        />
       </Grid>
     </Grid>
 

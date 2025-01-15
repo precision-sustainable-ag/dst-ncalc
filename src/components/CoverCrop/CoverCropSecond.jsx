@@ -8,7 +8,7 @@ import { get, set } from '../../store/Store';
 import Myslider from '../../shared/Slider';
 import Help from '../../shared/Help';
 import Required from '../../shared/Required';
-import NavButton from '../../shared/Navigate/NavButton';
+import NavigateBar from '../../shared/Navigate';
 
 const CustomInputText = styled(Typography)({
   fontSize: '1.2rem',
@@ -51,7 +51,7 @@ const CoverCropSecond = () => {
           These values are estimated based on plant species and growth satge
         </Typography>
         )}
-        <Box sx={{ width: '50%' }}>
+        <Box sx={{ width: '50%', marginBottom: '1rem' }}>
           <Box mt={2} sx={{ display: 'flex', flexDirection: 'row', alignItems: 'center' }}>
             <Stack direction="row" alignItems="center">
               <CustomInputText>Nitrogen (%)</CustomInputText>
@@ -113,27 +113,16 @@ const CoverCropSecond = () => {
           <Myslider id="lign" min={1} max={10} step={0.1} disabled={isSatelliteMode} />
         </Box>
 
-        <Box
-          sx={{
-            justifyContent: 'space-around',
-            alignItems: 'space-between',
-            width: '100%',
-            display: 'flex',
-            flexDirection: 'row',
+        <NavigateBar
+          next="next"
+          nextOnClick={() => {
+            dispatch(set.activeStep(4));
+            navigate('/cashcrop');
           }}
-          mt={6}
-        >
-          <NavButton onClick={() => navigate('/covercrop')}>BACK</NavButton>
-          <NavButton
-            onClick={() => {
-              dispatch(set.activeStep(4));
-              navigate('/cashcrop');
-            }}
-            disabled={!N || !carb || !cell || !lign}
-          >
-            NEXT
-          </NavButton>
-        </Box>
+          nextDisabled={!N || !carb || !cell || !lign}
+          back="back"
+          backOnClick={() => navigate('/covercrop')}
+        />
       </Grid>
     </Grid>
 

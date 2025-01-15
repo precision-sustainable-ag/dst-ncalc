@@ -8,10 +8,10 @@ import { useNavigate } from 'react-router-dom';
 import { PSATextField } from 'shared-react-components/src';
 import { get, set } from '../../store/Store';
 import Help from '../../shared/Help';
-import NavButton from '../../shared/Navigate/NavButton';
 import About from '../About';
 import { historyStates } from '../../store/inits';
 import HistoryDropdown from '../HistoryDropdown';
+import NavigateBar from '../../shared/Navigate';
 
 const BiomassMethodButton = styled(ToggleButton)(() => ({
   '&.Mui-selected': {
@@ -145,21 +145,16 @@ const Home = () => {
             </ToggleButtonGroup>
           </Stack>
         </Stack>
-        <Box sx={{ height: '2rem' }} />
-        <Stack spacing={2} direction="row" justifyContent="space-around">
-          <NavButton onClick={() => setAboutOpen(true)} fontSize="1rem">
-            About
-          </NavButton>
-          <NavButton
-            onClick={() => {
-              navigate('/location');
-              dispatch(set.activeStep(1));
-            }}
-            fontSize="1rem"
-          >
-            Get Started
-          </NavButton>
-        </Stack>
+        <Box sx={{ height: '1rem' }} />
+        <NavigateBar
+          next="Get Started"
+          nextOnClick={() => {
+            navigate('/location');
+            dispatch(set.activeStep(1));
+          }}
+          back="About"
+          backOnClick={() => setAboutOpen(true)}
+        />
         <About open={aboutOpen} setOpen={setAboutOpen} />
       </Grid>
     </Grid>

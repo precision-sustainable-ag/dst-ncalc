@@ -21,7 +21,7 @@ import Myslider from '../../shared/Slider';
 import Help from '../../shared/Help';
 import BiomassData from '../../shared/BiomassData';
 import Required from '../../shared/Required';
-import NavButton from '../../shared/Navigate/NavButton';
+import NavigateBar from '../../shared/Navigate';
 import { useFetchPlantFactors } from '../../hooks/useFetchApi';
 
 const UGA_LINK = 'https://extension.uga.edu/publications/detail.html?number=C1077';
@@ -101,7 +101,7 @@ const CoverCropFirst = () => {
         }}
       >
         <Typography variant="h4">Tell us about your Cover Crop</Typography>
-        <Stack direction="column" spacing={2} mt={2}>
+        <Stack direction="column" spacing={2} m={2}>
           <Stack direction="row" alignItems="center">
             {/* <CustomInputText>Cover Crop Species:</CustomInputText> */}
             {(!coverCrop || coverCrop.length === 0) && <Required />}
@@ -230,47 +230,36 @@ const CoverCropFirst = () => {
           )}
         </Stack>
 
-        <Box
-          sx={{
-              justifyContent: 'space-around',
-              alignItems: 'space-between',
-              width: '100%',
-              display: 'flex',
-              flexDirection: 'row',
-            }}
-          mt={4}
-        >
-          <NavButton
-            onClick={() => {
+        <NavigateBar
+          next="next"
+          nextOnClick={() => navigate('/covercrop2')}
+          nextDisabled={disableNextButton}
+          back="back"
+          backOnClick={() => {
                 dispatch(set.activeStep(2));
                 navigate('/soil');
-              }}
-          >
-            BACK
-          </NavButton>
-          <NavButton onClick={() => navigate('/covercrop2')} disabled={disableNextButton}>
-            NEXT
-          </NavButton>
-          <Snackbar
-            open={biomassNotExist}
-            TransitionComponent={Slide}
-            autoHideDuration={5000}
-            onClose={() => {
+          }}
+        />
+
+        <Snackbar
+          open={biomassNotExist}
+          TransitionComponent={Slide}
+          autoHideDuration={5000}
+          onClose={() => {
                 setBiomassNotExist(false);
               }}
-          >
-            <Alert
-              onClose={() => {
+        >
+          <Alert
+            onClose={() => {
                   setBiomassNotExist(false);
                 }}
-              severity="warning"
-              variant="filled"
-              sx={{ width: '100%' }}
-            >
-              <Typography variant="subtitle1">Biomass value need to be calculated first</Typography>
-            </Alert>
-          </Snackbar>
-        </Box>
+            severity="warning"
+            variant="filled"
+            sx={{ width: '100%' }}
+          >
+            <Typography variant="subtitle1">Biomass value need to be calculated first</Typography>
+          </Alert>
+        </Snackbar>
       </Grid>
     </Grid>
 

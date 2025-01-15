@@ -2,24 +2,15 @@ import React from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useDispatch, useSelector } from 'react-redux';
 import {
-  Box, Stack, Typography, Badge, Grid,
+  Box, Stack, Typography, Grid,
 } from '@mui/material';
-import { PSALoadingSpinner, PSATooltip } from 'shared-react-components/src';
+import { PSALoadingSpinner } from 'shared-react-components/src';
 import BiomassMap from '../../shared/Map/BiomassMap';
 import { get, set } from '../../store/Store';
-import NavButton from '../../shared/Navigate/NavButton';
 import useFetchHLS from '../../hooks/useFetchHLS';
 import Datebox from '../../shared/BiomassData/Datebox';
 import { AreaErrorModal, TaskFailModal } from '../../shared/BiomassData/Warnings';
-
-const nextButtonBadgeContent = () => (
-  <PSATooltip
-    title="No polygon is drawn"
-    tooltipContent={(
-      <Typography>?</Typography>
-  )}
-  />
-);
+import NavigateBar from '../../shared/Navigate';
 
 const Location = () => {
   const navigate = useNavigate();
@@ -96,43 +87,24 @@ const Location = () => {
           {biomassFetchIsFailed && <TaskFailModal task="biomass" /> }
           <BiomassMap variant="biomass" />
         </Stack>
-        <Box
-          mt={2}
-          sx={{
-            justifyContent: 'space-around',
-            alignItems: 'space-between',
-            width: '100%',
-            display: 'flex',
-            flexDirection: 'row',
+        <NavigateBar
+          next="next"
+          nextOnClick={() => {
+            if (isSatelliteMode) {
+              // calcBiomass();
+              dispatch(set.activeStep(3));
+              navigate('/covercrop');
+            } else {
+              dispatch(set.activeStep(2));
+              navigate('/soil');
+            }
           }}
-        >
-          <NavButton
-            onClick={() => {
-              dispatch(set.activeStep(0));
-              navigate('/home');
-            }}
-          >
-            BACK
-          </NavButton>
-          <Badge color="primary" invisible={!isSatelliteMode || isSatelliteMode} badgeContent={nextButtonBadgeContent()}>
-            <NavButton
-                  // disabled={isSatelliteMode}
-              onClick={() => {
-                if (isSatelliteMode) {
-                  // calcBiomass();
-                  dispatch(set.activeStep(3));
-                  navigate('/covercrop');
-                } else {
-                  dispatch(set.activeStep(2));
-                  navigate('/soil');
-                }
-                return null;
-              }}
-            >
-              NEXT
-            </NavButton>
-          </Badge>
-        </Box>
+          back="back"
+          backOnClick={() => {
+            dispatch(set.activeStep(0));
+            navigate('/home');
+          }}
+        />
       </Grid>
     </Grid>
 
