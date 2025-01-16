@@ -29,6 +29,7 @@ const ListWrapperStyles = {
 const ListStyles = {
   direction: 'column',
   marginLeft: 2,
+  marginTop: 2,
   paddingX: 2,
   paddingY: 2,
   borderRadius: 2,

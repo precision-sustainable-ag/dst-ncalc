@@ -98,41 +98,47 @@ const Home = () => {
         <Box
           sx={{
             marginTop: 3,
-            display: 'flex',
-            justifyContent: 'center',
-            alignItems: 'center',
+            padding: 4,
+            borderRadius: 2,
+            boxShadow: 5,
+            textAlign: 'center',
           }}
         >
-          <Box
-            sx={{
-              backgroundColor: '#fff',
-              padding: 4,
-              borderRadius: 2,
-              boxShadow: 5,
-              textAlign: 'center',
-            }}
-          >
-            <Typography mb={2}>
-              Would you like to save your selection history? Simply give it a name, and your selections will be stored after you&apos;ve made all your
-              selections.
-            </Typography>
-            <PSATextField
-              label="Name your Field (optional)"
-              value={fieldName}
-              onChange={(e) => setFieldName(e.target.value)}
-              error={isFieldNameExisted()}
-              helperText={isFieldNameExisted() ? 'Field name existed!' : null}
-              onBlur={() => {
-                if (!isFieldNameExisted()) dispatch(set.field(fieldName));
-              }}
-              onKeyDown={(e) => {
-                if (e.key === 'Enter' && !isFieldNameExisted()) dispatch(set.field(fieldName));
-              }}
-            />
-            <Help />
-            <Typography mb={2}>Retrieve your previous selections here:</Typography>
-            <HistoryDropdown />
-          </Box>
+          <Typography mb={2}>
+            Would you like to save your selection history? Simply give it a name, and your selections will be stored after you&apos;ve made all your
+            selections.
+          </Typography>
+          <Grid container spacing="1rem">
+            <Grid item xs={6} display="flex" justifyContent="flex-end" alignItems="center">
+              <Typography>
+                Name your field:
+                <Help />
+              </Typography>
+            </Grid>
+            <Grid item xs={6} display="flex" justifyContent="flex-start" alignItems="center">
+              <PSATextField
+                label="Name your Field (optional)"
+                value={fieldName}
+                onChange={(e) => setFieldName(e.target.value)}
+                error={isFieldNameExisted()}
+                helperText={isFieldNameExisted() ? 'Field name existed!' : null}
+                onBlur={() => {
+                  if (!isFieldNameExisted()) dispatch(set.field(fieldName));
+                }}
+                onKeyDown={(e) => {
+                  if (e.key === 'Enter' && !isFieldNameExisted()) dispatch(set.field(fieldName));
+                }}
+              />
+            </Grid>
+            <Grid item xs={6} display="flex" justifyContent="flex-end" alignItems="center">
+              <Typography mb={2}>Retrieve your previous selections here:</Typography>
+            </Grid>
+            <Grid item xs={6} display="flex" justifyContent="flex-start" alignItems="center">
+              <HistoryDropdown />
+            </Grid>
+
+          </Grid>
+
         </Box>
         <Box sx={{ height: '2rem' }} />
         <Stack spacing={2} direction="column">
