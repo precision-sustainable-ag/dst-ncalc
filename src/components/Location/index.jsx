@@ -3,6 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import { useDispatch, useSelector } from 'react-redux';
 import {
   Box, Stack, Typography, Grid,
+  useMediaQuery,
 } from '@mui/material';
 import { PSALoadingSpinner } from 'shared-react-components/src';
 import BiomassMap from '../../shared/Map/BiomassMap';
@@ -21,6 +22,8 @@ const Location = () => {
   const polyDrawTooBig = useSelector(get.polyDrawTooBig);
   const biomassFetchIsFailed = useSelector(get.biomassFetchIsFailed);
 
+  const matchesMd = useMediaQuery((theme) => theme.breakpoints.down('md'));
+
   // API for getting biomass map
   useFetchHLS();
 
@@ -29,10 +32,10 @@ const Location = () => {
       <Grid
         item
         xs={12}
-        lg={10}
+        md={10}
         sx={{
           marginTop: '1rem',
-          padding: '2rem 4rem',
+          padding: `2rem ${matchesMd ? '1rem' : '4rem'}`,
           boxShadow: 5,
           borderRadius: 5,
           opacity: 0.9,

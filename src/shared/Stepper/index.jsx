@@ -1,7 +1,7 @@
 import React, { useEffect } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
 import { useDispatch, useSelector } from 'react-redux';
-import { Box, useMediaQuery, useTheme } from '@mui/material';
+import { Box, useMediaQuery } from '@mui/material';
 import { PSAStepper } from 'shared-react-components/src';
 import { get, set } from '../../store/Store';
 
@@ -9,8 +9,7 @@ const tabs = ['home', 'location', 'soil', 'covercrop', 'cashcrop', 'output'];
 const titles = ['Home', 'Location', 'Soil', 'Cover Crop', 'Cash Crop', 'Output'];
 
 const NcalcStepper = () => {
-  const theme = useTheme();
-  const matchesMd = useMediaQuery(theme.breakpoints.down('md'));
+  const matchesMd = useMediaQuery((theme) => theme.breakpoints.down('md'));
 
   const step = useSelector(get.activeStep);
 
@@ -38,7 +37,7 @@ const NcalcStepper = () => {
         stepperProps={{ activeStep: step }}
         mobile={matchesMd}
         // TODO: add disable next logic
-        nextButtonDisabled={false}
+        nextButtonDisabled={step === tabs.length - 1}
       />
     </Box>
   );

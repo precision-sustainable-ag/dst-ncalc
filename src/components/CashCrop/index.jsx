@@ -4,13 +4,13 @@ import { useDispatch, useSelector } from 'react-redux';
 import { useNavigate } from 'react-router-dom';
 import {
   Autocomplete, Box, Stack, Typography, styled, Grid,
+  useMediaQuery,
 } from '@mui/material';
 import { PSATextField } from 'shared-react-components/src';
 import { get, set } from '../../store/Store';
 import Myslider from '../../shared/Slider';
 import Help from '../../shared/Help';
 import Required from '../../shared/Required';
-import NavButton from '../../shared/Navigate/NavButton';
 import { useFetchCropNames } from '../../hooks/useFetchStatic';
 import NavigateBar from '../../shared/Navigate';
 
@@ -34,15 +34,17 @@ const CashCrop = () => {
 
   const [plantingDate, setPlantingDate] = useState(cashCropPlantingDate);
 
+  const matchesMd = useMediaQuery((theme) => theme.breakpoints.down('md'));
+
   return (
     <Grid container justifyContent="center">
       <Grid
         item
         xs={12}
-        lg={10}
+        md={10}
         sx={{
           marginTop: '1rem',
-          padding: '2rem 4rem',
+          padding: `2rem ${matchesMd ? '1rem' : '4rem'}`,
           boxShadow: 5,
           borderRadius: 5,
           opacity: 0.9,

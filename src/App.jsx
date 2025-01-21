@@ -7,6 +7,7 @@ import {
 import { ThemeProvider, createTheme } from '@mui/material/styles';
 import {
   Container, Box, Button, Grid,
+  useMediaQuery,
 } from '@mui/material';
 import {
   PSATheme, PSAHeader, PSAAuthButton, FadeAlert,
@@ -80,6 +81,8 @@ const App = () => {
   const navigate = useNavigate();
   const dispatch = useDispatch();
 
+  const matchesMd = useMediaQuery(theme.breakpoints.down('md'));
+
   const path = window.location.toString().split('/').pop().toLowerCase() || 'home';
   const Screen = screens[path] || screens.home;
 
@@ -122,9 +125,9 @@ const App = () => {
       <Auth0ProviderWithNavigate>
         <PSAHeader title="Cover Crop Nitrogen Calculator" onLogoClick={() => navigate('/')} navContent={navContent} />
         <NcalcStepper />
-        <Container
+        <Box
           sx={{
-            minHeight: 'calc(99.7vh - 255px)',
+            minHeight: `calc(99.7vh - ${matchesMd ? '85px' : '255px'})`,
             minWidth: '100%',
             backgroundImage: `url(${'/background_0.jpg'})`,
             backgroundSize: 'cover',
@@ -139,7 +142,7 @@ const App = () => {
           </Routes>
           <Feedback />
           <SnackbarMessage />
-          <Box sx={{ position: 'fixed', bottom: 0, zIndex: 1000 }}>
+          <Box sx={{ position: 'fixed', bottom: matchesMd ? '45px' : 0, zIndex: 1000 }}>
             <FadeAlert
               showAlert={showAlert}
               severity={alertSeverity}
@@ -147,7 +150,7 @@ const App = () => {
               action={<Button onClick={() => dispatch(set.user.showAlert(false))}>CLOSE</Button>}
             />
           </Box>
-        </Container>
+        </Box>
       </Auth0ProviderWithNavigate>
     </ThemeProvider>
   );

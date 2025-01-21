@@ -3,6 +3,7 @@ import React, { useEffect, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import {
   Box, Grid, Stack, ToggleButton, ToggleButtonGroup, Typography, styled,
+  useMediaQuery,
 } from '@mui/material';
 import { useNavigate } from 'react-router-dom';
 import { PSATextField } from 'shared-react-components/src';
@@ -40,6 +41,7 @@ const BiomassMethodButton = styled(ToggleButton)(() => ({
 const Home = () => {
   const [aboutOpen, setAboutOpen] = useState(false);
   const dispatch = useDispatch();
+  const matchesMd = useMediaQuery((theme) => theme.breakpoints.down('md'));
   // const privacy = useSelector(get.privacy);
   const biomassCalcMode = useSelector(get.biomassCalcMode);
 
@@ -74,10 +76,10 @@ const Home = () => {
       <Grid
         item
         xs={12}
-        lg={10}
+        md={10}
         sx={{
           marginTop: '1rem',
-          padding: '2rem 4rem',
+          padding: `2rem ${matchesMd ? '1rem' : '4rem'}`,
           boxShadow: 5,
           borderRadius: 5,
           opacity: 0.9,
@@ -109,13 +111,13 @@ const Home = () => {
             selections.
           </Typography>
           <Grid container spacing="1rem">
-            <Grid item xs={6} display="flex" justifyContent="flex-end" alignItems="center">
+            <Grid item xs={12} sm={6} display="flex" justifyContent={matchesMd ? 'center' : 'flex-end'} alignItems="center">
               <Typography>
                 Name your field:
                 <Help />
               </Typography>
             </Grid>
-            <Grid item xs={6} display="flex" justifyContent="flex-start" alignItems="center">
+            <Grid item xs={12} sm={6} display="flex" justifyContent="flex-start" alignItems="center">
               <PSATextField
                 label="Name your Field (optional)"
                 value={fieldName}
@@ -130,10 +132,10 @@ const Home = () => {
                 }}
               />
             </Grid>
-            <Grid item xs={6} display="flex" justifyContent="flex-end" alignItems="center">
+            <Grid item xs={12} sm={6} display="flex" justifyContent={matchesMd ? 'center' : 'flex-end'} alignItems="center">
               <Typography mb={2}>Retrieve your previous selections here:</Typography>
             </Grid>
-            <Grid item xs={6} display="flex" justifyContent="flex-start" alignItems="center">
+            <Grid item xs={12} sm={6} display="flex" justifyContent="flex-start" alignItems="center">
               <HistoryDropdown />
             </Grid>
 

@@ -3,7 +3,9 @@ import { useDispatch, useSelector } from 'react-redux';
 import { useNavigate } from 'react-router-dom';
 import Box from '@mui/material/Box';
 import Typography from '@mui/material/Typography';
-import { Stack, styled, Grid } from '@mui/material';
+import {
+  Stack, styled, Grid, useMediaQuery,
+} from '@mui/material';
 import { get, set } from '../../store/Store';
 import Myslider from '../../shared/Slider';
 import Help from '../../shared/Help';
@@ -27,15 +29,17 @@ const CoverCropSecond = () => {
   const lign = useSelector(get.lign);
   const isSatelliteMode = useSelector(get.biomassCalcMode) === 'satellite';
 
+  const matchesMd = useMediaQuery((theme) => theme.breakpoints.down('md'));
+
   return (
     <Grid container justifyContent="center">
       <Grid
         item
         xs={12}
-        lg={10}
+        md={10}
         sx={{
           marginTop: '1rem',
-          padding: '2rem 4rem',
+          padding: `2rem ${matchesMd ? '1rem' : '4rem'}`,
           boxShadow: 5,
           borderRadius: 5,
           opacity: 0.9,

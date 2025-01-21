@@ -13,7 +13,7 @@ import Stack from '@mui/material/Stack';
 // import Modal from '@mui/material/Modal';
 import Alert from '@mui/material/Alert';
 import Slide from '@mui/material/Slide';
-import { Grid, styled } from '@mui/material';
+import { Grid, styled, useMediaQuery } from '@mui/material';
 import { get, set } from '../../store/Store';
 import CoverCropsInput from './CoverCropsInput';
 import GrowthStageInput from './GrowthStageInput';
@@ -60,6 +60,8 @@ const CoverCropFirst = () => {
   const [disableNextButton, setDisableNextButton] = useState(true);
   const [terminationDate, setTerminationDate] = useState(coverCropTerminationDate);
 
+  const matchesMd = useMediaQuery((theme) => theme.breakpoints.down('md'));
+
   /// Desc: Fetch the plant factors
   useFetchPlantFactors();
 
@@ -87,10 +89,10 @@ const CoverCropFirst = () => {
       <Grid
         item
         xs={12}
-        lg={10}
+        md={10}
         sx={{
           marginTop: '1rem',
-          padding: '2rem 4rem',
+          padding: `2rem ${matchesMd ? '1rem' : '4rem'}`,
           boxShadow: 5,
           borderRadius: 5,
           opacity: 0.9,

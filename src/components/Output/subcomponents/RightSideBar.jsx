@@ -16,7 +16,7 @@ const wrapperStyles = {
   maxWidth: {
     sm: '75%', md: '75%', lg: '80%', xl: '90%',
   },
-  padding: 0,
+  padding: '0 1rem',
 };
 
 /// /// /// ROOT COMPONENT /// /// ///
@@ -33,7 +33,7 @@ const RightSideBar = ({ summaryData, refs }) => {
 
   /// /// RETURN JSX /// ///
   return (
-    <Box sx={wrapperStyles} flex={4} justifyContent="center" id="rightside-wrapper">
+    <Box sx={wrapperStyles} flex={4} justifyContent="center">
       <Grid container spacing={3}>
         <Grid item sm={12} width="100%" mt="1rem">
           <SummaryCard refVal={refs[0]} data={summaryData} />
