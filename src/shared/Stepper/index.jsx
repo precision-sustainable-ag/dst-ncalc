@@ -25,7 +25,6 @@ const NcalcStepper = () => {
 
   // navigate to front page when refresh page
   useEffect(() => {
-    console.log('run');
     const tabLocation = `/${tabs[step]}`;
     if (!location.pathname.includes(tabLocation)) navigate('/home');
   }, []);

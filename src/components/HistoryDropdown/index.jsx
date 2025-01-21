@@ -11,9 +11,13 @@ import { loadHistory } from '../../utils/userHistory';
 const HistoryDropdown = () => {
   const { isAuthenticated, getAccessTokenSilently } = useAuth0();
   const dispatch = useDispatch();
+
+  const field = useSelector(get.field);
   const userHistoryList = useSelector(get.user.userHistoryList);
 
-  const [selectedField, setSelectedField] = useState('');
+  // eslint-disable-next-line no-nested-ternary
+  const initField = field === '' ? '' : (isAuthenticated ? `history-${field}` : `ncalc-${field}`);
+  const [selectedField, setSelectedField] = useState(initField);
 
   // get all fields from localStorage
   const myFields = Object.keys(localStorage).filter((key) => key.startsWith('ncalc-'));
@@ -34,6 +38,13 @@ const HistoryDropdown = () => {
     };
     if (isAuthenticated) fetchUserData();
   }, [isAuthenticated, getAccessTokenSilently]);
+
+  // reset history dropdown when fieldname is changed
+  useEffect(() => {
+    if (isAuthenticated) {
+      if (!userHistoryList.find((item) => item.label === `history-${field}`)) setSelectedField('');
+    } else if (!myFields.find((item) => item === `ncalc-${field}`)) setSelectedField('');
+  }, [field]);
 
   const handleDropdown = async (e) => {
     const fieldStr = e.target.value;

@@ -11,7 +11,6 @@ const CoverCropsInput = ({ isSatelliteMode }) => {
   const coverCrop = useSelector(get.coverCrop);
 
   const [value, setValue] = useState(isSatelliteMode ? (coverCrop.length === 0 ? null : coverCrop[0]) : coverCrop);
-  const [displayValue, setDisplayValue] = useState(isSatelliteMode ? (coverCrop.length === 0 ? '' : coverCrop[0]) : coverCrop);
 
   const getCoverCropSpeciesGroup = (crop) => {
     if (!species) return null;
@@ -56,8 +55,6 @@ const CoverCropsInput = ({ isSatelliteMode }) => {
         const group = getCoverCropSpeciesGroup(val);
         dispatch(set.coverCropSpecieGroup(group));
       }}
-      inputValue={displayValue}
-      onInputChange={(e, val) => { setDisplayValue(val); }}
     />
   );
 }; // CoverCropsInput
