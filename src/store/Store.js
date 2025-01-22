@@ -1,4 +1,5 @@
 /* eslint-disable no-alert */
+import { createAction } from '@reduxjs/toolkit';
 import { createStore } from './redux-autosetters';
 import initialState from './inits';
 
@@ -26,7 +27,11 @@ const afterChange = {
   InorganicN: (state) => { state.model = null; },
 }; // afterChange
 
-const reducers = {};
+const reducers = {
+  resetState: () => initialState,
+};
+
+export const resetState = createAction('resetState');
 
 const store = createStore(initialState, { afterChange, reducers });
 

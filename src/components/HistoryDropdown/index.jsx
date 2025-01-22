@@ -7,6 +7,7 @@ import { set, get } from '../../store/redux-autosetters';
 import { historyStates } from '../../store/inits';
 import { setAuthToken } from '../../utils/authToken';
 import { loadHistory } from '../../utils/userHistory';
+import { resetState } from '../../store/Store';
 
 const HistoryDropdown = () => {
   const { isAuthenticated, getAccessTokenSilently } = useAuth0();
@@ -39,11 +40,15 @@ const HistoryDropdown = () => {
     if (isAuthenticated) fetchUserData();
   }, [isAuthenticated, getAccessTokenSilently]);
 
-  // reset history dropdown when fieldname is changed
+  // reset history when fieldname is changed
   useEffect(() => {
-    if (isAuthenticated) {
-      if (!userHistoryList.find((item) => item.label === `history-${field}`)) setSelectedField('');
-    } else if (!myFields.find((item) => item === `ncalc-${field}`)) setSelectedField('');
+    if (field === '' || selectedField === '') return;
+    if (!userHistoryList.find((item) => item.label === `history-${field}`)
+      && !myFields.find((item) => item === `ncalc-${field}`)) {
+      setSelectedField('');
+      dispatch(resetState());
+      dispatch(set.field(field));
+    }
   }, [field]);
 
   const handleDropdown = async (e) => {
