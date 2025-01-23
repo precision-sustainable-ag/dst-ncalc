@@ -6,12 +6,9 @@ import {
   useMediaQuery,
 } from '@mui/material';
 import { useNavigate } from 'react-router-dom';
-import { PSATextField } from 'shared-react-components/src';
 import { get, set } from '../../store/Store';
-import Help from '../../shared/Help';
 import About from '../About';
-import { historyStates } from '../../store/inits';
-import HistoryDropdown from '../HistoryDropdown';
+import HistorySelect from '../HistorySelect';
 import NavigateBar from '../../shared/Navigate';
 
 const BiomassMethodButton = styled(ToggleButton)(() => ({
@@ -44,17 +41,6 @@ const Home = () => {
   const matchesMd = useMediaQuery((theme) => theme.breakpoints.down('md'));
   // const privacy = useSelector(get.privacy);
   const biomassCalcMode = useSelector(get.biomassCalcMode);
-
-  const { historyState, userHistoryList } = useSelector(get.user);
-  const field = useSelector(get.field);
-  const [fieldName, setFieldName] = useState(field);
-
-  // Check if field name exists in user history
-  const isFieldNameExisted = () => {
-    if (historyState === historyStates.imported) return false;
-    const result = userHistoryList.find((history) => history.label === 'history-'.concat(fieldName));
-    return result !== undefined;
-  };
 
   useEffect(() => {
     if (window.location.toString().includes('PSA')) {
@@ -97,51 +83,7 @@ const Home = () => {
             </Typography>
           </Box>
         </Stack>
-        <Box
-          sx={{
-            marginTop: 3,
-            padding: 4,
-            borderRadius: 2,
-            boxShadow: 5,
-            textAlign: 'center',
-          }}
-        >
-          <Typography mb={2}>
-            Would you like to save your selection history? Simply give it a name, and your selections will be stored after you&apos;ve made all your
-            selections.
-          </Typography>
-          <Grid container spacing="1rem">
-            <Grid item xs={12} sm={6} display="flex" justifyContent={matchesMd ? 'center' : 'flex-end'} alignItems="center">
-              <Typography>
-                Name your field:
-                <Help />
-              </Typography>
-            </Grid>
-            <Grid item xs={12} sm={6} display="flex" justifyContent="flex-start" alignItems="center">
-              <PSATextField
-                label="Name your Field (optional)"
-                value={fieldName}
-                onChange={(e) => setFieldName(e.target.value)}
-                error={isFieldNameExisted()}
-                helperText={isFieldNameExisted() ? 'Field name existed!' : null}
-                onBlur={() => {
-                  if (!isFieldNameExisted()) dispatch(set.field(fieldName));
-                }}
-                onKeyDown={(e) => {
-                  if (e.key === 'Enter' && !isFieldNameExisted()) dispatch(set.field(fieldName));
-                }}
-              />
-            </Grid>
-            <Grid item xs={12} sm={6} display="flex" justifyContent={matchesMd ? 'center' : 'flex-end'} alignItems="center">
-              <Typography mb={2}>Retrieve your previous selections here:</Typography>
-            </Grid>
-            <Grid item xs={12} sm={6} display="flex" justifyContent="flex-start" alignItems="center">
-              <HistoryDropdown />
-            </Grid>
-
-          </Grid>
-
-        </Box>
+        <HistorySelect />
         <Box sx={{ height: '2rem' }} />
         <Stack spacing={2} direction="column">
           <Stack justifyContent="space-around" alignItems="center" sx={{ flexDirection: { sm: 'column', md: 'row' } }}>
