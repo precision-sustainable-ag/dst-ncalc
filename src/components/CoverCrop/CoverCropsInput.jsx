@@ -1,4 +1,5 @@
-import React from 'react';
+/* eslint-disable no-nested-ternary */
+import React, { useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import Autocomplete from '@mui/material/Autocomplete';
 import { PSATextField } from 'shared-react-components/src';
@@ -8,6 +9,8 @@ const CoverCropsInput = ({ isSatelliteMode }) => {
   const dispatch = useDispatch();
   const species = useSelector(get.species);
   const coverCrop = useSelector(get.coverCrop);
+
+  const [value, setValue] = useState(isSatelliteMode ? (coverCrop.length === 0 ? null : coverCrop[0]) : coverCrop);
 
   const getCoverCropSpeciesGroup = (crop) => {
     if (!species) return null;
@@ -39,12 +42,15 @@ const CoverCropsInput = ({ isSatelliteMode }) => {
         return out;
       }}
       options={species ? [...species.grass, ...species.legume, ...species.brassica, ...species.broadleaf] : []}
-      value={(isSatelliteMode ? coverCrop[0] : coverCrop) || null}
       renderInput={(params) => <PSATextField {...params} label={isSatelliteMode ? 'Select a cover crop' : 'Select one or more cover crops'} />}
+      value={value}
       onChange={(e, val) => {
-        // if covercrop is a string(in Autocomplete non multiple mode)
-        dispatch(set.coverCrop(typeof val === 'string' ? [val] : val));
-        if (!isSatelliteMode) return;
+        setValue(val);
+        if (!isSatelliteMode) {
+          dispatch(set.coverCrop(val));
+          return;
+        }
+        dispatch(set.coverCrop(val === null ? [] : [val]));
         dispatch(set.coverCropGrowthStage(null));
         const group = getCoverCropSpeciesGroup(val);
         dispatch(set.coverCropSpecieGroup(group));

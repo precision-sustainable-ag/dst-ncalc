@@ -1,7 +1,7 @@
 /* eslint-disable react-hooks/rules-of-hooks */
 /* eslint-disable react-hooks/exhaustive-deps */
 /* eslint-disable no-console */
-import { Box, Stack } from '@mui/material';
+import { Stack } from '@mui/material';
 import React, { useEffect, useRef, useState } from 'react';
 import { useSelector } from 'react-redux';
 import dayjs from 'dayjs';
@@ -11,10 +11,6 @@ import { get } from '../../store/redux-autosetters';
 import useStoreMem from '../../hooks/useStoreMem';
 import { useFetchNitrogenArray } from '../../hooks/useFetchApi';
 import { sidebarListData, summaryDataDefaults } from '../../constants';
-
-const wrapperStyles = {
-  width: '100%',
-};
 
 const Output = () => {
   const [summaryData, setSummaryData] = useState(summaryDataDefaults);
@@ -48,12 +44,10 @@ const Output = () => {
   }, [field, biomass]);
 
   return (
-    <Box sx={wrapperStyles} id="gfdgdd">
-      <Stack direction="row" justifyContent="space-between">
-        <LeftSideBar sidebarListData={sidebarListData} refs={refs} />
-        <RightSideBar sidebarListData={sidebarListData} summaryData={summaryData} refs={refs} />
-      </Stack>
-    </Box>
+    <Stack direction="row" justifyContent="space-between">
+      <LeftSideBar sidebarListData={sidebarListData} refs={refs} />
+      <RightSideBar sidebarListData={sidebarListData} summaryData={summaryData} refs={refs} />
+    </Stack>
   );
 };
 export default Output;

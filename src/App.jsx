@@ -1,12 +1,17 @@
 /* eslint-disable no-console */
-import React from 'react';
+import React, { useEffect } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import {
-  useLocation, useNavigate, Route, Routes,
+  useNavigate, Route, Routes,
 } from 'react-router-dom';
 import { ThemeProvider, createTheme } from '@mui/material/styles';
-import { Container, Box } from '@mui/material';
-import { PSATheme, PSAHeader, PSAAuthButton } from 'shared-react-components/src';
+import {
+  Container, Box, Button, Grid,
+  useMediaQuery,
+} from '@mui/material';
+import {
+  PSATheme, PSAHeader, PSAAuthButton, FadeAlert,
+} from 'shared-react-components/src';
 import { deepmerge } from '@mui/utils';
 import ChatBubbleOutlineIcon from '@mui/icons-material/ChatBubbleOutline';
 // import ResponsiveNavBar from './components/ResponsiveNavBar';
@@ -34,10 +39,8 @@ screens.cashcrop = require('./components/CashCrop').default;
 screens.output = require('./components/Output').default;
 screens.feedback = require('./components/Feedback').default;
 screens.advanced = require('./components/Advanced').default;
-screens.satpath = require('./components/SatPath').default;
 
 screens.init.showInMenu = false;
-screens.satpath.showInMenu = false;
 
 if (screens.feedback) {
   screens.feedback.showInMenu = false;
@@ -75,13 +78,15 @@ const dstTheme = createTheme(deepmerge(PSATheme, theme));
 
 const App = () => {
   useSelector(get.screen); // force render
-  // eslint-disable-next-line no-unused-vars
-  const location = useLocation();
   const navigate = useNavigate();
   const dispatch = useDispatch();
 
+  const matchesMd = useMediaQuery(theme.breakpoints.down('md'));
+
   const path = window.location.toString().split('/').pop().toLowerCase() || 'home';
   const Screen = screens[path] || screens.home;
+
+  const { showAlert, alertSeverity, alertMessage } = useSelector(get.user);
 
   const navContent = [
     {
@@ -106,41 +111,46 @@ const App = () => {
     },
   ];
 
+  // auto close alert in fixed time
+  useEffect(() => {
+    if (showAlert) {
+      setTimeout(() => {
+        dispatch(set.user.showAlert(false));
+      }, 3000);
+    }
+  }, [showAlert]);
+
   return (
     <ThemeProvider theme={dstTheme}>
       <Auth0ProviderWithNavigate>
         <PSAHeader title="Cover Crop Nitrogen Calculator" onLogoClick={() => navigate('/')} navContent={navContent} />
         <NcalcStepper />
-        <Container
-        // py={50}
-          id="app-container"
+        <Box
           sx={{
-            minHeight: '99.7vh',
+            minHeight: `calc(99.7vh - ${matchesMd ? '85px' : '255px'})`,
             minWidth: '100%',
             backgroundImage: `url(${'/background_0.jpg'})`,
             backgroundSize: 'cover',
             backgroundRepeat: 'no-repeat',
           }}
         >
-          {/* <ResponsiveNavBar screens={screens} /> */}
-          <Box
-            sx={{
-              display: 'flex',
-              justifyContent: 'center',
-              paddingTop: '1rem',
-            }}
-            id="body-wrapper"
-          >
-            <Routes>
-              {Object.keys(screens).map((scr) => (
-                <Route key={scr} path={scr.toLowerCase()} element={<Screen />} />
-              ))}
-              <Route path="" element={<Screen />} />
-            </Routes>
-            <Feedback />
-            <SnackbarMessage />
+          <Routes>
+            {Object.keys(screens).map((scr) => (
+              <Route key={scr} path={scr.toLowerCase()} element={<Screen />} />
+            ))}
+            <Route path="" element={<Screen />} />
+          </Routes>
+          <Feedback />
+          <SnackbarMessage />
+          <Box sx={{ position: 'fixed', bottom: matchesMd ? '45px' : 0, zIndex: 1000 }}>
+            <FadeAlert
+              showAlert={showAlert}
+              severity={alertSeverity}
+              message={alertMessage}
+              action={<Button onClick={() => dispatch(set.user.showAlert(false))}>CLOSE</Button>}
+            />
           </Box>
-        </Container>
+        </Box>
       </Auth0ProviderWithNavigate>
     </ThemeProvider>
   );

@@ -1,14 +1,15 @@
 /* eslint-disable no-unused-vars */
 /* eslint-disable no-console */
 import React, { useEffect } from 'react';
-import { useSelector } from 'react-redux';
+import { useDispatch, useSelector } from 'react-redux';
 import { useAuth0 } from '@auth0/auth0-react';
-import { get } from '../store/redux-autosetters';
+import { set, get } from '../store/redux-autosetters';
 import { saveHistory } from '../utils/userHistory';
 import { historyStates } from '../store/inits';
 
 /** save current field data into localStorage and user history */
 const useStoreMem = () => {
+  const dispatch = useDispatch();
   /// //////////////////////////////////////////////
   // Home
   const biomassCalcMode = useSelector(get.biomassCalcMode);
@@ -104,6 +105,9 @@ const useStoreMem = () => {
           if (historyState !== historyStates.imported) saveHistory(name, history);
           else saveHistory(name, history, selectedHistory.id);
         }
+        dispatch(set.user.alertMessage('History saved.'));
+        dispatch(set.user.alertSeverity('success'));
+        dispatch(set.user.showAlert(true));
       } catch (err) {
         console.log(err);
       }

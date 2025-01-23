@@ -2,177 +2,149 @@
 import React from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { useNavigate } from 'react-router-dom';
-import { Box, Stack, Typography, Grid } from '@mui/material';
+import {
+  Box, Stack, Typography, Grid,
+  useMediaQuery,
+} from '@mui/material';
 import { PSALoadingSpinner } from 'shared-react-components/src';
 import { get, set } from '../../store/Store';
 import Myslider from '../../shared/Slider';
 import Help from '../../shared/Help';
 import { useFetchSSURGO } from '../../hooks/useFetchApi';
-import NavButton from '../../shared/Navigate/NavButton';
+import NavigateBar from '../../shared/Navigate';
 
 /// /// /// ROOT COMPONENT /// /// ///
-const Soil = ({ barebone = false }) => {
+const Soil = () => {
   /// /// /// VARIABLES /// /// ///
   const navigate = useNavigate();
   const dispatch = useDispatch();
   const ssurgo = useSelector(get.SSURGO);
   const isSatelliteMode = useSelector(get.biomassCalcMode) === 'satellite';
+
+  const matchesMd = useMediaQuery((theme) => theme.breakpoints.down('md'));
+
   /// /// /// HOOKS /// /// ///
   useFetchSSURGO();
 
   /// /// /// RETURN JSX /// ///
   return (
-    <Box
-      sx={{
-        justifyContent: 'center',
-        margin: '0% 5% 0% 5%',
-        display: 'flex',
-        alignItems: 'center',
-        backgroundColor: '#fff',
-        padding: '1rem',
-        borderRadius: '1rem',
-        flexDirection: 'column',
-        width: '100%',
-        // width: {
-        //   xs: '100%',
-        //   sm: '100%',
-        //   md: '90%',
-        //   lg: '70%',
-        //   xl: '60%',
-        // },
-      }}
-    >
-      <Box p={3} pb={0}>
-        {!barebone && <Typography variant="h4">Tell us about your Soil</Typography>}
-        {ssurgo ? (
-          isSatelliteMode ? (
-            <Box>
-              <Typography variant="h6" my={2}>
-                This model will use the NRCS&apos;s Soil Survey Geographic database (SSURGO) soil data from your field to estimate cover crop
-                decompostition
-              </Typography>
-              <Stack direction="row" spacing={6}>
-                <Stack direction="column" spacing={3}>
-                  <Stack direction="row" spacing={1}>
-                    <Typography variant="h6" my={2}>
-                      Organic Matter (%):
-                    </Typography>
+    <Grid container justifyContent="center">
+      <Grid
+        item
+        xs={12}
+        md={10}
+        sx={{
+          marginTop: '1rem',
+          padding: `2rem ${matchesMd ? '1rem' : '4rem'}`,
+          boxShadow: 5,
+          borderRadius: 5,
+          opacity: 0.9,
+          backgroundColor: 'white',
+        }}
+      >
+        <Stack spacing="1rem" sx={{ marginBottom: '1rem' }}>
+          <Typography variant="h4" align="center">Tell us about your Soil</Typography>
+          {ssurgo ? (
+            isSatelliteMode ? (
+              <Box>
+                <Typography variant="h6" my={2} align="center">
+                  This model will use the NRCS&apos;s Soil Survey Geographic database (SSURGO) soil data from your field to estimate cover crop
+                  decompostition
+                </Typography>
+                <Stack direction="row" spacing={6}>
+                  <Stack direction="column" spacing={3}>
+                    <Stack direction="row" spacing={1}>
+                      <Typography variant="h6" my={2}>
+                        Organic Matter (%):
+                      </Typography>
+                    </Stack>
+                    <Stack direction="row" spacing={1}>
+                      <Typography variant="h6" my={2}>
+                        Bulk Density (g/cm
+                        <sup>3</sup>
+                        ):
+                      </Typography>
+                    </Stack>
+                    <Stack direction="row" spacing={1}>
+                      <Typography variant="h6" my={2}>
+                        Soil Inorganic N (ppm or mg/kg):
+                      </Typography>
+                    </Stack>
                   </Stack>
-                  <Stack direction="row" spacing={1}>
-                    <Typography variant="h6" my={2}>
+                  <Stack direction="column" spacing={3}>
+                    <Stack direction="row" spacing={1}>
+                      <Typography variant="h6" my={2}>
+                        {ssurgo && Object.keys(ssurgo).length > 0 && ssurgo[0].om_r}
+                      </Typography>
+                    </Stack>
+                    <Stack direction="row" spacing={1}>
+                      <Typography variant="h6" my={2}>
+                        {ssurgo && Object.keys(ssurgo).length > 0 && ssurgo[0].dbthirdbar_r}
+                      </Typography>
+                    </Stack>
+                    <Stack direction="row" spacing={1}>
+                      <Typography variant="h6" my={2}>
+                        {ssurgo && Object.keys(ssurgo).length > 0 && 10}
+                      </Typography>
+                    </Stack>
+                  </Stack>
+                </Stack>
+              </Box>
+            ) : (
+              <>
+                <Typography variant="h6" align="center">
+                  The data below was pulled from NRCS&apos;s Soil Survey Geographic database (SSURGO) based on your field&apos;s latitude/longitude
+                  coordinates. You can adjust them if you have lab results.
+                </Typography>
+                <Box sx={{ display: 'flex', justifyContent: 'center' }}>
+                  <Stack spacing="1rem" sx={{ color: '#4f6b14', minWidth: '50%' }}>
+                    <Box>
+                      Organic Matter (%):
+                      <Help>Soil organic matter in the surface (0-10cm) soil</Help>
+                      <Myslider id="OM" min={0.1} max={5} step={0.1} />
+                    </Box>
+                    <Box>
                       Bulk Density (g/cm
                       <sup>3</sup>
                       ):
-                    </Typography>
-                  </Stack>
-                  <Stack direction="row" spacing={1}>
-                    <Typography variant="h6" my={2}>
+                      <Help>Soil bulk density in the surface (0-10cm) soil</Help>
+                      <Myslider id="BD" min={0.8} max={1.8} step={0.1} />
+                    </Box>
+                    <Box>
                       Soil Inorganic N (ppm or mg/kg):
-                    </Typography>
+                      <Help>Soil inorganic nitrogen in the surface (0-10cm) soil</Help>
+                      <Myslider id="InorganicN" min={0} max={25} />
+                    </Box>
                   </Stack>
-                </Stack>
-                <Stack direction="column" spacing={3}>
-                  <Stack direction="row" spacing={1}>
-                    <Typography variant="h6" my={2}>
-                      {ssurgo && Object.keys(ssurgo).length > 0 && ssurgo[0].om_r}
-                    </Typography>
-                  </Stack>
-                  <Stack direction="row" spacing={1}>
-                    <Typography variant="h6" my={2}>
-                      {ssurgo && Object.keys(ssurgo).length > 0 && ssurgo[0].dbthirdbar_r}
-                    </Typography>
-                  </Stack>
-                  <Stack direction="row" spacing={1}>
-                    <Typography variant="h6" my={2}>
-                      {ssurgo && Object.keys(ssurgo).length > 0 && 10}
-                    </Typography>
-                  </Stack>
-                </Stack>
-              </Stack>
-            </Box>
+                </Box>
+              </>
+            )
           ) : (
-            <Box>
-              <Typography variant="h6" my={2}>
-                The data below was pulled from NRCS&apos;s Soil Survey Geographic database (SSURGO) based on your field&apos;s latitude/longitude
-                coordinates.
-              </Typography>
-              <Typography variant="h6" my={2}>
-                You can adjust them if you have lab results.
-              </Typography>
-              <Box sx={{ color: '#4f6b14' }}>
-                <Box my={5}>
-                  Organic Matter (%):
-                  <Help>Soil organic matter in the surface (0-10cm) soil</Help>
-                  <Myslider id="OM" min={0.1} max={5} step={0.1} />
-                </Box>
-                <Box my={5}>
-                  Bulk Density (g/cm
-                  <sup>3</sup>
-                  ):
-                  <Help>Soil bulk density in the surface (0-10cm) soil</Help>
-                  <Myslider id="BD" min={0.8} max={1.8} step={0.1} />
-                </Box>
-                <Box my={5}>
-                  Soil Inorganic N (ppm or mg/kg):
-                  <Help>Soil inorganic nitrogen in the surface (0-10cm) soil</Help>
-                  <Myslider id="InorganicN" min={0} max={25} />
-                </Box>
-              </Box>
-            </Box>
-          )
-        ) : (
-          <Box>
-            <Grid
-              item
-              container
-              spacing={1}
-              justifyContent="center"
-              alignItems="center"
-              sx={{
-                display: 'flex',
-                justifyContent: 'center',
-                alignItems: 'center',
-                minHeight: '100px',
-              }}
-            >
+            <Box sx={{ display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
               <PSALoadingSpinner />
-            </Grid>
-            <Typography variant="h6" my={2}>
-              LOADING FROM SSURGO SERVER ...
-            </Typography>
-          </Box>
-        )}
-      </Box>
-      {!barebone && (
-        <Box
-          sx={{
-            justifyContent: 'space-around',
-            alignItems: 'space-between',
-            width: '100%',
-            display: 'flex',
-            flexDirection: 'row',
+              <Typography variant="h6" my={2}>
+                LOADING FROM SSURGO SERVER ...
+              </Typography>
+            </Box>
+          )}
+
+        </Stack>
+
+        <NavigateBar
+          next="next"
+          nextOnClick={() => {
+            dispatch(set.activeStep(3));
+            navigate('/covercrop');
           }}
-          mt={6}
-        >
-          <NavButton
-            onClick={() => {
-              dispatch(set.activeStep(1));
-              navigate('/location');
-            }}
-          >
-            BACK
-          </NavButton>
-          <NavButton
-            onClick={() => {
-              dispatch(set.activeStep(3));
-              navigate('/covercrop');
-            }}
-          >
-            NEXT
-          </NavButton>
-        </Box>
-      )}
-    </Box>
+          back="back"
+          backOnClick={() => {
+            dispatch(set.activeStep(1));
+            navigate('/location');
+          }}
+        />
+      </Grid>
+    </Grid>
+
   );
 }; // Soil
 
