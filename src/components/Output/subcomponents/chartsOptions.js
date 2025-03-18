@@ -1,8 +1,7 @@
 /* eslint-disable max-len */
 /* eslint-disable arrow-body-style */
-import Highcharts from 'highcharts';
-// eslint-disable-next-line import/no-extraneous-dependencies
 import _ from 'lodash';
+import Highcharts from '../../../utils/highchartsConfig';
 
 // const responsiveOptions = {
 //   rules: [{
