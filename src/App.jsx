@@ -1,19 +1,13 @@
 /* eslint-disable no-console */
 import React, { useEffect } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
-import {
-  useNavigate, Route, Routes,
-} from 'react-router-dom';
+import { useNavigate, Route, Routes } from 'react-router-dom';
 import { ThemeProvider, createTheme } from '@mui/material/styles';
-import {
-  Container, Box, Button, Grid,
-  useMediaQuery,
-} from '@mui/material';
-import {
-  PSATheme, PSAHeader, PSAAuthButton, FadeAlert,
-} from 'shared-react-components/src';
+import { Container, Box, Button, Grid, useMediaQuery } from '@mui/material';
+import { PSATheme, PSAHeader, PSAAuthButton, FadeAlert, PSAProfile } from 'shared-react-components/src';
 import { deepmerge } from '@mui/utils';
 import ChatBubbleOutlineIcon from '@mui/icons-material/ChatBubbleOutline';
+import AccountBoxOutlinedIcon from '@mui/icons-material/AccountBoxOutlined';
 // import ResponsiveNavBar from './components/ResponsiveNavBar';
 import Feedback from './components/Feedback';
 import SnackbarMessage from './shared/SnackbarMessage';
@@ -39,6 +33,8 @@ screens.cashcrop = require('./components/CashCrop').default;
 screens.output = require('./components/Output').default;
 screens.feedback = require('./components/Feedback').default;
 screens.advanced = require('./components/Advanced').default;
+
+screens.profile = () => <PSAProfile styles={{ backgroundColor: 'white' }} />;
 
 screens.init.showInMenu = false;
 
@@ -89,6 +85,15 @@ const App = () => {
   const { showAlert, alertSeverity, alertMessage } = useSelector(get.user);
 
   const navContent = [
+    {
+      type: 'button',
+      variant: 'text',
+      text: 'Profile',
+      icon: <AccountBoxOutlinedIcon />,
+      rightIcon: true,
+      onClick: () => navigate('/profile'),
+      textSx: { fontSize: '1rem' },
+    },
     {
       type: 'button',
       variant: 'text',
