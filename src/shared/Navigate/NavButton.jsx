@@ -1,7 +1,9 @@
 import React from 'react';
 import { PSAButton } from 'shared-react-components/src';
 
-const NavButton = ({ children, onClick, disabled = false, fontSize = '1rem' }) => (
+const NavButton = ({
+  children, onClick, disabled = false, fontSize = '1rem',
+}) => (
   <PSAButton
     title={children}
     sx={{
@@ -11,10 +13,11 @@ const NavButton = ({ children, onClick, disabled = false, fontSize = '1rem' }) =
       textAlign: 'center',
       borderRadius: '2rem',
       fontSize: { fontSize },
-      backgroundColor: '#6b9333',
+      backgroundColor: '#60802D',
       boxShadow: '0px 2px 2px rgba(160, 160, 160, 0.3)',
+      opacity: 1,
       '&:hover': {
-        backgroundColor: '#6b9333',
+        backgroundColor: '#60802D',
         textDecoration: 'underline',
         boxShadow: '0px 2px 2px rgba(160, 160, 160, 0.3)',
       },

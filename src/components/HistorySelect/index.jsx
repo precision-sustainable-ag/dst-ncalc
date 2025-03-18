@@ -23,7 +23,7 @@ const HistorySelect = () => {
 
   const [fieldName, setFieldName] = useState(field);
   // eslint-disable-next-line no-nested-ternary
-  const [selectedField, setSelectedField] = useState(field === '' ? '' : (isAuthenticated ? `history-${field}` : `ncalc-${field}`));
+  const [selectedField, setSelectedField] = useState(field === '' ? '' : isAuthenticated ? `history-${field}` : `ncalc-${field}`);
 
   // get all fields from localStorage
   const myFields = Object.keys(localStorage).filter((key) => key.startsWith('ncalc-'));
@@ -56,8 +56,7 @@ const HistorySelect = () => {
   useEffect(() => {
     setFieldName(field);
     if (field === '' || selectedField === '') return;
-    if (!userHistoryList.find((item) => item.label === `history-${field}`)
-      && !myFields.find((item) => item === `ncalc-${field}`)) {
+    if (!userHistoryList.find((item) => item.label === `history-${field}`) && !myFields.find((item) => item === `ncalc-${field}`)) {
       setSelectedField('');
       dispatch(resetState());
       dispatch(set.field(field));
@@ -142,8 +141,8 @@ const HistorySelect = () => {
         <Grid item xs={12} sm={6} display="flex" justifyContent="flex-start" alignItems="center">
           <PSADropdown
             label="Histories"
-            items={
-              [...(isAuthenticated
+            items={[
+              ...(isAuthenticated
                 ? [
                   { label: 'User History', isHeader: true },
                   ...userHistoryList.map((history) => ({
@@ -157,22 +156,25 @@ const HistorySelect = () => {
                     value: fld,
                     label: fld.replace('ncalc-', ''),
                   })),
-                ])]
-            }
+                ]),
+            ]}
             SelectProps={{
               value: selectedField,
               onChange: handleDropdown,
               'data-test': 'dropdown-fields',
+              sx: { '.MuiOutlinedInput-notchedOutline': { borderColor: 'rgba(0, 0, 0, .45)' } },
             }}
             formSx={{ minWidth: 200 }}
-            menuSx={{ fontWeight: 'bold', color: 'white', backgroundColor: 'green' }}
+            menuSx={{
+              fontWeight: 'bold',
+              color: 'white',
+              backgroundColor: 'green',
+              opacity: 1,
+            }}
           />
         </Grid>
-
       </Grid>
-
     </Box>
-
   );
 };
 
