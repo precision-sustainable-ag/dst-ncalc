@@ -138,7 +138,9 @@ const FieldDropdown = () => {
           'data-test': 'dropdown-fields',
         }}
         formSx={{ minWidth: 200 }}
-        menuSx={{ fontWeight: 'bold', color: 'white', backgroundColor: 'green' }}
+        menuSx={{
+          fontWeight: 'bold', color: 'white', backgroundColor: 'green', opacity: 1,
+        }}
       />
 
       {downloadCSVFailed && (

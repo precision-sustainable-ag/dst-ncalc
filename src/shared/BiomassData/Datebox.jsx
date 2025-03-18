@@ -49,6 +49,7 @@ const Datebox = () => {
                 dispatch(set.coverCropPlantingDate(newValue.format('YYYY-MM-DD')));
                 return null;
               }}
+              sx={{ '.MuiOutlinedInput-notchedOutline': { borderColor: 'rgba(0, 0, 0, .45)' } }}
             />
           </LocalizationProvider>
         </Stack>
@@ -67,6 +68,7 @@ const Datebox = () => {
                 dispatch(set.coverCropTerminationDate(newValue.format('YYYY-MM-DD')));
                 return null;
               }}
+              sx={{ '.MuiOutlinedInput-notchedOutline': { borderColor: 'rgba(0, 0, 0, .45)' } }}
             />
           </LocalizationProvider>
         </Stack>
