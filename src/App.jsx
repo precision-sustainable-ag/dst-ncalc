@@ -145,6 +145,7 @@ const App = () => {
               el.focus();
             }
           }}
+          sx={{ '&.MuiLink-root.Mui-focusVisible': { outlineOffset: '5px', outlineColor: 'black' } }}
         />
         <PSAHeader title="Cover Crop Nitrogen Calculator" onLogoClick={() => navigate('/')} navContent={navContent} />
         <NcalcStepper />
