@@ -28,6 +28,7 @@ const Myslider = ({
         value={value}
         onChange={(e) => {
           setValue(e.target.value);
+          dispatch(set[id](e.target.value));
         }}
       />
       <span>
@@ -38,13 +39,14 @@ const Myslider = ({
             onChange={(_, newValue) => {
               setValue(newValue);
             }}
-            onChangeCommitted={() => { dispatch(set[id](value)); }}
+            onChangeCommitted={(_, newValue) => {
+              dispatch(set[id](newValue));
+            }}
             aria-labelledby="input-slider"
             min={min}
             max={max}
             step={step}
             valueLabelDisplay={val <= max ? 'off' : 'off'}
-            tabIndex={-1}
             disabled={disabled}
           />
           <span className="tiny">{max}</span>
