@@ -1,10 +1,16 @@
 /* eslint-disable no-console */
 import React, { useEffect } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
-import { useNavigate, Route, Routes } from 'react-router-dom';
+import {
+  useNavigate, Route, Routes,
+} from 'react-router-dom';
 import { ThemeProvider, createTheme } from '@mui/material/styles';
-import { Container, Box, Button, Grid, useMediaQuery } from '@mui/material';
-import { PSATheme, PSAHeader, PSAAuthButton, FadeAlert, PSAProfile } from 'shared-react-components/src';
+import {
+  Box, Button, useMediaQuery,
+} from '@mui/material';
+import {
+  PSATheme, PSAHeader, PSAAuthButton, FadeAlert, PSAProfile, PSASkipContent,
+} from 'shared-react-components/src';
 import { deepmerge } from '@mui/utils';
 import ChatBubbleOutlineIcon from '@mui/icons-material/ChatBubbleOutline';
 import AccountBoxOutlinedIcon from '@mui/icons-material/AccountBoxOutlined';
@@ -128,9 +134,22 @@ const App = () => {
   return (
     <ThemeProvider theme={dstTheme}>
       <Auth0ProviderWithNavigate>
+        <PSASkipContent
+          text="Skip to main content"
+          component="button"
+          onClick={() => {
+            const el = document.getElementById('main-content');
+            if (el) {
+              el.scrollIntoView({ behavior: 'smooth', block: 'start' });
+              el.setAttribute('tabindex', '-1');
+              el.focus();
+            }
+          }}
+        />
         <PSAHeader title="Cover Crop Nitrogen Calculator" onLogoClick={() => navigate('/')} navContent={navContent} />
         <NcalcStepper />
         <Box
+          id="main-content"
           sx={{
             minHeight: `calc(99.7vh - ${matchesMd ? '85px' : '255px'})`,
             minWidth: '100%',
