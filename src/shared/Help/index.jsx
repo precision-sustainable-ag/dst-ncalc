@@ -17,6 +17,14 @@ const Help = () => {
         onClick={() => {
           setOpen(!open);
         }}
+        onKeyDown={(event) => {
+          if (event.key === 'Enter' || event.key === ' ') {
+            event.preventDefault();
+            event.currentTarget.click();
+          }
+        }}
+        role="button"
+        tabIndex={0}
       >
         help
       </Icon>
@@ -24,47 +32,47 @@ const Help = () => {
         open={open}
         onClose={() => setOpen(false)}
         closeAfterTransition
-        modalContent={
-        <Box className="modal">
-          <Stack>
-            <Typography>
-              This input is optional. If you enter a field name, you will be able to rerun the
-              model on this computer without re-entering your data.
-            </Typography>
-            <Typography fontWeight="bold" mt={2}>
-              Notes:
-            </Typography>
-            <List
-              sx={{
-                listStyleType: 'disc',
-                pl: 2,
-                '& .MuiListItem-root': {
-                  display: 'list-item',
-                },
-              }}
-            >
-              <ListItem>
-                <Typography>
-                  If you have multiple fields, you will be able to select them from a drop-down
-                  menu in the upper-right.
-                </Typography>
-              </ListItem>
-              <ListItem>
-                <Typography>
-                  Your information is stored on your computer only. It will not be uploaded to a
-                  server.
-                </Typography>
-              </ListItem>
-              <ListItem>
-                <Typography>
-                  If you clear your browser&apos;s cache, you will need to re-enter your data the
-                  next time you run the program.
-                </Typography>
-              </ListItem>
-            </List>
-          </Stack>
-        </Box>
-        }
+        modalContent={(
+          <Box className="modal">
+            <Stack>
+              <Typography>
+                This input is optional. If you enter a field name, you will be able to rerun the
+                model on this computer without re-entering your data.
+              </Typography>
+              <Typography fontWeight="bold" mt={2}>
+                Notes:
+              </Typography>
+              <List
+                sx={{
+                  listStyleType: 'disc',
+                  pl: 2,
+                  '& .MuiListItem-root': {
+                    display: 'list-item',
+                  },
+                }}
+              >
+                <ListItem>
+                  <Typography>
+                    If you have multiple fields, you will be able to select them from a drop-down
+                    menu in the upper-right.
+                  </Typography>
+                </ListItem>
+                <ListItem>
+                  <Typography>
+                    Your information is stored on your computer only. It will not be uploaded to a
+                    server.
+                  </Typography>
+                </ListItem>
+                <ListItem>
+                  <Typography>
+                    If you clear your browser&apos;s cache, you will need to re-enter your data the
+                    next time you run the program.
+                  </Typography>
+                </ListItem>
+              </List>
+            </Stack>
+          </Box>
+      )}
       />
     </>
   );
