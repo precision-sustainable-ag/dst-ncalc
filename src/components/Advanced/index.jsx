@@ -1,9 +1,9 @@
 /* eslint-disable react/no-unstable-nested-components */
 import React from 'react';
-import Highcharts from 'highcharts';
 import HighchartsReact from 'highcharts-react-official';
 import { useSelector } from 'react-redux';
 import { Link, useNavigate } from 'react-router-dom';
+import Highcharts from '../../utils/highchartsConfig';
 import { get, missingData } from '../../store/Store';
 
 import './styles.scss';

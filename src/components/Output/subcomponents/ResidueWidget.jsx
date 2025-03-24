@@ -10,7 +10,6 @@ import {
   Container,
 } from '@mui/material';
 import ReactDOMServer from 'react-dom/server';
-import Highcharts from 'highcharts';
 import HighchartsReact from 'highcharts-react-official';
 import React, { useEffect, useRef } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
@@ -22,6 +21,7 @@ import {
 import { modelCalc } from './helpers';
 import { get } from '../../../store/redux-autosetters';
 import { useFetchModel } from '../../../hooks/useFetchApi';
+import Highcharts from '../../../utils/highchartsConfig';
 
 /// /// /// STYLES /// /// ///
 const CardStyles = {
@@ -134,9 +134,10 @@ const ResidueCard = ({ refVal }) => {
             justifyContent: 'center',
             alignItems: 'center',
             position: 'abosolute',
-          }}>
+          }}
+          >
             <PSALoadingSpinner />
-          </div>
+          </div>,
         );
         chartRef1.current.chart.showLoading(spinnerHtml);
         chartRef2.current.chart.showLoading(spinnerHtml);

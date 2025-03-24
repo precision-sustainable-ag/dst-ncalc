@@ -12,10 +12,10 @@ import {
   Container,
   Box,
 } from '@mui/material';
-import Highcharts from 'highcharts';
 import HighchartsReact from 'highcharts-react-official';
 import { useDispatch, useSelector } from 'react-redux';
 import { PSALoadingSpinner } from 'shared-react-components/src';
+import Highcharts from '../../../utils/highchartsConfig';
 import {
   getGeneralChartOptions,
   getNitrogenChartOptions,
@@ -146,9 +146,10 @@ const NitrogenCard = ({ refVal }) => {
             justifyContent: 'center',
             alignItems: 'center',
             position: 'abosolute',
-          }}>
+          }}
+          >
             <PSALoadingSpinner />
-          </div>
+          </div>,
         );
         chartRef1.current.chart.showLoading(spinnerHtml);
         chartRef2.current.chart.showLoading(spinnerHtml);
