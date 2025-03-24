@@ -59,7 +59,9 @@ const CoverCropSecond = () => {
           <Box mt={2} sx={{ display: 'flex', flexDirection: 'row', alignItems: 'center' }}>
             <Stack direction="row" alignItems="center">
               <CustomInputText>Nitrogen (%)</CustomInputText>
-              <Help>Cover crop nitrogen concentration based on lab results.</Help>
+              <Help ariaLabel="Cover crop nitrogen concentration based on lab results.">
+                Cover crop nitrogen concentration based on lab results.
+              </Help>
               {!N && <Required />}
             </Stack>
             :
@@ -69,7 +71,7 @@ const CoverCropSecond = () => {
           <Box mt={2} sx={{ display: 'flex', flexDirection: 'row', alignItems: 'center' }}>
             <Stack direction="row" alignItems="center">
               <CustomInputText>Carbohydrates (%)</CustomInputText>
-              <Help>
+              <Help ariaLabel="Non-structural labile carbohydrate concentration based on lab results. Click for more details.">
                 <p>
                   Non-structural labile carbohydrate concentration based on lab results.
                   This represents the most readily decomposable C constituents in plant materials.
@@ -86,7 +88,7 @@ const CoverCropSecond = () => {
           <Box mt={2} sx={{ display: 'flex', flexDirection: 'row', alignItems: 'center' }}>
             <Stack direction="row" alignItems="center">
               <CustomInputText>Holo-cellulose (%)</CustomInputText>
-              <Help>
+              <Help ariaLabel="Structural holo-cellulose concentration based on lab results. Click for more details.">
                 <p>
                   Structural holo-cellulose (i.e., both cellulose and hemi-cellulose) concentration based on lab results. This represents the
                   moderately decomposable C constituents in plant materials.
@@ -103,7 +105,7 @@ const CoverCropSecond = () => {
           <Box mt={2} sx={{ display: 'flex', flexDirection: 'row', alignItems: 'center' }}>
             <Stack direction="row" alignItems="center">
               <CustomInputText>Lignin (%)</CustomInputText>
-              <Help>
+              <Help ariaLabel="Structural lignin concentration based on lab results.  Click for more details.">
                 <p>
                   Structural lignin concentration based on lab results.
                   This represents the most recalcitrant C constituents in plant materials.

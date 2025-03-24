@@ -4,7 +4,7 @@ import moment from 'moment';
 import { useAuth0 } from '@auth0/auth0-react';
 import { PSADropdown, PSATextField } from 'shared-react-components/src';
 import {
-  Box, Grid, Typography, useMediaQuery,
+  Box, Grid, Typography, useMediaQuery, Stack, List, ListItem,
 } from '@mui/material';
 import Help from '../../shared/Help';
 import { set, get } from '../../store/redux-autosetters';
@@ -117,7 +117,45 @@ const HistorySelect = () => {
         <Grid item xs={12} sm={6} display="flex" justifyContent={matchesMd ? 'center' : 'flex-end'} alignItems="center">
           <Typography>
             Name your field:
-            <Help />
+            <Help ariaLabel="This input is optional. Click for more details.">
+              <Stack>
+                <Typography>
+                  This input is optional. If you enter a field name, you will be able to rerun the
+                  model on this computer without re-entering your data.
+                </Typography>
+                <Typography fontWeight="bold" mt={2}>
+                  Notes:
+                </Typography>
+                <List
+                  sx={{
+                    listStyleType: 'disc',
+                    pl: 2,
+                    '& .MuiListItem-root': {
+                      display: 'list-item',
+                    },
+                  }}
+                >
+                  <ListItem>
+                    <Typography>
+                      If you have multiple fields, you will be able to select them from a drop-down
+                      menu in the upper-right.
+                    </Typography>
+                  </ListItem>
+                  <ListItem>
+                    <Typography>
+                      Your information is stored on your computer only. It will not be uploaded to a
+                      server.
+                    </Typography>
+                  </ListItem>
+                  <ListItem>
+                    <Typography>
+                      If you clear your browser&apos;s cache, you will need to re-enter your data the
+                      next time you run the program.
+                    </Typography>
+                  </ListItem>
+                </List>
+              </Stack>
+            </Help>
           </Typography>
         </Grid>
         <Grid item xs={12} sm={6} display="flex" justifyContent="flex-start" alignItems="center">
