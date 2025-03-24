@@ -25,6 +25,8 @@ const Help = () => {
         }}
         role="button"
         tabIndex={0}
+        aria-label="This input is optional."
+        aria-hidden={false}
       >
         help
       </Icon>
