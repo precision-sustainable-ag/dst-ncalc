@@ -105,7 +105,9 @@ const CashCrop = () => {
                 {unit}
                 ):
               </CustomInputText>
-              <Help>Specify the target N rate for your region.</Help>
+              <Help ariaLabel="Specify the target N rate for your region.">
+                Specify the target N rate for your region.
+              </Help>
               {(!targetN || targetN <= 0) && <Required />}
             </Stack>
           </Box>

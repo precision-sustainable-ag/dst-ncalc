@@ -33,7 +33,9 @@ const Myslider = ({
       />
       <span>
         <div style={{ display: 'flex', gap: '10px' }}>
-          <span className="tiny">{min}</span>
+          <span className="tiny" aria-label={`Minimun value: ${min}`}>
+            <span aria-hidden>{min}</span>
+          </span>
           <PSASlider
             value={Number(value)}
             onChange={(_, newValue) => {
@@ -49,7 +51,9 @@ const Myslider = ({
             valueLabelDisplay={val <= max ? 'off' : 'off'}
             disabled={disabled}
           />
-          <span className="tiny">{max}</span>
+          <span className="tiny" aria-label={`Maximun value: ${max}`}>
+            <span aria-hidden>{max}</span>
+          </span>
         </div>
       </span>
     </div>

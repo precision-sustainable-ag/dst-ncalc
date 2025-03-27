@@ -161,7 +161,7 @@ const CoverCropFirst = () => {
               >
                 <Stack direction="row" alignItems="center">
                   <CustomInputText>Dry Biomass </CustomInputText>
-                  <Help>
+                  <Help ariaLabel="The amount of cover crop biomass on a dry weight basis.">
                     <p>The amount of cover crop biomass on a dry weight basis.</p>
                     <p>
                       For details on cover crop biomass sampling and taking a representative sub-sample for quality analysis, please refer to
@@ -219,7 +219,9 @@ const CoverCropFirst = () => {
               >
                 <Stack direction="row" alignItems="center">
                   <CustomInputText>Cover Crop Water Content at Termination (g water/g dry biomass)</CustomInputText>
-                  <Help>
+                  <Help ariaLabel="Use the following calculation to adjust default values: Cover Crop Water Content
+                   = (Total fresh weight - Total dry weight)/(Total dry weight)"
+                  >
                     <p>Use the following calculation to adjust default values:</p>
                     <p>Cover Crop Water Content = (Total fresh weight - Total dry weight)/(Total dry weight)</p>
                   </Help>
