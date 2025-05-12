@@ -2,9 +2,8 @@ FROM node:18 as builder
 WORKDIR /usr/src/app
 COPY package.json package.json
 COPY . .
-RUN yarn install
-RUN npm install vite
-RUN yarn run build 
+RUN npm install
+RUN npm run build
 #################
 # for dev only 
 # ENTRYPOINT ["tail", "-f", "/dev/null"]
