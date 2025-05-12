@@ -181,4 +181,45 @@ const App = () => {
   );
 }; // App
 
+window.addEventListener('error', (err) => {
+  if (/(localhost|dev)/i.test(window.location)) return;
+
+  const requestPayload = {
+    repository: 'dst-feedback',
+    title: 'CRASH',
+    name: 'error',
+    email: 'error@error.com',
+    comments: `${err?.message}: ${err?.filename}`,
+    labels: ['crash', 'dst-ncalc'],
+  };
+  console.log(requestPayload);
+
+  /* eslint-disable no-alert */
+  fetch('https://feedback.covercrop-data.org/v1/issues', {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+    },
+    body: JSON.stringify(requestPayload),
+  })
+    .then((response) => response.json())
+    .then((body) => {
+      console.log(body.data);
+      if (body?.data?.status === 'success') {
+        alert(`
+          An error occurred.
+          We have been notified and will investigate the problem.
+        `);
+      } else {
+        alert('An error occurred');
+      }
+    })
+    .catch((error) => {
+      // eslint-disable-next-line no-console
+      console.log(error);
+      alert('Failed to send Feedback to Github.');
+    });
+}, { once: true });
+/* eslint-enable no-alert */
+
 export default App;
