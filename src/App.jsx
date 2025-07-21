@@ -1,12 +1,10 @@
 /* eslint-disable no-console */
 import React, { useEffect } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
-import {
-  useNavigate, Route, Routes,
-} from 'react-router-dom';
+import { useNavigate, Route, Routes } from 'react-router-dom';
 import { ThemeProvider, createTheme } from '@mui/material/styles';
 import {
-  Box, Button, useMediaQuery,
+  AppBar, Box, Button, useMediaQuery,
 } from '@mui/material';
 import {
   PSATheme, PSAHeader, PSAAuthButton, FadeAlert, PSAProfile, PSASkipContent,
@@ -147,12 +145,21 @@ const App = () => {
           }}
           sx={{ '&.MuiLink-root.Mui-focusVisible': { outlineOffset: '5px', outlineColor: 'black' } }}
         />
-        <PSAHeader title="Cover Crop Nitrogen Calculator" onLogoClick={() => navigate('/')} navContent={navContent} />
-        <NcalcStepper />
+        <AppBar position="static" component="header" sx={{ backgroundColor: 'white' }}>
+          <PSAHeader title="Cover Crop Nitrogen Calculator" onLogoClick={() => navigate('/')} navContent={navContent} />
+        </AppBar>
+
+        <AppBar
+          position={matchesMd ? 'static' : 'sticky'}
+          component="nav"
+          sx={{ zIndex: 1000, backgroundColor: 'white' }}
+        >
+          <NcalcStepper />
+        </AppBar>
         <Box
           id="main-content"
           sx={{
-            minHeight: `calc(99.7vh - ${matchesMd ? '85px' : '255px'})`,
+            minHeight: `calc(99.7vh - ${matchesMd ? '85px' : '220px'})`,
             minWidth: '100%',
             backgroundImage: `url(${'/background_0.jpg'})`,
             backgroundSize: 'cover',
@@ -181,45 +188,49 @@ const App = () => {
   );
 }; // App
 
-window.addEventListener('error', (err) => {
-  if (/(localhost|dev)/i.test(window.location)) return;
+window.addEventListener(
+  'error',
+  (err) => {
+    if (/(localhost|dev)/i.test(window.location)) return;
 
-  const requestPayload = {
-    repository: 'dst-feedback',
-    title: 'CRASH',
-    name: 'error',
-    email: 'error@error.com',
-    comments: `${err?.message}: ${err?.filename}`,
-    labels: ['crash', 'dst-ncalc'],
-  };
-  console.log(requestPayload);
+    const requestPayload = {
+      repository: 'dst-feedback',
+      title: 'CRASH',
+      name: 'error',
+      email: 'error@error.com',
+      comments: `${err?.message}: ${err?.filename}`,
+      labels: ['crash', 'dst-ncalc'],
+    };
+    console.log(requestPayload);
 
-  /* eslint-disable no-alert */
-  fetch('https://feedback.covercrop-data.org/v1/issues', {
-    method: 'POST',
-    headers: {
-      'Content-Type': 'application/json',
-    },
-    body: JSON.stringify(requestPayload),
-  })
-    .then((response) => response.json())
-    .then((body) => {
-      console.log(body.data);
-      if (body?.data?.status === 'success') {
-        alert(`
+    /* eslint-disable no-alert */
+    fetch('https://feedback.covercrop-data.org/v1/issues', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify(requestPayload),
+    })
+      .then((response) => response.json())
+      .then((body) => {
+        console.log(body.data);
+        if (body?.data?.status === 'success') {
+          alert(`
           An error occurred.
           We have been notified and will investigate the problem.
         `);
-      } else {
-        alert('An error occurred');
-      }
-    })
-    .catch((error) => {
-      // eslint-disable-next-line no-console
-      console.log(error);
-      alert('Failed to send Feedback to Github.');
-    });
-}, { once: true });
+        } else {
+          alert('An error occurred');
+        }
+      })
+      .catch((error) => {
+        // eslint-disable-next-line no-console
+        console.log(error);
+        alert('Failed to send Feedback to Github.');
+      });
+  },
+  { once: true },
+);
 /* eslint-enable no-alert */
 
 export default App;
