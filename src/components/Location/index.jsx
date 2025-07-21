@@ -107,6 +107,8 @@ const Location = () => {
             dispatch(set.activeStep(0));
             navigate('/home');
           }}
+          nextDisabled={isSatelliteMode && (biomassFetchIsLoading || !biomassTaskResults)}
+          nextTooltip="Please wait until the biomass map is loaded"
         />
       </Grid>
     </Grid>

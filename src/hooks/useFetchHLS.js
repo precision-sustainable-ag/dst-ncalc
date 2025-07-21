@@ -35,7 +35,6 @@ const useFetchHLS = () => {
   // initiate calculation of biomass
   useEffect(() => {
     if (isSatelliteMode && mapPolygon.length > 0 && !activeExample && !biomassTaskResults) {
-      dispatch(set.biomassTaskResults({}));
       dispatch(set.biomassTaskIsDone(false));
       // setData(null);
       let area;

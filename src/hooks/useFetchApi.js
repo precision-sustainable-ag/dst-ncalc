@@ -163,9 +163,8 @@ const useFetchSSURGO = () => {
         .get(url)
         .then((data) => {
           if (data.ERROR || !data.data || !data.data.length) {
-            dispatch(set.BD(''));
-            dispatch(set.OM(''));
-          } else if (!SSURGO || updateSSURGO) {
+            throw new Error('No SSURGO data found for this location');
+          } if (!SSURGO || updateSSURGO) {
             // } else {
             let filteredData = data.data.filter((d) => d.desgnmaster !== 'O');
             const minhzdept = Math.min(...filteredData.map((d) => d.hzdept_r));
@@ -180,6 +179,8 @@ const useFetchSSURGO = () => {
         })
         .catch((error) => {
           console.log(error);
+          dispatch(set.user.alertMessage(`Error: ${error.message}. Please use a different location or try again later!`));
+          dispatch(set.user.showAlert(true));
         });
     }
   }, [updateSSURGO, field]);

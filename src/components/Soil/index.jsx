@@ -20,7 +20,6 @@ const Soil = () => {
   const dispatch = useDispatch();
   const ssurgo = useSelector(get.SSURGO);
   const isSatelliteMode = useSelector(get.biomassCalcMode) === 'satellite';
-
   const matchesMd = useMediaQuery((theme) => theme.breakpoints.down('md'));
 
   /// /// /// HOOKS /// /// ///
@@ -147,6 +146,8 @@ const Soil = () => {
             dispatch(set.activeStep(1));
             navigate('/location');
           }}
+          nextDisabled={!isSatelliteMode && !ssurgo}
+          nextTooltip="Please wait until the soil data is loaded"
         />
       </Grid>
     </Grid>

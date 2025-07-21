@@ -127,7 +127,8 @@ const App = () => {
     if (showAlert) {
       setTimeout(() => {
         dispatch(set.user.showAlert(false));
-      }, 3000);
+        dispatch(set.user.alertMessage(null));
+      }, 5000);
     }
   }, [showAlert]);
 
