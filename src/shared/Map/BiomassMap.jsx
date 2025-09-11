@@ -3,7 +3,7 @@
 import React, { useState, useEffect } from 'react';
 // import mapboxgl from 'mapbox-gl';
 import { useSelector, useDispatch } from 'react-redux';
-import { NcalcMap } from 'shared-react-components/src';
+import { PSAReduxMap } from 'shared-react-components/src';
 import { Paper } from '@mui/material';
 // import { NcalcMap } from './mock/ncalc-map';
 import { get, set } from '../../store/Store';
@@ -13,7 +13,6 @@ import { mapboxToken } from '../../utils/keys';
 // mapboxgl.workerClass = require('worker-loader!mapbox-gl/dist/mapbox-gl-csp-worker').default;
 // import MapboxWorker from 'worker-loader!mapbox-gl/dist/mapbox-gl-csp-worker';
 
-let removedShapes = new Set();
 const biomassRasterColors = ['red', 'orange', 'lime', 'green', 'white'];
 // const nitrogenRasterColors = ['red', 'orange', 'magenta', 'lime', 'green', 'white'];
 // const nitrogenRasterColors = ['cyan', 'brown', 'white'];
@@ -29,68 +28,65 @@ const BiomassMapComp = ({ variant }) => {
   const mapPolygon = useSelector(get.mapPolygon);
   const unit = useSelector(get.unit);
   const [features, setFeatures] = useState(mapPolygon);
-  const [drawEvent, setDrawEvent] = useState({});
+  const [latLon, setLatLon] = useState([lat, lon]);
 
-  // mapAddress
-  useEffect(() => {
-    if (drawEvent.mode === 'delete') {
-      removedShapes = removedShapes.add(drawEvent.e.features[0].id);
-    }
-    const ids = new Set(mapPolygon.map((d) => d.id));
-    const merged = [...mapPolygon.filter((d) => !removedShapes.has(d.id)), ...features.filter((d) => !ids.has(d.id) && !removedShapes.has(d.id))];
-    dispatch(set.mapPolygon(merged));
-  }, [drawEvent]);
+  const updateProperties = (properties) => {
+    setAddress(properties?.address);
+    setZoom(properties?.zoom);
+    setFeatures(properties?.features);
+    setLatLon([properties?.lat, properties?.lon]);
+  };
 
   useEffect(() => {
-    // FIXME: the mapType seems not being used except for the map itself
-    // dispatch(set.mapType('satellite'));
-    if (address.latitude && address.longitude && (address.latitude !== lat || address.longitude !== lon)) {
-      dispatch(set.lat(address.latitude));
-      dispatch(set.lon(address.longitude));
-      if (address.address) {
-        dispatch(set.mapAddress(address.address));
-      }
-      dispatch(set.updateSSURGO(true));
-      dispatch(set.mapZoom(zoom));
+    dispatch(set.mapPolygon(features));
+  }, [features]);
+
+  useEffect(() => {
+    if (address.address) {
+      dispatch(set.mapAddress(address.address));
     }
   }, [address]);
 
+  useEffect(() => {
+    dispatch(set.lat(latLon[0]));
+    dispatch(set.lon(latLon[1]));
+    dispatch(set.updateSSURGO(true));
+  }, [latLon[0], latLon[1]]);
+
+  useEffect(() => {
+    if (zoom) dispatch(set.mapZoom(zoom));
+  }, [zoom]);
+
   return (
     <Paper>
-      <NcalcMap
-        setAddress={setAddress}
-        setFeatures={setFeatures}
-        setZoom={setZoom}
-        setMap={() => {}}
-        onDraw={setDrawEvent}
-        initRasterObject={biomassTaskResults}
-        initFeatures={mapPolygon}
-        unit={unit}
-        material={variant}
-        rasterColors={biomassRasterColors}
+      <PSAReduxMap
+        setProperties={updateProperties}
         initWidth="100%"
         initHeight="380px"
-        initAddress={mapAddress}
-        initLon={lon}
         initLat={lat}
+        initLon={lon}
         initStartZoom={zoom}
-        initMinZoom={5}
-        initMaxZoom={16}
+        initFeatures={mapPolygon}
+        initAddress={mapAddress}
         hasSearchBar
+        hasClear
         hasMarker
-        hasNavigation
-        hasCoordBar
-        hasDrawing
-        hasGeolocate
-        hasFullScreen
         hasMarkerPopup
         hasMarkerMovable
+        hasNavigation
+        hasFullScreen
+        hasGeolocate
+        hasDrawing
         scrollZoom
         dragRotate
         dragPan
         keyboard
         doubleClickZoom={false}
         touchZoomRotate
+        initRasterObject={biomassTaskResults}
+        rasterColors={biomassRasterColors}
+        unit={unit}
+        material={variant}
         mapboxToken={mapboxToken}
       />
     </Paper>
