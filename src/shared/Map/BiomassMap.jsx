@@ -108,10 +108,10 @@ const BiomassMapComp = ({ variant }) => {
         keyboard
         doubleClickZoom={false}
         touchZoomRotate
-        initRasterObject={biomassTaskResults}
-        rasterColors={biomassRasterColors}
-        unit={unit}
-        material={variant}
+        // initRasterObject={biomassGeojson}
+        // rasterColors={biomassRasterColors}
+        // unit={unit}
+        // material={variant}
         mapboxToken={mapboxToken}
       />
     </Paper>
