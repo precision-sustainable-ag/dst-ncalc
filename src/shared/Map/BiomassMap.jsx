@@ -13,7 +13,7 @@ import { mapboxToken } from '../../utils/keys';
 // mapboxgl.workerClass = require('worker-loader!mapbox-gl/dist/mapbox-gl-csp-worker').default;
 // import MapboxWorker from 'worker-loader!mapbox-gl/dist/mapbox-gl-csp-worker';
 
-const biomassRasterColors = ['red', 'orange', 'lime', 'green', 'white'];
+// const biomassRasterColors = ['red', 'orange', 'lime', 'green', 'white'];
 // const nitrogenRasterColors = ['red', 'orange', 'magenta', 'lime', 'green', 'white'];
 // const nitrogenRasterColors = ['cyan', 'brown', 'white'];
 
@@ -23,10 +23,10 @@ const BiomassMapComp = ({ variant }) => {
   const dispatch = useDispatch();
   const lat = useSelector(get.lat);
   const lon = useSelector(get.lon);
-  const biomassGeojson = useSelector(get.biomassGeojson);
+  // const biomassGeojson = useSelector(get.biomassGeojson);
   const mapAddress = useSelector(get.mapAddress);
   const mapPolygon = useSelector(get.mapPolygon);
-  const unit = useSelector(get.unit);
+  // const unit = useSelector(get.unit);
   const [features, setFeatures] = useState(mapPolygon);
   const [latLon, setLatLon] = useState([lat, lon]);
 

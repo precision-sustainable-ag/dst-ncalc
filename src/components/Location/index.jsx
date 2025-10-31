@@ -5,7 +5,7 @@ import {
   Box, Stack, Typography, Grid,
   useMediaQuery,
 } from '@mui/material';
-import { PSALoadingSpinner } from 'shared-react-components/src';
+// import { PSALoadingSpinner } from 'shared-react-components/src';
 import BiomassMap from '../../shared/Map/BiomassMap';
 import { get, set } from '../../store/Store';
 // import useFetchHLS from '../../hooks/useFetchHLS';
@@ -53,12 +53,12 @@ const Location = () => {
           </Typography>
           {isSatelliteMode && (
             <Typography variant="h8" align="center" pt={1}>
-              Specify your crop&apos;s planting and termination dates, anc your field&apos;s boundary on the map using the drawing tool.
+              Specify your crop&apos;s planting and termination dates, and your field&apos;s boundary on the map using the drawing tool.
             </Typography>
           )}
           <Datebox />
 
-          {biomassFetchIsLoading && (
+          {/* {biomassFetchIsLoading && (
             <Box>
               <Grid
                 item
@@ -79,7 +79,7 @@ const Location = () => {
                 Calculating Biomass ...
               </Typography>
             </Box>
-          )}
+          )} */}
           {biomassTaskResults && !biomassFetchIsLoading && (
             <Box justifyContent="center" alignItems="center">
               <Typography variant="h6" fontWeight="bold" gutterBottom textAlign="center">
