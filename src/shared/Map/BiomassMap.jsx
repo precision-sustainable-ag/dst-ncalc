@@ -23,7 +23,7 @@ const BiomassMapComp = ({ variant }) => {
   const dispatch = useDispatch();
   const lat = useSelector(get.lat);
   const lon = useSelector(get.lon);
-  const biomassTaskResults = useSelector(get.biomassTaskResults);
+  const biomassGeojson = useSelector(get.biomassGeojson);
   const mapAddress = useSelector(get.mapAddress);
   const mapPolygon = useSelector(get.mapPolygon);
   const unit = useSelector(get.unit);
@@ -38,7 +38,32 @@ const BiomassMapComp = ({ variant }) => {
   };
 
   useEffect(() => {
-    dispatch(set.mapPolygon(features));
+    if (!features?.[0]?.geometry?.coordinates) return;
+
+    let coords = features[0].geometry.coordinates[0];
+
+    const ringArea = (ring) => {
+      let area = 0;
+      for (let i = 0, len = ring.length - 1; i < len; i++) {
+        const [x1, y1] = ring[i];
+        const [x2, y2] = ring[i + 1];
+        area += (x2 - x1) * (y2 + y1);
+      }
+      return area;
+    };
+
+    if (ringArea(coords) > 0) {
+      coords = [...coords].reverse();
+    }
+
+    const newFeatures = [{
+      ...features[0],
+      geometry: {
+        ...features[0].geometry,
+        coordinates: [coords],
+      },
+    }];
+    dispatch(set.mapPolygon(newFeatures));
   }, [features]);
 
   useEffect(() => {
