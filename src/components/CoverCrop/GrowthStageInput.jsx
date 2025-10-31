@@ -10,10 +10,11 @@ import { get, set } from '../../store/Store';
 const GrowthStageInput = () => {
   const dispatch = useDispatch();
   const plantGrowthStages = useSelector(get.plantGrowthStages);
-  const coverCropSpecieGroup = useSelector(get.coverCropSpecieGroup);
+  // const coverCropSpecieGroup = useSelector(get.coverCropSpecieGroup);
   const coverCropGrowthStage = useSelector(get.coverCropGrowthStage);
+  const coverCrop = useSelector(get.coverCrop);
 
-  const options = (coverCropSpecieGroup && coverCropSpecieGroup !== 'ERROR') ? plantGrowthStages[coverCropSpecieGroup] : [];
+  const options = (coverCrop[0] && coverCrop[0] !== 'ERROR') ? plantGrowthStages[coverCrop[0]] : [];
 
   return (
     <Autocomplete
