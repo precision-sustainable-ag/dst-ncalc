@@ -21,6 +21,8 @@ import { get, set } from './store/Store';
 import FieldDropdown from './components/FieldDropdown';
 import NcalcStepper from './shared/Stepper';
 import Auth0ProviderWithNavigate from './shared/AuthProvider';
+import useFetchHLS from './hooks/useFetchHLS';
+import { useFetchPlantFactors } from './hooks/useFetchApi';
 
 const screens = {
   init: () => null,
@@ -80,6 +82,9 @@ const App = () => {
   useSelector(get.screen); // force render
   const navigate = useNavigate();
   const dispatch = useDispatch();
+
+  useFetchHLS();
+  useFetchPlantFactors();
 
   const matchesMd = useMediaQuery(theme.breakpoints.down('md'));
 

@@ -9,7 +9,7 @@ import LeftSideBar from './subcomponents/LeftSideBar';
 import RightSideBar from './subcomponents/RightSideBar';
 import { get } from '../../store/redux-autosetters';
 import useStoreMem from '../../hooks/useStoreMem';
-import { useFetchNitrogenArray } from '../../hooks/useFetchApi';
+// import { useFetchNitrogenArray } from '../../hooks/useFetchApi';
 import { sidebarListData, summaryDataDefaults } from '../../constants';
 
 const Output = () => {
@@ -28,7 +28,7 @@ const Output = () => {
   // TODO: save the current field to localStorage
   useStoreMem();
   //
-  useFetchNitrogenArray();
+  // useFetchNitrogenArray();
 
   useEffect(() => {
     const tempSummaryData = { ...summaryData };

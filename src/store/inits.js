@@ -133,6 +133,7 @@ const initialState = {
   coverCropTerminationDate: coverCropTerminationDate.format('YYYY-MM-DD'),
   cashCropPlantingDate: cashCropPlantingDate.format('YYYY-MM-DD'),
   biomassTaskResults: null,
+  biomassGeojson: null,
   nitrogenTaskResults: null,
   biomassTotalValue: null,
   maxZoom: 20,
@@ -177,6 +178,8 @@ const initialState = {
   biomassFetchIsLoading: false,
   biomassTaskIsDone: true,
   polyDrawTooBig: false,
+  nitrogenFetchIsFailed: false,
+  nitrogenFetchIsLoading: false,
   nitrogenTaskIsDone: true,
   activeStep: 0,
   user: {

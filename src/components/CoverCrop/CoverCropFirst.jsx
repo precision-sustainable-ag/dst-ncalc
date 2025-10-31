@@ -63,7 +63,7 @@ const CoverCropFirst = () => {
   const matchesMd = useMediaQuery((theme) => theme.breakpoints.down('md'));
 
   /// Desc: Fetch the plant factors
-  useFetchPlantFactors();
+  // useFetchPlantFactors();
 
   /// Desc: Set the warning text
   let warningText;

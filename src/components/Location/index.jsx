@@ -8,7 +8,7 @@ import {
 import { PSALoadingSpinner } from 'shared-react-components/src';
 import BiomassMap from '../../shared/Map/BiomassMap';
 import { get, set } from '../../store/Store';
-import useFetchHLS from '../../hooks/useFetchHLS';
+// import useFetchHLS from '../../hooks/useFetchHLS';
 import Datebox from '../../shared/BiomassData/Datebox';
 import { AreaErrorModal, TaskFailModal } from '../../shared/BiomassData/Warnings';
 import NavigateBar from '../../shared/Navigate';
@@ -25,7 +25,7 @@ const Location = () => {
   const matchesMd = useMediaQuery((theme) => theme.breakpoints.down('md'));
 
   // API for getting biomass map
-  useFetchHLS();
+  // useFetchHLS();
 
   return (
     <Grid container justifyContent="center">

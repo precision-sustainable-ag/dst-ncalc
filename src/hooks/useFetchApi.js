@@ -11,7 +11,7 @@ import { historyStates } from '../store/inits';
 const NCAL_API_URL = 'https://api.covercrop-ncalc.org/surface';
 const SSURGO_API_URL = 'https://ssurgo.covercrop-data.org';
 const WEATHER_API_URL = 'https://weather.covercrop-data.org';
-const PLANTFACTORS_API_URL = 'https://api.covercrop-imagery.org';
+const PLANTFACTORS_API_URL = 'https://developapi.covercrop-imagery.org';
 
 // TODO: hooks for fetching data from different apis
 
@@ -197,27 +197,39 @@ const useFetchPlantFactors = () => {
   const plantGrowthStages = useSelector(get.plantGrowthStages);
   const coverCrop = useSelector(get.coverCrop);
   const coverCropGrowthStage = useSelector(get.coverCropGrowthStage);
-  // const N = useSelector(get.N);
-  // const carb = useSelector(get.carb);
-  // const cell = useSelector(get.cell);
-  // const lign = useSelector(get.lign);
+  const coverCropPlantingDate = useSelector(get.coverCropPlantingDate);
+  const coverCropTerminationDate = useSelector(get.coverCropTerminationDate);
+  const N = useSelector(get.N);
+  const carb = useSelector(get.carb);
+  const cell = useSelector(get.cell);
+  const lign = useSelector(get.lign);
+  const activeStep = useSelector(get.activeStep);
+  const targetN = useSelector(get.targetN);
+  const biomassTaskResults = useSelector(get.biomassTaskResults);
+  const nitrogenTaskResults = useSelector(get.nitrogenTaskResults);
+  const isSatelliteMode = useSelector(get.biomassCalcMode) === 'satellite';
 
   useEffect(() => {
-    if (coverCrop && coverCropGrowthStage) {
+    if (isSatelliteMode && coverCrop && coverCropGrowthStage) {
       const url = `${PLANTFACTORS_API_URL}/plantfactors`;
       axios
         .get(url, { params: { plant_species: coverCrop[0], growth_stage: coverCropGrowthStage } })
         .then((data) => {
           if (data.data) {
-            dispatch(set.N(data.data.nitrogen_percentage));
-            dispatch(set.carb(data.data.carbohydrates_percentage));
-            dispatch(set.cell(data.data.holo_cellulose_percentage));
-            dispatch(set.lign(data.data.lignin_percentage));
+            dispatch(set.N(data.data.mean_n.toFixed(2)));
+            dispatch(set.carb(data.data.mean_carb.toFixed(2)));
+            dispatch(set.cell(data.data.mean_cellulose.toFixed(2)));
+            dispatch(set.lign(data.data.mean_lignin.toFixed(2)));
           }
         })
         .catch((error) => {
           console.log(error);
         });
+    } else {
+      dispatch(set.N(null));
+      dispatch(set.carb(null));
+      dispatch(set.cell(null));
+      dispatch(set.lign(null));
     }
   }, [dispatch, coverCrop, coverCropGrowthStage]);
 
@@ -249,7 +261,129 @@ const useFetchPlantFactors = () => {
         });
     }
   }, [dispatch, species, plantGrowthStages]);
+
+  useEffect(() => {
+    dispatch(set.nitrogenTaskResults(null));
+  }, [biomassTaskResults, coverCrop, coverCropGrowthStage, coverCropPlantingDate, coverCropTerminationDate, N, carb, cell, lign, targetN]);
+
+  useEffect(() => {
+    async function fetchNitrogen() {
+      if (biomassTaskResults && !nitrogenTaskResults && species && plantGrowthStages && coverCropPlantingDate && coverCropTerminationDate
+            && targetN && N && carb && cell && lign && activeStep > 4) {
+        const url = `${PLANTFACTORS_API_URL}/nitrogen`;
+        dispatch(set.nitrogenFetchIsLoading(true));
+        try {
+          const response = await axios.post(url, {
+            data_array: biomassTaskResults.data_array,
+            bbox: biomassTaskResults.bbox,
+            species: coverCrop[0],
+            growth_stage: coverCropGrowthStage,
+            start: coverCropPlantingDate,
+            end: coverCropTerminationDate,
+            target_n: targetN
+          });
+
+          dispatch(set.nitrogenFetchIsLoading(false));
+
+          if (response.status === 200 && response.data) {
+            const geojsonData = response.data;
+            delete geojsonData.properties;
+
+            const reqnGeojson = JSON.parse(JSON.stringify(geojsonData));
+
+            geojsonData.features.forEach((feature) => {
+              if (
+                feature.properties
+                && feature.properties.MinNfromFOM !== undefined
+              ) {
+                feature.properties.value = feature.properties.MinNfromFOM;
+              }
+            });
+
+            reqnGeojson.features.forEach((feature) => {
+              if (
+                feature.properties
+                && feature.properties.ReqN !== undefined
+              ) {
+                feature.properties.value = feature.properties.ReqN;
+              }
+            });
+
+            dispatch(set.nitrogenTaskResults({ minN : geojsonData, reqN: reqnGeojson}));
+          } else {
+            dispatch(set.nitrogenFetchIsFailed(true));
+          }
+        } catch (error) {
+          console.log(error);
+          dispatch(set.nitrogenFetchIsLoading(false));
+          dispatch(set.nitrogenFetchIsFailed(true));
+        }
+      }
+    }
+    fetchNitrogen();
+  }, [dispatch, biomassTaskResults, species, plantGrowthStages, coverCropPlantingDate, coverCropTerminationDate, targetN, N, carb, cell, lign, activeStep]);
 }; // useFetchPlantFactors
+
+const fetchNitrogenData = async (
+  biomassTaskResults,
+  coverCrop,
+  coverCropGrowthStage,
+  coverCropPlantingDate,
+  coverCropTerminationDate,
+  targetN,
+  dispatch
+) => {
+  const url = `${PLANTFACTORS_API_URL}/nitrogen`;
+
+  dispatch(set.nitrogenFetchIsLoading(true));
+
+  try {
+    const response = await axios.post(url, {
+      data_array: biomassTaskResults.data_array,
+      bbox: biomassTaskResults.bbox,
+      species: coverCrop[0],
+      growth_stage: coverCropGrowthStage,
+      start: coverCropPlantingDate,
+      end: coverCropTerminationDate,
+      target_n: targetN
+    });
+
+    dispatch(set.nitrogenFetchIsLoading(false));
+
+    if (response.status === 200 && response.data) {
+      const geojsonData = response.data;
+      delete geojsonData.properties;
+
+      const reqnGeojson = JSON.parse(JSON.stringify(geojsonData));
+
+      geojsonData.features.forEach((feature) => {
+        if (
+          feature.properties
+          && feature.properties.MinNfromFOM !== undefined
+        ) {
+          feature.properties.value = feature.properties.MinNfromFOM;
+        }
+      });
+
+      reqnGeojson.features.forEach((feature) => {
+        if (
+          feature.properties
+          && feature.properties.ReqN !== undefined
+        ) {
+          feature.properties.value = feature.properties.ReqN;
+        }
+      });
+
+      dispatch(set.nitrogenTaskResults({ minN : geojsonData, reqN: reqnGeojson}));
+    } else {
+      dispatch(set.nitrogenFetchIsFailed(true));
+    }
+  } catch (error) {
+    console.log(error);
+    dispatch(set.nitrogenFetchIsLoading(false));
+    dispatch(set.nitrogenFetchIsFailed(true));
+  }
+};
 
 /// Desc: useFetchNitrogenArray
 /// ..............................................................................
@@ -291,5 +425,5 @@ const useFetchNitrogenArray = () => {
 }; // useFetchNitrogenArray
 
 export {
-  useFetchModel, useFetchSSURGO, useFetchCornN, useFetchPlantFactors, useFetchNitrogenArray,
+  useFetchModel, useFetchSSURGO, useFetchCornN, useFetchPlantFactors, fetchNitrogenData
 };
