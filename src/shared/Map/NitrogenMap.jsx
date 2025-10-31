@@ -13,16 +13,15 @@ import { mapboxToken } from '../../utils/keys';
 // mapboxgl.workerClass = require('worker-loader!mapbox-gl/dist/mapbox-gl-csp-worker').default;
 // import MapboxWorker from 'worker-loader!mapbox-gl/dist/mapbox-gl-csp-worker';
 
-// const biomassRasterColors = ['red', 'orange', 'magenta', 'lime', 'green', 'white'];
+const biomassRasterColors = ['red', 'orange', 'magenta', 'lime', 'green', 'white'];
 const nitrogenRasterColors = ['red', 'orange', 'magenta', 'lime', 'green', 'white'];
-// const nitrogenRasterColors = ['cyan', 'brown', 'white'];
 
-const NitrogenMapComp = ({ variant }) => {
+const NitrogenMapComp = ({ variant, nitrogenLayer = 'reqN' }) => {
   const [address, setAddress] = useState({});
   const dispatch = useDispatch();
   const lat = useSelector(get.lat);
   const lon = useSelector(get.lon);
-  const biomassTaskResults = useSelector(get.biomassTaskResults);
+  const biomassGeojson = useSelector(get.biomassGeojson);
   const nitrogenTaskResults = useSelector(get.nitrogenTaskResults);
   const mapAddress = useSelector(get.mapAddress);
   const mapZoom = useSelector(get.mapZoom);
@@ -85,8 +84,9 @@ const NitrogenMapComp = ({ variant }) => {
         keyboard
         doubleClickZoom={false}
         touchZoomRotate
-        initRasterObject={variant === 'biomass' ? biomassTaskResults : nitrogenTaskResults}
-        rasterColors={nitrogenRasterColors}
+        initRasterObject={variant === 'biomass' ? biomassGeojson : nitrogenTaskResults?.[nitrogenLayer]}
+        rasterColors={variant === 'biomass' ? biomassRasterColors : nitrogenRasterColors}
+        color_steps={7}
         unit={unit}
         material={variant}
         mapboxToken={mapboxToken}

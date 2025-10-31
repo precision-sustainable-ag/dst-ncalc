@@ -21,6 +21,7 @@ const Location = () => {
   const biomassTaskResults = useSelector(get.biomassTaskResults);
   const polyDrawTooBig = useSelector(get.polyDrawTooBig);
   const biomassFetchIsFailed = useSelector(get.biomassFetchIsFailed);
+  const mapPolygon = useSelector(get.mapPolygon);
 
   const matchesMd = useMediaQuery((theme) => theme.breakpoints.down('md'));
 
@@ -107,7 +108,7 @@ const Location = () => {
             dispatch(set.activeStep(0));
             navigate('/home');
           }}
-          nextDisabled={isSatelliteMode && (biomassFetchIsLoading || !biomassTaskResults)}
+          nextDisabled={isSatelliteMode && mapPolygon.length === 0}
           nextTooltip="Please wait until the biomass map is loaded"
         />
       </Grid>
