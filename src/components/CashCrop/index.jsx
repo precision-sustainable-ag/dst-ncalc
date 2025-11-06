@@ -1,17 +1,20 @@
 /* eslint-disable operator-linebreak */
-import React, { useState } from 'react';
+import React, { useEffect } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { useNavigate } from 'react-router-dom';
 import {
   Autocomplete, Box, Stack, Typography, styled, Grid,
   useMediaQuery,
 } from '@mui/material';
-import { PSATextField } from 'shared-react-components/src';
+// import { PSATextField } from 'shared-react-components/src';
+import { DatePicker, LocalizationProvider } from '@mui/x-date-pickers';
+import dayjs from 'dayjs';
+import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
 import { get, set } from '../../store/Store';
 import Myslider from '../../shared/Slider';
 import Help from '../../shared/Help';
 import Required from '../../shared/Required';
-import { useFetchCropNames } from '../../hooks/useFetchStatic';
+// import { useFetchCropNames } from '../../hooks/useFetchStatic';
 import NavigateBar from '../../shared/Navigate';
 
 const CustomInputText = styled(Typography)({
@@ -26,15 +29,23 @@ const CashCrop = () => {
   const navigate = useNavigate();
   const dispatch = useDispatch();
   const unit = useSelector(get.unit);
-  const cashCrop = useSelector(get.cashCrop);
+  // const cashCrop = useSelector(get.cashCrop);
   const targetN = useSelector(get.targetN);
   const Yield = useSelector(get.yield);
   const cashCropPlantingDate = useSelector(get.cashCropPlantingDate);
-  const crops = useFetchCropNames();
+  // const crops = useFetchCropNames();
+  const coverCropTerminationDate = useSelector(get.coverCropTerminationDate);
 
-  const [plantingDate, setPlantingDate] = useState(cashCropPlantingDate);
+  // const [plantingDate, setPlantingDate] = useState(cashCropPlantingDate);
 
   const matchesMd = useMediaQuery((theme) => theme.breakpoints.down('md'));
+
+  // Set default cash crop planting date on mount if not set or invalid
+  useEffect(() => {
+    if (!cashCropPlantingDate || dayjs(cashCropPlantingDate).isBefore(dayjs(coverCropTerminationDate))) {
+      dispatch(set.cashCropPlantingDate(dayjs(coverCropTerminationDate).add(7, 'day').format('YYYY-MM-DD')));
+    }
+  });
 
   return (
     <Grid container justifyContent="center">
@@ -54,9 +65,9 @@ const CashCrop = () => {
           alignItems: 'center',
         }}
       >
-        <Typography variant="h4">Tell us about your Cash Crop</Typography>
+        <Typography variant="h4">Tell us about your Target Rate</Typography>
         <Box m={2}>
-          <Stack direction="row" alignItems="center">
+          {/* <Stack direction="row" alignItems="center">
             <CustomInputText>Cash Crop: </CustomInputText>
             {!cashCrop && <Required />}
           </Stack>
@@ -75,20 +86,32 @@ const CashCrop = () => {
                 dispatch(set.cashCrop(va));
               }}
             />
-          )}
+          )} */}
           <Stack direction="row" alignItems="center">
-            <CustomInputText>Cash Crop Planting Date: </CustomInputText>
+            <CustomInputText>Side Dress Fertilization Date: </CustomInputText>
             {!cashCropPlantingDate && <Required />}
           </Stack>
-          <PSATextField
+          {/* <PSATextField
             type="date"
             value={plantingDate}
             onChange={(e) => {
               setPlantingDate(e.target.value);
               dispatch(set.cashCropPlantingDate(e.target.value));
             }}
-          />
-          {cashCrop === 'Corn' && (
+          /> */}
+          <LocalizationProvider dateAdapter={AdapterDayjs}>
+            <DatePicker
+              minDate={dayjs(coverCropTerminationDate).add(7, 'day')}
+              value={dayjs(cashCropPlantingDate)}
+              onChange={(newValue) => {
+                dispatch(set.cashCropPlantingDate(newValue.format('YYYY-MM-DD')));
+                return null;
+              }}
+              shouldDisableDate={(date) => date.isBefore(dayjs(coverCropTerminationDate), 'day')}
+            />
+          </LocalizationProvider>
+
+          {/* {cashCrop === 'Corn' && (
             <Box mt={2}>
               <Stack direction="row" alignItems="center">
                 <CustomInputText>Yield Goal (bu/ac):</CustomInputText>
@@ -96,7 +119,7 @@ const CashCrop = () => {
               </Stack>
               <Myslider id="yield" min={0} max={300} />
             </Box>
-          )}
+          )} */}
 
           <Box mt={2} sx={{ display: 'flex', flexDirection: 'row', alignItems: 'center' }}>
             <Stack direction="row" alignItems="center">
@@ -122,7 +145,7 @@ const CashCrop = () => {
             dispatch(set.activeStep(5));
             navigate('/output');
           }}
-          nextDisabled={!cashCrop || !cashCropPlantingDate || !targetN || targetN < 0 || !Yield || Yield < 0}
+          nextDisabled={!cashCropPlantingDate || !targetN || targetN < 0 || !Yield || Yield < 0}
           back="back"
           backOnClick={() => {
             dispatch(set.activeStep(3));

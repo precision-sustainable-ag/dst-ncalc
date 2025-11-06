@@ -52,7 +52,7 @@ const CoverCropSecond = () => {
         <Typography variant="h4">Tell us about your Cover Crop Quality</Typography>
         {isSatelliteMode && (
         <Typography variant="subtitle1" fontWeight={900}>
-          These values are estimated based on plant species and growth satge
+          These values are estimated based on plant species and growth stage
         </Typography>
         )}
         <Box sx={{ width: '50%', marginBottom: '1rem' }}>
@@ -123,7 +123,7 @@ const CoverCropSecond = () => {
           next="next"
           nextOnClick={() => {
             dispatch(set.activeStep(4));
-            navigate('/cashcrop');
+            navigate('/sidedress');
           }}
           nextDisabled={!N || !carb || !cell || !lign}
           back="back"

@@ -236,7 +236,13 @@ const CoverCropFirst = () => {
 
         <NavigateBar
           next="next"
-          nextOnClick={() => navigate('/covercrop2')}
+          nextOnClick={() => {
+            if (isSatelliteMode) {
+              dispatch(set.activeStep(4));
+              navigate('/sidedress')
+            }
+            else navigate('/covercrop2')
+          }}
           nextDisabled={disableNextButton}
           back="back"
           backOnClick={() => {

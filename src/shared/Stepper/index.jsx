@@ -5,8 +5,8 @@ import { Box, useMediaQuery } from '@mui/material';
 import { PSAStepper } from 'shared-react-components/src';
 import { get, set } from '../../store/Store';
 
-const tabs = ['home', 'location', 'soil', 'covercrop', 'cashcrop', 'output'];
-const titles = ['Home', 'Location', 'Soil', 'Cover Crop', 'Cash Crop', 'Output'];
+const tabs = ['home', 'location', 'soil', 'covercrop', 'sidedress', 'output'];
+const titles = ['Home', 'Location', 'Soil', 'Cover Crop', 'Side Dress Date', 'Output'];
 
 const NcalcStepper = () => {
   const matchesMd = useMediaQuery((theme) => theme.breakpoints.down('md'));

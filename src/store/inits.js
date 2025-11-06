@@ -6,7 +6,7 @@ const now = dayjs();
 const coverCropPlantingDate =
   now.month() < 6 ? now.subtract(2, 'year').startOf('month').month(10) : now.subtract(1, 'year').startOf('month').month(10);
 const coverCropTerminationDate = coverCropPlantingDate.add(6, 'month');
-const cashCropPlantingDate = coverCropTerminationDate.add(1, 'week');
+// const cashCropPlantingDate = coverCropTerminationDate.add(1, 'week');
 
 // const initSpecies = {
 //   Brassica: [
@@ -131,7 +131,7 @@ const initialState = {
   biomassCropType: 'Wheat',
   coverCropPlantingDate: coverCropPlantingDate.format('YYYY-MM-DD'),
   coverCropTerminationDate: coverCropTerminationDate.format('YYYY-MM-DD'),
-  cashCropPlantingDate: cashCropPlantingDate.format('YYYY-MM-DD'),
+  cashCropPlantingDate: null,
   biomassTaskResults: null,
   biomassGeojson: null,
   nitrogenTaskResults: null,

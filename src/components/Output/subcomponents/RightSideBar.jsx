@@ -61,7 +61,7 @@ const RightSideBar = ({ summaryData, refs }) => {
             back="back"
             backOnClick={() => {
               dispatch(set.activeStep(4));
-              navigate('/cashcrop');
+              navigate('/sidedress');
             }}
           />
         </Grid>
