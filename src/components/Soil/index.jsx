@@ -1,5 +1,5 @@
 /* eslint-disable no-nested-ternary */
-import React from 'react';
+import React, { useEffect } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { useNavigate } from 'react-router-dom';
 import {
@@ -20,10 +20,18 @@ const Soil = () => {
   const dispatch = useDispatch();
   const ssurgo = useSelector(get.SSURGO);
   const isSatelliteMode = useSelector(get.biomassCalcMode) === 'satellite';
+  const isPM3DMode = useSelector(get.biomassCalcMode) === 'pm3d';
   const matchesMd = useMediaQuery((theme) => theme.breakpoints.down('md'));
 
   /// /// /// HOOKS /// /// ///
   useFetchSSURGO();
+
+  useEffect(() => {
+    if (isSatelliteMode || isPM3DMode) {
+      dispatch(set.activeStep(3));
+      navigate('/covercrop');
+    }
+  }, []);
 
   /// /// /// RETURN JSX /// ///
   return (

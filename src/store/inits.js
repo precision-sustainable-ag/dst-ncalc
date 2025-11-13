@@ -173,7 +173,7 @@ const initialState = {
   species: null,
   plantGrowthStages: null,
   coverCropSpecieGroup: null,
-  coverCropGrowthStage: null,
+  coverCropGrowthStage: {},
   maxBiomass: initMaxBiomass,
   biomassFetchIsFailed: false,
   biomassFetchIsLoading: false,

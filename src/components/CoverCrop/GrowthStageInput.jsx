@@ -14,18 +14,36 @@ const GrowthStageInput = () => {
   const coverCropGrowthStage = useSelector(get.coverCropGrowthStage);
   const coverCrop = useSelector(get.coverCrop);
 
-  const options = (coverCrop[0] && coverCrop[0] !== 'ERROR') ? plantGrowthStages[coverCrop[0]] : [];
+  const handleGrowthStageChange = (species, growthStage) => {
+    const updatedGrowthStages = {...(coverCropGrowthStage || {}) };
+    if (growthStage === null) {
+      delete updatedGrowthStages[species];
+    } else {
+      updatedGrowthStages[species] = growthStage;
+    }
+    dispatch(set.coverCropGrowthStage(updatedGrowthStages));
+  };
 
   return (
-    <Autocomplete
-      placeholder="Select a cover crop Growth Stage"
-      options={options}
-      value={coverCropGrowthStage}
-      renderInput={(params) => <PSATextField {...params} label="Select a cover crop growing stage" />}
-      onChange={(el, va) => {
-        dispatch(set.coverCropGrowthStage(va));
-      }}
-    />
+    Array.isArray(coverCrop) && coverCrop.length > 0 && (
+      coverCrop.map((species, _) => {
+        if (!species || species === 'ERROR') return null;
+
+        const options = plantGrowthStages[species] || [];
+        const value = coverCropGrowthStage?.[species] || null;
+
+        return (
+          <Autocomplete
+            placeholder={`Select a cover crop Growth Stage for ${species}`}
+            options={options}
+            value={value}
+            renderInput={(params) => <PSATextField {...params} label={`Select a cover crop growing stage for ${species}`} />}
+            onChange={(el, va) => handleGrowthStageChange(species, va)}
+            sx={{ mt: 2}}
+          />
+        );
+      })
+    )
   );
 }; // GrowthStageInput
 

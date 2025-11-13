@@ -78,12 +78,15 @@ const CoverCropFirst = () => {
 
   /// Desc: Set the disableNextButton state
   useEffect(() => {
-    if (isSatelliteMode) {
-      setDisableNextButton(!biomassTotalValue || !coverCrop || !coverCropGrowthStage);
+    if (isSatelliteMode || isPM3DMode) {
+      const allStagesSelected = Array.isArray(coverCrop) && coverCrop.length > 0 &&
+        coverCrop.every((species) => coverCropGrowthStage?.[species] && coverCropGrowthStage[species] !== '');
+
+      setDisableNextButton(!biomassTotalValue || !coverCrop || coverCrop.length === 0 || !allStagesSelected);
     } else {
       setDisableNextButton(!biomass || coverCrop.length === 0 || !coverCropTerminationDate || !lwc);
     }
-  }, [isSatelliteMode, biomass, coverCrop, coverCropGrowthStage, coverCropTerminationDate, lwc, biomassTotalValue]);
+  }, [isSatelliteMode, isPM3DMode, biomass, coverCrop, coverCropGrowthStage, coverCropTerminationDate, lwc, biomassTotalValue]);
 
   return (
     <Grid container justifyContent="center">
@@ -114,7 +117,7 @@ const CoverCropFirst = () => {
             <Box>
               <Stack direction="row" alignItems="center">
                 <CustomInputText>Cover Crop Growth Stage:</CustomInputText>
-                {!coverCropGrowthStage && <Required />}
+                {(!coverCropGrowthStage || Object.keys(coverCropGrowthStage).length !== coverCrop.length) && <Required />}
               </Stack>
               <GrowthStageInput isSatelliteMode={isSatelliteMode} />
             </Box>
