@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useDispatch, useSelector } from 'react-redux';
 import {
@@ -17,6 +17,7 @@ const Location = () => {
   const navigate = useNavigate();
   const dispatch = useDispatch();
   const isSatelliteMode = useSelector(get.biomassCalcMode) === 'satellite';
+  const isPM3DMode = useSelector(get.biomassCalcMode) === 'pm3d';
   const biomassFetchIsLoading = useSelector(get.biomassFetchIsLoading);
   const biomassTaskResults = useSelector(get.biomassTaskResults);
   const polyDrawTooBig = useSelector(get.polyDrawTooBig);
@@ -27,6 +28,13 @@ const Location = () => {
 
   // API for getting biomass map
   // useFetchHLS();
+
+  useEffect(() => {
+    if (isPM3DMode) {
+      dispatch(set.activeStep(3));
+      navigate('/covercrop');
+    }
+  }, []);
 
   return (
     <Grid container justifyContent="center">
@@ -56,7 +64,10 @@ const Location = () => {
               Specify your crop&apos;s planting and termination dates, and your field&apos;s boundary on the map using the drawing tool.
             </Typography>
           )}
-          <Datebox />
+
+          {isSatelliteMode && (
+            <Datebox />
+          )}
 
           {/* {biomassFetchIsLoading && (
             <Box>

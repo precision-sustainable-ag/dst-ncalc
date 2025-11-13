@@ -24,6 +24,7 @@ const RightSideBar = ({ summaryData, refs }) => {
   /// /// /// VARIABLES /// /// ///
   // if (!model) return <Loading />;
   const isSatelliteMode = useSelector(get.biomassCalcMode) === 'satellite';
+  const isPM3DMode = useSelector(get.biomassCalcMode) === 'pm3d';
   useSelector(get.screen); // force render
   useSelector(get.biomassTaskResults); // force render
   useSelector(get.nitrogenTaskResults); // force render
@@ -44,12 +45,12 @@ const RightSideBar = ({ summaryData, refs }) => {
         <Grid item sm={12} lg={6} width="100%">
           <ResidueCard refVal={refs[2]} />
         </Grid>
-        {isSatelliteMode && (
+        {(isSatelliteMode || isPM3DMode) && (
           <Grid item sm={12} lg={12} width="100%">
             <BiomassMapWidget refVal={refs[3]} />
           </Grid>
         )}
-        {isSatelliteMode && (
+        {(isSatelliteMode || isPM3DMode) && (
           <Grid item sm={12} lg={12} width="100%">
             <NitrogenMapWidget refVal={refs[4]} />
           </Grid>

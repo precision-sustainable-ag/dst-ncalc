@@ -39,6 +39,7 @@ const CoverCropFirst = () => {
   const navigate = useNavigate();
   const maxBiomass = useSelector(get.maxBiomass);
   const isSatelliteMode = useSelector(get.biomassCalcMode) === 'satellite';
+  const isPM3DMode = useSelector(get.biomassCalcMode) === 'pm3d';
   const coverCrop = useSelector(get.coverCrop);
   // eslint-disable-next-line no-nested-ternary
   const max = isSatelliteMode
@@ -109,7 +110,7 @@ const CoverCropFirst = () => {
             {(!coverCrop || coverCrop.length === 0) && <Required />}
           </Stack>
           <CoverCropsInput isSatelliteMode={isSatelliteMode} />
-          {isSatelliteMode && coverCrop && (
+          {(isSatelliteMode || isPM3DMode) && coverCrop && (
             <Box>
               <Stack direction="row" alignItems="center">
                 <CustomInputText>Cover Crop Growth Stage:</CustomInputText>
@@ -117,8 +118,8 @@ const CoverCropFirst = () => {
               </Stack>
               <GrowthStageInput isSatelliteMode={isSatelliteMode} />
             </Box>
-        )}
-          {isSatelliteMode ? (
+          )}
+          {isSatelliteMode && (
             <Paper mt={2}>
               <Stack m={2} direction="row" alignItems="center">
                 <Typography>Biomass Unit: &nbsp;</Typography>
@@ -137,7 +138,8 @@ const CoverCropFirst = () => {
               </Stack>
               <BiomassData minified={false} />
             </Paper>
-          ) : (
+          )} 
+          {!isSatelliteMode && (
             <>
               <Stack direction="row" alignItems="center">
                 <CustomInputText>Cover Crop Termination Date:</CustomInputText>
@@ -151,6 +153,11 @@ const CoverCropFirst = () => {
                   dispatch(set.coverCropTerminationDate(e.target.value));
               }}
               />
+            </>
+            )
+          }
+          {!isPM3DMode && !isSatelliteMode && (
+            <>
               <Box
                 mt={1}
                 sx={{
@@ -237,7 +244,7 @@ const CoverCropFirst = () => {
         <NavigateBar
           next="next"
           nextOnClick={() => {
-            if (isSatelliteMode) {
+            if (isSatelliteMode || isPM3DMode) {
               dispatch(set.activeStep(4));
               navigate('/sidedress')
             }
@@ -246,8 +253,16 @@ const CoverCropFirst = () => {
           nextDisabled={disableNextButton}
           back="back"
           backOnClick={() => {
+            if (isSatelliteMode) {
+              dispatch(set.activeStep(1));
+              navigate('/location');
+            } else if (isPM3DMode) {
+              dispatch(set.activeStep(0));
+              navigate('/upload');
+            } else {
                 dispatch(set.activeStep(2));
                 navigate('/soil');
+            }
           }}
         />
 

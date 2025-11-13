@@ -182,6 +182,7 @@ const initialState = {
   nitrogenFetchIsLoading: false,
   nitrogenTaskIsDone: true,
   activeStep: 0,
+  pm3dData: null,
   user: {
     historyState: historyStates.none,
     selectedHistory: null,

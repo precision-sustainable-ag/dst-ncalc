@@ -39,6 +39,7 @@ screens.sidedress = require('./components/CashCrop').default;
 screens.output = require('./components/Output').default;
 screens.feedback = require('./components/Feedback').default;
 screens.advanced = require('./components/Advanced').default;
+screens.upload = require('./components/Upload').default;
 
 screens.profile = () => <PSAProfile styles={{ backgroundColor: 'white' }} />;
 

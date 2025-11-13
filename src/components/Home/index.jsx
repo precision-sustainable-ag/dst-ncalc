@@ -92,6 +92,7 @@ const Home = () => {
               <BiomassMethodButton value="sampled">User Sampled</BiomassMethodButton>
               {/* <Box sx={{ width: 10, borderRight: '2px solid black' }} /> */}
               <BiomassMethodButton value="satellite">Satellite</BiomassMethodButton>
+              <BiomassMethodButton value="pm3d">PM3D</BiomassMethodButton>
             </ToggleButtonGroup>
           </Stack>
         </Stack>
@@ -99,8 +100,12 @@ const Home = () => {
         <NavigateBar
           next="Get Started"
           nextOnClick={() => {
-            navigate('/location');
-            dispatch(set.activeStep(1));
+            if (biomassCalcMode !== 'pm3d') {
+              navigate('/location');
+              dispatch(set.activeStep(1));
+            } else {
+              navigate('/upload');
+            }
           }}
           back="About"
           backOnClick={() => setAboutOpen(true)}
