@@ -31,16 +31,27 @@ const useFetchHLS = () => {
   const dispatch = useDispatch();
   // eslint-disable-next-line no-unneeded-ternary
   const isSatelliteMode = useSelector(get.biomassCalcMode) === 'satellite' ? true : false;
+  const isPM3DMode = useSelector(get.biomassCalcMode) === 'pm3d';
+  const pm3dData = useSelector(get.pm3dData);
   const activeStep = useSelector(get.activeStep);
 
   useEffect(() => {
-    if (!activeExample) {
+    if (!activeExample && isSatelliteMode) {
       dispatch(set.biomassGeojson(null));
       dispatch(set.biomassTaskResults(null));
       dispatch(set.biomassTotalValue(null));
       dispatch(set.biomass(null));
     }
   }, [JSON.stringify(mapPolygon), coverCropPlantingDate, coverCropTerminationDate]);
+
+  useEffect(() => {
+    if (!activeExample && isPM3DMode) {
+      dispatch(set.biomassGeojson(null));
+      dispatch(set.biomassTaskResults(null));
+      dispatch(set.biomassTotalValue(null));
+      dispatch(set.biomass(null));
+    }
+  }, [JSON.stringify(pm3dData)]);
 
   // initiate calculation of biomass
   useEffect(() => {
@@ -136,13 +147,13 @@ const useFetchHLS = () => {
 
   // set biomass value
   useEffect(() => {
-    if (isSatelliteMode && biomassTaskResults && biomassTaskResults.data_array) {
+    if ((isSatelliteMode || isPM3DMode) && biomassTaskResults && biomassTaskResults.data_array) {
       const flattenedBiomass = biomassTaskResults.data_array.flat(1).filter((el) => el !== 0);
       const factor = unit === 'lb/ac' ? 1.12085 : 1;
       const biomassAVG = arrayAverage(flattenedBiomass) * factor;
       dispatch(set.biomassTotalValue(Math.round(biomassAVG, 0)));
     }
-  }, [biomassTaskResults, unit, isSatelliteMode]);
+  }, [biomassTaskResults, unit, isSatelliteMode, isPM3DMode]);
 
   // useEffect(() => {
   //   dispatch(set.coverCropPlantingDate(coverCropPlantingDate));
@@ -154,6 +165,38 @@ const useFetchHLS = () => {
       dispatch(set.biomass(biomassTotalValue));
     }
   }, [biomassTotalValue, unit]);
+
+  useEffect(() => {
+    async function fetchBiomass() {
+      if (isPM3DMode && pm3dData && !biomassTaskResults && activeStep > 0) {
+        const url = `${HLS_API_URL}/generate-grid`;
+        try {
+          const response = await axios.post(url, {
+            points: pm3dData,
+            grid_size_meters: 63.6,
+          });
+
+          if (response.status === 200 && response.data) {
+            const biomassData = response.data;
+            const bbox = biomassData.bbox;
+            const rasterObject = { data_array: biomassData.data_array, bbox: biomassData.bbox };
+            const biomassGeojson = biomassData.biomass_geojson;
+            const coverCrop = biomassData.species;
+            const speciesBiomassAverage = biomassData.species_biomass_average;
+            dispatch(set.biomassGeojson(biomassGeojson));
+            dispatch(set.biomassTaskResults(rasterObject));
+            dispatch(set.speciesBiomassAverage(speciesBiomassAverage));
+            dispatch(set.coverCrop(coverCrop));
+            dispatch(set.lon((bbox[0] + bbox[2]) / 2));
+            dispatch(set.lat((bbox[1] + bbox[3]) / 2));
+          }
+        } catch (error) {
+          console.log(error);
+        }
+      }
+    }
+    fetchBiomass();
+  }, [isPM3DMode, pm3dData, activeStep]);
 
   return null;
 }; // useFetchHLS

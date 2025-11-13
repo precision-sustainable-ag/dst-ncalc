@@ -186,6 +186,85 @@ const useFetchSSURGO = () => {
   }, [updateSSURGO, field]);
 }; // fetchSSURGO
 
+const fetchNitrogenData = async (
+  biomassTaskResults,
+  coverCrop,
+  coverCropGrowthStage,
+  coverCropTerminationDate,
+  cashCropPlantingDate,
+  targetN,
+  biomassCalcMode,
+  speciesBiomassAverage,
+  dispatch
+) => {
+  const url = `${PLANTFACTORS_API_URL}/nitrogen`;
+
+  dispatch(set.nitrogenFetchIsLoading(true));
+
+  let species;
+  let growthStage;
+
+  if (biomassCalcMode === 'satellite') {
+    species = coverCrop?.[0];
+    growthStage = coverCropGrowthStage?.[species] || 'Unknown growth stage';
+  } else if (biomassCalcMode === 'pm3d') {
+    species = coverCrop?.length > 0 ? coverCrop : [];
+    growthStage = species.map(
+      (item) => coverCropGrowthStage?.[item] || 'Unknown growth stage'
+    );
+  }
+
+
+  try {
+    const response = await axios.post(url, {
+      data_array: biomassTaskResults.data_array,
+      bbox: biomassTaskResults.bbox,
+      species,
+      growth_stage: growthStage,
+      start: coverCropTerminationDate,
+      end: cashCropPlantingDate,
+      target_n: targetN,
+      mode: biomassCalcMode,
+      species_biomass_average: speciesBiomassAverage,
+    });
+
+    dispatch(set.nitrogenFetchIsLoading(false));
+
+    if (response.status === 200 && response.data) {
+      const geojsonData = response.data;
+      delete geojsonData.properties;
+
+      const reqnGeojson = JSON.parse(JSON.stringify(geojsonData));
+
+      geojsonData.features.forEach((feature) => {
+        if (
+          feature.properties
+          && feature.properties.MinNfromFOM !== undefined
+        ) {
+          feature.properties.value = feature.properties.MinNfromFOM;
+        }
+      });
+
+      reqnGeojson.features.forEach((feature) => {
+        if (
+          feature.properties
+          && feature.properties.ReqN !== undefined
+        ) {
+          feature.properties.value = feature.properties.ReqN;
+        }
+      });
+
+      dispatch(set.nitrogenTaskResults({ minN : geojsonData, reqN: reqnGeojson}));
+    } else {
+      dispatch(set.nitrogenFetchIsFailed(true));
+    }
+  } catch (error) {
+    console.log(error);
+    dispatch(set.nitrogenFetchIsLoading(false));
+    dispatch(set.nitrogenFetchIsFailed(true));
+  }
+};
+
 /// Desc: useFetchPlantFactors
 /// ..............................................................................
 /// ..............................................................................
@@ -197,8 +276,8 @@ const useFetchPlantFactors = () => {
   const plantGrowthStages = useSelector(get.plantGrowthStages);
   const coverCrop = useSelector(get.coverCrop);
   const coverCropGrowthStage = useSelector(get.coverCropGrowthStage);
-  const coverCropPlantingDate = useSelector(get.coverCropPlantingDate);
   const coverCropTerminationDate = useSelector(get.coverCropTerminationDate);
+  const cashCropPlantingDate = useSelector(get.cashCropPlantingDate);
   const N = useSelector(get.N);
   const carb = useSelector(get.carb);
   const cell = useSelector(get.cell);
@@ -208,6 +287,9 @@ const useFetchPlantFactors = () => {
   const biomassTaskResults = useSelector(get.biomassTaskResults);
   const nitrogenTaskResults = useSelector(get.nitrogenTaskResults);
   const isSatelliteMode = useSelector(get.biomassCalcMode) === 'satellite';
+  const biomassCalcMode = useSelector(get.biomassCalcMode);
+  const speciesBiomassAverage = useSelector(get.speciesBiomassAverage);
+
 
   useEffect(() => {
     if (isSatelliteMode && coverCrop && coverCropGrowthStage) {
@@ -264,126 +346,15 @@ const useFetchPlantFactors = () => {
 
   useEffect(() => {
     dispatch(set.nitrogenTaskResults(null));
-  }, [biomassTaskResults, coverCrop, coverCropGrowthStage, coverCropPlantingDate, coverCropTerminationDate, N, carb, cell, lign, targetN]);
+  }, [biomassTaskResults, coverCrop, coverCropGrowthStage, coverCropTerminationDate, cashCropPlantingDate, N, carb, cell, lign, targetN]);
 
   useEffect(() => {
-    async function fetchNitrogen() {
-      if (biomassTaskResults && !nitrogenTaskResults && species && plantGrowthStages && coverCropPlantingDate && coverCropTerminationDate
-            && targetN && N && carb && cell && lign && activeStep > 4) {
-        const url = `${PLANTFACTORS_API_URL}/nitrogen`;
-        dispatch(set.nitrogenFetchIsLoading(true));
-        try {
-          const response = await axios.post(url, {
-            data_array: biomassTaskResults.data_array,
-            bbox: biomassTaskResults.bbox,
-            species: coverCrop[0],
-            growth_stage: coverCropGrowthStage,
-            start: coverCropPlantingDate,
-            end: coverCropTerminationDate,
-            target_n: targetN
-          });
-
-          dispatch(set.nitrogenFetchIsLoading(false));
-
-          if (response.status === 200 && response.data) {
-            const geojsonData = response.data;
-            delete geojsonData.properties;
-
-            const reqnGeojson = JSON.parse(JSON.stringify(geojsonData));
-
-            geojsonData.features.forEach((feature) => {
-              if (
-                feature.properties
-                && feature.properties.MinNfromFOM !== undefined
-              ) {
-                feature.properties.value = feature.properties.MinNfromFOM;
-              }
-            });
-
-            reqnGeojson.features.forEach((feature) => {
-              if (
-                feature.properties
-                && feature.properties.ReqN !== undefined
-              ) {
-                feature.properties.value = feature.properties.ReqN;
-              }
-            });
-
-            dispatch(set.nitrogenTaskResults({ minN : geojsonData, reqN: reqnGeojson}));
-          } else {
-            dispatch(set.nitrogenFetchIsFailed(true));
-          }
-        } catch (error) {
-          console.log(error);
-          dispatch(set.nitrogenFetchIsLoading(false));
-          dispatch(set.nitrogenFetchIsFailed(true));
-        }
-      }
+    if (biomassTaskResults && !nitrogenTaskResults && species && plantGrowthStages && coverCropTerminationDate && cashCropPlantingDate
+          && targetN && activeStep > 4) {
+      fetchNitrogenData(biomassTaskResults, coverCrop, coverCropGrowthStage, coverCropTerminationDate, cashCropPlantingDate, targetN, biomassCalcMode,speciesBiomassAverage, dispatch)
     }
-    fetchNitrogen();
-  }, [dispatch, biomassTaskResults, species, plantGrowthStages, coverCropPlantingDate, coverCropTerminationDate, targetN, N, carb, cell, lign, activeStep]);
+  }, [dispatch, biomassTaskResults, species, plantGrowthStages, coverCropTerminationDate, cashCropPlantingDate, targetN, N, carb, cell, lign, activeStep]);
 }; // useFetchPlantFactors
-
-const fetchNitrogenData = async (
-  biomassTaskResults,
-  coverCrop,
-  coverCropGrowthStage,
-  coverCropPlantingDate,
-  coverCropTerminationDate,
-  targetN,
-  dispatch
-) => {
-  const url = `${PLANTFACTORS_API_URL}/nitrogen`;
-
-  dispatch(set.nitrogenFetchIsLoading(true));
-
-  try {
-    const response = await axios.post(url, {
-      data_array: biomassTaskResults.data_array,
-      bbox: biomassTaskResults.bbox,
-      species: coverCrop[0],
-      growth_stage: coverCropGrowthStage,
-      start: coverCropPlantingDate,
-      end: coverCropTerminationDate,
-      target_n: targetN
-    });
-
-    dispatch(set.nitrogenFetchIsLoading(false));
-
-    if (response.status === 200 && response.data) {
-      const geojsonData = response.data;
-      delete geojsonData.properties;
-
-      const reqnGeojson = JSON.parse(JSON.stringify(geojsonData));
-
-      geojsonData.features.forEach((feature) => {
-        if (
-          feature.properties
-          && feature.properties.MinNfromFOM !== undefined
-        ) {
-          feature.properties.value = feature.properties.MinNfromFOM;
-        }
-      });
-
-      reqnGeojson.features.forEach((feature) => {
-        if (
-          feature.properties
-          && feature.properties.ReqN !== undefined
-        ) {
-          feature.properties.value = feature.properties.ReqN;
-        }
-      });
-
-      dispatch(set.nitrogenTaskResults({ minN : geojsonData, reqN: reqnGeojson}));
-    } else {
-      dispatch(set.nitrogenFetchIsFailed(true));
-    }
-  } catch (error) {
-    console.log(error);
-    dispatch(set.nitrogenFetchIsLoading(false));
-    dispatch(set.nitrogenFetchIsFailed(true));
-  }
-};
 
 /// Desc: useFetchNitrogenArray
 /// ..............................................................................

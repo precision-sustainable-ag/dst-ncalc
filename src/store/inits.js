@@ -134,6 +134,7 @@ const initialState = {
   cashCropPlantingDate: null,
   biomassTaskResults: null,
   biomassGeojson: null,
+  speciesBiomassAverage: {},
   nitrogenTaskResults: null,
   biomassTotalValue: null,
   maxZoom: 20,
