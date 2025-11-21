@@ -132,7 +132,7 @@ const useFetchModel = ({
           console.log(error);
         });
     }
-  }, []);
+  }, [N]);
 
   return model;
 };
@@ -231,7 +231,7 @@ const fetchNitrogenData = async (
     dispatch(set.nitrogenFetchIsLoading(false));
 
     if (response.status === 200 && response.data) {
-      const geojsonData = response.data;
+      const geojsonData = response.data?.geojson_data;
       delete geojsonData.properties;
 
       const reqnGeojson = JSON.parse(JSON.stringify(geojsonData));
@@ -255,6 +255,8 @@ const fetchNitrogenData = async (
       });
 
       dispatch(set.nitrogenTaskResults({ minN : geojsonData, reqN: reqnGeojson}));
+
+      if (response.data?.n > 0) dispatch(set.N(response.data.n.toFixed(2)));
     } else {
       dispatch(set.nitrogenFetchIsFailed(true));
     }
@@ -346,7 +348,7 @@ const useFetchPlantFactors = () => {
 
   useEffect(() => {
     dispatch(set.nitrogenTaskResults(null));
-  }, [biomassTaskResults, coverCrop, coverCropGrowthStage, coverCropTerminationDate, cashCropPlantingDate, N, carb, cell, lign, targetN]);
+  }, [biomassTaskResults, coverCrop, coverCropGrowthStage, coverCropTerminationDate, cashCropPlantingDate, targetN]);
 
   useEffect(() => {
     if (biomassTaskResults && !nitrogenTaskResults && species && plantGrowthStages && coverCropTerminationDate && cashCropPlantingDate
