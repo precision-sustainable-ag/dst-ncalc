@@ -1,5 +1,5 @@
 /* eslint-disable no-nested-ternary */
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import Autocomplete from '@mui/material/Autocomplete';
 import { PSATextField } from 'shared-react-components/src';
@@ -26,6 +26,10 @@ const CoverCropsInput = ({ isSatelliteMode }) => {
     );
     dispatch(set.coverCropGrowthStage(filteredStages));
   };
+
+  useEffect(() => {
+    setValue(isSatelliteMode ? (coverCrop.length === 0 ? null : coverCrop[0]) : coverCrop);
+  }, [isSatelliteMode, coverCrop]);
 
   return (
     <Autocomplete
