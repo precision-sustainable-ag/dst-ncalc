@@ -22,13 +22,13 @@ const Advanced = () => {
   // const gotModel = useSelector(get.gotModel);
   const model = useSelector(get.model);
 
-  const navigate = useNavigate();
+  // const navigate = useNavigate();
 
-  const scr = missingData();
-  if (scr) {
-    setTimeout(() => navigate(`../${scr}`), 1);
-    return '';
-  }
+  // const scr = missingData();
+  // if (scr) {
+  //   setTimeout(() => navigate(`../${scr}`), 1);
+  //   return '';
+  // }
 
   // if (!gotModel || !model || !biomass || !N || !carb || !cell || !lign || !lwc || !BD || !InorganicN) {
   //   return (
@@ -68,7 +68,11 @@ const Advanced = () => {
       date = new Date(coverCropTerminationDate);
       date.setHours(0, 0, 0, 0);
       let total = 0;
-      model.s[parmm].forEach((d) => {
+      const arr = model?.s?.[parmm];
+      if (!arr) {
+        return;
+      }
+      arr.forEach((d) => {
         const value = +(d / factor).toFixed(2);
         total += +value;
         if (hourly || date.getHours() === 23) {

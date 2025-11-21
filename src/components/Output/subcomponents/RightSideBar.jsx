@@ -25,6 +25,7 @@ const RightSideBar = ({ summaryData, refs }) => {
   // if (!model) return <Loading />;
   const isSatelliteMode = useSelector(get.biomassCalcMode) === 'satellite';
   const isPM3DMode = useSelector(get.biomassCalcMode) === 'pm3d';
+  const model = useSelector(get.model);
   useSelector(get.screen); // force render
   useSelector(get.biomassTaskResults); // force render
   useSelector(get.nitrogenTaskResults); // force render
@@ -59,6 +60,7 @@ const RightSideBar = ({ summaryData, refs }) => {
           <NavigateBar
             next="ADVANCED"
             nextOnClick={() => { navigate('/advanced'); }}
+            nextDisabled={!model || !model.s}
             back="back"
             backOnClick={() => {
               dispatch(set.activeStep(4));

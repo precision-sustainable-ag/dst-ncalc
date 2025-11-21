@@ -12,9 +12,9 @@ const afterChange = {
     }
     state.model = null;
   },
-  carb: (state) => { state.model = null; state.edited = true; },
-  cell: (state) => { state.model = null; state.edited = true; },
-  lign: (state) => { state.model = null; state.edited = true; },
+  carb: (state, { payload }) => { if (payload !== null) { state.model = null; state.edited = true; }},
+  cell: (state, { payload }) => { if (payload !== null) { state.model = null; state.edited = true; }},
+  lign: (state, { payload }) => { if (payload !== null) { state.model = null; state.edited = true; }},
   lat: (state) => { state.model = null; },
   lon: (state) => { state.model = null; },
   lwc: (state) => { state.model = null; },
