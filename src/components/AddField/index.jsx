@@ -16,7 +16,7 @@ import { get } from '../../store/redux-autosetters';
 import { mapboxToken } from '../../utils/keys';
 import { processGeometries, validateAndProcessGeoJSON } from '../../utils/geojsonUtils';
 
-const API_BASE_URL = 'http://localhost:80/api/v1';
+const API_BASE_URL = 'https://developpm3dapi.covercrop-ncalc.org/api/v1';
 const ROLES = ['NIFA-Soy', 'Willard', 'GROW'];
 
 // TODO: Placeholder values - to be updated

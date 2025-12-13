@@ -19,7 +19,7 @@ import shpjs from 'shpjs';
 import { azureSASToken, containerName, storageAccountName } from '../../utils/keys';
 import { isValidGeoJSON } from '../../utils/geojsonUtils';
 
-const API_BASE_URL = 'http://localhost:80/api/v1';
+const API_BASE_URL = 'https://developpm3dapi.covercrop-ncalc.org/api/v1';
 const MAP_TYPES = ['Spray Map', 'Yield Map'];
 const ROLES = ['NIFA-Soy', 'Willard', 'GROW'];
 
