@@ -4,7 +4,6 @@ import { useAuth0 } from '@auth0/auth0-react';
 import { BlobServiceClient } from '@azure/storage-blob';
 import {
   Autocomplete,
-  Button,
   CircularProgress,
   Grid,
   Stack,
@@ -85,18 +84,18 @@ const UploadMap = () => {
       const containerClient = blobServiceClient.getContainerClient(containerName);
 
       const {
-        programName, growerName, farmName, fieldName,
+        programName, growerName, farmName, fieldName, season,
       } = selectedField.properties;
 
       /**
        * Construct Folder/File Path
-       * Folder format: programName_growerName_farmName_fieldName
+       * Folder format: programName_growerName_farmName_fieldName_seaspn
        * File format: mapType_filename
-       * Example: NIFA_Midwest_Ohio_FieldA/Yield_Map_data.zip
+       * Example: NIFA_Midwest_Ohio_Field_A_Spring_2025/Yield_Map_data.zip
        */
-      const folderName = `${programName}_${growerName}_${farmName}_${fieldName}`;
+      const folderName = `${programName}_${growerName}_${farmName}_${fieldName}_${season}`;
       const cleanFileName = selectedFile.name.replace(/\s+/g, '_');
-      const blobName = `${folderName}/${mapType.replace(/\s+/g, '_')}_${cleanFileName}`;
+      const blobName = `${folderName.replace(/\s+/g, '_')}/${mapType.replace(/\s+/g, '_')}_${cleanFileName}`;
 
       const blockBlobClient = containerClient.getBlockBlobClient(blobName);
 
@@ -222,6 +221,8 @@ const UploadMap = () => {
                       {option.properties.growerName}
                       {' - '}
                       {option.properties.farmName}
+                      {' - '}
+                      {option.properties.season}
                     </Typography>
                   </Stack>
                 </Box>
@@ -229,7 +230,7 @@ const UploadMap = () => {
               renderInput={(params) => (
                 <PSATextField
                   {...params}
-                  label="Select Field (Program / Grower / Farm / Field)"
+                  label="Select Field (Program / Grower / Farm / Field / Season)"
                   placeholder="Type to search..."
                   InputProps={{
                     ...params.InputProps,
