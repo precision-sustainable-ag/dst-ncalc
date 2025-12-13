@@ -12,6 +12,8 @@ import {
 import { deepmerge } from '@mui/utils';
 import ChatBubbleOutlineIcon from '@mui/icons-material/ChatBubbleOutline';
 import AccountBoxOutlinedIcon from '@mui/icons-material/AccountBoxOutlined';
+import GrassOutlinedIcon from '@mui/icons-material/GrassOutlined';
+import CloudUploadOutlinedIcon from '@mui/icons-material/CloudUploadOutlined';
 // import ResponsiveNavBar from './components/ResponsiveNavBar';
 import Feedback from './components/Feedback';
 import SnackbarMessage from './shared/SnackbarMessage';
@@ -40,6 +42,8 @@ screens.output = require('./components/Output').default;
 screens.feedback = require('./components/Feedback').default;
 screens.advanced = require('./components/Advanced').default;
 screens.upload = require('./components/Upload').default;
+screens.field = require('./components/AddField').default;
+screens.upload = require('./components/FileUpload').default;
 
 screens.profile = () => <PSAProfile styles={{ backgroundColor: 'white' }} />;
 
@@ -93,6 +97,7 @@ const App = () => {
   const Screen = screens[path] || screens.home;
 
   const { showAlert, alertSeverity, alertMessage } = useSelector(get.user);
+  const isPM3DMode = useSelector(get.biomassCalcMode) === 'pm3d';
 
   const navContent = [
     {
@@ -116,6 +121,30 @@ const App = () => {
         dispatch(set.openFeedbackModal(true));
       },
     },
+    ...(isPM3DMode
+      ? [
+        {
+          type: 'button',
+          variant: 'text',
+          text: 'Add Field',
+          icon: <GrassOutlinedIcon />,
+          rightIcon: true,
+          onClick: () => navigate('/field'),
+        },
+      ]
+      : []),
+    ...(isPM3DMode
+      ? [
+        {
+          type: 'button',
+          variant: 'text',
+          text: 'Upload Files',
+          icon: <CloudUploadOutlinedIcon />,
+          rightIcon: true,
+          onClick: () => navigate('/upload'),
+        },
+      ]
+      : []),
     {
       type: 'component',
       component: <FieldDropdown />,

@@ -1,0 +1,367 @@
+/* eslint-disable no-alert */
+import React, { useEffect, useMemo, useState } from 'react';
+import { useAuth0 } from '@auth0/auth0-react';
+import {
+  Autocomplete,
+  Box,
+  Button,
+  CircularProgress,
+  Grid, Stack, Typography, useMediaQuery,
+} from '@mui/material';
+import { PSAReduxMap, PSATextField } from 'shared-react-components/src';
+import { useSelector } from 'react-redux';
+import shpjs from 'shpjs';
+import axios from 'axios';
+import { useNavigate } from 'react-router-dom';
+import { get } from '../../store/redux-autosetters';
+import { mapboxToken } from '../../utils/keys';
+import { processGeometries, validateAndProcessGeoJSON } from '../../utils/geojsonUtils';
+
+const API_BASE_URL = 'http://localhost:80/api/v1';
+const ROLES = ['NIFA-Soy', 'Willard', 'GROW'];
+
+const AddField = () => {
+  const {
+    user, isAuthenticated, isLoading, getAccessTokenSilently,
+  } = useAuth0();
+
+  const navigate = useNavigate();
+  const matchesMd = useMediaQuery((theme) => theme.breakpoints.down('md'));
+
+  // FORM DATA STATE VARIABLES
+  const [program, setProgram] = useState(null);
+  const [grower, setGrower] = useState(null);
+  const [farm, setFarm] = useState(null);
+  const [field, setField] = useState(null);
+  const [isSaving, setIsSaving] = useState(false);
+
+  // MAP STATE VARIABLES
+  const defaultLat = useSelector(get.lat);
+  const defaultLon = useSelector(get.lon);
+  const [address, setAddress] = useState({});
+  const [zoom, setZoom] = useState(13);
+  const [features, setFeatures] = useState(null);
+  const [latLon, setLatLon] = useState([defaultLat, defaultLon]);
+  const [bounds, setBounds] = useState(null);
+
+  // DATA FOR ALL THE FIELDS
+  const [allFields, setAllFields] = useState([]);
+  const [loadingOptions, setLoadingOptions] = useState(true);
+
+  const roles = user?.['https://dst-ncalc.org/claims'] || [];
+  const isAllowed = isAuthenticated && (roles.includes('admin') || roles.some((r) => ROLES.includes(r)));
+  const isAdmin = roles.includes('admin');
+  const allowedPrograms = isAdmin
+    ? ROLES
+    : ROLES.filter((role) => roles.includes(role));
+
+  const updateProperties = (properties) => {
+    setAddress(properties?.address);
+    setZoom(properties?.zoom);
+    setFeatures(properties?.features);
+    setLatLon([properties?.lat, properties?.lon]);
+  };
+
+  useEffect(() => {
+    const fetchOptions = async () => {
+      try {
+        const token = await getAccessTokenSilently();
+        const response = await axios.get(`${API_BASE_URL}/fields-identifiers`, {
+          headers: { Authorization: `Bearer ${token}` },
+        });
+        // setOptions(response.data);
+        setAllFields(response.data);
+      } catch (error) {
+        console.error('Failed to load dropdown options', error);
+      } finally {
+        setLoadingOptions(false);
+      }
+    };
+
+    if (isAuthenticated) {
+      fetchOptions();
+    }
+  }, [isAuthenticated, getAccessTokenSilently]);
+
+  const {
+    programOptions, growerOptions, farmOptions, fieldOptions,
+  } = useMemo(() => {
+    // Helper to extract unique values from a filtered list
+    const getUnique = (list, key) => [...new Set(list.map((item) => item.properties[key]).filter(Boolean))].sort();
+
+    // A. Programs: Show programs list according to the user's role
+    const uniquePrograms = allowedPrograms;
+
+    // B. Growers: Filter master list by Selected Program
+    const validGrowersList = allFields.filter((f) => !program || f.properties.programName.toLowerCase() === program.toLowerCase());
+    const uniqueGrowers = getUnique(validGrowersList, 'growerName');
+
+    // C. Farms: Filter by Selected Program AND Selected Grower
+    const validFarmsList = validGrowersList.filter((f) => !grower || f.properties.growerName.toLowerCase() === grower.toLowerCase());
+    const uniqueFarms = getUnique(validFarmsList, 'farmName');
+
+    // D. Fields: Filter by Program AND Grower AND Farm
+    const validFieldsList = validFarmsList.filter((f) => !farm || f.properties.farmName.toLowerCase() === farm.toLowerCase());
+    const uniqueFields = getUnique(validFieldsList, 'fieldName');
+
+    return {
+      programOptions: uniquePrograms,
+      growerOptions: uniqueGrowers,
+      farmOptions: uniqueFarms,
+      fieldOptions: uniqueFields,
+    };
+  }, [allowedPrograms, allFields, program, grower, farm]);
+
+  const handleProgramChange = (newVal) => {
+    setProgram(newVal);
+    setGrower(null);
+    setFarm(null);
+    setField(null);
+  };
+
+  const handleGrowerChange = (newVal) => {
+    setGrower(newVal);
+    setFarm(null);
+    setField(null);
+  };
+
+  const handleFarmChange = (newVal) => {
+    setFarm(newVal);
+    setField(null);
+  };
+
+  const handleSaveField = async () => {
+    // Validate form fields
+    if (!program || !grower || !farm || !field) {
+      alert('Please fill in all text fields (Program, Grower, Farm, Field Name).');
+      return;
+    }
+
+    const finalGeometry = processGeometries(features);
+    if (!finalGeometry) {
+      alert('Please draw a shape or upload a file.');
+      return;
+    }
+
+    setIsSaving(true);
+
+    try {
+      const token = await getAccessTokenSilently();
+
+      const payload = {
+        programName: program,
+        farmName: farm,
+        growerName: grower,
+        fieldName: field,
+        geometry: finalGeometry,
+      };
+
+      await axios.post(`${API_BASE_URL}/fields`, payload, {
+        headers: {
+          Authorization: `Bearer ${token}`,
+          'Content-Type': 'application/json',
+        },
+      });
+
+      setProgram(null);
+      setGrower(null);
+      setFarm(null);
+      setField(null);
+      setFeatures(null);
+
+      alert('Field saved successfully!');
+      navigate('/home');
+    } catch (error) {
+      if (error.response?.data?.message) {
+        alert(`Error: ${error.response.data.message}`);
+      } else if (error.response) {
+        alert(`Error: ${error.response.data?.error || 'Failed to save field'}`);
+      } else {
+        alert('Network error. Could not connect to server.');
+      }
+    } finally {
+      setIsSaving(false);
+    }
+  };
+
+  const handleFileUpload = (e) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    const ext = file.name.split('.').pop()?.toLowerCase();
+
+    if (['geojson', 'json'].includes(ext)) {
+      const reader = new FileReader();
+      reader.onload = () => {
+        try {
+          const geojson = JSON.parse(reader.result);
+          validateAndProcessGeoJSON(geojson, setFeatures, setLatLon, setBounds);
+        } catch (err) {
+          alert('Error parsing GeoJSON file');
+        }
+      };
+      reader.readAsText(file);
+    } else if (['shp', 'zip'].includes(ext)) {
+      const reader = new FileReader();
+      reader.onload = async () => {
+        try {
+          const arrayBuffer = reader.result;
+          const geojson = await shpjs(arrayBuffer);
+          validateAndProcessGeoJSON(geojson, setFeatures, setLatLon, setBounds);
+        } catch (err) {
+          alert('Error parsing Shapefile. Please ensure it is a valid .zip containing .shp, .shx, and .dbf files.');
+        }
+      };
+      reader.readAsArrayBuffer(file);
+    } else {
+      alert('Unsupported file type. Please upload .geojson or .shp');
+    }
+  };
+
+  if (isLoading) {
+    return (
+      <Box display="flex" justifyContent="center" alignItems="center" minHeight="100vh">
+        <CircularProgress />
+      </Box>
+    );
+  }
+
+  return (
+    <Grid container justifyContent="center">
+      <Grid
+        item
+        xs={12}
+        md={10}
+        sx={{
+          marginTop: '1rem',
+          padding: `2rem ${matchesMd ? '1rem' : '4rem'}`,
+          boxShadow: 5,
+          borderRadius: 5,
+          opacity: 0.9,
+          backgroundColor: 'white',
+        }}
+      >
+        {isAllowed ? (
+          <Stack spacing="1.5rem">
+            <Grid container spacing={2}>
+              <Grid item xs={12} md={6}>
+                <Autocomplete
+                  loading={loadingOptions}
+                  options={programOptions}
+                  value={program}
+                  onChange={(e, val) => handleProgramChange(val)}
+                  onInputChange={(e, newInputValue) => handleProgramChange(newInputValue)}
+                  renderInput={(params) => <PSATextField {...params} label="Select a Program name" />}
+                />
+              </Grid>
+              <Grid item xs={12} md={6}>
+                <Autocomplete
+                  key={program}
+                  freeSolo
+                  loading={loadingOptions}
+                  options={growerOptions}
+                  value={grower}
+                  onChange={(e, val) => handleGrowerChange(val)}
+                  onInputChange={(e, newInputValue) => handleGrowerChange(newInputValue)}
+                  renderInput={(params) => <PSATextField {...params} label="Select a Grower name" />}
+                />
+              </Grid>
+            </Grid>
+
+            <Grid container spacing={2}>
+              <Grid item xs={12} md={6}>
+                <Autocomplete
+                  key={grower}
+                  freeSolo
+                  loading={loadingOptions}
+                  options={farmOptions}
+                  value={farm}
+                  onChange={(e, val) => handleFarmChange(val)}
+                  onInputChange={(e, newInputValue) => handleFarmChange(newInputValue)}
+                  renderInput={(params) => <PSATextField {...params} label="Select a Farm name" />}
+                />
+              </Grid>
+              <Grid item xs={12} md={6}>
+                <Autocomplete
+                  key={farm}
+                  freeSolo
+                  loading={loadingOptions}
+                  options={fieldOptions}
+                  value={field}
+                  onChange={(e, val) => setField(val)}
+                  onInputChange={(e, newInputValue) => setField(newInputValue)}
+                  renderInput={(params) => <PSATextField {...params} label="Select a Field name" />}
+                />
+              </Grid>
+            </Grid>
+
+            <Typography variant="h4" align="center">
+              Where is your Field located?
+            </Typography>
+            <Typography variant="h6" align="center">
+              Enter your address or zip code to determine your field&apos;s location. You can then zoom in and click to pinpoint it on the map. If
+              you know your exact coordinates, you can enter them in search bar separated by comma (ex. 37.7, -80.2 ).
+            </Typography>
+            <Stack direction="row" justifyContent="flex-end">
+              <Button variant="contained" component="label">
+                Upload Shapefile / GeoJSON
+                <input
+                  type="file"
+                  hidden
+                  accept=".geojson,.shp,.zip"
+                  onChange={handleFileUpload}
+                />
+              </Button>
+            </Stack>
+
+            <Box sx={{ position: 'relative' }}>
+              <PSAReduxMap
+                setProperties={updateProperties}
+                initWidth="100%"
+                initHeight="380px"
+                initLat={latLon[0]}
+                initLon={latLon[1]}
+                initStartZoom={zoom}
+                initFeatures={features}
+                initAddress={address?.address}
+                initBounds={bounds}
+                hasSearchBar
+                hasClear
+                hasMarker
+                hasMarkerPopup
+                hasMarkerMovable
+                hasNavigation
+                hasFullScreen
+                hasGeolocate
+                hasDrawing
+                scrollZoom
+                dragRotate
+                dragPan
+                keyboard
+                doubleClickZoom={false}
+                touchZoomRotate
+                mapboxToken={mapboxToken}
+              />
+            </Box>
+
+            <Stack direction="row" justifyContent="center" sx={{ mt: 2 }}>
+              <Button
+                variant="contained"
+                color="primary"
+                size="large"
+                onClick={handleSaveField}
+                disabled={isSaving || !program || !grower || !farm || !field}
+                sx={{ minWidth: '200px' }}
+              >
+                {isSaving ? <CircularProgress size={24} color="inherit" /> : 'Save Field'}
+              </Button>
+            </Stack>
+          </Stack>
+        )
+          : 'Access denied'}
+      </Grid>
+    </Grid>
+  );
+};
+
+export default AddField;
