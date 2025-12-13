@@ -14,7 +14,7 @@ import {
   Box,
   useMediaQuery,
 } from '@mui/material';
-import { PSATextField } from 'shared-react-components/src';
+import { PSAButton, PSATextField } from 'shared-react-components/src';
 import axios from 'axios';
 import shpjs from 'shpjs';
 import { azureSASToken, containerName, storageAccountName } from '../../utils/keys';
@@ -255,10 +255,8 @@ const UploadMap = () => {
             </TextField>
 
             <Stack direction="row" alignItems="center" spacing={2} sx={{ border: '1px dashed grey', p: 3, borderRadius: 2 }}>
-              <Button variant="contained" component="label">
-                Choose File
-                <input type="file" hidden accept=".geojson,.json,.shp,.zip" onChange={handleFileChange} />
-              </Button>
+              <input id="file-input" type="file" hidden accept=".geojson,.json,.shp,.zip" onChange={handleFileChange} />
+              <PSAButton buttonType="Back" title="Choose File" variant="contained" onClick={() => document.getElementById('file-input').click()} />
               <Typography variant="body1">
                 {selectedFile ? selectedFile.name : 'No file selected'}
               </Typography>
@@ -274,15 +272,19 @@ const UploadMap = () => {
             </Stack>
             )}
 
-            <Button
+            <PSAButton
               variant="contained"
-              color="primary"
-              size="large"
+              title={isUploading ? 'Uploading...' : 'Upload to Azure'}
               onClick={handleUpload}
               disabled={isUploading || !selectedFile || !mapType || !selectedField}
-            >
-              {isUploading ? 'Uploading...' : 'Upload to Azure'}
-            </Button>
+              sx={{
+                backgroundColor: '#60802D',
+                '&:hover': {
+                  backgroundColor: '#60802D',
+                  textDecoration: 'underline',
+                },
+              }}
+            />
 
           </Stack>
         )

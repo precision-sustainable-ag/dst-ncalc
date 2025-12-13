@@ -8,7 +8,7 @@ import {
   CircularProgress,
   Grid, Stack, Typography, useMediaQuery,
 } from '@mui/material';
-import { PSAReduxMap, PSATextField } from 'shared-react-components/src';
+import { PSAButton, PSAReduxMap, PSATextField } from 'shared-react-components/src';
 import { useSelector } from 'react-redux';
 import shpjs from 'shpjs';
 import axios from 'axios';
@@ -303,15 +303,30 @@ const AddField = () => {
               you know your exact coordinates, you can enter them in search bar separated by comma (ex. 37.7, -80.2 ).
             </Typography>
             <Stack direction="row" justifyContent="flex-end">
-              <Button variant="contained" component="label">
-                Upload Shapefile / GeoJSON
-                <input
-                  type="file"
-                  hidden
-                  accept=".geojson,.shp,.zip"
-                  onChange={handleFileUpload}
-                />
-              </Button>
+              <input
+                id="upload-input"
+                type="file"
+                hidden
+                accept=".geojson,.shp,.zip"
+                onChange={handleFileUpload}
+              />
+              <PSAButton
+                title="Upload Shapefile / GeoJSON"
+                variant="contained"
+                onClick={() => document.getElementById('upload-input').click()}
+                sx={{
+                  minWidth: '150px',
+                  color: 'white',
+                  padding: '0.8rem 1.5rem',
+                  borderRadius: '2rem',
+                  backgroundColor: '#60802D',
+                  '&:hover': {
+                    backgroundColor: '#60802D',
+                    textDecoration: 'underline',
+                    boxShadow: '0px 2px 2px rgba(160, 160, 160, 0.3)',
+                  },
+                }}
+              />
             </Stack>
 
             <Box sx={{ position: 'relative' }}>
@@ -345,16 +360,24 @@ const AddField = () => {
             </Box>
 
             <Stack direction="row" justifyContent="center" sx={{ mt: 2 }}>
-              <Button
+              <PSAButton
+                title={isSaving ? <CircularProgress size={24} color="inherit" /> : 'Save Field'}
                 variant="contained"
-                color="primary"
-                size="large"
                 onClick={handleSaveField}
                 disabled={isSaving || !program || !grower || !farm || !field}
-                sx={{ minWidth: '200px' }}
-              >
-                {isSaving ? <CircularProgress size={24} color="inherit" /> : 'Save Field'}
-              </Button>
+                sx={{
+                  minWidth: '150px',
+                  color: 'white',
+                  padding: '0.8rem 1.5rem',
+                  borderRadius: '2rem',
+                  backgroundColor: '#60802D',
+                  '&:hover': {
+                    backgroundColor: '#60802D',
+                    textDecoration: 'underline',
+                    boxShadow: '0px 2px 2px rgba(160, 160, 160, 0.3)',
+                  },
+                }}
+              />
             </Stack>
           </Stack>
         )
