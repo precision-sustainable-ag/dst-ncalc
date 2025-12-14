@@ -43,7 +43,7 @@ screens.feedback = require('./components/Feedback').default;
 screens.advanced = require('./components/Advanced').default;
 screens.upload = require('./components/Upload').default;
 screens.field = require('./components/AddField').default;
-screens.upload = require('./components/FileUpload').default;
+screens.fileupload = require('./components/FileUpload').default;
 
 screens.profile = () => <PSAProfile styles={{ backgroundColor: 'white' }} />;
 
@@ -141,7 +141,7 @@ const App = () => {
           text: 'Upload Files',
           icon: <CloudUploadOutlinedIcon />,
           rightIcon: true,
-          onClick: () => navigate('/upload'),
+          onClick: () => navigate('/fileupload'),
         },
       ]
       : []),
