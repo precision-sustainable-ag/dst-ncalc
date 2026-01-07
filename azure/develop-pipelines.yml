@@ -40,7 +40,7 @@ stages:
         echo VITE_API_AUTH0_AUDIENCE="$(VITE_API_AUTH0_AUDIENCE)" >> /home/vsts/work/1/s/.env
         echo VITE_API_USER_HISTORY_API_URL="$(VITE_API_USER_HISTORY_API_URL)" >> /home/vsts/work/1/s/.env
         echo VITE_API_USER_HISTORY_SCHEMA="$(VITE_API_USER_HISTORY_SCHEMA)" >> /home/vsts/work/1/s/.env
-        echo VITE_AZURE_SAS_TOKEN="$(VITE_AZURE_SAS_TOKEN)" >> /home/vsts/work/1/s/.env
+        echo "VITE_AZURE_SAS_TOKEN=$(VITE_AZURE_SAS_TOKEN)" >> /home/vsts/work/1/s/.env
         echo VITE_STORAGE_ACCOUNT_NAME="$(VITE_STORAGE_ACCOUNT_NAME)" >> /home/vsts/work/1/s/.env
         echo VITE_CONTAINER_NAME="$(VITE_CONTAINER_NAME)" >> /home/vsts/work/1/s/.env
     - task: Docker@2
