@@ -122,7 +122,7 @@ const CoverCropSecond = () => {
         <NavigateBar
           next="next"
           nextOnClick={() => {
-            dispatch(set.activeStep(4));
+            dispatch(set.activeStep(5));
             navigate('/sidedress');
           }}
           nextDisabled={!N || !carb || !cell || !lign}

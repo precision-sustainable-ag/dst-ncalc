@@ -352,7 +352,7 @@ const useFetchPlantFactors = () => {
 
   useEffect(() => {
     if (biomassTaskResults && !nitrogenTaskResults && species && plantGrowthStages && coverCropTerminationDate && cashCropPlantingDate
-          && targetN && activeStep > 4) {
+          && targetN && activeStep > 5) {
       fetchNitrogenData(biomassTaskResults, coverCrop, coverCropGrowthStage, coverCropTerminationDate, cashCropPlantingDate, targetN, biomassCalcMode,speciesBiomassAverage, dispatch)
     }
   }, [dispatch, biomassTaskResults, species, plantGrowthStages, coverCropTerminationDate, cashCropPlantingDate, targetN, N, carb, cell, lign, activeStep]);

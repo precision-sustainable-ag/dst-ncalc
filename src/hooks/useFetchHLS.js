@@ -55,7 +55,7 @@ const useFetchHLS = () => {
 
   // initiate calculation of biomass
   useEffect(() => {
-    if (isSatelliteMode && mapPolygon.length > 0 && !activeExample && !biomassTaskResults && activeStep > 1) {
+    if (isSatelliteMode && mapPolygon.length > 0 && !activeExample && !biomassTaskResults && activeStep > 2) {
       dispatch(set.biomassTaskIsDone(false));
       // setData(null);
       let area;
@@ -149,7 +149,7 @@ const useFetchHLS = () => {
   useEffect(() => {
     if ((isSatelliteMode || isPM3DMode) && biomassTaskResults && biomassTaskResults.data_array) {
       const flattenedBiomass = biomassTaskResults.data_array.flat(1).filter((el) => el !== 0);
-      const factor = unit === 'lb/ac' ? 1.12085 : 1;
+      const factor = unit === 'lb/ac' ? 1 : 1.12085;
       const biomassAVG = arrayAverage(flattenedBiomass) * factor;
       dispatch(set.biomassTotalValue(Math.round(biomassAVG, 0)));
     }
@@ -168,7 +168,7 @@ const useFetchHLS = () => {
 
   useEffect(() => {
     async function fetchBiomass() {
-      if (isPM3DMode && pm3dData && !biomassTaskResults && activeStep > 0) {
+      if (isPM3DMode && pm3dData && !biomassTaskResults && activeStep > 1) {
         const url = `${HLS_API_URL}/generate-grid`;
         try {
           const response = await axios.post(url, {

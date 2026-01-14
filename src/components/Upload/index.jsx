@@ -179,12 +179,15 @@ const Upload = () => {
           next="Next"
           nextOnClick={() => {
             navigate('/covercrop');
-            dispatch(set.activeStep(3));
+            dispatch(set.activeStep(4));
           }}
           nextDisabled={!data}
           nextTooltip={!data ? 'Upload a file' : ''}
           back="Back"
-          backOnClick={() => navigate('/home')}
+          backOnClick={() => {
+            navigate('/home');
+            dispatch(set.activeStep(0));
+          }}
         />
       </Grid>
     </Grid>

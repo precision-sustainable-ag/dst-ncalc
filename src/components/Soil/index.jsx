@@ -28,7 +28,7 @@ const Soil = () => {
 
   useEffect(() => {
     if (isSatelliteMode || isPM3DMode) {
-      dispatch(set.activeStep(3));
+      dispatch(set.activeStep(4));
       navigate('/covercrop');
     }
   }, []);
@@ -146,12 +146,12 @@ const Soil = () => {
         <NavigateBar
           next="next"
           nextOnClick={() => {
-            dispatch(set.activeStep(3));
+            dispatch(set.activeStep(4));
             navigate('/covercrop');
           }}
           back="back"
           backOnClick={() => {
-            dispatch(set.activeStep(1));
+            dispatch(set.activeStep(2));
             navigate('/location');
           }}
           nextDisabled={!isSatelliteMode && !ssurgo}

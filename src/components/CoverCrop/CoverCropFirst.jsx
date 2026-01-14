@@ -248,7 +248,7 @@ const CoverCropFirst = () => {
           next="next"
           nextOnClick={() => {
             if (isSatelliteMode || isPM3DMode) {
-              dispatch(set.activeStep(4));
+              dispatch(set.activeStep(5));
               navigate('/sidedress')
             }
             else navigate('/covercrop2')
@@ -257,13 +257,13 @@ const CoverCropFirst = () => {
           back="back"
           backOnClick={() => {
             if (isSatelliteMode) {
-              dispatch(set.activeStep(1));
+              dispatch(set.activeStep(2));
               navigate('/location');
             } else if (isPM3DMode) {
-              dispatch(set.activeStep(0));
+              dispatch(set.activeStep(1));
               navigate('/upload');
             } else {
-                dispatch(set.activeStep(2));
+                dispatch(set.activeStep(3));
                 navigate('/soil');
             }
           }}

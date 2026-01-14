@@ -102,9 +102,10 @@ const Home = () => {
           nextOnClick={() => {
             if (biomassCalcMode !== 'pm3d') {
               navigate('/location');
-              dispatch(set.activeStep(1));
+              dispatch(set.activeStep(2));
             } else {
               navigate('/upload');
+              dispatch(set.activeStep(1));
             }
           }}
           back="About"

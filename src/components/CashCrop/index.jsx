@@ -3,7 +3,7 @@ import React, { useEffect } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { useNavigate } from 'react-router-dom';
 import {
-  Autocomplete, Box, Stack, Typography, styled, Grid,
+  Box, Stack, Typography, styled, Grid,
   useMediaQuery,
 } from '@mui/material';
 // import { PSATextField } from 'shared-react-components/src';
@@ -28,6 +28,8 @@ const CustomInputText = styled(Typography)({
 const CashCrop = () => {
   const navigate = useNavigate();
   const dispatch = useDispatch();
+  const isSatelliteMode = useSelector(get.biomassCalcMode) === 'satellite';
+  const isPM3DMode = useSelector(get.biomassCalcMode) === 'pm3d';
   const unit = useSelector(get.unit);
   // const cashCrop = useSelector(get.cashCrop);
   const targetN = useSelector(get.targetN);
@@ -142,14 +144,19 @@ const CashCrop = () => {
         <NavigateBar
           next="next"
           nextOnClick={() => {
-            dispatch(set.activeStep(5));
+            dispatch(set.activeStep(6));
             navigate('/output');
           }}
           nextDisabled={!cashCropPlantingDate || !targetN || targetN < 0 || !Yield || Yield < 0}
           back="back"
           backOnClick={() => {
-            dispatch(set.activeStep(3));
-            navigate('/covercrop');
+            if (isSatelliteMode || isPM3DMode) {
+              dispatch(set.activeStep(4));
+              navigate('/covercrop');
+            } else {
+              dispatch(set.activeStep(4));
+              navigate('/covercrop2');
+            }
           }}
         />
       </Grid>

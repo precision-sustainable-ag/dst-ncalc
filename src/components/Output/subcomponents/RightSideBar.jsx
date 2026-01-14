@@ -63,7 +63,7 @@ const RightSideBar = ({ summaryData, refs }) => {
             nextDisabled={!model || !model.s}
             back="back"
             backOnClick={() => {
-              dispatch(set.activeStep(4));
+              dispatch(set.activeStep(5));
               navigate('/sidedress');
             }}
           />

@@ -31,7 +31,7 @@ const Location = () => {
 
   useEffect(() => {
     if (isPM3DMode) {
-      dispatch(set.activeStep(3));
+      dispatch(set.activeStep(4));
       navigate('/covercrop');
     }
   }, []);
@@ -107,10 +107,10 @@ const Location = () => {
           nextOnClick={() => {
             if (isSatelliteMode) {
               // calcBiomass();
-              dispatch(set.activeStep(3));
+              dispatch(set.activeStep(4));
               navigate('/covercrop');
             } else {
-              dispatch(set.activeStep(2));
+              dispatch(set.activeStep(3));
               navigate('/soil');
             }
           }}
