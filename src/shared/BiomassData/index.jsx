@@ -20,6 +20,7 @@ const BiomassData = () => {
   const biomassFetchIsLoading = useSelector(get.biomassFetchIsLoading);
   const polyDrawTooBig = useSelector(get.polyDrawTooBig);
   const unit = useSelector(get.unit);
+  const isPM3DMode = useSelector(get.biomassCalcMode) === 'pm3d';
 
   // useFetchHLS();
 
@@ -29,37 +30,47 @@ const BiomassData = () => {
       {biomassFetchIsFailed && <TaskFailModal task="biomass" />}
       <Box sx={{ margin: 2 }}>
         <Grid container spacing={2} alignItems="flex-end" justify="center">
-          <Grid item xs={12}>
-            <Typography variant="h5" gutterBottom>
-              Calculate my field&apos;s Biomass
-            </Typography>
-          </Grid>
-          <Grid item xs={12}>
-            <Typography variant="h8" gutterBottom>
-              You can change your planting date and termination dates below and recalculate the biomass value.
-            </Typography>
-          </Grid>
-          <Grid item xs={12} md={8}>
-            <Datebox />
-          </Grid>
-          <Grid item xs={12} md={2} display="flex" justifyContent="center">
-            <Box display="flex" order="2px solid blue">
-              <Stack direction="column" spacing={0}>
-                {biomassFetchIsLoading && <LinearProgress />}
-                <PSAButton
-                  title="Calculate Biomass"
-                  color={polyDrawTooBig ? 'warning' : 'success'}
-                  disabled={mapPolygon.length !== 1 || biomassFetchIsLoading}
-                  // eslint-disable-next-line no-undef
-                  // onClick={handleButton}
-                />
-              </Stack>
-            </Box>
-          </Grid>
-          <Grid item xs={12} md={2} display="flex" justifyContent="center">
-            {biomassTotalValue && (
-              <Box sx={{ border: 1, maxWidth: 200, padding: '0.3rem 1.2rem' }}>
-                <Stack direction="column" justifyContent="center" alignItems="center">
+          {!isPM3DMode && (
+            <>
+              <Grid item xs={12}>
+                <Typography variant="h5" gutterBottom>
+                  Calculate my field&apos;s Biomass
+                </Typography>
+              </Grid>
+              <Grid item xs={12}>
+                <Typography variant="h8" gutterBottom>
+                  You can change your planting date and termination dates below and recalculate the biomass value.
+                </Typography>
+              </Grid>
+              <Grid item xs={12} md={8}>
+                <Datebox />
+              </Grid>
+              <Grid item xs={12} md={4} display="flex" justifyContent="center">
+                <Box display="flex" order="2px solid blue">
+                  <Stack direction="column" spacing={0}>
+                    {biomassFetchIsLoading && <LinearProgress />}
+                    <PSAButton
+                      title="Calculate Biomass"
+                      color={polyDrawTooBig ? 'warning' : 'success'}
+                      disabled={mapPolygon.length !== 1 || biomassFetchIsLoading}
+                      // eslint-disable-next-line no-undef
+                      // onClick={handleButton}
+                    />
+                  </Stack>
+                </Box>
+              </Grid>
+            </>
+          )}
+          {biomassTotalValue && (
+            <Grid item xs={12} display="flex" justifyContent="center">
+              <Box sx={{ border: 1, maxWidth: 200, padding: '0.3rem 1.2rem', textAlign: 'center' }}>
+                <Stack direction="row" justifyContent="center" alignItems="center">
+                  <Typography variant="h8" gutterBottom>
+                    Biomass Value
+                  </Typography>
+                  <Typography variant="h8" gutterBottom sx={{ mx: 1 }}>
+                    :
+                  </Typography>
                   <Typography variant="h8" gutterBottom>
                     {biomassTotalValue}
                   </Typography>
@@ -68,8 +79,8 @@ const BiomassData = () => {
                   </Typography>
                 </Stack>
               </Box>
-            )}
-          </Grid>
+            </Grid>
+          )}
         </Grid>
       </Box>
     </Box>

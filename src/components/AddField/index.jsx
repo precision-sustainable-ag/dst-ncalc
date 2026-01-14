@@ -17,10 +17,10 @@ import { mapboxToken } from '../../utils/keys';
 import { processGeometries, validateAndProcessGeoJSON } from '../../utils/geojsonUtils';
 
 const API_BASE_URL = 'https://developpm3dapi.covercrop-ncalc.org/api/v1';
-const ROLES = ['NIFA-Soy', 'Willard', 'GROW'];
+const ROLES = ['NIFA-Soy', 'Willard', 'Growmark'];
 
 // TODO: Placeholder values - to be updated
-const CASH_CROP_OPTIONS = ['Corn', 'Soy', 'Wheat', 'Cotton'];
+const CASH_CROP_OPTIONS = ['Corn', 'Soybeans', 'Wheat', 'Cotton'];
 const COVER_CROP_OPTIONS = ['Barley', 'Cereal Rye', 'Crimson Clover', 'Oats', 'Hairy Vetch', 'Winter Wheat'];
 const SEASONS = ['Spring 2025', 'Fall 2025', 'Spring 2026', 'Fall 2026'];
 
@@ -236,6 +236,40 @@ const AddField = () => {
     );
   }
 
+  if (!isAuthenticated) {
+    return (
+      <Grid container justifyContent="center">
+        <Grid
+          item
+          xs={12}
+          md={10}
+          sx={{
+            marginTop: '1rem', padding: '2rem', backgroundColor: 'white', borderRadius: 5,
+          }}
+        >
+          <Typography variant="h6" align="center">Please log in to enroll a field</Typography>
+        </Grid>
+      </Grid>
+    );
+  }
+
+  if (!isAllowed) {
+    return (
+      <Grid container justifyContent="center">
+        <Grid
+          item
+          xs={12}
+          md={10}
+          sx={{
+            marginTop: '1rem', padding: '2rem', backgroundColor: 'white', borderRadius: 5,
+          }}
+        >
+          <Typography variant="h6" align="center">Access denied</Typography>
+        </Grid>
+      </Grid>
+    );
+  }
+
   return (
     <Grid container justifyContent="center">
       <Grid
@@ -251,190 +285,194 @@ const AddField = () => {
           backgroundColor: 'white',
         }}
       >
-        {isAllowed ? (
-          <Stack spacing="1.5rem">
+        <Stack spacing="1.5rem">
 
-            <Typography variant="h5" sx={{ fontWeight: 'bold', color: '#60802D' }}>
-              Field Metadata
-            </Typography>
+          <Typography variant="h5" sx={{ fontWeight: 'bold', color: '#60802D' }}>
+            Field Metadata
+          </Typography>
 
-            <Grid container spacing={2}>
-              <Grid item xs={12} md={6}>
-                <Autocomplete
-                  loading={loadingOptions}
-                  options={programOptions}
-                  value={program}
-                  onChange={(e, val) => handleProgramChange(val)}
-                  onInputChange={(e, newInputValue) => handleProgramChange(newInputValue)}
-                  renderInput={(params) => <PSATextField {...params} label="Select a Program name" />}
-                />
-              </Grid>
-              <Grid item xs={12} md={6}>
-                <Autocomplete
-                  key={program}
-                  freeSolo
-                  loading={loadingOptions}
-                  options={growerOptions}
-                  value={grower}
-                  onChange={(e, val) => handleGrowerChange(val)}
-                  onInputChange={(e, newInputValue) => handleGrowerChange(newInputValue)}
-                  renderInput={(params) => <PSATextField {...params} label="Select a Grower name" />}
-                />
-              </Grid>
-            </Grid>
-
-            <Grid container spacing={2}>
-              <Grid item xs={12} md={6}>
-                <Autocomplete
-                  key={grower}
-                  freeSolo
-                  loading={loadingOptions}
-                  options={farmOptions}
-                  value={farm}
-                  onChange={(e, val) => handleFarmChange(val)}
-                  onInputChange={(e, newInputValue) => handleFarmChange(newInputValue)}
-                  renderInput={(params) => <PSATextField {...params} label="Select a Farm name" />}
-                />
-              </Grid>
-              <Grid item xs={12} md={6}>
-                <Autocomplete
-                  key={farm}
-                  freeSolo
-                  loading={loadingOptions}
-                  options={fieldOptions}
-                  value={field}
-                  onChange={(e, val) => setField(val)}
-                  onInputChange={(e, newInputValue) => setField(newInputValue)}
-                  renderInput={(params) => <PSATextField {...params} label="Select a Field name" />}
-                />
-              </Grid>
-            </Grid>
-
-            <Typography variant="h5" sx={{ fontWeight: 'bold', color: '#60802D', mt: 1 }}>
-              Crop Details
-            </Typography>
-
-            <Grid container spacing={2}>
-              <Grid item xs={12} md={4}>
-                <Autocomplete
-                  freeSolo
-                  options={SEASONS}
-                  value={season}
-                  onChange={(e, val) => setSeason(val)}
-                  onInputChange={(e, val) => setSeason(val)}
-                  renderInput={(params) => <PSATextField {...params} label="Season" />}
-                />
-              </Grid>
-
-              <Grid item xs={12} md={4}>
-                <Autocomplete
-                  options={CASH_CROP_OPTIONS}
-                  value={cashCrop}
-                  onChange={(e, val) => setCashCrop(val)}
-                  renderInput={(params) => <PSATextField {...params} label="Cash Crop" />}
-                />
-              </Grid>
-
-              <Grid item xs={12} md={4}>
-                <Autocomplete
-                  multiple
-                  options={COVER_CROP_OPTIONS}
-                  value={coverCrops}
-                  onChange={(e, val) => setCoverCrops(val)}
-                  renderInput={(params) => (
-                    <PSATextField {...params} label="Cover Crops" />
-                  )}
-                />
-              </Grid>
-            </Grid>
-
-            <Typography variant="h4" align="center">
-              Where is your Field located?
-            </Typography>
-            <Typography variant="h6" align="center">
-              Enter your address or zip code to determine your field&apos;s location. You can then zoom in and click to pinpoint it on the map. If
-              you know your exact coordinates, you can enter them in search bar separated by comma (ex. 37.7, -80.2 ).
-            </Typography>
-            <Stack direction="row" justifyContent="flex-end">
-              <input
-                id="upload-input"
-                type="file"
-                hidden
-                accept=".geojson,.shp,.zip"
-                onChange={handleFileUpload}
+          <Grid container spacing={2}>
+            <Grid item xs={12} md={6}>
+              <Autocomplete
+                loading={loadingOptions}
+                options={programOptions}
+                value={program}
+                onChange={(e, val) => handleProgramChange(val)}
+                onInputChange={(e, newInputValue) => handleProgramChange(newInputValue)}
+                renderInput={(params) => <PSATextField {...params} label="Select a Program name" />}
               />
-              <PSAButton
-                title="Upload Shapefile / GeoJSON"
-                variant="contained"
-                onClick={() => document.getElementById('upload-input').click()}
-                sx={{
-                  minWidth: '150px',
-                  color: 'white',
-                  padding: '0.8rem 1.5rem',
-                  borderRadius: '2rem',
+            </Grid>
+            <Grid item xs={12} md={6}>
+              <Autocomplete
+                key={program}
+                freeSolo
+                loading={loadingOptions}
+                options={growerOptions}
+                value={grower}
+                onChange={(e, val) => handleGrowerChange(val)}
+                onInputChange={(e, newInputValue) => handleGrowerChange(newInputValue)}
+                renderInput={(params) => <PSATextField {...params} label="Select a Grower name" />}
+              />
+            </Grid>
+          </Grid>
+
+          <Grid container spacing={2}>
+            <Grid item xs={12} md={6}>
+              <Autocomplete
+                key={grower}
+                freeSolo
+                loading={loadingOptions}
+                options={farmOptions}
+                value={farm}
+                onChange={(e, val) => handleFarmChange(val)}
+                onInputChange={(e, newInputValue) => handleFarmChange(newInputValue)}
+                renderInput={(params) => <PSATextField {...params} label="Select a Farm name" />}
+              />
+            </Grid>
+            <Grid item xs={12} md={6}>
+              <Autocomplete
+                key={farm}
+                freeSolo
+                loading={loadingOptions}
+                options={fieldOptions}
+                value={field}
+                onChange={(e, val) => setField(val)}
+                onInputChange={(e, newInputValue) => setField(newInputValue)}
+                renderInput={(params) => <PSATextField {...params} label="Select a Field name" />}
+              />
+            </Grid>
+          </Grid>
+
+          <Typography variant="h5" sx={{ fontWeight: 'bold', color: '#60802D', mt: 1 }}>
+            Crop Details
+          </Typography>
+
+          <Grid container spacing={2}>
+            <Grid item xs={12} md={4}>
+              <Autocomplete
+                freeSolo
+                options={SEASONS}
+                value={season}
+                onChange={(e, val) => setSeason(val)}
+                onInputChange={(e, val) => setSeason(val)}
+                renderInput={(params) => <PSATextField {...params} label="Season" />}
+              />
+            </Grid>
+
+            <Grid item xs={12} md={4}>
+              <Autocomplete
+                options={CASH_CROP_OPTIONS}
+                value={cashCrop}
+                onChange={(e, val) => setCashCrop(val)}
+                renderInput={(params) => <PSATextField {...params} label="Cash Crop" />}
+              />
+            </Grid>
+
+            <Grid item xs={12} md={4}>
+              <Autocomplete
+                multiple
+                options={COVER_CROP_OPTIONS}
+                value={coverCrops}
+                onChange={(e, val) => setCoverCrops(val)}
+                renderInput={(params) => (
+                  <PSATextField {...params} label="Cover Crops" />
+                )}
+              />
+            </Grid>
+          </Grid>
+
+          <Typography variant="h4" align="center">
+            Where is your Field located?
+          </Typography>
+          <Typography variant="h6" align="center">
+            Enter your address, zip code, or GPS coordinates into the map search bar. If you
+            know your exact coordinates, you can enter them separated by a comma (ex. 37.7,
+            -80.2). You can also click the button to use your device&apos;s current location.
+          </Typography>
+
+          <Typography variant="h6" align="center" sx={{ mt: 2 }}>
+            You can mark your field by using the tool to draw a shape (clicking twice to
+            complete it). Alternatively, upload a shape file or GeoJSON of your field&apos;s
+            boundary.
+          </Typography>
+          <Stack direction="row" justifyContent="flex-end">
+            <input
+              id="upload-input"
+              type="file"
+              hidden
+              accept=".geojson,.shp,.zip"
+              onChange={handleFileUpload}
+            />
+            <PSAButton
+              title="Upload Shapefile / GeoJSON"
+              variant="contained"
+              onClick={() => document.getElementById('upload-input').click()}
+              sx={{
+                minWidth: '150px',
+                color: 'white',
+                padding: '0.8rem 1.5rem',
+                borderRadius: '2rem',
+                backgroundColor: '#60802D',
+                '&:hover': {
                   backgroundColor: '#60802D',
-                  '&:hover': {
-                    backgroundColor: '#60802D',
-                    textDecoration: 'underline',
-                    boxShadow: '0px 2px 2px rgba(160, 160, 160, 0.3)',
-                  },
-                }}
-              />
-            </Stack>
-
-            <Box sx={{ position: 'relative' }}>
-              <PSAReduxMap
-                setProperties={updateProperties}
-                initWidth="100%"
-                initHeight="380px"
-                initLat={latLon[0]}
-                initLon={latLon[1]}
-                initStartZoom={zoom}
-                initFeatures={features}
-                initAddress={address?.address}
-                initBounds={bounds}
-                hasSearchBar
-                hasClear
-                hasMarker
-                hasMarkerPopup
-                hasMarkerMovable
-                hasNavigation
-                hasFullScreen
-                hasGeolocate
-                hasDrawing
-                scrollZoom
-                dragRotate
-                dragPan
-                keyboard
-                doubleClickZoom={false}
-                touchZoomRotate
-                mapboxToken={mapboxToken}
-              />
-            </Box>
-
-            <Stack direction="row" justifyContent="center" sx={{ mt: 2 }}>
-              <PSAButton
-                title={isSaving ? <CircularProgress size={24} color="inherit" /> : 'Save Field'}
-                variant="contained"
-                onClick={handleSaveField}
-                disabled={isSaving || !program || !grower || !farm || !field || !season || !cashCrop || !coverCrops || coverCrops.length < 1}
-                sx={{
-                  minWidth: '150px',
-                  color: 'white',
-                  padding: '0.8rem 1.5rem',
-                  borderRadius: '2rem',
-                  backgroundColor: '#60802D',
-                  '&:hover': {
-                    backgroundColor: '#60802D',
-                    textDecoration: 'underline',
-                    boxShadow: '0px 2px 2px rgba(160, 160, 160, 0.3)',
-                  },
-                }}
-              />
-            </Stack>
+                  textDecoration: 'underline',
+                  boxShadow: '0px 2px 2px rgba(160, 160, 160, 0.3)',
+                },
+              }}
+            />
           </Stack>
-        )
-          : 'Access denied'}
+
+          <Box sx={{ position: 'relative' }}>
+            <PSAReduxMap
+              setProperties={updateProperties}
+              initWidth="100%"
+              initHeight="380px"
+              initLat={latLon[0]}
+              initLon={latLon[1]}
+              initStartZoom={zoom}
+              initFeatures={features}
+              initAddress={address?.address}
+              initBounds={bounds}
+              hasSearchBar
+              hasClear
+              hasMarker
+              hasMarkerPopup
+              hasMarkerMovable
+              hasNavigation
+              hasFullScreen
+              hasGeolocate
+              hasDrawing
+              scrollZoom
+              dragRotate
+              dragPan
+              keyboard
+              doubleClickZoom={false}
+              touchZoomRotate
+              mapboxToken={mapboxToken}
+            />
+          </Box>
+
+          <Stack direction="row" justifyContent="center" sx={{ mt: 2 }}>
+            <PSAButton
+              title={isSaving ? <CircularProgress size={24} color="inherit" /> : 'Save Field'}
+              variant="contained"
+              onClick={handleSaveField}
+              disabled={isSaving || !program || !grower || !farm || !field || !season || !cashCrop || !coverCrops || coverCrops.length < 1}
+              sx={{
+                minWidth: '150px',
+                color: 'white',
+                padding: '0.8rem 1.5rem',
+                borderRadius: '2rem',
+                backgroundColor: '#60802D',
+                '&:hover': {
+                  backgroundColor: '#60802D',
+                  textDecoration: 'underline',
+                  boxShadow: '0px 2px 2px rgba(160, 160, 160, 0.3)',
+                },
+              }}
+            />
+          </Stack>
+        </Stack>
       </Grid>
     </Grid>
   );

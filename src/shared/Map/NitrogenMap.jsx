@@ -13,8 +13,8 @@ import { mapboxToken } from '../../utils/keys';
 // mapboxgl.workerClass = require('worker-loader!mapbox-gl/dist/mapbox-gl-csp-worker').default;
 // import MapboxWorker from 'worker-loader!mapbox-gl/dist/mapbox-gl-csp-worker';
 
-const biomassRasterColors = ['red', 'orange', 'magenta', 'lime', 'green', 'white'];
-const nitrogenRasterColors = ['red', 'orange', 'magenta', 'lime', 'green', 'white'];
+const biomassRasterColors = ['#d73027', '#f46d43', '#fdae61', '#fee08b', '#a6d96a', '#1a9850'];
+const nitrogenRasterColors = ['#762a83', '#af8dc3', '#e7d4e8', '#d9f0d3', '#7fbf7b', '#1b7837'];
 
 const NitrogenMapComp = ({ variant, nitrogenLayer = 'reqN' }) => {
   const [address, setAddress] = useState({});

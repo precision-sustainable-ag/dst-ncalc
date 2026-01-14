@@ -90,9 +90,9 @@ const useFetchModel = ({
 
       biomass *= factor;
 
-      const url = `${NCAL_API_URL}?lat=${lat}&lon=${lon}&start=${start}
-                   &end=${end}&n=${N}&biomass=${biomass}&lwc=${lwc}&carb=${carb}&cell=${cell}
-                   &lign=${lign}&om=${OM}&bd=${BD}&in=${InorganicN}&pmn=${pmn}`;
+      const url = `${NCAL_API_URL}?lat=${lat}&lon=${lon}&start=${start}` +
+                   `&end=${end}&n=${N}&biomass=${biomass}&lwc=${lwc}&carb=${carb}&cell=${cell}` +
+                   `&lign=${lign}&om=${OM}&bd=${BD}&in=${InorganicN}&pmn=${pmn}`;
       axios
         .get(url)
         .then(({ data }) => {

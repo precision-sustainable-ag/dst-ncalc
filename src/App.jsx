@@ -126,7 +126,7 @@ const App = () => {
         {
           type: 'button',
           variant: 'text',
-          text: 'Add Field',
+          text: 'Enroll Field',
           icon: <GrassOutlinedIcon />,
           rightIcon: true,
           onClick: () => navigate('/field'),
