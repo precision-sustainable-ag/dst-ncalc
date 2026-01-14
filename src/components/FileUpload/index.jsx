@@ -1,7 +1,6 @@
 /* eslint-disable no-alert */
 import React, { useState, useEffect, useMemo } from 'react';
 import { useAuth0 } from '@auth0/auth0-react';
-import { BlobServiceClient } from '@azure/storage-blob';
 import {
   Autocomplete,
   CircularProgress,
@@ -16,7 +15,6 @@ import {
 import { PSAButton, PSATextField } from 'shared-react-components/src';
 import axios from 'axios';
 import shpjs from 'shpjs';
-import { azureSASToken, containerName, storageAccountName } from '../../utils/keys';
 import { isValidGeoJSON } from '../../utils/geojsonUtils';
 
 const API_BASE_URL = 'https://developpm3dapi.covercrop-ncalc.org/api/v1';
@@ -65,63 +63,6 @@ const UploadMap = () => {
       fetchFields();
     }
   }, [isAuthenticated, getAccessTokenSilently]);
-
-  // Azure Upload
-  // const handleUpload = async () => {
-  //   if (!selectedFile || !selectedField) {
-  //     alert('Please select a field and a valid file.');
-  //     return;
-  //   }
-
-  //   setIsUploading(true);
-  //   setUploadProgress(0);
-
-  //   try {
-  //     // Create Azure Blob Service Client
-  //     const blobServiceClient = new BlobServiceClient(
-  //       `https://${storageAccountName}.blob.core.windows.net?${azureSASToken}`,
-  //     );
-
-  //     // Get Container Client
-  //     const containerClient = blobServiceClient.getContainerClient(containerName);
-
-  //     const {
-  //       programName, growerName, farmName, fieldName, season,
-  //     } = selectedField.properties;
-
-  //     /**
-  //      * Construct Folder/File Path
-  //      * Folder format: programName_growerName_farmName_fieldName_seaspn
-  //      * File format: mapType_filename
-  //      * Example: NIFA_Midwest_Ohio_Field_A_Spring_2025/Yield_Map_data.zip
-  //      */
-  //     const folderName = `${programName}_${growerName}_${farmName}_${fieldName}_${season}`;
-  //     const cleanFileName = selectedFile.name.replace(/\s+/g, '_');
-  //     const blobName = `${folderName.replace(/\s+/g, '_')}/${mapType.replace(/\s+/g, '_')}_${cleanFileName}`;
-
-  //     const blockBlobClient = containerClient.getBlockBlobClient(blobName);
-
-  //     await blockBlobClient.uploadData(selectedFile, {
-  //       onProgress: (progress) => {
-  //         const percent = Math.round((progress.loadedBytes / selectedFile.size) * 100);
-  //         setUploadProgress(percent);
-  //       },
-  //       blobHTTPHeaders: { blobContentType: selectedFile.type },
-  //     });
-
-  //     alert(`File uploaded successfully to folder: ${folderName}`);
-
-  //     // Reset file input
-  //     setSelectedFile(null);
-  //     setUploadProgress(0);
-  //     setSelectedField(null);
-  //     setMapType(MAP_TYPES[0]);
-  //   } catch (error) {
-  //     alert(`Upload failed: ${error.message || 'Unknown error occurred'}`);
-  //   } finally {
-  //     setIsUploading(false);
-  //   }
-  // };
 
   // Returns list of case insensitive unique strings
   const getUniqueCaseInsensitive = (list) => {
@@ -198,7 +139,7 @@ const UploadMap = () => {
       formData.append('season', season);
       formData.append('mapType', mapType);
 
-      await axios.post('http://localhost:80/api/v1/upload-map', formData, {
+      await axios.post(`${API_BASE_URL}/upload-map`, formData, {
         headers: {
           Authorization: `Bearer ${token}`,
           'Content-Type': 'multipart/form-data',

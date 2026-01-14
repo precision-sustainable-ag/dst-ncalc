@@ -65,7 +65,7 @@ const NcalcStepper = () => {
       const tabLocation = `/${currentStepConfig.id}`;
       if (!location.pathname.includes(tabLocation)) navigate('/home');
     }
-  }, [currentGlobalStep, location.pathname, navigate]);
+  }, []);
 
   return (
     <Box sx={{ p: matchesMd ? 0 : '1rem' }}>
