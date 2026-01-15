@@ -1,6 +1,7 @@
 /* eslint-disable no-alert */
 import React, { useState, useEffect, useMemo } from 'react';
 import { useAuth0 } from '@auth0/auth0-react';
+import { BlobServiceClient } from '@azure/storage-blob';
 import {
   Autocomplete,
   CircularProgress,
@@ -16,6 +17,7 @@ import { PSAButton, PSATextField } from 'shared-react-components/src';
 import axios from 'axios';
 import shpjs from 'shpjs';
 import { isValidGeoJSON } from '../../utils/geojsonUtils';
+import { azureSASToken, containerName, storageAccountName } from '../../utils/keys';
 
 const API_BASE_URL = 'https://developpm3dapi.covercrop-ncalc.org/api/v1';
 const MAP_TYPES = ['Spray Map', 'Yield Map'];
@@ -120,48 +122,95 @@ const UploadMap = () => {
     setIsUploading(true);
     setUploadProgress(0);
 
+    // Backend upload logic
+    // try {
+    //   const token = await getAccessTokenSilently();
+
+    //   // Create FormData object
+    //   const formData = new FormData();
+    //   formData.append('file', selectedFile);
+
+    //   // Append metadata
+    //   const {
+    //     programName, growerName, farmName, fieldName, season,
+    //   } = selectedField.properties;
+
+    //   formData.append('programName', programName);
+    //   formData.append('growerName', growerName);
+    //   formData.append('farmName', farmName);
+    //   formData.append('fieldName', fieldName);
+    //   formData.append('season', season);
+    //   formData.append('mapType', mapType);
+
+    //   await axios.post(`${API_BASE_URL}/upload-map`, formData, {
+    //     headers: {
+    //       Authorization: `Bearer ${token}`,
+    //       'Content-Type': 'multipart/form-data',
+    //     },
+    //     onUploadProgress: (progressEvent) => {
+    //       const percentCompleted = Math.round((progressEvent.loaded * 100) / progressEvent.total);
+    //       setUploadProgress(percentCompleted);
+    //     },
+    //   });
+
+    //   alert('File uploaded successfully!');
+
+    //   // Reset UI
+    //   setSelectedFile(null);
+    //   setUploadProgress(0);
+    //   setSelectedField(null);
+    //   setMapType(MAP_TYPES[0]);
+    //   setFilterProgram(null);
+    //   setFilterGrower(null);
+    // } catch (error) {
+    //   const msg = error.response?.data?.error || 'Upload failed';
+    //   alert(`Error: ${msg}`);
+    // } finally {
+    //   setIsUploading(false);
+    // }
+
     try {
-      const token = await getAccessTokenSilently();
+      // Create Azure Blob Service Client
+      const blobServiceClient = new BlobServiceClient(
+        `https://${storageAccountName}.blob.core.windows.net?${azureSASToken}`,
+      );
 
-      // Create FormData object
-      const formData = new FormData();
-      formData.append('file', selectedFile);
+      // Get Container Client
+      const containerClient = blobServiceClient.getContainerClient(containerName);
 
-      // Append metadata
       const {
         programName, growerName, farmName, fieldName, season,
       } = selectedField.properties;
 
-      formData.append('programName', programName);
-      formData.append('growerName', growerName);
-      formData.append('farmName', farmName);
-      formData.append('fieldName', fieldName);
-      formData.append('season', season);
-      formData.append('mapType', mapType);
+      /**
+       * Construct Folder/File Path
+       * Folder format: programName_growerName_farmName_fieldName_seaspn
+       * File format: mapType_filename
+       * Example: NIFA_Midwest_Ohio_Field_A_Spring_2025/Yield_Map_data.zip
+       */
+      const folderName = `${programName}_${growerName}_${farmName}_${fieldName}_${season}`;
+      const cleanFileName = selectedFile.name.replace(/\s+/g, '_');
+      const blobName = `${folderName.replace(/\s+/g, '_')}/${mapType.replace(/\s+/g, '_')}_${cleanFileName}`;
 
-      await axios.post(`${API_BASE_URL}/upload-map`, formData, {
-        headers: {
-          Authorization: `Bearer ${token}`,
-          'Content-Type': 'multipart/form-data',
+      const blockBlobClient = containerClient.getBlockBlobClient(blobName);
+
+      await blockBlobClient.uploadData(selectedFile, {
+        onProgress: (progress) => {
+          const percent = Math.round((progress.loadedBytes / selectedFile.size) * 100);
+          setUploadProgress(percent);
         },
-        onUploadProgress: (progressEvent) => {
-          const percentCompleted = Math.round((progressEvent.loaded * 100) / progressEvent.total);
-          setUploadProgress(percentCompleted);
-        },
+        blobHTTPHeaders: { blobContentType: selectedFile.type },
       });
 
-      alert('File uploaded successfully!');
+      alert(`File uploaded successfully to folder: ${folderName}`);
 
-      // Reset UI
+      // Reset file input
       setSelectedFile(null);
       setUploadProgress(0);
       setSelectedField(null);
       setMapType(MAP_TYPES[0]);
-      setFilterProgram(null);
-      setFilterGrower(null);
     } catch (error) {
-      const msg = error.response?.data?.error || 'Upload failed';
-      alert(`Error: ${msg}`);
+      alert(`Upload failed: ${error.message || 'Unknown error occurred'}`);
     } finally {
       setIsUploading(false);
     }
