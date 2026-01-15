@@ -129,7 +129,10 @@ const App = () => {
           text: 'Enroll Field',
           icon: <GrassOutlinedIcon />,
           rightIcon: true,
-          onClick: () => navigate('/field'),
+          onClick: () => {
+            dispatch(set.activeStep(0));
+            navigate('/field')
+          },
         },
       ]
       : []),
@@ -141,7 +144,10 @@ const App = () => {
           text: 'Upload Files',
           icon: <CloudUploadOutlinedIcon />,
           rightIcon: true,
-          onClick: () => navigate('/fileupload'),
+          onClick: () => {
+            dispatch(set.activeStep(0));
+            navigate('/fileupload')
+          },
         },
       ]
       : []),
