@@ -442,6 +442,7 @@ const AddField = () => {
               hasFullScreen
               hasGeolocate
               hasDrawing
+              hasFindField
               scrollZoom
               dragRotate
               dragPan

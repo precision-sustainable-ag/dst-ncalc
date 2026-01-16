@@ -102,6 +102,7 @@ const BiomassMapComp = ({ variant }) => {
         hasFullScreen
         hasGeolocate
         hasDrawing
+        hasFindField
         scrollZoom
         dragRotate
         dragPan
