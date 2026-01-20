@@ -21,7 +21,7 @@ const ROLES = ['NIFA-Soy', 'Willard', 'Growmark'];
 
 // TODO: Placeholder values - to be updated
 const CASH_CROP_OPTIONS = ['Corn', 'Soybeans', 'Wheat', 'Cotton'];
-const COVER_CROP_OPTIONS = ['Barley', 'Cereal Rye', 'Crimson Clover', 'Oats', 'Hairy Vetch', 'Winter Wheat'];
+const COVER_CROP_OPTIONS = ['Barley', 'Cereal Rye', 'Wheat', 'Oats', 'Triticale', 'Winter Pea', 'Hairy Vetch', 'Crimson Clover', 'Brassica', 'Canola', 'Radish', 'Buckwheat'];
 const SEASONS = ['Spring 2025', 'Fall 2025', 'Spring 2026', 'Fall 2026'];
 
 const AddField = () => {
@@ -371,7 +371,7 @@ const AddField = () => {
             <Grid item xs={12} md={4}>
               <Autocomplete
                 multiple
-                options={COVER_CROP_OPTIONS}
+                options={COVER_CROP_OPTIONS.sort()}
                 value={coverCrops}
                 onChange={(e, val) => setCoverCrops(val)}
                 renderInput={(params) => (
