@@ -12,7 +12,10 @@ import {
   TextField,
   Box,
   useMediaQuery,
+  ListItemText,
+  ListItemIcon,
 } from '@mui/material';
+import CheckCircleIcon from '@mui/icons-material/CheckCircle';
 import { PSAButton, PSATextField } from 'shared-react-components/src';
 import axios from 'axios';
 import shpjs from 'shpjs';
@@ -33,6 +36,9 @@ const UploadMap = () => {
   const [fieldOptions, setFieldOptions] = useState([]);
   const [isFetching, setIsFetching] = useState(null);
 
+  const [existingMapTypes, setExistingMapTypes] = useState(new Set());
+  const [checkingMapTypes, setCheckingMapTypes] = useState(false);
+
   const [filterProgram, setFilterProgram] = useState(null);
   const [filterGrower, setFilterGrower] = useState(null);
   const [selectedField, setSelectedField] = useState(null);
@@ -43,6 +49,53 @@ const UploadMap = () => {
 
   const roles = user?.['https://dst-ncalc.org/claims'] || [];
   const isAllowed = isAuthenticated && (roles.includes('admin') || roles.some((r) => ROLES.includes(r)));
+
+  useEffect(() => {
+    const checkExistingMaps = async () => {
+      setExistingMapTypes(new Set());
+
+      if (!selectedField || !isAuthenticated) return;
+
+      try {
+        setCheckingMapTypes(true);
+        const blobServiceClient = new BlobServiceClient(
+          `https://${storageAccountName}.blob.core.windows.net?${azureSASToken}`,
+        );
+        const containerClient = blobServiceClient.getContainerClient(containerName);
+
+        const {
+          programName, growerName, farmName, fieldName, season,
+        } = selectedField.properties;
+
+        const folderName = `${programName}_${growerName}_${farmName}_${fieldName}_${season}`;
+        const safeFolderName = folderName.replace(/\s+/g, '_');
+
+        const foundTypes = new Set();
+
+        // We append '/' to ensure we look inside the directory
+        const iterator = containerClient.listBlobsFlat({ prefix: `${safeFolderName}/` });
+
+        // eslint-disable-next-line no-restricted-syntax
+        for await (const blob of iterator) {
+          const fileName = blob.name.split('/').pop();
+
+          if (fileName.startsWith('Spray_Map')) {
+            foundTypes.add('Spray Map');
+          } else if (fileName.startsWith('Yield_Map')) {
+            foundTypes.add('Yield Map');
+          }
+        }
+
+        setExistingMapTypes(foundTypes);
+      } catch (error) {
+        console.error('Error checking existing maps:', error);
+      } finally {
+        setCheckingMapTypes(false);
+      }
+    };
+
+    checkExistingMaps();
+  }, [selectedField, isAuthenticated]);
 
   // Fetch All Fields
   useEffect(() => {
@@ -404,8 +457,25 @@ const UploadMap = () => {
             value={mapType}
             onChange={(e) => setMapType(e.target.value)}
             fullWidth
+            disabled={!selectedField || checkingMapTypes}
+            helperText={checkingMapTypes ? 'Checking existing maps...' : ''}
           >
-            {MAP_TYPES.map((type) => (<MenuItem value={type}>{type}</MenuItem>))}
+            {MAP_TYPES.map((type) => {
+              const exists = existingMapTypes.has(type);
+
+              return (
+                <MenuItem key={type} value={type}>
+                  <Stack direction="row" alignItems="center" width="100%">
+                    <ListItemText primary={type} />
+                    {exists && (
+                    <ListItemIcon sx={{ minWidth: 'auto', ml: 2 }}>
+                      <CheckCircleIcon color="success" fontSize="small" />
+                    </ListItemIcon>
+                    )}
+                  </Stack>
+                </MenuItem>
+              );
+            })}
           </TextField>
 
           <Stack direction="row" alignItems="center" spacing={2} sx={{ border: '1px dashed grey', p: 3, borderRadius: 2 }}>
