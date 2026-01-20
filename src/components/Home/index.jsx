@@ -98,14 +98,14 @@ const Home = () => {
         </Stack>
         <Box sx={{ height: '1rem' }} />
         <NavigateBar
-          next="Get Started"
+          next={biomassCalcMode !== 'pm3d' ? 'Get Started' : 'Enroll Field'}
           nextOnClick={() => {
             if (biomassCalcMode !== 'pm3d') {
               navigate('/location');
               dispatch(set.activeStep(2));
             } else {
-              navigate('/upload');
-              dispatch(set.activeStep(1));
+              navigate('/field');
+              // dispatch(set.activeStep(1));
             }
           }}
           back="About"

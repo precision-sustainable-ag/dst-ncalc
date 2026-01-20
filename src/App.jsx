@@ -1,7 +1,9 @@
 /* eslint-disable no-console */
 import React, { useEffect } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
-import { useNavigate, Route, Routes } from 'react-router-dom';
+import {
+  useNavigate, Route, Routes, useLocation,
+} from 'react-router-dom';
 import { ThemeProvider, createTheme } from '@mui/material/styles';
 import {
   AppBar, Box, Button, useMediaQuery,
@@ -87,6 +89,7 @@ const App = () => {
   useSelector(get.screen); // force render
   const navigate = useNavigate();
   const dispatch = useDispatch();
+  const location = useLocation();
 
   useFetchHLS();
   useFetchPlantFactors();
@@ -98,6 +101,9 @@ const App = () => {
 
   const { showAlert, alertSeverity, alertMessage } = useSelector(get.user);
   const isPM3DMode = useSelector(get.biomassCalcMode) === 'pm3d';
+
+  const noStepperPaths = ['/profile', '/field', '/fileupload'];
+  const showStepper = !isPM3DMode && !noStepperPaths.includes(location.pathname.toLowerCase());
 
   const navContent = [
     {
@@ -121,21 +127,21 @@ const App = () => {
         dispatch(set.openFeedbackModal(true));
       },
     },
-    ...(isPM3DMode
-      ? [
-        {
-          type: 'button',
-          variant: 'text',
-          text: 'Enroll Field',
-          icon: <GrassOutlinedIcon />,
-          rightIcon: true,
-          onClick: () => {
-            dispatch(set.activeStep(0));
-            navigate('/field')
-          },
-        },
-      ]
-      : []),
+    // ...(isPM3DMode
+    //   ? [
+    //     {
+    //       type: 'button',
+    //       variant: 'text',
+    //       text: 'Enroll Field',
+    //       icon: <GrassOutlinedIcon />,
+    //       rightIcon: true,
+    //       onClick: () => {
+    //         dispatch(set.activeStep(0));
+    //         navigate('/field');
+    //       },
+    //     },
+    //   ]
+    //   : []),
     ...(isPM3DMode
       ? [
         {
@@ -146,7 +152,7 @@ const App = () => {
           rightIcon: true,
           onClick: () => {
             dispatch(set.activeStep(0));
-            navigate('/fileupload')
+            navigate('/fileupload');
           },
         },
       ]
@@ -187,42 +193,47 @@ const App = () => {
           }}
           sx={{ '&.MuiLink-root.Mui-focusVisible': { outlineOffset: '5px', outlineColor: 'black' } }}
         />
-        <AppBar position="static" component="header" sx={{ backgroundColor: 'white' }}>
-          <PSAHeader title="Cover Crop Nitrogen Calculator" onLogoClick={() => navigate('/')} navContent={navContent} />
-        </AppBar>
 
-        <AppBar
-          position={matchesMd ? 'static' : 'sticky'}
-          component="nav"
-          sx={{ zIndex: 1000, backgroundColor: 'white' }}
-        >
-          <NcalcStepper />
-        </AppBar>
-        <Box
-          id="main-content"
-          sx={{
-            minHeight: `calc(99.7vh - ${matchesMd ? '85px' : '220px'})`,
-            minWidth: '100%',
-            backgroundImage: `url(${'/background_0.jpg'})`,
-            backgroundSize: 'cover',
-            backgroundRepeat: 'no-repeat',
-          }}
-        >
-          <Routes>
-            {Object.keys(screens).map((scr) => (
-              <Route key={scr} path={scr.toLowerCase()} element={<Screen />} />
-            ))}
-            <Route path="" element={<Screen />} />
-          </Routes>
-          <Feedback />
-          <SnackbarMessage />
-          <Box sx={{ position: 'fixed', bottom: matchesMd ? '45px' : 0, zIndex: 1000 }}>
-            <FadeAlert
-              showAlert={showAlert}
-              severity={alertSeverity}
-              message={alertMessage}
-              action={<Button onClick={() => dispatch(set.user.showAlert(false))}>CLOSE</Button>}
-            />
+        <Box sx={{ minHeight: '100vh', display: 'flex', flexDirection: 'column' }}>
+          <AppBar position="static" component="header" sx={{ backgroundColor: 'white' }}>
+            <PSAHeader title="Cover Crop Nitrogen Calculator" onLogoClick={() => navigate('/')} navContent={navContent} />
+          </AppBar>
+
+          {showStepper && (
+            <AppBar
+              position={matchesMd ? 'static' : 'sticky'}
+              component="nav"
+              sx={{ zIndex: 1000, backgroundColor: 'white' }}
+            >
+              <NcalcStepper />
+            </AppBar>
+          )}
+          <Box
+            id="main-content"
+            sx={{
+              flex: 1,
+              minWidth: '100%',
+              backgroundImage: `url(${'/background_0.jpg'})`,
+              backgroundSize: 'cover',
+              backgroundRepeat: 'no-repeat',
+            }}
+          >
+            <Routes>
+              {Object.keys(screens).map((scr) => (
+                <Route key={scr} path={scr.toLowerCase()} element={<Screen />} />
+              ))}
+              <Route path="" element={<Screen />} />
+            </Routes>
+            <Feedback />
+            <SnackbarMessage />
+            <Box sx={{ position: 'fixed', bottom: matchesMd ? '45px' : 0, zIndex: 1000 }}>
+              <FadeAlert
+                showAlert={showAlert}
+                severity={alertSeverity}
+                message={alertMessage}
+                action={<Button onClick={() => dispatch(set.user.showAlert(false))}>CLOSE</Button>}
+              />
+            </Box>
           </Box>
         </Box>
       </Auth0ProviderWithNavigate>
