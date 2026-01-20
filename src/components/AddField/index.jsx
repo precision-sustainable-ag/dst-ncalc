@@ -21,7 +21,6 @@ const ROLES = ['NIFA-Soy', 'Willard', 'Growmark'];
 
 // TODO: Placeholder values - to be updated
 const CASH_CROP_OPTIONS = ['Corn', 'Soybeans', 'Wheat', 'Cotton'];
-const COVER_CROP_OPTIONS = ['Barley', 'Cereal Rye', 'Wheat', 'Oats', 'Triticale', 'Winter Pea', 'Hairy Vetch', 'Crimson Clover', 'Brassica', 'Canola', 'Radish', 'Buckwheat'];
 const SEASONS = ['Spring 2025', 'Fall 2025', 'Spring 2026', 'Fall 2026'];
 
 const AddField = () => {
@@ -31,6 +30,8 @@ const AddField = () => {
 
   const navigate = useNavigate();
   const matchesMd = useMediaQuery((theme) => theme.breakpoints.down('md'));
+
+  const COVER_CROP_OPTIONS = useSelector(get.species) || [];
 
   // FORM DATA STATE VARIABLES
   const [program, setProgram] = useState(null);
@@ -371,7 +372,7 @@ const AddField = () => {
             <Grid item xs={12} md={4}>
               <Autocomplete
                 multiple
-                options={COVER_CROP_OPTIONS.sort()}
+                options={COVER_CROP_OPTIONS}
                 value={coverCrops}
                 onChange={(e, val) => setCoverCrops(val)}
                 renderInput={(params) => (

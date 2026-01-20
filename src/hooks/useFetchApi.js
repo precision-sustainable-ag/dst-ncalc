@@ -302,7 +302,7 @@ const useFetchPlantFactors = () => {
           if (data.data) {
             dispatch(set.N(data.data.mean_n.toFixed(2)));
             dispatch(set.carb(data.data.mean_carb.toFixed(2)));
-            dispatch(set.cell(data.data.mean_cellulose.toFixed(2)));
+            dispatch(set.cell(data.data.mean_holocellulose.toFixed(2)));
             dispatch(set.lign(data.data.mean_lignin.toFixed(2)));
           }
         })
@@ -328,6 +328,7 @@ const useFetchPlantFactors = () => {
           }
         })
         .catch((error) => {
+          dispatch(set.species([]));
           console.log(error);
         });
     }
