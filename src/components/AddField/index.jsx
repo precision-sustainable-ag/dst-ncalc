@@ -5,7 +5,7 @@ import {
   Autocomplete,
   Box,
   CircularProgress,
-  Grid, Stack, Typography, useMediaQuery,
+  Grid, Stack, SvgIcon, Typography, useMediaQuery,
 } from '@mui/material';
 import { PSAButton, PSAReduxMap, PSATextField } from 'shared-react-components/src';
 import { useSelector } from 'react-redux';
@@ -79,7 +79,7 @@ const AddField = () => {
   const [grower, setGrower] = useState(null);
   const [farm, setFarm] = useState(null);
   const [field, setField] = useState(null);
-  const [season, setSeason] = useState(null);
+  // const [season, setSeason] = useState(null);
   const [cashCrop, setCashCrop] = useState(null);
   const [coverCrops, setCoverCrops] = useState([]);
   const [isSaving, setIsSaving] = useState(false);
@@ -181,7 +181,7 @@ const AddField = () => {
 
   const handleSaveField = async () => {
     // Validate form fields
-    if (!program || !grower || !farm || !field || !season || !cashCrop || !coverCrops || coverCrops.length < 1) {
+    if (!program || !grower || !farm || !field || !cashCrop || !coverCrops || coverCrops.length < 1) {
       alert('Please fill in all text fields');
       return;
     }
@@ -202,7 +202,6 @@ const AddField = () => {
         farmName: farm,
         growerName: grower,
         fieldName: field,
-        season,
         cashCrop,
         coverCrop: coverCrops,
         geometry: finalGeometry,
@@ -390,7 +389,7 @@ const AddField = () => {
           </Typography>
 
           <Grid container spacing={2}>
-            <Grid item xs={12} md={4}>
+            {/* <Grid item xs={12} md={4}>
               <Autocomplete
                 freeSolo
                 options={SEASONS}
@@ -399,9 +398,9 @@ const AddField = () => {
                 onInputChange={(e, val) => setSeason(val)}
                 renderInput={(params) => <PSATextField {...params} label="Season" />}
               />
-            </Grid>
+            </Grid> */}
 
-            <Grid item xs={12} md={4}>
+            <Grid item xs={12} md={6}>
               <Autocomplete
                 options={CASH_CROP_OPTIONS}
                 value={cashCrop}
@@ -410,7 +409,7 @@ const AddField = () => {
               />
             </Grid>
 
-            <Grid item xs={12} md={4}>
+            <Grid item xs={12} md={6}>
               <Autocomplete
                 multiple
                 options={COVER_CROP_OPTIONS}
@@ -511,7 +510,7 @@ const AddField = () => {
               title={isSaving ? <CircularProgress size={24} color="inherit" /> : 'Save Field'}
               variant="contained"
               onClick={handleSaveField}
-              disabled={isSaving || !program || !grower || !farm || !field || !season || !cashCrop || !coverCrops || coverCrops.length < 1}
+              disabled={isSaving || !program || !grower || !farm || !field || !cashCrop || !coverCrops || coverCrops.length < 1}
               sx={{
                 minWidth: '150px',
                 color: 'white',

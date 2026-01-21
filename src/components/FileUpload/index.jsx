@@ -42,6 +42,7 @@ const UploadMap = () => {
   const [filterProgram, setFilterProgram] = useState(null);
   const [filterGrower, setFilterGrower] = useState(null);
   const [selectedField, setSelectedField] = useState(null);
+  const [selectedSeason, setSelectedSeason] = useState(null);
   const [mapType, setMapType] = useState(MAP_TYPES[0]);
   const [selectedFile, setSelectedFile] = useState(null);
   const [isUploading, setIsUploading] = useState(false);
@@ -54,7 +55,7 @@ const UploadMap = () => {
     const checkExistingMaps = async () => {
       setExistingMapTypes(new Set());
 
-      if (!selectedField || !isAuthenticated) return;
+      if (!selectedField || !selectedSeason || !isAuthenticated) return;
 
       try {
         setCheckingMapTypes(true);
@@ -64,10 +65,10 @@ const UploadMap = () => {
         const containerClient = blobServiceClient.getContainerClient(containerName);
 
         const {
-          programName, growerName, farmName, fieldName, season,
+          programName, growerName, farmName, fieldName,
         } = selectedField.properties;
 
-        const folderName = `${programName}_${growerName}_${farmName}_${fieldName}_${season}`;
+        const folderName = `${programName}_${growerName}_${farmName}_${fieldName}_${selectedSeason}`;
         const safeFolderName = folderName.replace(/\s+/g, '_');
 
         const foundTypes = new Set();
@@ -95,7 +96,7 @@ const UploadMap = () => {
     };
 
     checkExistingMaps();
-  }, [selectedField, isAuthenticated]);
+  }, [selectedField, selectedSeason, isAuthenticated]);
 
   // Fetch All Fields
   useEffect(() => {
@@ -167,7 +168,7 @@ const UploadMap = () => {
   };
 
   const handleUpload = async () => {
-    if (!selectedFile || !selectedField) {
+    if (!selectedFile || !selectedField || !selectedSeason) {
       alert('Please select a field and a valid file.');
       return;
     }
@@ -232,7 +233,7 @@ const UploadMap = () => {
       const containerClient = blobServiceClient.getContainerClient(containerName);
 
       const {
-        programName, growerName, farmName, fieldName, season,
+        programName, growerName, farmName, fieldName,
       } = selectedField.properties;
 
       /**
@@ -241,7 +242,7 @@ const UploadMap = () => {
        * File format: mapType_filename
        * Example: NIFA_Midwest_Ohio_Field_A_Spring_2025/Yield_Map_data.zip
        */
-      const folderName = `${programName}_${growerName}_${farmName}_${fieldName}_${season}`;
+      const folderName = `${programName}_${growerName}_${farmName}_${fieldName}_${selectedSeason}`;
       const cleanFileName = selectedFile.name.replace(/\s+/g, '_');
       const blobName = `${folderName.replace(/\s+/g, '_')}/${mapType.replace(/\s+/g, '_')}_${cleanFileName}`;
 
@@ -410,7 +411,10 @@ const UploadMap = () => {
             options={filteredFieldList}
             value={selectedField}
             key={`${filterProgram}-${filterGrower}`}
-            onChange={(event, newValue) => setSelectedField(newValue)}
+            onChange={(event, newValue) => {
+              setSelectedField(newValue);
+              setSelectedSeason(null);
+            }}
             getOptionLabel={(option) => {
               const p = option.properties;
               return `${p.programName} / ${p.growerName} / ${p.farmName} / ${p.fieldName}`;
@@ -427,8 +431,8 @@ const UploadMap = () => {
                     {option.properties.growerName}
                     {' - '}
                     {option.properties.farmName}
-                    {' - '}
-                    {option.properties.season}
+                    {/* {' - '}
+                    {option.properties.season} */}
                   </Typography>
                 </Stack>
               </Box>
@@ -436,7 +440,7 @@ const UploadMap = () => {
             renderInput={(params) => (
               <PSATextField
                 {...params}
-                label="Select Field (Program / Grower / Farm / Field / Season)"
+                label="Select Field (Program / Grower / Farm / Field)"
                 placeholder="Type to search..."
                 InputProps={{
                   ...params.InputProps,
@@ -451,13 +455,29 @@ const UploadMap = () => {
             )}
           />
 
+          {selectedField && (
+          <Autocomplete
+            options={selectedField.properties.season || []}
+            value={selectedSeason}
+            onChange={(event, newValue) => setSelectedSeason(newValue)}
+            getOptionLabel={(option) => option}
+            renderInput={(params) => (
+              <PSATextField
+                {...params}
+                label="Select Season"
+                placeholder="Choose a season..."
+              />
+            )}
+          />
+          )}
+
           <TextField
             select
             label="Select Map Type"
             value={mapType}
             onChange={(e) => setMapType(e.target.value)}
             fullWidth
-            disabled={!selectedField || checkingMapTypes}
+            disabled={!selectedField || !selectedSeason || checkingMapTypes}
             helperText={checkingMapTypes ? 'Checking existing maps...' : ''}
           >
             {MAP_TYPES.map((type) => {
