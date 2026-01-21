@@ -12,6 +12,10 @@ import { useSelector } from 'react-redux';
 import shpjs from 'shpjs';
 import axios from 'axios';
 import { useNavigate } from 'react-router-dom';
+import { DatePicker } from '@mui/x-date-pickers/DatePicker';
+import { LocalizationProvider } from '@mui/x-date-pickers';
+import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
+import dayjs from 'dayjs';
 import { get } from '../../store/redux-autosetters';
 import { mapboxToken } from '../../utils/keys';
 import { processGeometries, validateAndProcessGeoJSON } from '../../utils/geojsonUtils';
@@ -82,6 +86,9 @@ const AddField = () => {
   // const [season, setSeason] = useState(null);
   const [cashCrop, setCashCrop] = useState(null);
   const [coverCrops, setCoverCrops] = useState([]);
+  const [cashCropPlantingDate, setCashCropPlantingDate] = useState();
+  const [cashCropHarvestingDate, setCashCropHarvestingDate] = useState();
+  const [coverCropTerminationDate, setCoverCropTerminationDate] = useState();
   const [isSaving, setIsSaving] = useState(false);
 
   // MAP STATE VARIABLES
@@ -181,8 +188,9 @@ const AddField = () => {
 
   const handleSaveField = async () => {
     // Validate form fields
-    if (!program || !grower || !farm || !field || !cashCrop || !coverCrops || coverCrops.length < 1) {
-      alert('Please fill in all text fields');
+    if (!program || !grower || !farm || !field || !cashCrop || !coverCrops || coverCrops.length < 1
+      || !cashCropPlantingDate || !cashCropHarvestingDate || !coverCropTerminationDate) {
+      alert('Please fill in all the fields');
       return;
     }
 
@@ -205,6 +213,9 @@ const AddField = () => {
         cashCrop,
         coverCrop: coverCrops,
         geometry: finalGeometry,
+        cashCropPlantingDate,
+        cashCropHarvestingDate,
+        coverCropTerminationDate,
       };
 
       await axios.post(`${API_BASE_URL}/fields`, payload, {
@@ -422,6 +433,60 @@ const AddField = () => {
             </Grid>
           </Grid>
 
+          <Grid container spacing={2}>
+            <Grid item xs={12} md={4}>
+              <LocalizationProvider dateAdapter={AdapterDayjs}>
+                <DatePicker
+                  label="Cash Crop Planting Month"
+                  views={['year', 'month']}
+                  openTo="month"
+                  format="YYYY-MM"
+                  value={cashCropPlantingDate ? dayjs(cashCropPlantingDate) : null}
+                  onChange={(newValue) => {
+                    setCashCropPlantingDate(newValue ? newValue.startOf('month').format('YYYY-MM-DD') : null);
+                    return null;
+                  }}
+                  sx={{ width: '100%' }}
+                />
+              </LocalizationProvider>
+            </Grid>
+
+            <Grid item xs={12} md={4}>
+              <LocalizationProvider dateAdapter={AdapterDayjs}>
+                <DatePicker
+                  label="Cash Crop Harvesting Month"
+                  views={['year', 'month']}
+                  openTo="month"
+                  format="YYYY-MM"
+                  value={cashCropHarvestingDate ? dayjs(cashCropHarvestingDate) : null}
+                  onChange={(newValue) => {
+                    setCashCropHarvestingDate(newValue ? newValue.endOf('month').format('YYYY-MM-DD') : null);
+                    return null;
+                  }}
+                  sx={{ width: '100%' }}
+                />
+              </LocalizationProvider>
+            </Grid>
+
+            <Grid item xs={12} md={4}>
+              <LocalizationProvider dateAdapter={AdapterDayjs}>
+                <DatePicker
+                  label="Cover Crop Termination Month"
+                  views={['year', 'month']}
+                  openTo="month"
+                  format="YYYY-MM"
+                  value={coverCropTerminationDate ? dayjs(coverCropTerminationDate) : null}
+                  onChange={(newValue) => {
+                    setCoverCropTerminationDate(newValue ? newValue.endOf('month').format('YYYY-MM-DD') : null);
+                    return null;
+                  }}
+                  sx={{ width: '100%' }}
+
+                />
+              </LocalizationProvider>
+            </Grid>
+          </Grid>
+
           <Typography variant="h4" align="center">
             Where is your Field located?
           </Typography>
@@ -510,7 +575,8 @@ const AddField = () => {
               title={isSaving ? <CircularProgress size={24} color="inherit" /> : 'Save Field'}
               variant="contained"
               onClick={handleSaveField}
-              disabled={isSaving || !program || !grower || !farm || !field || !cashCrop || !coverCrops || coverCrops.length < 1}
+              disabled={isSaving || !program || !grower || !farm || !field || !cashCrop || !coverCrops || coverCrops.length < 1
+                || !cashCropPlantingDate || !cashCropHarvestingDate || !coverCropTerminationDate}
               sx={{
                 minWidth: '150px',
                 color: 'white',
