@@ -21,7 +21,48 @@ const ROLES = ['NIFA-Soy', 'Willard', 'Growmark'];
 
 // TODO: Placeholder values - to be updated
 const CASH_CROP_OPTIONS = ['Corn', 'Soybeans', 'Wheat', 'Cotton'];
-const SEASONS = ['Spring 2025', 'Fall 2025', 'Spring 2026', 'Fall 2026'];
+// const SEASONS = ['Spring 2025', 'Fall 2025', 'Spring 2026', 'Fall 2026'];
+
+const polygonIcon = (
+  <SvgIcon
+    viewBox="0 0 20 20"
+    fontSize="inherit"
+    sx={{ verticalAlign: 'middle', mx: 0.5 }}
+  >
+    <path
+      d="m15 12.3v-4.6c.6-.3 1-1 1-1.7 0-1.1-.9-2-2-2-.7 0-1.4.4-1.7 1h-4.6c-.3-.6-1-1-1.7-1-1.1 0-2 .9-2 2 0 .7.4 1.4 1
+      1.7v4.6c-.6.3-1 1-1 1.7 0 1.1.9 2 2 2 .7 0 1.4-.4 1.7-1h4.6c.3.6 1 1 1.7 1 1.1 0 2-.9 2-2 0-.7-.4-1.4-1-1.7zm-8-.3v-4l1-1h4l1
+      1v4l-1 1h-4z"
+    />
+  </SvgIcon>
+);
+
+const gpsIcon = (
+  <SvgIcon
+    viewBox="0 0 24 24"
+    fontSize="small"
+    sx={{ verticalAlign: 'middle', mx: 0.5 }}
+  >
+    <path
+      d="M12,8A4,4 0 0,1 16,12A4,4 0 0,1 12,16A4,4 0 0,1 8,12A4,4 0 0,1 12,8M3.05,13H1V11H3.05C3.5,6.83 6.83,3.5 11,
+      3.05V1H13V3.05C17.17,3.5 20.5,6.83 20.95,11H23V13H20.95C20.5,17.17 17.17,20.5 13,20.95V23H11V20.95C6.83,20.5 3.5,
+      17.17 3.05,13M12,5A7,7 0 0,0 5,12A7,7 0 0,0 12,19A7,7 0 0,0 19,12A7,7 0 0,0 12,5Z"
+    />
+  </SvgIcon>
+);
+
+const fieldIcon = (
+  <SvgIcon
+    viewBox="0 0 24 24"
+    fontSize="small"
+    sx={{ verticalAlign: 'middle', mx: 0.5 }}
+  >
+    <path
+      d="M19 19H15V21H19C20.1 21 21 20.1 21 19V15H19M19 3H15V5H19V9H21V5C21 3.9 20.1 3 19 3M5 5H9V3H5C3.9 3 3 3.9 3
+      5V9H5M5 15H3V19C3 20.1 3.9 21 5 21H9V19H5V15M7 11H9V13H7V11M11 11H13V13H11V11M15 11H17V13H15V11Z"
+    />
+  </SvgIcon>
+);
 
 const AddField = () => {
   const {
@@ -388,14 +429,25 @@ const AddField = () => {
           <Typography variant="h6" align="center">
             Enter your address, zip code, or GPS coordinates into the map search bar. If you
             know your exact coordinates, you can enter them separated by a comma (ex. 37.7,
-            -80.2). You can also click the button to use your device&apos;s current location.
+            -80.2). You can also click the
+            {gpsIcon}
+            button to use your device&apos;s current location.
           </Typography>
 
           <Typography variant="h6" align="center" sx={{ mt: 2 }}>
-            You can mark your field by using the tool to draw a shape (clicking twice to
-            complete it). Alternatively, upload a shape file or GeoJSON of your field&apos;s
-            boundary.
+            You can draw the field boundaries using the polygon tool
+            {polygonIcon}
+            (Click twice or press enter to finish).
+            Alternatively, upload a shape file or GeoJSON of your field boundaries.
           </Typography>
+
+          <Typography variant="h6" align="center" sx={{ mt: 2 }}>
+            You can also use the
+            {fieldIcon}
+            to guess the field boundaries of your current marker location. When clicked
+            it will populate the map with the USDA Crop Sequence Boundary for your field if one exists.
+          </Typography>
+
           <Stack direction="row" justifyContent="flex-end">
             <input
               id="upload-input"
