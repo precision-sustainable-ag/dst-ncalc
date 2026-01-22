@@ -1,3 +1,4 @@
+/* eslint-disable react-hooks/exhaustive-deps */
 /* eslint-disable no-console */
 import { useEffect, useState } from 'react';
 import axios from 'axios';
@@ -5,17 +6,21 @@ import moment from 'moment';
 import { useDispatch, useSelector } from 'react-redux';
 import { get, set } from '../store/Store';
 import { weightedAverage } from './helpers';
+import { historyStates } from '../store/inits';
 
-const NCAL_API_URL = 'https://api.precisionsustainableag.org/cc-ncalc/surface';
+const NCAL_API_URL = 'https://api.covercrop-ncalc.org/surface';
 const SSURGO_API_URL = 'https://ssurgo.covercrop-data.org';
 const WEATHER_API_URL = 'https://weather.covercrop-data.org';
+const PLANTFACTORS_API_URL = 'https://developapi.covercrop-imagery.org';
+
+// TODO: hooks for fetching data from different apis
 
 /// Desc: useFetchCornN
 /// ..............................................................................
 /// ..............................................................................
 //
+/** fetch cornN data(used for model calculation in Released Nitrogen chart) */
 const useFetchCornN = () => {
-  const [endDate, setEndDate] = useState(null);
   const [cornData, setCornData] = useState(null);
   const dispatch = useDispatch();
   const lat = useSelector(get.lat);
@@ -23,16 +28,10 @@ const useFetchCornN = () => {
   const cashCropPlantingDate = useSelector(get.cashCropPlantingDate);
 
   useEffect(() => {
-    const end = moment(cashCropPlantingDate)
-      .add(110, 'days')
-      .add(1, 'hour')
-      .format('yyyy-MM-DD');
-    setEndDate(end);
+    const end = moment(cashCropPlantingDate).add(110, 'days').add(1, 'hour').format('yyyy-MM-DD');
     dispatch(set.errorCorn(false));
     // eslint-disable-next-line max-len
-    const url = `${WEATHER_API_URL}/hourly?lat=${lat}&lon=${lon}&start=${moment(
-      cashCropPlantingDate,
-    ).format(
+    const url = `${WEATHER_API_URL}/hourly?lat=${lat}&lon=${lon}&start=${moment(cashCropPlantingDate).format(
       'yyyy-MM-DD',
     )}&end=${end}&attributes=air_temperature&options=predicted`;
     axios
@@ -48,7 +47,7 @@ const useFetchCornN = () => {
       .catch((error) => {
         console.log(error);
       });
-  }, [cashCropPlantingDate, endDate]);
+  }, []);
   return cornData;
 }; // fetchCornN
 
@@ -57,38 +56,18 @@ const useFetchCornN = () => {
 /// ..............................................................................
 //
 const useFetchModel = ({
-  lat,
-  lon,
-  N,
-  OM,
-  BD,
-  unit,
-  coverCropTerminationDate,
-  cashCropPlantingDate,
-  carb,
-  cell,
-  lign,
-  biomass,
-  lwc,
-  InorganicN,
+  lat, lon, N, OM, BD, unit, coverCropTerminationDate, cashCropPlantingDate, carb, cell, lign, biomass, lwc, InorganicN,
 }) => {
   // eslint-disable-next-line no-unused-vars
   const [isDatesValid, setIsDatesValid] = useState(null);
   const [model, setModel] = useState(null);
   const dispatch = useDispatch();
 
-  const start = moment(coverCropTerminationDate)
-    .add(1, 'hour')
-    .format('yyyy-MM-DD');
-  const end = moment(cashCropPlantingDate)
-    .add(110, 'days')
-    .add(1, 'hour')
-    .format('yyyy-MM-DD');
+  const start = moment(coverCropTerminationDate).add(1, 'hour').format('yyyy-MM-DD');
+  const end = moment(cashCropPlantingDate).add(110, 'days').add(1, 'hour').format('yyyy-MM-DD');
 
   useEffect(() => {
-    const validity = start !== 'Invalid date'
-      && end !== 'Invalid date'
-      && moment(end) > moment(start);
+    const validity = start !== 'Invalid date' && end !== 'Invalid date' && moment(end) > moment(start);
     setIsDatesValid(validity);
     if (!validity) {
       console.log('invalid dates for fetch Model'); // eslint-disable-line no-console
@@ -111,9 +90,9 @@ const useFetchModel = ({
 
       biomass *= factor;
 
-      const url = `${NCAL_API_URL}?lat=${lat}&lon=${lon}&start=${start}
-                   &end=${end}&n=${N}&biomass=${biomass}&lwc=${lwc}&carb=${carb}&cell=${cell}
-                   &lign=${lign}&om=${OM}&bd=${BD}&in=${InorganicN}&pmn=${pmn}`;
+      const url = `${NCAL_API_URL}?lat=${lat}&lon=${lon}&start=${start}` +
+                   `&end=${end}&n=${N}&biomass=${biomass}&lwc=${lwc}&carb=${carb}&cell=${cell}` +
+                   `&lign=${lign}&om=${OM}&bd=${BD}&in=${InorganicN}&pmn=${pmn}`;
       axios
         .get(url)
         .then(({ data }) => {
@@ -153,7 +132,7 @@ const useFetchModel = ({
           console.log(error);
         });
     }
-  }, [cashCropPlantingDate, coverCropTerminationDate, end, start]);
+  }, [N]);
 
   return model;
 };
@@ -162,7 +141,7 @@ const useFetchModel = ({
 /// ..............................................................................
 /// ..............................................................................
 //
-
+/** Fetch soil data from ssurgo api */
 const useFetchSSURGO = () => {
   const dispatch = useDispatch();
   const updateSSURGO = useSelector(get.updateSSURGO);
@@ -170,32 +149,255 @@ const useFetchSSURGO = () => {
   const lat = useSelector(get.lat);
   const lon = useSelector(get.lon);
   const field = useSelector(get.field);
+  const { historyState } = useSelector(get.user);
 
   useEffect(() => {
-    if (!field.includes('Mockup')) {
+    // if ssurgo data need to be updated(map location change), set ssurgo to null
+    if (updateSSURGO) {
+      dispatch(set.SSURGO(null));
+    }
+    // exclude example fields
+    if ((!SSURGO || updateSSURGO)) {
       const url = `${SSURGO_API_URL}/?lat=${lat}&lon=${lon}&component=major`;
       axios
         .get(url)
         .then((data) => {
           if (data.ERROR || !data.data || !data.data.length) {
-            dispatch(set.BD(''));
-            dispatch(set.OM(''));
-          } else if (!SSURGO || updateSSURGO) {
+            throw new Error('No SSURGO data found for this location');
+          } if (!SSURGO || updateSSURGO) {
             // } else {
             let filteredData = data.data.filter((d) => d.desgnmaster !== 'O');
             const minhzdept = Math.min(...filteredData.map((d) => d.hzdept_r));
             filteredData = filteredData.filter((d) => +d.hzdept_r === +minhzdept);
-            dispatch(set.BD(weightedAverage(filteredData, 'dbthirdbar_r')));
-            dispatch(set.OM(weightedAverage(filteredData, 'om_r')));
+            if (historyState !== historyStates.imported) {
+              dispatch(set.BD(weightedAverage(filteredData, 'dbthirdbar_r')));
+              dispatch(set.OM(weightedAverage(filteredData, 'om_r')));
+            }
             dispatch(set.SSURGO(filteredData));
             dispatch(set.updateSSURGO(false));
           }
         })
         .catch((error) => {
           console.log(error);
+          dispatch(set.user.alertMessage(`Error: ${error.message}. Please use a different location or try again later!`));
+          dispatch(set.user.showAlert(true));
         });
     }
   }, [updateSSURGO, field]);
 }; // fetchSSURGO
 
-export { useFetchModel, useFetchSSURGO, useFetchCornN };
+const fetchNitrogenData = async (
+  biomassTaskResults,
+  coverCrop,
+  coverCropGrowthStage,
+  coverCropTerminationDate,
+  cashCropPlantingDate,
+  targetN,
+  biomassCalcMode,
+  speciesBiomassAverage,
+  dispatch
+) => {
+  const url = `${PLANTFACTORS_API_URL}/nitrogen`;
+
+  dispatch(set.nitrogenFetchIsLoading(true));
+
+  let species;
+  let growthStage;
+
+  if (biomassCalcMode === 'satellite') {
+    species = coverCrop?.[0];
+    growthStage = coverCropGrowthStage?.[species] || 'Unknown growth stage';
+  } else if (biomassCalcMode === 'pm3d') {
+    species = coverCrop?.length > 0 ? coverCrop : [];
+    growthStage = species.map(
+      (item) => coverCropGrowthStage?.[item] || 'Unknown growth stage'
+    );
+  }
+
+
+  try {
+    const response = await axios.post(url, {
+      data_array: biomassTaskResults.data_array,
+      bbox: biomassTaskResults.bbox,
+      species,
+      growth_stage: growthStage,
+      start: coverCropTerminationDate,
+      end: cashCropPlantingDate,
+      target_n: targetN,
+      mode: biomassCalcMode,
+      species_biomass_average: speciesBiomassAverage,
+    });
+
+    dispatch(set.nitrogenFetchIsLoading(false));
+
+    if (response.status === 200 && response.data) {
+      const geojsonData = response.data?.geojson_data;
+      delete geojsonData.properties;
+
+      const reqnGeojson = JSON.parse(JSON.stringify(geojsonData));
+
+      geojsonData.features.forEach((feature) => {
+        if (
+          feature.properties
+          && feature.properties.MinNfromFOM !== undefined
+        ) {
+          feature.properties.value = feature.properties.MinNfromFOM;
+        }
+      });
+
+      reqnGeojson.features.forEach((feature) => {
+        if (
+          feature.properties
+          && feature.properties.ReqN !== undefined
+        ) {
+          feature.properties.value = feature.properties.ReqN;
+        }
+      });
+
+      dispatch(set.nitrogenTaskResults({ minN : geojsonData, reqN: reqnGeojson}));
+
+      if (response.data?.n > 0) dispatch(set.N(response.data.n.toFixed(2)));
+    } else {
+      dispatch(set.nitrogenFetchIsFailed(true));
+    }
+  } catch (error) {
+    console.log(error);
+    dispatch(set.nitrogenFetchIsLoading(false));
+    dispatch(set.nitrogenFetchIsFailed(true));
+  }
+};
+
+/// Desc: useFetchPlantFactors
+/// ..............................................................................
+/// ..............................................................................
+//
+
+const useFetchPlantFactors = () => {
+  const dispatch = useDispatch();
+  const species = useSelector(get.species);
+  const plantGrowthStages = useSelector(get.plantGrowthStages);
+  const coverCrop = useSelector(get.coverCrop);
+  const coverCropGrowthStage = useSelector(get.coverCropGrowthStage);
+  const coverCropTerminationDate = useSelector(get.coverCropTerminationDate);
+  const cashCropPlantingDate = useSelector(get.cashCropPlantingDate);
+  const N = useSelector(get.N);
+  const carb = useSelector(get.carb);
+  const cell = useSelector(get.cell);
+  const lign = useSelector(get.lign);
+  const activeStep = useSelector(get.activeStep);
+  const targetN = useSelector(get.targetN);
+  const biomassTaskResults = useSelector(get.biomassTaskResults);
+  const nitrogenTaskResults = useSelector(get.nitrogenTaskResults);
+  const isSatelliteMode = useSelector(get.biomassCalcMode) === 'satellite';
+  const biomassCalcMode = useSelector(get.biomassCalcMode);
+  const speciesBiomassAverage = useSelector(get.speciesBiomassAverage);
+
+
+  useEffect(() => {
+    if (isSatelliteMode && coverCrop && coverCropGrowthStage[coverCrop]) {
+      const url = `${PLANTFACTORS_API_URL}/plantfactors`;
+      axios
+        .get(url, { params: { plant_species: coverCrop[0], growth_stage: coverCropGrowthStage[coverCrop] } })
+        .then((data) => {
+          if (data.data) {
+            dispatch(set.N(data.data.mean_n.toFixed(2)));
+            dispatch(set.carb(data.data.mean_carb.toFixed(2)));
+            dispatch(set.cell(data.data.mean_holocellulose.toFixed(2)));
+            dispatch(set.lign(data.data.mean_lignin.toFixed(2)));
+          }
+        })
+        .catch((error) => {
+          console.log(error);
+        });
+    } else {
+      dispatch(set.N(null));
+      dispatch(set.carb(null));
+      dispatch(set.cell(null));
+      dispatch(set.lign(null));
+    }
+  }, [dispatch, coverCrop, coverCropGrowthStage]);
+
+  useEffect(() => {
+    if (!species) {
+      const url = `${PLANTFACTORS_API_URL}/species`;
+      axios
+        .get(url)
+        .then((data) => {
+          if (data.data) {
+            dispatch(set.species(data.data));
+          }
+        })
+        .catch((error) => {
+          dispatch(set.species([]));
+          console.log(error);
+        });
+    }
+    if (!plantGrowthStages) {
+      const url = `${PLANTFACTORS_API_URL}/plantgrowthstages`;
+      axios
+        .get(url)
+        .then((data) => {
+          if (data.data) {
+            dispatch(set.plantGrowthStages(data.data));
+          }
+        })
+        .catch((error) => {
+          console.log(error);
+        });
+    }
+  }, [dispatch, species, plantGrowthStages]);
+
+  useEffect(() => {
+    dispatch(set.nitrogenTaskResults(null));
+  }, [biomassTaskResults, coverCrop, coverCropGrowthStage, coverCropTerminationDate, cashCropPlantingDate, targetN]);
+
+  useEffect(() => {
+    if (biomassTaskResults && !nitrogenTaskResults && species && plantGrowthStages && coverCropTerminationDate && cashCropPlantingDate
+          && targetN && activeStep > 5) {
+      fetchNitrogenData(biomassTaskResults, coverCrop, coverCropGrowthStage, coverCropTerminationDate, cashCropPlantingDate, targetN, biomassCalcMode,speciesBiomassAverage, dispatch)
+    }
+  }, [dispatch, biomassTaskResults, species, plantGrowthStages, coverCropTerminationDate, cashCropPlantingDate, targetN, N, carb, cell, lign, activeStep]);
+}; // useFetchPlantFactors
+
+/// Desc: useFetchNitrogenArray
+/// ..............................................................................
+/// ..............................................................................
+//
+/** only work in satellite mode */
+const useFetchNitrogenArray = () => {
+  const dispatch = useDispatch();
+  const N = useSelector(get.N);
+  const carb = useSelector(get.carb);
+  const cell = useSelector(get.cell);
+  const lign = useSelector(get.lign);
+  const biomassTaskResults = useSelector(get.biomassTaskResults);
+  // const nitrogenTaskResults = useSelector(get.nitrogenTaskResults);
+
+  useEffect(() => {
+    if (biomassTaskResults && N && carb && cell && lign) {
+      const url = `${PLANTFACTORS_API_URL}/nitrogen`;
+      const payload = {
+        nitrogen_percentage: N,
+        carbohydrates_percentage: carb,
+        holo_cellulose_percentage: cell,
+        lignin_percentage: lign,
+        data_array: biomassTaskResults.data_array,
+        bbox: biomassTaskResults.bbox,
+      };
+      axios
+        .post(url, payload)
+        .then((response) => {
+          if (response.data) {
+            dispatch(set.nitrogenTaskResults(response.data));
+          }
+        })
+        .catch((error) => {
+          console.log(error);
+        });
+    }
+  }, [dispatch, biomassTaskResults, N, carb, cell, lign]);
+}; // useFetchNitrogenArray
+
+export {
+  useFetchModel, useFetchSSURGO, useFetchCornN, useFetchPlantFactors, fetchNitrogenData
+};

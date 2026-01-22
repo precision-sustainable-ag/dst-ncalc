@@ -1,70 +1,79 @@
-# Getting Started with Create React App
+## Cover Crop Nitrogen Calculator
 
-This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
+The Cover Crop Nitrogen Calculator (CC-NCALC) is a user-friendly tool designed to help farmers and agricultural professionals estimate nitrogen (N) release from decomposing cover crop residues. It provides insights into:
 
-## Available Scripts
+- The rate of N release over time
+- The amount of undecomposed residue remaining
+- Corn N uptake based on yield goals
+- N fertilizer recommendations considering cover crop contributions
 
-In the project directory, you can run:
+CC-NCALC is based on the CERES-N sub-model and incorporates data from lab and field studies across diverse environments. By using real-time and historical weather data, as well as soil properties from the NRCS SSURGO database, the tool enhances nitrogen management by predicting N availability and optimizing fertilizer inputs. Users can input field location, cover crop biomass, and N concentration, with optional advanced inputs for more precise estimations.
 
-### `npm start`
+To access the live tool, visit [here](https://covercrop-ncalc.org/).
 
-Runs the app in the development mode.\
-Open [http://localhost:3000](http://localhost:3000) to view it in the browser.
+To see the documents for this tool, visit the [wiki pages](https://precision-sustainable-ag.atlassian.net/wiki/spaces/DST/pages/241565697/Nitrogen+Calculator).
 
-The page will reload if you make edits.\
-You will also see any lint errors in the console.
+**Date Created**: 07/09/21
 
-### `npm test`
+**Date Last Modified**: 02/25/25
 
-Launches the test runner in the interactive watch mode.\
-See the section about [running tests](https://facebook.github.io/create-react-app/docs/running-tests) for more information.
+**Table of Contents:**
 
-### `npm run build`
+- [Cover Crop Nitrogen Calculator](#cover-crop-nitrogen-calculator)
+- [Getting Started](#getting-started)
+  - [Prerequisites](#prerequisites)
+  - [Installation](#installation)
+  - [Folder Structure](#folder-structure)
 
-Builds the app for production to the `build` folder.\
-It correctly bundles React in production mode and optimizes the build for the best performance.
+## Getting Started
 
-The build is minified and the filenames include the hashes.\
-Your app is ready to be deployed!
+### Prerequisites
 
-See the section about [deployment](https://facebook.github.io/create-react-app/docs/deployment) for more information.
+Before running the application, ensure you have the following installed:
 
-### `npm run eject`
+- [Node.js and NPM](https://nodejs.org/en/download/)
+- [Git](https://git-scm.com/book/en/v2/Getting-Started-Installing-Git)
+- Code Editor like [Visual Studio Code](https://code.visualstudio.com/docs/setup/setup-overview)
 
-**Note: this is a one-way operation. Once you `eject`, you can’t go back!**
+### Installation
 
-If you aren’t satisfied with the build tool and configuration choices, you can `eject` at any time. This command will remove the single build dependency from your project.
+To get started with CC-NCalc, clone this repository to your local machine using the following command:
 
-Instead, it will copy all the configuration files and the transitive dependencies (webpack, Babel, ESLint, etc) right into your project so you have full control over them. All of the commands except `eject` will still work, but they will point to the copied scripts so you can tweak them. At this point you’re on your own.
+```bash
+git clone https://github.com/precision-sustainable-ag/dst-ncalc.git
+```
 
-You don’t have to ever use `eject`. The curated feature set is suitable for small and middle deployments, and you shouldn’t feel obligated to use this feature. However we understand that this tool wouldn’t be useful if you couldn’t customize it when you are ready for it.
+Install the necessary dependencies by running:
 
-## Learn More
+```bash
+npm install
+```
 
-You can learn more in the [Create React App documentation](https://facebook.github.io/create-react-app/docs/getting-started).
+On root directory, create a file named `.env`, the file should contain following keys, ask @mikahpinegar for the values of the keys.
 
-To learn React, check out the [React documentation](https://reactjs.org/).
+```
+VITE_MAPBOX_TOKEN
+VITE_API_AUTH0_DOMAIN
+VITE_API_AUTH0_CLIENT_ID
+VITE_API_AUTH0_AUDIENCE
+VITE_API_USER_HISTORY_API_URL
+VITE_API_USER_HISTORY_SCHEMA
+```
 
-### Code Splitting
+To start the application, run:
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/code-splitting](https://facebook.github.io/create-react-app/docs/code-splitting)
+```bash
+npm start
+```
 
-### Analyzing the Bundle Size
+### Folder Structure
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/analyzing-the-bundle-size](https://facebook.github.io/create-react-app/docs/analyzing-the-bundle-size)
+```
+src/
+├── components        # Major pages of the app
+├── hooks             # Hooks for retrieving data, calling api, etc
+├── shared            # Reusable components across the app
+├── store             # Redux store and functions
+├── util              # Utility functions
 
-### Making a Progressive Web App
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/making-a-progressive-web-app](https://facebook.github.io/create-react-app/docs/making-a-progressive-web-app)
-
-### Advanced Configuration
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/advanced-configuration](https://facebook.github.io/create-react-app/docs/advanced-configuration)
-
-### Deployment
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/deployment](https://facebook.github.io/create-react-app/docs/deployment)
-
-### `npm run build` fails to minify
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify](https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify)
+```

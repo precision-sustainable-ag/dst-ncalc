@@ -3,7 +3,7 @@
 # https://docs.microsoft.com/azure/devops/pipelines/languages/docker
 
 trigger:
-- feature/api-changes
+- develop
 
 resources:
 - repo: self
@@ -43,6 +43,7 @@ stages:
         echo "VITE_AZURE_SAS_TOKEN=$(VITE_AZURE_SAS_TOKEN)" >> /home/vsts/work/1/s/.env
         echo VITE_STORAGE_ACCOUNT_NAME="$(VITE_STORAGE_ACCOUNT_NAME)" >> /home/vsts/work/1/s/.env
         echo VITE_CONTAINER_NAME="$(VITE_CONTAINER_NAME)" >> /home/vsts/work/1/s/.env
+        echo VITE_NCALC_API_URL="$(VITE_NCALC_API_URL)" >> /home/vsts/work/1/s/.env
     - task: Docker@2
       displayName: Build and push an image to container registry
       inputs:

@@ -1,4 +1,5 @@
 /* eslint-disable no-alert */
+import { createAction } from '@reduxjs/toolkit';
 import { createStore } from './redux-autosetters';
 import initialState from './inits';
 
@@ -11,9 +12,9 @@ const afterChange = {
     }
     state.model = null;
   },
-  carb: (state) => { state.model = null; state.edited = true; },
-  cell: (state) => { state.model = null; state.edited = true; },
-  lign: (state) => { state.model = null; state.edited = true; },
+  carb: (state, { payload }) => { if (payload !== null) { state.model = null; state.edited = true; }},
+  cell: (state, { payload }) => { if (payload !== null) { state.model = null; state.edited = true; }},
+  lign: (state, { payload }) => { if (payload !== null) { state.model = null; state.edited = true; }},
   lat: (state) => { state.model = null; },
   lon: (state) => { state.model = null; },
   lwc: (state) => { state.model = null; },
@@ -26,7 +27,11 @@ const afterChange = {
   InorganicN: (state) => { state.model = null; },
 }; // afterChange
 
-const reducers = {};
+const reducers = {
+  resetState: () => initialState,
+};
+
+export const resetState = createAction('resetState');
 
 const store = createStore(initialState, { afterChange, reducers });
 

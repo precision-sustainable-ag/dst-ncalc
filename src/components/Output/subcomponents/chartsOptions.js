@@ -1,7 +1,7 @@
+/* eslint-disable max-len */
 /* eslint-disable arrow-body-style */
-import Highcharts from 'highcharts';
-// eslint-disable-next-line import/no-extraneous-dependencies
 import _ from 'lodash';
+import Highcharts from '../../../utils/highchartsConfig';
 
 // const responsiveOptions = {
 //   rules: [{
@@ -242,7 +242,7 @@ const getGeneralChartOptions = (props) => {
           width: 0.4,
           label: {
             useHTML: true,
-            text: '<div style="background: white; transform: rotate(-90deg); position: relative; left: -50px; font-size: 1.2em;">Planting date</div>',
+            text: '<div style="background: white; transform: rotate(180deg); position: relative; left: 50px; top: 40px; font-size: 1em;">planting date</div>',
           },
         }],
       },
