@@ -20,9 +20,9 @@ import { PSAButton, PSATextField } from 'shared-react-components/src';
 import axios from 'axios';
 import shpjs from 'shpjs';
 import { isValidGeoJSON } from '../../utils/geojsonUtils';
-import { azureSASToken, containerName, storageAccountName } from '../../utils/keys';
+import { azureSASToken, containerName, ncalcApiUrl, storageAccountName } from '../../utils/keys';
 
-const API_BASE_URL = 'https://developpm3dapi.covercrop-ncalc.org/api/v1';
+const API_BASE_URL = ncalcApiUrl;
 const MAP_TYPES = ['Spray Map', 'Yield Map'];
 const ROLES = ['NIFA-Soy', 'Willard', 'Growmark'];
 

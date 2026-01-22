@@ -17,10 +17,10 @@ import { LocalizationProvider } from '@mui/x-date-pickers';
 import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
 import dayjs from 'dayjs';
 import { get } from '../../store/redux-autosetters';
-import { mapboxToken } from '../../utils/keys';
+import { mapboxToken, ncalcApiUrl } from '../../utils/keys';
 import { processGeometries, validateAndProcessGeoJSON } from '../../utils/geojsonUtils';
 
-const API_BASE_URL = 'https://developpm3dapi.covercrop-ncalc.org/api/v1';
+const API_BASE_URL = ncalcApiUrl;
 const ROLES = ['NIFA-Soy', 'Willard', 'Growmark'];
 
 // TODO: Placeholder values - to be updated

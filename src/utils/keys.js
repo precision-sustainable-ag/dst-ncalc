@@ -7,7 +7,8 @@ const {
   VITE_MAPBOX_TOKEN,
   VITE_AZURE_SAS_TOKEN,
   VITE_STORAGE_ACCOUNT_NAME,
-  VITE_CONTAINER_NAME
+  VITE_CONTAINER_NAME,
+  VITE_NCALC_API_URL,
 } = import.meta.env;
 
 export const auth0Domain = VITE_API_AUTH0_DOMAIN;
@@ -19,3 +20,4 @@ export const mapboxToken = VITE_MAPBOX_TOKEN;
 export const azureSASToken = VITE_AZURE_SAS_TOKEN;
 export const storageAccountName = VITE_STORAGE_ACCOUNT_NAME;
 export const containerName = VITE_CONTAINER_NAME;
+export const ncalcApiUrl = VITE_NCALC_API_URL;
