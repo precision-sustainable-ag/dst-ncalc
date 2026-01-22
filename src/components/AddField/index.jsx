@@ -86,9 +86,10 @@ const AddField = () => {
   // const [season, setSeason] = useState(null);
   const [cashCrop, setCashCrop] = useState(null);
   const [coverCrops, setCoverCrops] = useState([]);
-  const [cashCropPlantingDate, setCashCropPlantingDate] = useState();
-  const [cashCropHarvestingDate, setCashCropHarvestingDate] = useState();
-  const [coverCropTerminationDate, setCoverCropTerminationDate] = useState();
+  const [cashCropPlantingDate, setCashCropPlantingDate] = useState(null);
+  const [cashCropHarvestingDate, setCashCropHarvestingDate] = useState(null);
+  const [coverCropPlantingDate, setCoverCropPlantingDate] = useState(null);
+  const [coverCropTerminationDate, setCoverCropTerminationDate] = useState(null);
   const [isSaving, setIsSaving] = useState(false);
 
   // MAP STATE VARIABLES
@@ -117,6 +118,22 @@ const AddField = () => {
     setFeatures(properties?.features);
     setLatLon([properties?.lat, properties?.lon]);
   };
+
+  // Reset dates start date > end date
+  useEffect(() => {
+    if (coverCropPlantingDate && coverCropTerminationDate && dayjs(coverCropPlantingDate) > dayjs(coverCropTerminationDate)) {
+      setCoverCropTerminationDate(null);
+      setCashCropPlantingDate(null);
+      setCashCropHarvestingDate(null);
+    }
+    if (coverCropTerminationDate && cashCropPlantingDate && dayjs(coverCropTerminationDate) > dayjs(cashCropPlantingDate)) {
+      setCashCropPlantingDate(null);
+      setCashCropHarvestingDate(null);
+    }
+    if (cashCropHarvestingDate && cashCropPlantingDate && dayjs(cashCropPlantingDate) > dayjs(cashCropHarvestingDate)) {
+      setCashCropHarvestingDate(null);
+    }
+  }, [cashCropPlantingDate, cashCropHarvestingDate, coverCropPlantingDate, coverCropTerminationDate]);
 
   useEffect(() => {
     const fetchOptions = async () => {
@@ -189,7 +206,7 @@ const AddField = () => {
   const handleSaveField = async () => {
     // Validate form fields
     if (!program || !grower || !farm || !field || !cashCrop || !coverCrops || coverCrops.length < 1
-      || !cashCropPlantingDate || !cashCropHarvestingDate || !coverCropTerminationDate) {
+      || !cashCropPlantingDate || !cashCropHarvestingDate || !coverCropPlantingDate || !coverCropTerminationDate) {
       alert('Please fill in all the fields');
       return;
     }
@@ -215,6 +232,7 @@ const AddField = () => {
         geometry: finalGeometry,
         cashCropPlantingDate,
         cashCropHarvestingDate,
+        coverCropPlantingDate,
         coverCropTerminationDate,
       };
 
@@ -413,34 +431,67 @@ const AddField = () => {
 
             <Grid item xs={12} md={6}>
               <Autocomplete
-                options={CASH_CROP_OPTIONS}
-                value={cashCrop}
-                onChange={(e, val) => setCashCrop(val)}
-                renderInput={(params) => <PSATextField {...params} label="Cash Crop" />}
-              />
-            </Grid>
-
-            <Grid item xs={12} md={6}>
-              <Autocomplete
                 multiple
                 options={COVER_CROP_OPTIONS}
                 value={coverCrops}
                 onChange={(e, val) => setCoverCrops(val)}
                 renderInput={(params) => (
-                  <PSATextField {...params} label="Cover Crops" />
+                  <PSATextField {...params} label="What cover crop species are planted in this field?" />
                 )}
+              />
+            </Grid>
+
+            <Grid item xs={12} md={6}>
+              <Autocomplete
+                options={CASH_CROP_OPTIONS}
+                value={cashCrop}
+                onChange={(e, val) => setCashCrop(val)}
+                renderInput={(params) => <PSATextField {...params} label="What cash crop will be planted next?" />}
               />
             </Grid>
           </Grid>
 
           <Grid container spacing={2}>
-            <Grid item xs={12} md={4}>
+            <Grid item xs={12} md={6} xl={3}>
+              <LocalizationProvider dateAdapter={AdapterDayjs}>
+                <DatePicker
+                  label="Cover Crop Planting Date"
+                  value={coverCropPlantingDate ? dayjs(coverCropPlantingDate) : null}
+                  onChange={(newValue) => {
+                    setCoverCropPlantingDate(newValue ? newValue.format('YYYY-MM-DD') : null);
+                    return null;
+                  }}
+                  sx={{ width: '100%' }}
+
+                />
+              </LocalizationProvider>
+            </Grid>
+            <Grid item xs={12} md={6} xl={3}>
+              <LocalizationProvider dateAdapter={AdapterDayjs}>
+                <DatePicker
+                  label="Cover Crop Termination Month"
+                  views={['year', 'month']}
+                  openTo="month"
+                  format="YYYY-MM"
+                  minDate={dayjs(coverCropPlantingDate)}
+                  value={coverCropTerminationDate ? dayjs(coverCropTerminationDate) : null}
+                  onChange={(newValue) => {
+                    setCoverCropTerminationDate(newValue ? newValue.endOf('month').format('YYYY-MM-DD') : null);
+                    return null;
+                  }}
+                  sx={{ width: '100%' }}
+
+                />
+              </LocalizationProvider>
+            </Grid>
+            <Grid item xs={12} md={6} xl={3}>
               <LocalizationProvider dateAdapter={AdapterDayjs}>
                 <DatePicker
                   label="Cash Crop Planting Month"
                   views={['year', 'month']}
                   openTo="month"
                   format="YYYY-MM"
+                  minDate={dayjs(coverCropTerminationDate).add(1, 'day')}
                   value={cashCropPlantingDate ? dayjs(cashCropPlantingDate) : null}
                   onChange={(newValue) => {
                     setCashCropPlantingDate(newValue ? newValue.startOf('month').format('YYYY-MM-DD') : null);
@@ -451,37 +502,20 @@ const AddField = () => {
               </LocalizationProvider>
             </Grid>
 
-            <Grid item xs={12} md={4}>
+            <Grid item xs={12} md={6} xl={3}>
               <LocalizationProvider dateAdapter={AdapterDayjs}>
                 <DatePicker
-                  label="Cash Crop Harvesting Month"
+                  label="Cash Crop Harvest Month"
                   views={['year', 'month']}
                   openTo="month"
                   format="YYYY-MM"
+                  minDate={dayjs(cashCropPlantingDate)}
                   value={cashCropHarvestingDate ? dayjs(cashCropHarvestingDate) : null}
                   onChange={(newValue) => {
                     setCashCropHarvestingDate(newValue ? newValue.endOf('month').format('YYYY-MM-DD') : null);
                     return null;
                   }}
                   sx={{ width: '100%' }}
-                />
-              </LocalizationProvider>
-            </Grid>
-
-            <Grid item xs={12} md={4}>
-              <LocalizationProvider dateAdapter={AdapterDayjs}>
-                <DatePicker
-                  label="Cover Crop Termination Month"
-                  views={['year', 'month']}
-                  openTo="month"
-                  format="YYYY-MM"
-                  value={coverCropTerminationDate ? dayjs(coverCropTerminationDate) : null}
-                  onChange={(newValue) => {
-                    setCoverCropTerminationDate(newValue ? newValue.endOf('month').format('YYYY-MM-DD') : null);
-                    return null;
-                  }}
-                  sx={{ width: '100%' }}
-
                 />
               </LocalizationProvider>
             </Grid>
@@ -576,7 +610,8 @@ const AddField = () => {
               variant="contained"
               onClick={handleSaveField}
               disabled={isSaving || !program || !grower || !farm || !field || !cashCrop || !coverCrops || coverCrops.length < 1
-                || !cashCropPlantingDate || !cashCropHarvestingDate || !coverCropTerminationDate}
+                || !cashCropPlantingDate || !cashCropHarvestingDate || !coverCropPlantingDate || !coverCropTerminationDate
+                || !features || features.length < 1}
               sx={{
                 minWidth: '150px',
                 color: 'white',
