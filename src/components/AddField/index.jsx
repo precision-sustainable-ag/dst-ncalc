@@ -381,7 +381,7 @@ const AddField = () => {
                 value={grower}
                 onChange={(e, val) => handleGrowerChange(val)}
                 onInputChange={(e, newInputValue) => handleGrowerChange(newInputValue)}
-                renderInput={(params) => <PSATextField {...params} label="Select a Grower name" />}
+                renderInput={(params) => <PSATextField {...params} label="Select or enter a Grower name" />}
               />
             </Grid>
           </Grid>
@@ -396,7 +396,7 @@ const AddField = () => {
                 value={farm}
                 onChange={(e, val) => handleFarmChange(val)}
                 onInputChange={(e, newInputValue) => handleFarmChange(newInputValue)}
-                renderInput={(params) => <PSATextField {...params} label="Select a Farm name" />}
+                renderInput={(params) => <PSATextField {...params} label="Select or enter a Farm name" />}
               />
             </Grid>
             <Grid item xs={12} md={6}>
@@ -408,7 +408,7 @@ const AddField = () => {
                 value={field}
                 onChange={(e, val) => setField(val)}
                 onInputChange={(e, newInputValue) => setField(newInputValue)}
-                renderInput={(params) => <PSATextField {...params} label="Select a Field name" />}
+                renderInput={(params) => <PSATextField {...params} label="Select or enter a Field name" />}
               />
             </Grid>
           </Grid>
