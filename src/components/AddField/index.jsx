@@ -544,6 +544,7 @@ const AddField = () => {
             {fieldIcon}
             to guess the field boundaries of your current marker location. When clicked
             it will populate the map with the USDA Crop Sequence Boundary for your field if one exists.
+            You can double click inside the field to edit the boundaries.
           </Typography>
 
           <Stack direction="row" justifyContent="flex-end">
