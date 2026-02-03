@@ -124,3 +124,41 @@ export const processGeometries = (featuresArray) => {
     coordinates: cleanCoords,
   };
 };
+
+/**
+ * Converts geometries (format as saved in db) to features (format required for mapbox maps)
+ * @param {*} geometry - Geometry as saved in database (geometry.type can be either Polygon or MultiPolygon)
+ * @param {Function} setFeatures - React state setter used to store the extracted array of GeoJSON features.
+ * @param {Function} setLatLon - React state setter that sets [lat, lon] based on the centroid
+ * @param {Function} setBounds - React state setter that sets the bounding box array [minX, minY, maxX, maxY] based on the features.
+ */
+export const geometriesToFeatures = (geometry, setFeatures, setLatLon, setBounds) => {
+  if (geometry && geometry.type && geometry.coordinates) {
+    const featuresToSet = [
+      {
+        type: 'Feature',
+        properties: {},
+        geometry, // works for BOTH Polygon & MultiPolygon
+      },
+    ];
+
+    setFeatures(featuresToSet);
+
+    try {
+      const centerPoint = centroid({
+        type: 'FeatureCollection',
+        features: featuresToSet,
+      });
+      const [centerLon, centerLat] = centerPoint.geometry.coordinates;
+      setLatLon([centerLat, centerLon]);
+
+      const newBounds = bbox({
+        type: 'FeatureCollection',
+        features: featuresToSet,
+      });
+      setBounds(newBounds);
+    } catch (e) {
+      console.warn('Could not calculate bounds', e);
+    }
+  }
+};

@@ -11,14 +11,14 @@ import { PSAButton, PSAReduxMap, PSATextField } from 'shared-react-components/sr
 import { useSelector } from 'react-redux';
 import shpjs from 'shpjs';
 import axios from 'axios';
-import { useNavigate } from 'react-router-dom';
+import { useLocation, useNavigate } from 'react-router-dom';
 import { DatePicker } from '@mui/x-date-pickers/DatePicker';
 import { LocalizationProvider } from '@mui/x-date-pickers';
 import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
 import dayjs from 'dayjs';
 import { get } from '../../store/redux-autosetters';
 import { mapboxToken, ncalcApiUrl } from '../../utils/keys';
-import { processGeometries, validateAndProcessGeoJSON } from '../../utils/geojsonUtils';
+import { geometriesToFeatures, processGeometries, validateAndProcessGeoJSON } from '../../utils/geojsonUtils';
 
 const API_BASE_URL = ncalcApiUrl;
 const ROLES = ['NIFA-Soy', 'Willard', 'Growmark'];
@@ -74,6 +74,9 @@ const AddField = () => {
   } = useAuth0();
 
   const navigate = useNavigate();
+  const location = useLocation();
+  const isEdit = location.pathname === '/editfield';
+
   const matchesMd = useMediaQuery((theme) => theme.breakpoints.down('md'));
 
   const COVER_CROP_OPTIONS = useSelector(get.species) || [];
@@ -105,6 +108,9 @@ const AddField = () => {
   // DATA FOR ALL THE FIELDS
   const [allFields, setAllFields] = useState([]);
   const [loadingOptions, setLoadingOptions] = useState(true);
+
+  // SELECTED FIELD (USED FOR EDIT FIELD METADATA)
+  const [selectedField, setSelectedField] = useState(null);
 
   const roles = user?.['https://dst-ncalc.org/claims'] || [];
   const isAdmin = roles.includes('admin');
@@ -138,6 +144,7 @@ const AddField = () => {
   useEffect(() => {
     const fetchOptions = async () => {
       try {
+        setLoadingOptions(true);
         const token = await getAccessTokenSilently();
         const response = await axios.get(`${API_BASE_URL}/fields-identifiers`, {
           headers: { Authorization: `Bearer ${token}` },
@@ -155,6 +162,39 @@ const AddField = () => {
       fetchOptions();
     }
   }, [isAuthenticated, getAccessTokenSilently]);
+
+  useEffect(() => {
+    if (!selectedField) return;
+
+    setProgram(selectedField?.properties.programName);
+    setGrower(selectedField?.properties.growerName);
+    setFarm(selectedField?.properties.farmName);
+    setField(selectedField?.properties.fieldName);
+    setCoverCrops(selectedField?.properties.coverCrop);
+    setCashCrop(selectedField?.properties.cashCrop);
+    setCoverCropPlantingDate(selectedField?.properties.coverCropPlantingDate);
+    setCoverCropTerminationDate(selectedField?.properties.coverCropTerminationDate);
+    setCashCropPlantingDate(selectedField?.properties.cashCropPlantingDate);
+    setCashCropHarvestingDate(selectedField?.properties.cashCropHarvestingDate);
+    geometriesToFeatures(selectedField?.geometry, setFeatures, setLatLon, setBounds);
+  }, [selectedField]);
+
+  // Reset states when switching between create and edit
+  useEffect(() => {
+    setProgram(null);
+    setGrower(null);
+    setFarm(null);
+    setField(null);
+    setCoverCrops([]);
+    setCashCrop(null);
+    setCoverCropPlantingDate(null);
+    setCoverCropTerminationDate(null);
+    setCashCropPlantingDate(null);
+    setCashCropHarvestingDate(null);
+    setFeatures(null);
+    setAddress({});
+    setZoom(13);
+  }, [isEdit]);
 
   const {
     programOptions, growerOptions, farmOptions, fieldOptions,
@@ -267,6 +307,67 @@ const AddField = () => {
     }
   };
 
+  const handleUpdateField = async () => {
+    // Validate form fields
+    if (!program || !grower || !farm || !field || !cashCrop || !coverCrops || coverCrops.length < 1
+      || !cashCropPlantingDate || !cashCropHarvestingDate || !coverCropPlantingDate || !coverCropTerminationDate) {
+      alert('Please fill in all the fields');
+      return;
+    }
+
+    const finalGeometry = processGeometries(features);
+    if (!finalGeometry) {
+      alert('Please draw a shape or upload a file.');
+      return;
+    }
+
+    setIsSaving(true);
+
+    try {
+      const token = await getAccessTokenSilently();
+
+      const payload = {
+        programName: program,
+        farmName: farm,
+        growerName: grower,
+        fieldName: field,
+        cashCrop,
+        coverCrop: coverCrops,
+        geometry: finalGeometry,
+        cashCropPlantingDate,
+        cashCropHarvestingDate,
+        coverCropPlantingDate,
+        coverCropTerminationDate,
+      };
+
+      await axios.put(`${API_BASE_URL}/fields`, payload, {
+        headers: {
+          Authorization: `Bearer ${token}`,
+          'Content-Type': 'application/json',
+        },
+      });
+
+      setProgram(null);
+      setGrower(null);
+      setFarm(null);
+      setField(null);
+      setFeatures(null);
+
+      alert('Field updated successfully!');
+      navigate('/home');
+    } catch (error) {
+      if (error.response?.data?.message) {
+        alert(`Error: ${error.response.data.message}`);
+      } else if (error.response) {
+        alert(`Error: ${error.response.data?.error || 'Failed to update field'}`);
+      } else {
+        alert('Network error. Could not connect to server.');
+      }
+    } finally {
+      setIsSaving(false);
+    }
+  };
+
   const handleFileUpload = (e) => {
     const file = e.target.files?.[0];
     if (!file) return;
@@ -308,6 +409,7 @@ const AddField = () => {
         xs={12}
         md={10}
         sx={{
+          position: 'relative',
           marginTop: '1rem',
           padding: `2rem ${matchesMd ? '1rem' : '4rem'}`,
           boxShadow: 5,
@@ -316,7 +418,92 @@ const AddField = () => {
           backgroundColor: 'white',
         }}
       >
+        <Stack
+          direction="row"
+          sx={{
+            position: 'absolute',
+            top: '1.5rem',
+            right: '1.5rem',
+          }}
+        >
+          <PSAButton
+            title={isEdit ? 'Go To Create Field' : 'Go To Edit Field'}
+            variant="contained"
+            onClick={isEdit ? () => navigate('/field') : () => navigate('/editfield')}
+            sx={{
+              minWidth: '150px',
+              color: 'white',
+              padding: '0.8rem 1.5rem',
+              borderRadius: '2rem',
+              backgroundColor: '#60802D',
+              '&:hover': {
+                backgroundColor: '#60802D',
+                textDecoration: 'underline',
+                boxShadow: '0px 2px 2px rgba(160, 160, 160, 0.3)',
+              },
+            }}
+          />
+        </Stack>
+
         <Stack spacing="1.5rem">
+          {isEdit
+            ? (
+              <>
+                <Typography variant="h4" sx={{ fontWeight: 'bold', color: '#60802D' }}>
+                  Edit Field Details
+                </Typography>
+
+                <Autocomplete
+                  loading={loadingOptions}
+                  loadingText="Loading fields..."
+                  options={allFields}
+                  value={selectedField}
+                  key={`${allFields.programName}-${allFields.growerName}`}
+                  onChange={(event, newValue) => {
+                    setSelectedField(newValue);
+                  }}
+                  getOptionLabel={(option) => {
+                    const p = option.properties;
+                    return `${p.programName} / ${p.growerName} / ${p.farmName} / ${p.fieldName}`;
+                  }}
+                  renderOption={(props, option) => (
+                    <Box component="li" {...props}>
+                      <Stack>
+                        <Typography variant="subtitle1" sx={{ fontWeight: 'bold' }}>
+                          {option.properties.fieldName}
+                        </Typography>
+                        <Typography variant="caption" color="textSecondary">
+                          {option.properties.programName}
+                          {' - '}
+                          {option.properties.growerName}
+                          {' - '}
+                          {option.properties.farmName}
+                          {/* {' - '}
+                      {option.properties.season} */}
+                        </Typography>
+                      </Stack>
+                    </Box>
+                  )}
+                  renderInput={(params) => (
+                    <PSATextField
+                      {...params}
+                      label="Select Field (Program / Grower / Farm / Field)"
+                      placeholder="Type to search..."
+                      InputProps={{
+                        ...params.InputProps,
+                        endAdornment: (
+                          <>
+                            {loadingOptions ? <CircularProgress color="inherit" size={20} /> : null}
+                            {params.InputProps.endAdornment}
+                          </>
+                        ),
+                      }}
+                    />
+                  )}
+                />
+              </>
+            )
+            : null}
 
           <Typography variant="h5" sx={{ fontWeight: 'bold', color: '#60802D' }}>
             Field Metadata
@@ -325,12 +512,14 @@ const AddField = () => {
           <Grid container spacing={2}>
             <Grid item xs={12} md={6}>
               <Autocomplete
+                freeSolo={isEdit}
                 loading={loadingOptions}
                 options={programOptions}
                 value={program}
                 onChange={(e, val) => handleProgramChange(val)}
                 onInputChange={(e, newInputValue) => handleProgramChange(newInputValue)}
                 renderInput={(params) => <PSATextField {...params} label="Select a Program name" />}
+                disabled={isEdit}
               />
             </Grid>
             <Grid item xs={12} md={6}>
@@ -343,6 +532,7 @@ const AddField = () => {
                 onChange={(e, val) => handleGrowerChange(val)}
                 onInputChange={(e, newInputValue) => handleGrowerChange(newInputValue)}
                 renderInput={(params) => <PSATextField {...params} label="Select or enter a Grower name" />}
+                disabled={isEdit}
               />
             </Grid>
           </Grid>
@@ -358,6 +548,7 @@ const AddField = () => {
                 onChange={(e, val) => handleFarmChange(val)}
                 onInputChange={(e, newInputValue) => handleFarmChange(newInputValue)}
                 renderInput={(params) => <PSATextField {...params} label="Select or enter a Farm name" />}
+                disabled={isEdit}
               />
             </Grid>
             <Grid item xs={12} md={6}>
@@ -370,6 +561,7 @@ const AddField = () => {
                 onChange={(e, val) => setField(val)}
                 onInputChange={(e, newInputValue) => setField(newInputValue)}
                 renderInput={(params) => <PSATextField {...params} label="Select or enter a Field name" />}
+                disabled={isEdit}
               />
             </Grid>
           </Grid>
@@ -585,9 +777,10 @@ const AddField = () => {
 
           <Stack direction="row" justifyContent="center" sx={{ mt: 2 }}>
             <PSAButton
-              title={isSaving ? <CircularProgress size={24} color="inherit" /> : 'Save Field'}
+              // eslint-disable-next-line no-nested-ternary
+              title={isSaving ? <CircularProgress size={24} color="inherit" /> : isEdit ? 'Update Field' : 'Save Field'}
               variant="contained"
-              onClick={handleSaveField}
+              onClick={isEdit ? handleUpdateField : handleSaveField}
               disabled={isSaving || !program || !grower || !farm || !field || !cashCrop || !coverCrops || coverCrops.length < 1
                 || !cashCropPlantingDate || !cashCropHarvestingDate || !coverCropTerminationDate
                 || !features || features.length < 1}
