@@ -7,6 +7,7 @@ import { get, set } from '../store/Store';
 
 const POLYGON_FILE_NAME = 'sample_polygon.json';
 const BIOMASS_FILE_NAME = 'sample_biomass_result.json';
+const NITROGEN_FILE_NAME = 'sample_nitrogen_result.json';
 const CROPNAMES_FILE_NAME = 'crops.json';
 
 // TODO: hooks for fetching static data like field example and crop names.
@@ -42,7 +43,8 @@ const useFetchSampleBiomass = () => {
         fetch(BIOMASS_FILE_NAME, { HEADERS })
           .then((response) => response.json())
           .then((jsonObj) => {
-            dispatch(set.biomassTaskResults(jsonObj));
+            dispatch(set.biomassTaskResults({ data_array: jsonObj.data_array, bbox: jsonObj.bbox }));
+            dispatch(set.biomassGeojson(jsonObj.biomass_geojson));
             setBiomass(jsonObj);
             return null;
           });
@@ -55,6 +57,46 @@ const useFetchSampleBiomass = () => {
   }, [biomassCalcMode, activeExample]);
 
   return [polygon, biomass];
+};
+
+const useFetchSampleNitrogen = () => {
+  const dispatch = useDispatch();
+  const activeExample = useSelector(get.activeExample);
+
+  useEffect(() => {
+    const HEADERS = {
+      'Content-Type': 'application/json',
+      Accept: 'application/json',
+    };
+    // fetch sample polygon if example is active
+    if (activeExample) {
+      fetch(NITROGEN_FILE_NAME, { HEADERS })
+        .then((response) => response.json())
+        .then((jsonObj) => {
+          delete jsonObj.properties;
+          const reqnGeojson = JSON.parse(JSON.stringify(jsonObj));
+          jsonObj.features.forEach((feature) => {
+            if (
+              feature.properties
+              && feature.properties.MinNfromFOM !== undefined
+            ) {
+              feature.properties.value = feature.properties.MinNfromFOM;
+            }
+          });
+
+          reqnGeojson.features.forEach((feature) => {
+            if (
+              feature.properties
+              && feature.properties.ReqN !== undefined
+            ) {
+              feature.properties.value = feature.properties.ReqN;
+            }
+          });
+
+          dispatch(set.nitrogenTaskResults({ minN: jsonObj, reqN: reqnGeojson }));
+        });
+    }
+  }, [activeExample]);
 };
 
 /// Desc: useFetchCropNames
@@ -83,4 +125,4 @@ const useFetchCropNames = () => {
 
   return cropNames;
 };
-export { useFetchSampleBiomass, useFetchCropNames };
+export { useFetchSampleBiomass, useFetchSampleNitrogen, useFetchCropNames };

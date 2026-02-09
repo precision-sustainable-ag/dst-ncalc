@@ -51,6 +51,7 @@ const Home = () => {
   const handleChange = (event, newValue) => {
     if (newValue === null) return;
     dispatch(set.biomassCalcMode(newValue));
+    dispatch(set.activeExample(''));
     dispatch(set.coverCrop([]));
   };
 
