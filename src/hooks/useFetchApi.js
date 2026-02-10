@@ -90,9 +90,9 @@ const useFetchModel = ({
 
       biomass *= factor;
 
-      const url = `${NCAL_API_URL}?lat=${lat}&lon=${lon}&start=${start}` +
-                   `&end=${end}&n=${N}&biomass=${biomass}&lwc=${lwc}&carb=${carb}&cell=${cell}` +
-                   `&lign=${lign}&om=${OM}&bd=${BD}&in=${InorganicN}&pmn=${pmn}`;
+      const url = `${NCAL_API_URL}?lat=${lat}&lon=${lon}&start=${start}`
+                   + `&end=${end}&n=${N}&biomass=${biomass}&lwc=${lwc}&carb=${carb}&cell=${cell}`
+                   + `&lign=${lign}&om=${OM}&bd=${BD}&in=${InorganicN}&pmn=${pmn}`;
       axios
         .get(url)
         .then(({ data }) => {
@@ -195,7 +195,7 @@ const fetchNitrogenData = async (
   targetN,
   biomassCalcMode,
   speciesBiomassAverage,
-  dispatch
+  dispatch,
 ) => {
   const url = `${PLANTFACTORS_API_URL}/nitrogen`;
 
@@ -210,10 +210,9 @@ const fetchNitrogenData = async (
   } else if (biomassCalcMode === 'pm3d') {
     species = coverCrop?.length > 0 ? coverCrop : [];
     growthStage = species.map(
-      (item) => coverCropGrowthStage?.[item] || 'Unknown growth stage'
+      (item) => coverCropGrowthStage?.[item] || 'Unknown growth stage',
     );
   }
-
 
   try {
     const response = await axios.post(url, {
@@ -254,7 +253,7 @@ const fetchNitrogenData = async (
         }
       });
 
-      dispatch(set.nitrogenTaskResults({ minN : geojsonData, reqN: reqnGeojson}));
+      dispatch(set.nitrogenTaskResults({ minN: geojsonData, reqN: reqnGeojson }));
 
       if (response.data?.n > 0) dispatch(set.N(response.data.n.toFixed(2)));
     } else {
@@ -291,19 +290,21 @@ const useFetchPlantFactors = () => {
   const isSatelliteMode = useSelector(get.biomassCalcMode) === 'satellite';
   const biomassCalcMode = useSelector(get.biomassCalcMode);
   const speciesBiomassAverage = useSelector(get.speciesBiomassAverage);
-
+  const activeExample = useSelector(get.activeExample);
 
   useEffect(() => {
+    if (activeExample) return;
+
     if (isSatelliteMode && coverCrop && coverCropGrowthStage[coverCrop]) {
       const url = `${PLANTFACTORS_API_URL}/plantfactors`;
       axios
         .get(url, { params: { plant_species: coverCrop[0], growth_stage: coverCropGrowthStage[coverCrop] } })
         .then((data) => {
           if (data.data) {
-            dispatch(set.N(data.data.mean_n.toFixed(2)));
-            dispatch(set.carb(data.data.mean_carb.toFixed(2)));
-            dispatch(set.cell(data.data.mean_holocellulose.toFixed(2)));
-            dispatch(set.lign(data.data.mean_lignin.toFixed(2)));
+            dispatch(set.N(Number(data.data.mean_n.toFixed(2))));
+            dispatch(set.carb(Number(data.data.mean_carb.toFixed(2))));
+            dispatch(set.cell(Number(data.data.mean_holocellulose.toFixed(2))));
+            dispatch(set.lign(Number(data.data.mean_lignin.toFixed(2))));
           }
         })
         .catch((error) => {
@@ -318,20 +319,22 @@ const useFetchPlantFactors = () => {
   }, [dispatch, coverCrop, coverCropGrowthStage]);
 
   useEffect(() => {
-    if (!species) {
-      const url = `${PLANTFACTORS_API_URL}/species`;
-      axios
-        .get(url)
-        .then((data) => {
-          if (data.data) {
-            dispatch(set.species(data.data));
-          }
-        })
-        .catch((error) => {
-          dispatch(set.species([]));
-          console.log(error);
-        });
-    }
+    const satelliteSpecies = 'Winter cereals';
+    const url = isSatelliteMode ? `${PLANTFACTORS_API_URL}/species/${satelliteSpecies}` : `${PLANTFACTORS_API_URL}/species`;
+    axios
+      .get(url)
+      .then((data) => {
+        if (data.data) {
+          dispatch(set.species(data.data));
+        }
+      })
+      .catch((error) => {
+        dispatch(set.species([]));
+        console.log(error);
+      });
+  }, [dispatch, biomassCalcMode]);
+
+  useEffect(() => {
     if (!plantGrowthStages) {
       const url = `${PLANTFACTORS_API_URL}/plantgrowthstages`;
       axios
@@ -345,18 +348,50 @@ const useFetchPlantFactors = () => {
           console.log(error);
         });
     }
-  }, [dispatch, species, plantGrowthStages]);
+  }, [dispatch]);
 
   useEffect(() => {
     dispatch(set.nitrogenTaskResults(null));
   }, [biomassTaskResults, coverCrop, coverCropGrowthStage, coverCropTerminationDate, cashCropPlantingDate, targetN]);
 
   useEffect(() => {
-    if (biomassTaskResults && !nitrogenTaskResults && species && plantGrowthStages && coverCropTerminationDate && cashCropPlantingDate
-          && targetN && activeStep > 5) {
-      fetchNitrogenData(biomassTaskResults, coverCrop, coverCropGrowthStage, coverCropTerminationDate, cashCropPlantingDate, targetN, biomassCalcMode,speciesBiomassAverage, dispatch)
+    if (activeExample) return;
+    if (
+      biomassTaskResults
+      && !nitrogenTaskResults
+      && species
+      && plantGrowthStages
+      && coverCropTerminationDate
+      && cashCropPlantingDate
+      && targetN
+      && activeStep > 5
+    ) {
+      fetchNitrogenData(
+        biomassTaskResults,
+        coverCrop,
+        coverCropGrowthStage,
+        coverCropTerminationDate,
+        cashCropPlantingDate,
+        targetN,
+        biomassCalcMode,
+        speciesBiomassAverage,
+        dispatch,
+      );
     }
-  }, [dispatch, biomassTaskResults, species, plantGrowthStages, coverCropTerminationDate, cashCropPlantingDate, targetN, N, carb, cell, lign, activeStep]);
+  }, [
+    dispatch,
+    biomassTaskResults,
+    species,
+    plantGrowthStages,
+    coverCropTerminationDate,
+    cashCropPlantingDate,
+    targetN,
+    N,
+    carb,
+    cell,
+    lign,
+    activeStep,
+  ]);
 }; // useFetchPlantFactors
 
 /// Desc: useFetchNitrogenArray
@@ -364,40 +399,40 @@ const useFetchPlantFactors = () => {
 /// ..............................................................................
 //
 /** only work in satellite mode */
-const useFetchNitrogenArray = () => {
-  const dispatch = useDispatch();
-  const N = useSelector(get.N);
-  const carb = useSelector(get.carb);
-  const cell = useSelector(get.cell);
-  const lign = useSelector(get.lign);
-  const biomassTaskResults = useSelector(get.biomassTaskResults);
-  // const nitrogenTaskResults = useSelector(get.nitrogenTaskResults);
+// const useFetchNitrogenArray = () => {
+//   const dispatch = useDispatch();
+//   const N = useSelector(get.N);
+//   const carb = useSelector(get.carb);
+//   const cell = useSelector(get.cell);
+//   const lign = useSelector(get.lign);
+//   const biomassTaskResults = useSelector(get.biomassTaskResults);
+//   // const nitrogenTaskResults = useSelector(get.nitrogenTaskResults);
 
-  useEffect(() => {
-    if (biomassTaskResults && N && carb && cell && lign) {
-      const url = `${PLANTFACTORS_API_URL}/nitrogen`;
-      const payload = {
-        nitrogen_percentage: N,
-        carbohydrates_percentage: carb,
-        holo_cellulose_percentage: cell,
-        lignin_percentage: lign,
-        data_array: biomassTaskResults.data_array,
-        bbox: biomassTaskResults.bbox,
-      };
-      axios
-        .post(url, payload)
-        .then((response) => {
-          if (response.data) {
-            dispatch(set.nitrogenTaskResults(response.data));
-          }
-        })
-        .catch((error) => {
-          console.log(error);
-        });
-    }
-  }, [dispatch, biomassTaskResults, N, carb, cell, lign]);
-}; // useFetchNitrogenArray
+//   useEffect(() => {
+//     if (biomassTaskResults && N && carb && cell && lign) {
+//       const url = `${PLANTFACTORS_API_URL}/nitrogen`;
+//       const payload = {
+//         nitrogen_percentage: N,
+//         carbohydrates_percentage: carb,
+//         holo_cellulose_percentage: cell,
+//         lignin_percentage: lign,
+//         data_array: biomassTaskResults.data_array,
+//         bbox: biomassTaskResults.bbox,
+//       };
+//       axios
+//         .post(url, payload)
+//         .then((response) => {
+//           if (response.data) {
+//             dispatch(set.nitrogenTaskResults(response.data));
+//           }
+//         })
+//         .catch((error) => {
+//           console.log(error);
+//         });
+//     }
+//   }, [dispatch, biomassTaskResults, N, carb, cell, lign]);
+// }; // useFetchNitrogenArray
 
 export {
-  useFetchModel, useFetchSSURGO, useFetchCornN, useFetchPlantFactors, fetchNitrogenData
+  useFetchModel, useFetchSSURGO, useFetchCornN, useFetchPlantFactors, fetchNitrogenData,
 };
