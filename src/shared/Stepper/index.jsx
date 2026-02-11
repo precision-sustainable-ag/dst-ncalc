@@ -32,14 +32,21 @@ const NcalcStepper = () => {
 
   // Filter out the steps that are not needed
   const visibleSteps = useMemo(() => {
+    const updatedSteps = ALL_STEPS.map((s) => {
+      if (s.id === 'sidedress' && biomassCalcMode === 'sampled') {
+        return { ...s, title: 'Cash Crop' };
+      }
+      return s;
+    });
+
     if (biomassCalcMode === 'pm3d') {
-      return ALL_STEPS.filter((s) => s.id !== 'location' && s.id !== 'soil');
+      return updatedSteps.filter((s) => s.id !== 'location' && s.id !== 'soil');
     } if (biomassCalcMode === 'satellite') {
-      return ALL_STEPS.filter((s) => s.id !== 'upload' && s.id !== 'soil');
+      return updatedSteps.filter((s) => s.id !== 'upload' && s.id !== 'soil');
     } if (biomassCalcMode === 'sampled') {
-      return ALL_STEPS.filter((s) => s.id !== 'upload');
+      return updatedSteps.filter((s) => s.id !== 'upload');
     }
-    return ALL_STEPS;
+    return updatedSteps;
   }, [biomassCalcMode]);
 
   const titles = visibleSteps.map((s) => s.title);

@@ -5,8 +5,9 @@ import { useNavigate } from 'react-router-dom';
 import {
   Box, Stack, Typography, styled, Grid,
   useMediaQuery,
+  Autocomplete,
 } from '@mui/material';
-// import { PSATextField } from 'shared-react-components/src';
+import { PSATextField } from 'shared-react-components/src';
 import { DatePicker, LocalizationProvider } from '@mui/x-date-pickers';
 import dayjs from 'dayjs';
 import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
@@ -14,7 +15,7 @@ import { get, set } from '../../store/Store';
 import Myslider from '../../shared/Slider';
 import Help from '../../shared/Help';
 import Required from '../../shared/Required';
-// import { useFetchCropNames } from '../../hooks/useFetchStatic';
+import { useFetchCropNames } from '../../hooks/useFetchStatic';
 import NavigateBar from '../../shared/Navigate';
 
 const CustomInputText = styled(Typography)({
@@ -30,12 +31,13 @@ const CashCrop = () => {
   const dispatch = useDispatch();
   const isSatelliteMode = useSelector(get.biomassCalcMode) === 'satellite';
   const isPM3DMode = useSelector(get.biomassCalcMode) === 'pm3d';
+  const isUserSampledMode = useSelector(get.biomassCalcMode) === 'sampled';
   const unit = useSelector(get.unit);
-  // const cashCrop = useSelector(get.cashCrop);
+  const cashCrop = useSelector(get.cashCrop);
   const targetN = useSelector(get.targetN);
   const Yield = useSelector(get.yield);
   const cashCropPlantingDate = useSelector(get.cashCropPlantingDate);
-  // const crops = useFetchCropNames();
+  const crops = useFetchCropNames();
   const coverCropTerminationDate = useSelector(get.coverCropTerminationDate);
 
   // const [plantingDate, setPlantingDate] = useState(cashCropPlantingDate);
@@ -69,28 +71,34 @@ const CashCrop = () => {
       >
         <Typography variant="h4">Tell us about your Target Rate</Typography>
         <Box m={2}>
-          {/* <Stack direction="row" alignItems="center">
-            <CustomInputText>Cash Crop: </CustomInputText>
-            {!cashCrop && <Required />}
-          </Stack>
-          {crops && (
-            <Autocomplete
-              placeholder="Start typing your crop, then select from the list"
-              disablePortal
-              id="combo-box-demo"
-              autoFocus
-              options={[...crops]}
-              sx={{ width: '100%' }}
-              // defaultValue={coverCrop ? coverCrop : ''}
-              value={cashCrop}
-              renderInput={(params) => <PSATextField {...params} placeholder="Select a cash crop" />}
-              onChange={(el, va) => {
-                dispatch(set.cashCrop(va));
-              }}
-            />
-          )} */}
+          {isUserSampledMode && (
+            <>
+              <Stack direction="row" alignItems="center">
+                <CustomInputText>Cash Crop: </CustomInputText>
+                {!cashCrop && <Required />}
+              </Stack>
+              {crops && (
+                <Autocomplete
+                  placeholder="Start typing your crop, then select from the list"
+                  disablePortal
+                  id="combo-box-demo"
+                  autoFocus
+                  options={[...crops]}
+                  sx={{ width: '100%' }}
+                  // defaultValue={coverCrop ? coverCrop : ''}
+                  value={cashCrop}
+                  renderInput={(params) => <PSATextField {...params} placeholder="Select a cash crop" />}
+                  onChange={(el, va) => {
+                    dispatch(set.cashCrop(va));
+                  }}
+                />
+              )}
+            </>
+          )}
           <Stack direction="row" alignItems="center">
-            <CustomInputText>Side Dress Fertilization Date: </CustomInputText>
+            <CustomInputText>
+              {isUserSampledMode ? 'Cash Crop Planting Date:' : 'Side Dress Fertilization Date:'}
+            </CustomInputText>
             {!cashCropPlantingDate && <Required />}
           </Stack>
           {/* <PSATextField
@@ -113,7 +121,7 @@ const CashCrop = () => {
             />
           </LocalizationProvider>
 
-          {/* {cashCrop === 'Corn' && (
+          {isUserSampledMode && cashCrop === 'Corn' && (
             <Box mt={2}>
               <Stack direction="row" alignItems="center">
                 <CustomInputText>Yield Goal (bu/ac):</CustomInputText>
@@ -121,7 +129,7 @@ const CashCrop = () => {
               </Stack>
               <Myslider id="yield" min={0} max={300} />
             </Box>
-          )} */}
+          )}
 
           <Box mt={2} sx={{ display: 'flex', flexDirection: 'row', alignItems: 'center' }}>
             <Stack direction="row" alignItems="center">
@@ -147,7 +155,7 @@ const CashCrop = () => {
             dispatch(set.activeStep(6));
             navigate('/output');
           }}
-          nextDisabled={!cashCropPlantingDate || !targetN || targetN < 0 || !Yield || Yield < 0}
+          nextDisabled={!cashCropPlantingDate || !targetN || targetN < 0 || !Yield || Yield < 0 || (isUserSampledMode && !cashCrop)}
           back="back"
           backOnClick={() => {
             if (isSatelliteMode || isPM3DMode) {
