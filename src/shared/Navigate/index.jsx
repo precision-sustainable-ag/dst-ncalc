@@ -3,7 +3,7 @@ import { Box } from '@mui/material';
 import NavButton from './NavButton';
 
 const NavigateBar = ({
-  next, back, nextOnClick, backOnClick, nextDisabled = false, nextTooltip = '',
+  next, back, nextOnClick, backOnClick, nextDisabled = false, nextTooltip = '', extraAction = null,
 }) => (
   <Box
     sx={{
@@ -17,6 +17,7 @@ const NavigateBar = ({
     }}
   >
     <NavButton onClick={backOnClick}>{back}</NavButton>
+    {extraAction}
     <NavButton onClick={nextOnClick} disabled={nextDisabled} tooltip={nextTooltip}>{next}</NavButton>
   </Box>
 );

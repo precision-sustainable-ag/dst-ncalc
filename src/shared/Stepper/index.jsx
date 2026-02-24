@@ -17,6 +17,7 @@ const ALL_STEPS = [
   { id: 'soil', title: 'Soil', step: 3 },
   { id: 'covercrop', title: 'Cover Crop', step: 4 },
   { id: 'sidedress', title: 'Side Dress Date', step: 5 },
+  { id: 'fertilizer', title: 'Nitrogen Fertilizer', step: 5 },
   { id: 'output', title: 'Output', step: 6 },
 ];
 
@@ -40,11 +41,11 @@ const NcalcStepper = () => {
     });
 
     if (biomassCalcMode === 'pm3d') {
-      return updatedSteps.filter((s) => s.id !== 'location' && s.id !== 'soil');
+      return updatedSteps.filter((s) => s.id !== 'location' && s.id !== 'soil' && s.id !== 'sidedress');
     } if (biomassCalcMode === 'satellite') {
-      return updatedSteps.filter((s) => s.id !== 'upload' && s.id !== 'soil');
+      return updatedSteps.filter((s) => s.id !== 'upload' && s.id !== 'soil' && s.id !== 'fertilizer');
     } if (biomassCalcMode === 'sampled') {
-      return updatedSteps.filter((s) => s.id !== 'upload');
+      return updatedSteps.filter((s) => s.id !== 'upload' && s.id !== 'fertilizer');
     }
     return updatedSteps;
   }, [biomassCalcMode]);

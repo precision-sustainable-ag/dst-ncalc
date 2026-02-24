@@ -10,6 +10,7 @@ import { get, set } from '../../store/Store';
 import About from '../About';
 import HistorySelect from '../HistorySelect';
 import NavigateBar from '../../shared/Navigate';
+import NavButton from '../../shared/Navigate/NavButton';
 
 const BiomassMethodButton = styled(ToggleButton)(() => ({
   '&.Mui-selected': {
@@ -99,18 +100,25 @@ const Home = () => {
         </Stack>
         <Box sx={{ height: '1rem' }} />
         <NavigateBar
-          next={biomassCalcMode !== 'pm3d' ? 'Get Started' : 'Enroll Field'}
+          next="Get Started"
           nextOnClick={() => {
             if (biomassCalcMode !== 'pm3d') {
               navigate('/location');
               dispatch(set.activeStep(2));
             } else {
-              navigate('/field');
-              // dispatch(set.activeStep(1));
+              navigate('/upload');
+              dispatch(set.activeStep(1));
             }
           }}
           back="About"
           backOnClick={() => setAboutOpen(true)}
+          extraAction={
+            biomassCalcMode === 'pm3d' && (
+              <NavButton onClick={() => navigate('/field')}>
+                Enroll Field
+              </NavButton>
+            )
+          }
         />
         <About open={aboutOpen} setOpen={setAboutOpen} />
       </Grid>

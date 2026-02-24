@@ -266,6 +266,94 @@ const fetchNitrogenData = async (
   }
 };
 
+const fetchPrescription = async (
+  points,
+  fieldGeometry,
+  nitrogenSprayMap,
+  coverCrop,
+  coverCropGrowthStage,
+  coverCropTerminationDate,
+  cashCropPlantingDate,
+  nitrogenSprayMapProperty,
+  multiplier,
+  hasFixedNRate,
+  targetN,
+  dispatch,
+) => {
+  const url = `${PLANTFACTORS_API_URL}/grid`;
+  const growthStage = coverCrop.map(
+    (item) => coverCropGrowthStage?.[item] || 'Unknown growth stage',
+  );
+  try {
+    dispatch(set.biomassFetchIsLoading(true));
+    dispatch(set.nitrogenFetchIsLoading(true));
+    const payload = {
+      points,
+      field_geometry: fieldGeometry,
+      species: coverCrop,
+      growth_stage: growthStage,
+      start: coverCropTerminationDate,
+      end: cashCropPlantingDate,
+      multiplier,
+      has_fixed_rate: hasFixedNRate,
+      ...(hasFixedNRate && { target_n: targetN }),
+      ...(!hasFixedNRate && {
+        feature_collection: nitrogenSprayMap,
+        property_key: nitrogenSprayMapProperty,
+      }),
+    };
+    const response = await axios.post(url, payload);
+    if (response.status === 200 && response.data) {
+      // console.log('prescription response', response.data);
+      const geojsonData = response.data?.geojson_data;
+      delete geojsonData.properties;
+
+      const biomassGeojson = JSON.parse(JSON.stringify(geojsonData));
+      const reqnGeojson = JSON.parse(JSON.stringify(geojsonData));
+
+      biomassGeojson.features.forEach((feature) => {
+        if (
+          feature.properties
+          && feature.properties.ReqN !== undefined
+        ) {
+          feature.properties.value = feature.properties.biomass_average;
+        }
+      });
+
+      geojsonData.features.forEach((feature) => {
+        if (
+          feature.properties
+          && feature.properties.MinNfromFOM !== undefined
+        ) {
+          feature.properties.value = feature.properties.MinNfromFOM;
+        }
+      });
+
+      reqnGeojson.features.forEach((feature) => {
+        if (
+          feature.properties
+          && feature.properties.ReqN !== undefined
+        ) {
+          feature.properties.value = feature.properties.ReqN;
+        }
+      });
+
+      dispatch(set.biomassGeojson(biomassGeojson));
+      dispatch(set.nitrogenTaskResults({ minN: geojsonData, reqN: reqnGeojson }));
+
+      if (response.data?.n > 0) dispatch(set.N(response.data.n.toFixed(2)));
+    } else {
+      dispatch(set.nitrogenFetchIsFailed(true));
+    }
+  } catch (error) {
+    console.error(error);
+    dispatch(set.nitrogenFetchIsFailed(true));
+  } finally {
+    dispatch(set.biomassFetchIsLoading(false));
+    dispatch(set.nitrogenFetchIsLoading(false));
+  }
+};
+
 /// Desc: useFetchPlantFactors
 /// ..............................................................................
 /// ..............................................................................
@@ -290,6 +378,12 @@ const useFetchPlantFactors = () => {
   const isSatelliteMode = useSelector(get.biomassCalcMode) === 'satellite';
   const biomassCalcMode = useSelector(get.biomassCalcMode);
   const speciesBiomassAverage = useSelector(get.speciesBiomassAverage);
+  const selectedBiomassFile = useSelector(get.selectedBiomassFile);
+  const selectedField = useSelector(get.selectedField);
+  const nitrogenSprayMap = useSelector(get.nitrogenSprayMap);
+  const nitrogenSprayMapProperty = useSelector(get.nitrogenSprayMapProperty);
+  const multiplier = useSelector(get.multiplier);
+  const hasFixedNRate = useSelector(get.hasFixedNRate);
   const activeExample = useSelector(get.activeExample);
 
   useEffect(() => {
@@ -390,6 +484,49 @@ const useFetchPlantFactors = () => {
     carb,
     cell,
     lign,
+    activeStep,
+  ]);
+
+  useEffect(() => {
+    if (activeExample || biomassCalcMode !== 'pm3d') return;
+
+    if (
+      selectedBiomassFile
+      && selectedBiomassFile.points
+      && selectedField.geometry
+      && ((!hasFixedNRate && nitrogenSprayMap && nitrogenSprayMapProperty) || (hasFixedNRate && targetN > 0))
+      && coverCrop
+      && plantGrowthStages
+      && coverCropTerminationDate
+      && cashCropPlantingDate
+      && multiplier
+      && activeStep > 5
+    ) {
+      fetchPrescription(
+        selectedBiomassFile.points,
+        selectedField.geometry,
+        nitrogenSprayMap,
+        coverCrop,
+        coverCropGrowthStage,
+        coverCropTerminationDate,
+        cashCropPlantingDate,
+        nitrogenSprayMapProperty,
+        multiplier,
+        hasFixedNRate,
+        targetN,
+        dispatch,
+      );
+    }
+  }, [
+    dispatch,
+    selectedBiomassFile,
+    nitrogenSprayMap,
+    nitrogenSprayMapProperty,
+    coverCrop,
+    plantGrowthStages,
+    coverCropTerminationDate,
+    cashCropPlantingDate,
+    multiplier,
     activeStep,
   ]);
 }; // useFetchPlantFactors

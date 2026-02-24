@@ -29,7 +29,7 @@ const GrowthStageInput = () => {
       coverCrop.map((species, _) => {
         if (!species || species === 'ERROR') return null;
 
-        const options = plantGrowthStages[species] || [];
+        const options = plantGrowthStages?.[species] || [];
         const value = coverCropGrowthStage?.[species] || null;
 
         return (

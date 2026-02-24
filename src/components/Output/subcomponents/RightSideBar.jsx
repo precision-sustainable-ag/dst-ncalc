@@ -63,8 +63,13 @@ const RightSideBar = ({ summaryData, refs }) => {
             nextDisabled={!model || !model.s}
             back="back"
             backOnClick={() => {
-              dispatch(set.activeStep(5));
-              navigate('/sidedress');
+              if (isPM3DMode) {
+                dispatch(set.activeStep(5));
+                navigate('/fertilizer');
+              } else {
+                dispatch(set.activeStep(5));
+                navigate('/sidedress');
+              }
             }}
           />
         </Grid>

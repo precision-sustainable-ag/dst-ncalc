@@ -184,6 +184,13 @@ const initialState = {
   nitrogenTaskIsDone: true,
   activeStep: 0,
   pm3dData: null,
+  selectedField: null,
+  selectedBiomassFile: null,
+  biomassPoints: null,
+  nitrogenSprayMap: null,
+  nitrogenSprayMapProperty: null,
+  multiplier: 1,
+  hasFixedNRate: false,
   user: {
     historyState: historyStates.none,
     selectedHistory: null,

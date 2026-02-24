@@ -46,6 +46,7 @@ screens.advanced = require('./components/Advanced').default;
 screens.upload = require('./components/Upload').default;
 screens.field = require('./components/AddField').default;
 screens.fileupload = require('./components/FileUpload').default;
+screens.fertilizer = require('./components/NitrogenFertilizer').default;
 
 screens.profile = () => <PSAProfile styles={{ backgroundColor: 'white' }} />;
 
@@ -102,8 +103,8 @@ const App = () => {
   const { showAlert, alertSeverity, alertMessage } = useSelector(get.user);
   const isPM3DMode = useSelector(get.biomassCalcMode) === 'pm3d';
 
-  const noStepperPaths = ['/profile', '/field', '/fileupload'];
-  const showStepper = !isPM3DMode && !noStepperPaths.includes(location.pathname.toLowerCase());
+  const noStepperPaths = ['/profile', '/field', '/editfield', '/fileupload'];
+  const showStepper = !noStepperPaths.includes(location.pathname.toLowerCase());
 
   const navContent = [
     {

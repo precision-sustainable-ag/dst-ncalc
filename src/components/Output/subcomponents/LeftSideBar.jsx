@@ -87,6 +87,7 @@ const LeftSideBar = ({ sidebarListData, refs }) => {
   const [scrollPosition, setScrollPosition] = useState(0);
   const [disableScrollListener, setDisableScrollListener] = useState(false);
   const isSatelliteMode = useSelector(get.biomassCalcMode) === 'satellite';
+  const isPM3DMode = useSelector(get.biomassCalcMode) === 'pm3d';
   // const biomass = useSelector(get.biomass);
   // const [value, setValue] = useState(3000);
   // const dispatch = useDispatch();
@@ -106,7 +107,7 @@ const LeftSideBar = ({ sidebarListData, refs }) => {
   useEffect(() => {
     if (!disableScrollListener) {
       sidebarListData.forEach((el, index) => {
-        if (!isSatelliteMode && el.label === 'Map Visualization') return;
+        if ((!isSatelliteMode && !isPM3DMode) && el.label === 'Map Visualization') return;
         const element = refs[index].current;
         if (element === null) return;
         const yTop = element.getBoundingClientRect().top + window.scrollY + YOFFSET;
@@ -126,8 +127,8 @@ const LeftSideBar = ({ sidebarListData, refs }) => {
         <Stack sx={ListStyles} gap={2} alignItems="flex-start">
           {
             sidebarListData.map((el, index) => {
-              if (!isSatelliteMode && el.label === 'Map Visualization') return;
-              if (!isSatelliteMode && (el.label === 'Biomass Map' || el.label === 'Nitrogen Map')) return;
+              if (!isSatelliteMode && !isPM3DMode && el.label === 'Map Visualization') return;
+              if (!isSatelliteMode && !isPM3DMode && (el.label === 'Biomass Map' || el.label === 'Nitrogen Map')) return;
               return (
                 <ListItem
                   label={el.label}

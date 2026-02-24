@@ -82,7 +82,7 @@ const CoverCropFirst = () => {
       const allStagesSelected = Array.isArray(coverCrop) && coverCrop.length > 0 &&
         coverCrop.every((species) => coverCropGrowthStage?.[species] && coverCropGrowthStage[species] !== '');
 
-      setDisableNextButton(!biomassTotalValue || !coverCrop || coverCrop.length === 0 || !allStagesSelected);
+      setDisableNextButton((isSatelliteMode && !biomassTotalValue) || !coverCrop || coverCrop.length === 0 || !allStagesSelected);
     } else {
       setDisableNextButton(!biomass || coverCrop.length === 0 || !coverCropTerminationDate || !lwc);
     }
@@ -247,9 +247,12 @@ const CoverCropFirst = () => {
         <NavigateBar
           next="next"
           nextOnClick={() => {
-            if (isSatelliteMode || isPM3DMode) {
+            if (isSatelliteMode) {
               dispatch(set.activeStep(5));
               navigate('/sidedress')
+            } else if (isPM3DMode) {
+              dispatch(set.activeStep(5));
+              navigate('/fertilizer')
             }
             else navigate('/covercrop2')
           }}
