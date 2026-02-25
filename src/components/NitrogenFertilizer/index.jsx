@@ -23,7 +23,7 @@ const CustomInputText = styled(Typography)({
   fontSize: '1.2rem',
   fontWeight: 400,
   color: '#4f6b14',
-  marginTop: '1.3rem',
+  marginTop: '0.5rem',
   marginBottom: '0.2rem',
 });
 
@@ -189,6 +189,14 @@ const NitrogenFertilizer = () => {
     fileInputRef.current.click();
   };
 
+  const MainContentBox = styled(Box)({
+    width: '100%',
+    maxWidth: '600px',
+    minHeight: '450px',
+    display: 'flex',
+    flexDirection: 'column',
+  });
+
   return (
     <Grid container justifyContent="center">
       <Grid
@@ -207,46 +215,44 @@ const NitrogenFertilizer = () => {
           alignItems: 'center',
         }}
       >
-        <Typography variant="h4">Tell us about your Fertilizer</Typography>
+        <Typography variant="h4" gutterBottom>Tell us about your Fertilizer</Typography>
+
         {error && (
-        <Box sx={{ marginBottom: '1rem' }}>
-          <Alert severity="error">{error}</Alert>
-        </Box>
+        <Alert severity="error" sx={{ width: '100%', mb: 2 }}>{error}</Alert>
         )}
-        <Box m={2}>
-          <PSARadioButton
-            options={[
-              { label: 'Liquid Fertilizer', value: 'liquid' },
-              { label: 'Granular Fertilizer', value: 'granular' },
-            ]}
-            selectedValue={fertilizerType}
-            onChange={(value) => setFertilizerType(value)}
-            row
-            sx={{ marginLeft: '1em', display: 'inline-block' }}
-            aria-label="position"
-            name="position"
-          />
+
+        <MainContentBox>
+          <Box sx={{ mb: 2 }}>
+            <PSARadioButton
+              options={[
+                { label: 'Liquid Fertilizer', value: 'liquid' },
+                { label: 'Granular Fertilizer', value: 'granular' },
+              ]}
+              selectedValue={fertilizerType}
+              onChange={(value) => setFertilizerType(value)}
+              row
+            />
+          </Box>
 
           {fertilizerType === 'granular' && (
-            <>
-              <CustomInputText>Select a granular fertilizer:</CustomInputText>
-              <Autocomplete
-                options={['Urea', 'Other']}
-                value={granularFertilizer}
-                onChange={(e, val) => {
-                  setGranularFertilizer(val);
-                  if (val !== 'Other') {
-                    setOtherGranularFertilizerName(null);
-                    setOtherGranularFertilizerNPercentage(null);
-                  }
-                }}
-                renderInput={(params) => <PSATextField {...params} label="" placeholder="Select a granular fertilizer" />}
-              />
-            </>
-          )}
+          <>
+            {/* <CustomInputText>Select a granular fertilizer:</CustomInputText> */}
+            <Autocomplete
+              fullWidth
+              options={['Urea', 'Other']}
+              value={granularFertilizer}
+              onChange={(e, val) => {
+                setGranularFertilizer(val);
+                if (val !== 'Other') {
+                  setOtherGranularFertilizerName(null);
+                  setOtherGranularFertilizerNPercentage(null);
+                }
+              }}
+              renderInput={(params) => <PSATextField {...params} label="Granular Fertilizer" placeholder="Select a granular fertilizer" />}
+            />
 
-          {granularFertilizer && granularFertilizer === 'Other' && (
-            <Stack direction={{ xs: 'column', md: 'row' }} mt={2}>
+            {granularFertilizer && granularFertilizer === 'Other' && (
+            <Stack direction={{ xs: 'column', md: 'row' }} spacing={{ xs: 3, md: 2 }} mt={3}>
               <PSATextField
                 fullWidth
                 label="Fertilizer Name"
@@ -269,29 +275,30 @@ const NitrogenFertilizer = () => {
                 }}
               />
             </Stack>
+            )}
+          </>
           )}
 
           {fertilizerType === 'liquid' && (
-            <>
-              <CustomInputText>Select a liquid fertilizer:</CustomInputText>
-              <Autocomplete
-                options={['UAN 28%', 'UAN 30%', 'UAN 32%', 'Other']}
-                value={liquidFertilizer}
-                onChange={(e, val) => {
-                  setLiquidFertilizer(val);
-                  if (val !== 'Other') {
-                    setOtherLiquidFertilizerName(null);
-                    setOtherLiquidFertilizerDensity(null);
-                    setOtherLiquidFertilizerNPercentage(null);
-                  }
-                }}
-                renderInput={(params) => <PSATextField {...params} label="" placeholder="Select a liquid fertilizer" />}
-              />
-            </>
-          )}
+          <>
+            {/* <CustomInputText>Select a liquid fertilizer:</CustomInputText> */}
+            <Autocomplete
+              fullWidth
+              options={['UAN 28%', 'UAN 30%', 'UAN 32%', 'Other']}
+              value={liquidFertilizer}
+              onChange={(e, val) => {
+                setLiquidFertilizer(val);
+                if (val !== 'Other') {
+                  setOtherLiquidFertilizerName(null);
+                  setOtherLiquidFertilizerDensity(null);
+                  setOtherLiquidFertilizerNPercentage(null);
+                }
+              }}
+              renderInput={(params) => <PSATextField {...params} label="Liquid Fertilizer" placeholder="Select a liquid fertilizer" />}
+            />
 
-          {liquidFertilizer && liquidFertilizer === 'Other' && (
-            <Stack direction={{ xs: 'column', md: 'row' }} mt={2}>
+            {liquidFertilizer && liquidFertilizer === 'Other' && (
+            <Stack direction={{ xs: 'column', md: 'row' }} spacing={{ xs: 3, md: 2 }} mt={3}>
               <PSATextField
                 fullWidth
                 label="Liquid Fertilizer Name"
@@ -321,6 +328,8 @@ const NitrogenFertilizer = () => {
                 }}
               />
             </Stack>
+            )}
+          </>
           )}
 
           {isUserSampledMode && (
@@ -348,22 +357,22 @@ const NitrogenFertilizer = () => {
             </>
           )}
 
-          <PSARadioButton
-            options={[
-              { label: 'Fixed Rate', value: true },
-              { label: 'Variable Rate', value: false },
-            ]}
-            selectedValue={hasFixedNRate}
-            onChange={(value) => dispatch(set.hasFixedNRate(value))}
-            row
-            sx={{ marginLeft: '1em', display: 'inline-block' }}
-            aria-label="position"
-            name="position"
-          />
+          <Box sx={{ borderBottom: '1px solid #eee', my: 3 }} />
 
-          {hasFixedNRate && (
+          <Box sx={{ minHeight: '140px' }}>
+            <PSARadioButton
+              options={[
+                { label: 'Fixed Rate', value: true },
+                { label: 'Variable Rate', value: false },
+              ]}
+              selectedValue={hasFixedNRate}
+              onChange={(value) => dispatch(set.hasFixedNRate(value))}
+              row
+            />
+
+            {hasFixedNRate && (
             <>
-              <Box mt={2} sx={{ display: 'flex', flexDirection: 'row', alignItems: 'center' }}>
+              <Box mt={1}>
                 <Stack direction="row" alignItems="center">
                   <CustomInputText>
                     What is your Target Nitrogen Fertilizer Rate?
@@ -378,46 +387,49 @@ const NitrogenFertilizer = () => {
 
               <Myslider id="targetN" min={0} max={300} />
             </>
-          )}
+            )}
 
-          {!hasFixedNRate && (
-            <Stack spacing={2} direction="column">
-              <Stack justifyContent="space-around" sx={{ flexDirection: { sm: 'column', md: 'column' } }}>
-                <Typography variant="subtitle">
+            {!hasFixedNRate && (
+            <Stack spacing={2} mt={3}>
+              <Stack direction={{ sm: 'column', md: 'row' }} justifyContent="space-between">
+                <Typography variant="body1" sx={{ color: '#666', alignContent: 'center' }}>
                   {' '}
-                  {fileName ? `Selected file: ${fileName}` : 'Select file'}
+                  {fileName ? `Selected file: ${fileName}` : 'No file selected'}
                   {' '}
                 </Typography>
-                <NavButton onClick={handleUploadClick}>Upload</NavButton>
-                <input ref={fileInputRef} type="file" accept=".geojson,.shp,.zip" hidden style={{ display: 'none' }} onChange={handleFileSelect} />
+                <NavButton onClick={handleUploadClick}>Upload Map</NavButton>
+                <input ref={fileInputRef} type="file" accept=".geojson,.shp,.zip" hidden onChange={handleFileSelect} />
               </Stack>
               {properties.length > 0 && (
-                <Autocomplete
-                  options={properties}
-                  value={nitrogenSprayMapProperty}
-                  onChange={(e, val) => dispatch(set.nitrogenSprayMapProperty(val))}
-                  renderInput={(params) => <PSATextField {...params} label="Select a Property name" />}
-                />
+              <Autocomplete
+                options={properties}
+                value={nitrogenSprayMapProperty}
+                onChange={(e, val) => dispatch(set.nitrogenSprayMapProperty(val))}
+                renderInput={(params) => <PSATextField {...params} label="Select a Property name" />}
+              />
               )}
             </Stack>
-          )}
+            )}
+          </Box>
 
-          <Stack direction="row" alignItems="center">
+          <Box sx={{ borderBottom: '1px solid #eee', mt: 4, mb: 2 }} />
+
+          <Box mt={0} sx={{ mt: 'auto' }}>
             <CustomInputText>Side Dress Fertilization Date:</CustomInputText>
             {!cashCropPlantingDate && <Required />}
-          </Stack>
-          <LocalizationProvider dateAdapter={AdapterDayjs}>
-            <DatePicker
-              minDate={dayjs(coverCropTerminationDate).add(7, 'day')}
-              value={dayjs(cashCropPlantingDate)}
-              onChange={(newValue) => {
-                dispatch(set.cashCropPlantingDate(newValue.format('YYYY-MM-DD')));
-                return null;
-              }}
-              shouldDisableDate={(date) => date.isBefore(dayjs(coverCropTerminationDate), 'day')}
-            />
-          </LocalizationProvider>
-        </Box>
+            <LocalizationProvider dateAdapter={AdapterDayjs}>
+              <DatePicker
+                minDate={dayjs(coverCropTerminationDate).add(7, 'day')}
+                value={dayjs(cashCropPlantingDate)}
+                onChange={(newValue) => {
+                  dispatch(set.cashCropPlantingDate(newValue.format('YYYY-MM-DD')));
+                  return null;
+                }}
+                shouldDisableDate={(date) => date.isBefore(dayjs(coverCropTerminationDate), 'day')}
+              />
+            </LocalizationProvider>
+          </Box>
+        </MainContentBox>
 
         <NavigateBar
           next="next"

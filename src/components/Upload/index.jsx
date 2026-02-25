@@ -324,6 +324,7 @@ const Upload = () => {
               placeholder="Choose biomass file..."
             />
           )}
+          sx={{ mt: 2 }}
         />
         )}
 
