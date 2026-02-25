@@ -11,13 +11,15 @@ import { DatePicker, LocalizationProvider } from '@mui/x-date-pickers';
 import dayjs from 'dayjs';
 import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
 import shpjs from 'shpjs';
+import axios from 'axios';
+import { useAuth0 } from '@auth0/auth0-react';
 import { get, set } from '../../store/Store';
 import Myslider from '../../shared/Slider';
 import Help from '../../shared/Help';
 import Required from '../../shared/Required';
-import { useFetchCropNames } from '../../hooks/useFetchStatic';
 import NavigateBar from '../../shared/Navigate';
 import NavButton from '../../shared/Navigate/NavButton';
+import { ncalcApiUrl } from '../../utils/keys';
 
 const CustomInputText = styled(Typography)({
   fontSize: '1.2rem',
@@ -27,26 +29,37 @@ const CustomInputText = styled(Typography)({
   marginBottom: '0.2rem',
 });
 
-const UAN_DATA = {
-  'UAN 28%': { n: 0.28, density: 10.67 },
-  'UAN 30%': { n: 0.3, density: 10.86 },
-  'UAN 32%': { n: 0.32, density: 11.08 },
-};
+const MainContentBox = styled(Box)({
+  width: '100%',
+  maxWidth: '600px',
+  minHeight: '450px',
+  display: 'flex',
+  flexDirection: 'column',
+});
+
+// const UAN_DATA = {
+//   'UAN 28%': { n: 0.28, density: 10.67 },
+//   'UAN 30%': { n: 0.3, density: 10.86 },
+//   'UAN 32%': { n: 0.32, density: 11.08 },
+// };
 
 const CONVERSION_FACTOR = 1.12085; // lb n/acre -> kg n/ha
 
+const API_BASE_URL = ncalcApiUrl;
+
 const NitrogenFertilizer = () => {
+  const {
+    isAuthenticated, getAccessTokenSilently,
+  } = useAuth0();
   const navigate = useNavigate();
   const dispatch = useDispatch();
-  const isSatelliteMode = useSelector(get.biomassCalcMode) === 'satellite';
-  const isPM3DMode = useSelector(get.biomassCalcMode) === 'pm3d';
-  const isUserSampledMode = useSelector(get.biomassCalcMode) === 'sampled';
   //   const unit = useSelector(get.unit);
-  const cashCrop = useSelector(get.cashCrop);
   const targetN = useSelector(get.targetN);
   const cashCropPlantingDate = useSelector(get.cashCropPlantingDate);
-  const crops = useFetchCropNames();
   const coverCropTerminationDate = useSelector(get.coverCropTerminationDate);
+
+  const [isFetching, setIsFetching] = useState(false);
+  const [fertilizers, setFertilizers] = useState([]);
 
   const [fertilizerType, setFertilizerType] = useState('liquid');
   const [granularFertilizer, setGranularFertilizer] = useState(null);
@@ -66,12 +79,27 @@ const NitrogenFertilizer = () => {
   const [properties, setProperties] = useState([]);
   const nitrogenSprayMapProperty = useSelector(get.nitrogenSprayMapProperty);
 
-  //   const multiplier = useSelector(get.multiplier);
+  const granularOptions = !isFetching
+    ? [...fertilizers.filter((f) => f.type === 'granular').map((f) => f.name), 'Other']
+    : [];
+
+  const liquidOptions = !isFetching
+    ? [...fertilizers.filter((f) => f.type === 'liquid').map((f) => f.name), 'Other']
+    : [];
+
+  const granularExists = fertilizerType === 'granular' &&
+  fertilizers.some((f) => f.type === 'granular' &&
+    f.name.toLowerCase() === otherGranularFertilizerName?.toLowerCase().trim());
+
+  const liquidExists = fertilizerType === 'liquid' &&
+  fertilizers.some((f) => f.type === 'liquid' &&
+    f.name.toLowerCase() === otherLiquidFertilizerName?.toLowerCase().trim());
 
   const matchesMd = useMediaQuery((theme) => theme.breakpoints.down('md'));
 
   const isNextDisabled = (() => {
     if (!cashCropPlantingDate) return true;
+    if (granularExists || liquidExists) return true;
 
     // Fertilizer specific requirements
     if (fertilizerType === 'granular') {
@@ -84,7 +112,7 @@ const NitrogenFertilizer = () => {
     }
 
     // Rate specific requirements
-    if (hasFixedNRate) {
+    if (hasFixedNRate === 'fixed') {
       if (!targetN || targetN <= 0) return true;
     } else if (!nitrogenSprayMap || !nitrogenSprayMapProperty) return true;
 
@@ -99,25 +127,50 @@ const NitrogenFertilizer = () => {
   });
 
   useEffect(() => {
+    const fetchFertilizers = async () => {
+      try {
+        setIsFetching(true);
+        const token = await getAccessTokenSilently();
+        const response = await axios.get(`${API_BASE_URL}/fertilizers`, {
+          headers: { Authorization: `Bearer ${token}` },
+        });
+        setFertilizers(response.data?.data || []);
+      } catch (e) {
+        // console.error('Failed to load options', e);
+        setFertilizers([]);
+      } finally {
+        setIsFetching(false);
+      }
+    };
+
+    if (isAuthenticated) {
+      fetchFertilizers();
+    }
+  }, [isAuthenticated, getAccessTokenSilently]);
+
+  useEffect(() => {
     let newMultiplier = 1;
 
     if (fertilizerType === 'granular') {
-      const nPercent = granularFertilizer === 'Urea' ? 0.46 : parseFloat(otherGranularFertilizerNPercentage) / 100 || 0;
+      const selected = fertilizers.find((f) => f.name === granularFertilizer);
+      const nPercent = granularFertilizer === 'Other' ? parseFloat(otherGranularFertilizerNPercentage) / 100 || 0 : (selected?.n_percent || 0) / 100;
 
       newMultiplier = CONVERSION_FACTOR * nPercent;
     } else if (fertilizerType === 'liquid') {
+      const selected = fertilizers.find((f) => f.name === liquidFertilizer);
+
       let nPercent = 0;
-      let lbsPerGal = 0;
+      let density = 0;
 
       if (liquidFertilizer === 'Other') {
         nPercent = parseFloat(otherLiquidFertilizerNPercentage) / 100 || 0;
-        lbsPerGal = parseFloat(otherLiquidFertilizerDensity) || 0;
-      } else if (UAN_DATA[liquidFertilizer]) {
-        nPercent = UAN_DATA[liquidFertilizer].n;
-        lbsPerGal = UAN_DATA[liquidFertilizer].density;
+        density = parseFloat(otherLiquidFertilizerDensity) || 0;
+      } else {
+        nPercent = (selected?.n_percent || 0) / 100;
+        density = selected?.density || 0;
       }
 
-      newMultiplier = lbsPerGal * nPercent * CONVERSION_FACTOR;
+      newMultiplier = density * nPercent * CONVERSION_FACTOR;
     }
 
     dispatch(set.multiplier(newMultiplier));
@@ -128,6 +181,7 @@ const NitrogenFertilizer = () => {
     otherLiquidFertilizerNPercentage,
     otherLiquidFertilizerDensity,
     otherGranularFertilizerNPercentage,
+    fertilizers,
     dispatch,
   ]);
 
@@ -189,13 +243,34 @@ const NitrogenFertilizer = () => {
     fileInputRef.current.click();
   };
 
-  const MainContentBox = styled(Box)({
-    width: '100%',
-    maxWidth: '600px',
-    minHeight: '450px',
-    display: 'flex',
-    flexDirection: 'column',
-  });
+  const saveCustomFertilizer = async () => {
+    // Only proceed if 'Other' is selected
+    const isOtherGranular = fertilizerType === 'granular' && granularFertilizer === 'Other';
+    const isOtherLiquid = fertilizerType === 'liquid' && liquidFertilizer === 'Other';
+
+    if (!isOtherGranular && !isOtherLiquid) return;
+
+    try {
+      const token = await getAccessTokenSilently();
+
+      const payload = fertilizerType === 'granular'
+        ? {
+          type: 'granular',
+          name: otherGranularFertilizerName,
+          n_percent: parseFloat(otherGranularFertilizerNPercentage),
+        }
+        : {
+          type: 'liquid',
+          name: otherLiquidFertilizerName,
+          n_percent: parseFloat(otherLiquidFertilizerNPercentage),
+          density: parseFloat(otherLiquidFertilizerDensity),
+        };
+
+      axios.post(`${API_BASE_URL}/fertilizers`, payload, {
+        headers: { Authorization: `Bearer ${token}` },
+      });
+    } catch (err) { /* empty */ }
+  };
 
   return (
     <Grid container justifyContent="center">
@@ -239,7 +314,8 @@ const NitrogenFertilizer = () => {
             {/* <CustomInputText>Select a granular fertilizer:</CustomInputText> */}
             <Autocomplete
               fullWidth
-              options={['Urea', 'Other']}
+              loading={isFetching}
+              options={granularOptions}
               value={granularFertilizer}
               onChange={(e, val) => {
                 setGranularFertilizer(val);
@@ -257,6 +333,8 @@ const NitrogenFertilizer = () => {
                 fullWidth
                 label="Fertilizer Name"
                 value={otherGranularFertilizerName || ''}
+                error={granularExists}
+                helperText={granularExists ? 'This fertilizer already exists in the list.' : ''}
                 onChange={(e) => setOtherGranularFertilizerName(e.target.value)}
               />
               <PSATextField
@@ -284,7 +362,8 @@ const NitrogenFertilizer = () => {
             {/* <CustomInputText>Select a liquid fertilizer:</CustomInputText> */}
             <Autocomplete
               fullWidth
-              options={['UAN 28%', 'UAN 30%', 'UAN 32%', 'Other']}
+              loading={isFetching}
+              options={liquidOptions}
               value={liquidFertilizer}
               onChange={(e, val) => {
                 setLiquidFertilizer(val);
@@ -303,6 +382,8 @@ const NitrogenFertilizer = () => {
                 fullWidth
                 label="Liquid Fertilizer Name"
                 value={otherLiquidFertilizerName || ''}
+                error={liquidExists}
+                helperText={liquidExists ? 'This fertilizer already exists in the list.' : ''}
                 onChange={(e) => setOtherLiquidFertilizerName(e.target.value)}
               />
               <PSATextField
@@ -332,45 +413,20 @@ const NitrogenFertilizer = () => {
           </>
           )}
 
-          {isUserSampledMode && (
-            <>
-              <Stack direction="row" alignItems="center">
-                <CustomInputText>Cash Crop: </CustomInputText>
-                {!cashCrop && <Required />}
-              </Stack>
-              {crops && (
-                <Autocomplete
-                  placeholder="Start typing your crop, then select from the list"
-                  disablePortal
-                  id="combo-box-demo"
-                  autoFocus
-                  options={[...crops]}
-                  sx={{ width: '100%' }}
-                  // defaultValue={coverCrop ? coverCrop : ''}
-                  value={cashCrop}
-                  renderInput={(params) => <PSATextField {...params} placeholder="Select a cash crop" />}
-                  onChange={(el, va) => {
-                    dispatch(set.cashCrop(va));
-                  }}
-                />
-              )}
-            </>
-          )}
-
           <Box sx={{ borderBottom: '1px solid #eee', my: 3 }} />
 
           <Box sx={{ minHeight: '140px' }}>
             <PSARadioButton
               options={[
-                { label: 'Fixed Rate', value: true },
-                { label: 'Variable Rate', value: false },
+                { label: 'Fixed Rate', value: 'fixed' },
+                { label: 'Variable Rate', value: 'variable' },
               ]}
               selectedValue={hasFixedNRate}
               onChange={(value) => dispatch(set.hasFixedNRate(value))}
               row
             />
 
-            {hasFixedNRate && (
+            {hasFixedNRate === 'fixed' && (
             <>
               <Box mt={1}>
                 <Stack direction="row" alignItems="center">
@@ -389,7 +445,7 @@ const NitrogenFertilizer = () => {
             </>
             )}
 
-            {!hasFixedNRate && (
+            {hasFixedNRate === 'variable' && (
             <Stack spacing={2} mt={3}>
               <Stack direction={{ sm: 'column', md: 'row' }} justifyContent="space-between">
                 <Typography variant="body1" sx={{ color: '#666', alignContent: 'center' }}>
@@ -434,19 +490,15 @@ const NitrogenFertilizer = () => {
         <NavigateBar
           next="next"
           nextOnClick={() => {
+            saveCustomFertilizer();
             dispatch(set.activeStep(6));
             navigate('/output');
           }}
           nextDisabled={isNextDisabled}
           back="back"
           backOnClick={() => {
-            if (isSatelliteMode || isPM3DMode) {
-              dispatch(set.activeStep(4));
-              navigate('/covercrop');
-            } else {
-              dispatch(set.activeStep(4));
-              navigate('/covercrop2');
-            }
+            dispatch(set.activeStep(4));
+            navigate('/covercrop');
           }}
         />
       </Grid>

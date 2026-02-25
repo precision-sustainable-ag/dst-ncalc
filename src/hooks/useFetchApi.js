@@ -295,9 +295,9 @@ const fetchPrescription = async (
       start: coverCropTerminationDate,
       end: cashCropPlantingDate,
       multiplier,
-      has_fixed_rate: hasFixedNRate,
-      ...(hasFixedNRate && { target_n: targetN }),
-      ...(!hasFixedNRate && {
+      has_fixed_rate: hasFixedNRate === 'fixed',
+      ...(hasFixedNRate === 'fixed' && { target_n: targetN }),
+      ...((hasFixedNRate === 'variable') && {
         feature_collection: nitrogenSprayMap,
         property_key: nitrogenSprayMapProperty,
       }),
@@ -494,7 +494,7 @@ const useFetchPlantFactors = () => {
       selectedBiomassFile
       && selectedBiomassFile.points
       && selectedField.geometry
-      && ((!hasFixedNRate && nitrogenSprayMap && nitrogenSprayMapProperty) || (hasFixedNRate && targetN > 0))
+      && ((hasFixedNRate === 'variable' && nitrogenSprayMap && nitrogenSprayMapProperty) || (hasFixedNRate === 'fixed' && targetN > 0))
       && coverCrop
       && plantGrowthStages
       && coverCropTerminationDate
