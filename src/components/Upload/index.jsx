@@ -1,14 +1,10 @@
+/* eslint-disable no-console */
 /* eslint-disable react-hooks/exhaustive-deps */
-import React, {
-  useEffect, useMemo, useRef, useState,
-} from 'react';
+import React, { useEffect, useState } from 'react';
 import { useAuth0 } from '@auth0/auth0-react';
 import { useDispatch, useSelector } from 'react-redux';
 import {
-  Alert,
-  Autocomplete,
-  Box, CircularProgress, Grid, Stack, Typography,
-  useMediaQuery,
+  Alert, Autocomplete, Box, Grid, Stack, Typography, useMediaQuery,
 } from '@mui/material';
 import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
@@ -18,20 +14,16 @@ import centroid from '@turf/centroid';
 import { get, set } from '../../store/Store';
 import NavigateBar from '../../shared/Navigate';
 import { ncalcApiUrl } from '../../utils/keys';
+import FieldDropdown from '../../shared/FieldDropdown/FieldDropdown';
 
 const API_BASE_URL = ncalcApiUrl;
 
 const Upload = () => {
-  const {
-    user, isAuthenticated, isLoading, getAccessTokenSilently,
-  } = useAuth0();
+  const { isAuthenticated, getAccessTokenSilently } = useAuth0();
 
   const dispatch = useDispatch();
   const matchesMd = useMediaQuery((theme) => theme.breakpoints.down('md'));
-  const [fieldOptions, setFieldOptions] = useState([]);
-  const [isFetching, setIsFetching] = useState(null);
-  // const [filterProgram, setFilterProgram] = useState(null);
-  // const [filterGrower, setFilterGrower] = useState(null);
+  const [isFetchingBiomass, setIsFetchingBiomass] = useState(null);
   const selectedField = useSelector(get.selectedField);
   const [biomassFiles, setBiomassFiles] = useState([]);
   const selectedBiomassFile = useSelector(get.selectedBiomassFile);
@@ -109,17 +101,15 @@ const Upload = () => {
     }
   };
 
-  // const filteredFieldList = useMemo(() => fieldOptions.filter((f) => {
-  //   const pName = f.properties.programName;
-  //   const gName = f.properties.growerName;
-
-  //   const matchProgram = !filterProgram || (pName && pName.toLowerCase() === filterProgram.toLowerCase());
-  //   const matchGrower = !filterGrower || (gName && gName.toLowerCase() === filterGrower.toLowerCase());
-
-  //   return matchProgram && matchGrower;
-  // }), [fieldOptions, filterProgram, filterGrower]);
-
   useEffect(() => {
+    dispatch(set.selectedBiomassFile(null));
+    if (!selectedField) {
+      dispatch(set.coverCrop([]));
+      dispatch(set.coverCropPlantingDate(null));
+      dispatch(set.coverCropTerminationDate(null));
+      return;
+    }
+
     if (selectedField && selectedField.properties?.coverCrop) {
       dispatch(set.coverCrop(selectedField.properties.coverCrop));
     }
@@ -150,36 +140,14 @@ const Upload = () => {
     }
   }, [selectedField]);
 
-  // Fetch All Fields
-  useEffect(() => {
-    const fetchFields = async () => {
-      try {
-        setIsFetching(true);
-        const token = await getAccessTokenSilently();
-        const response = await axios.get(`${API_BASE_URL}/fields-identifiers`, {
-          headers: { Authorization: `Bearer ${token}` },
-        });
-        setFieldOptions(response.data);
-      } catch (e) {
-        console.error('Failed to load options', e);
-      } finally {
-        setIsFetching(false);
-      }
-    };
-
-    if (isAuthenticated) {
-      fetchFields();
-    }
-  }, [isAuthenticated, getAccessTokenSilently]);
-
   // Fetch Biomass Files for selected field
   useEffect(() => {
     const fetchBiomassFiles = async () => {
       try {
         if (!selectedField) return;
-        setIsFetching(true);
+        setIsFetchingBiomass(true);
         const token = await getAccessTokenSilently();
-        const fieldId = selectedField?._id;
+        const { _id: fieldId } = selectedField;
         if (!fieldId) return;
         const response = await axios.get(`${API_BASE_URL}/biomass/field/${fieldId}`, {
           headers: { Authorization: `Bearer ${token}` },
@@ -189,7 +157,7 @@ const Upload = () => {
         console.error('Failed to load options', e);
         setBiomassFiles([]);
       } finally {
-        setIsFetching(false);
+        setIsFetchingBiomass(false);
       }
     };
 
@@ -228,123 +196,73 @@ const Upload = () => {
         }}
       >
         <Stack spacing={2} direction="column">
-          <Box>
-            <Typography variant="h4" align="center">Select your field</Typography>
-          </Box>
-        </Stack>
-        <Box sx={{ height: '2rem' }} />
+          <Typography variant="h4" align="center">Select your field</Typography>
 
-        <Autocomplete
-          loading={isFetching}
-          loadingText="Loading fields..."
-          options={fieldOptions}
-          value={selectedField}
-          // key={`${filterProgram}-${filterGrower}`}
-          onChange={(event, newValue) => {
-            dispatch(set.selectedField(newValue));
-            dispatch(set.selectedBiomassFile(null));
-          }}
-          getOptionLabel={(option) => {
-            const p = option.properties;
-            return `${p.programName} / ${p.growerName} / ${p.farmName} / ${p.fieldName}`;
-          }}
-          renderOption={(props, option) => (
-            <Box component="li" {...props}>
-              <Stack>
-                <Typography variant="subtitle1" sx={{ fontWeight: 'bold' }}>
-                  {option.properties.fieldName}
-                </Typography>
-                <Typography variant="caption" color="textSecondary">
-                  {option.properties.programName}
-                  {' - '}
-                  {option.properties.growerName}
-                  {' - '}
-                  {option.properties.farmName}
-                  {/* {' - '}
-                  {option.properties.season} */}
-                </Typography>
-              </Stack>
-            </Box>
-          )}
-          renderInput={(params) => (
-            <PSATextField
-              {...params}
-              label="Select Field (Program / Grower / Farm / Field)"
-              placeholder="Type to search..."
-              InputProps={{
-                ...params.InputProps,
-                endAdornment: (
-                  <>
-                    {isFetching ? <CircularProgress color="inherit" size={20} /> : null}
-                    {params.InputProps.endAdornment}
-                  </>
-                ),
-              }}
-            />
-          )}
-        />
+          <FieldDropdown />
 
-        {selectedField && (
-        <Autocomplete
-          loading={isFetching}
-          loadingText="Loading biomass files..."
-          options={biomassFiles}
-          value={selectedBiomassFile}
-          // key={`${filterProgram}-${filterGrower}`}
-          onChange={(event, newValue) => {
-            dispatch(set.selectedBiomassFile(newValue));
-          }}
-          getOptionLabel={(option) => (option?.createdAt ? `${dayjs(option.createdAt).format('MMM D, YYYY')} (${option.points?.length || 0} points)` : '')}
-          renderOption={(props, option) => (
-            <Box component="li" {...props}>
-              <Stack>
-                <Typography variant="subtitle1" sx={{ fontWeight: 'bold' }}>
-                  {dayjs(option.createdAt).format('MMM D, YYYY')}
-                </Typography>
-                <Stack direction="row" spacing={2}>
-                  <Typography variant="body2" color="text.secondary">
-                    Time:
-                    {' '}
-                    <b>{dayjs(option.createdAt).format('h:mm A')}</b>
+          {selectedField && (
+          <Autocomplete
+            loading={isFetchingBiomass}
+            loadingText="Loading biomass files..."
+            options={biomassFiles}
+            value={selectedBiomassFile}
+            onChange={(event, newValue) => {
+              dispatch(set.selectedBiomassFile(newValue));
+            }}
+            getOptionLabel={(option) => (option?.createdAt
+              ? `${dayjs(option.createdAt).format('MMM D, YYYY')} (${option.points?.length || 0} points)` : '')}
+            renderOption={(props, option) => (
+              <Box component="li" {...props}>
+                <Stack>
+                  <Typography variant="subtitle1" sx={{ fontWeight: 'bold' }}>
+                    {dayjs(option.createdAt).format('MMM D, YYYY')}
                   </Typography>
+                  <Stack direction="row" spacing={2}>
+                    <Typography variant="body2" color="text.secondary">
+                      Time:
+                      {' '}
+                      <b>{dayjs(option.createdAt).format('h:mm A')}</b>
+                    </Typography>
 
-                  <Typography variant="body2" color="text.secondary">
-                    Points:
-                    {' '}
-                    <b>{option.points?.length || 0}</b>
-                  </Typography>
+                    <Typography variant="body2" color="text.secondary">
+                      Points:
+                      {' '}
+                      <b>{option.points?.length || 0}</b>
+                    </Typography>
+                  </Stack>
                 </Stack>
-              </Stack>
-            </Box>
+              </Box>
+            )}
+            renderInput={(params) => (
+              <PSATextField
+                {...params}
+                label="Select biomass file"
+                placeholder="Choose biomass file..."
+              />
+            )}
+            sx={{ mt: 2 }}
+          />
           )}
-          renderInput={(params) => (
-            <PSATextField
-              {...params}
-              label="Select biomass file"
-              placeholder="Choose biomass file..."
-            />
-          )}
-          sx={{ mt: 2 }}
-        />
-        )}
 
-        {error && (
+          {error && (
           <Box sx={{ marginBottom: '1rem' }}>
             <Alert severity="error">{error}</Alert>
           </Box>
-        )}
+          )}
 
-        {biomassPoints && (
-          <Box sx={{ marginBottom: '1rem' }}>
-            <Alert severity="success">
-              Successfully loaded
-              {' '}
-              {biomassPoints.length}
-              {' '}
-              data points.
-            </Alert>
-          </Box>
-        )}
+          {biomassPoints && (
+            <Box sx={{ marginBottom: '1rem' }}>
+              <Alert severity="success">
+                Successfully loaded
+                {' '}
+                {biomassPoints.length}
+                {' '}
+                data points.
+              </Alert>
+            </Box>
+          )}
+        </Stack>
+
         <Box sx={{ height: '1rem' }} />
         <NavigateBar
           next="Next"

@@ -6,12 +6,14 @@ import {
   Card,
   CardContent,
   Typography,
-  Grid
+  Grid,
 } from '@mui/material';
-import Map from '../../../shared/Map/NitrogenMap';
 import { PSALoadingSpinner, PSARadioButton } from 'shared-react-components/src';
-import { useSelector } from 'react-redux';
+import { useDispatch, useSelector } from 'react-redux';
+import Map from '../../../shared/Map/NitrogenMap';
 import { get } from '../../../store/redux-autosetters';
+import NavButton from '../../../shared/Navigate/NavButton';
+import { downloadPrescriptionShapefile } from '../../../hooks/useFetchApi';
 
 /// /// /// STYLES /// /// ///
 const CardStyles = {
@@ -32,9 +34,16 @@ const cardContentStyles = {
 
 /// /// /// RETURN JSX /// /// ///
 const NitrogenMapWidget = ({ refVal }) => {
+  const dispatch = useDispatch();
+  const isPM3DMode = useSelector(get.biomassCalcMode) === 'pm3d';
   const nitrogenFetchIsLoading = useSelector(get.nitrogenFetchIsLoading);
+  const nitrogenTaskResults = useSelector(get.nitrogenTaskResults);
   const [layer, setLayer] = useState('reqN');
-  
+
+  const handleDownloadClick = () => {
+    downloadPrescriptionShapefile(nitrogenTaskResults?.reqN, dispatch);
+  };
+
   return (
     <Card sx={CardStyles} elevation={8} ref={refVal}>
       <CardContent sx={cardContentStyles}>
@@ -63,24 +72,43 @@ const NitrogenMapWidget = ({ refVal }) => {
           </Typography>
         </Box>
         )}
-        <Box sx={{ height: '90%', width: '100%', marginBottom: 5 }}>
+        <Box sx={{ height: '90%', width: '100%', marginBottom: 2 }}>
           <Map variant="nitrogen" nitrogenLayer={layer} />
         </Box>
 
-        <PSARadioButton
-          options={[
-            { label: 'Required Nitrogen Map', value: 'reqN' },
-            { label: 'Current Nitrogen Map', value: 'minN' },
-          ]}
-          selectedValue={layer}
-          onChange={(value) => setLayer(value)}
-          row
-          sx={{ marginLeft: '1em' }}
-          aria-label="position"
-          name="position"
-        />
+        <Box sx={{
+          width: '100%',
+          p: 2,
+          bgcolor: '#f9f9f9',
+          borderRadius: 3,
+          display: 'flex',
+          flexDirection: 'column',
+          alignItems: 'center',
+          gap: 2,
+        }}
+        >
+          <PSARadioButton
+            options={[
+              { label: 'Prescription Map', value: 'reqN' },
+              { label: 'Nitrogen Credit Map', value: 'minN' },
+            ]}
+            selectedValue={layer}
+            onChange={(value) => setLayer(value)}
+            row
+          />
+          {isPM3DMode && (
+          <NavButton
+            onClick={handleDownloadClick}
+            disabled={!nitrogenTaskResults?.reqN || nitrogenFetchIsLoading}
+            sx={{ mt: 2 }}
+          >
+            Download Prescription
+          </NavButton>
+          )}
+        </Box>
       </CardContent>
     </Card>
-  );}
+  );
+};
 
 export default NitrogenMapWidget;

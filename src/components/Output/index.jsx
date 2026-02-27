@@ -20,6 +20,7 @@ const Output = () => {
   const coverCropTerminationDate = useSelector(get.coverCropTerminationDate);
   const biomass = useSelector(get.biomass);
   const residueC = useSelector(get.residueC);
+  const N = useSelector(get.N);
   const carb = useSelector(get.carb);
   const cell = useSelector(get.cell);
   const lign = useSelector(get.lign);
@@ -40,6 +41,7 @@ const Output = () => {
     tempSummaryData.Carbohydrates.value = String(carb).concat(' %');
     tempSummaryData['Holo-cellulose'].value = String(cell).concat(' %');
     tempSummaryData.Lignin.value = String(lign).concat(' %');
+    tempSummaryData.Nitrogen.value = String(N).concat(' %');
     setSummaryData({ ...tempSummaryData });
   }, [field, biomass]);
 

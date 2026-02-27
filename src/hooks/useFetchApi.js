@@ -67,6 +67,7 @@ const useFetchModel = ({
   const end = moment(cashCropPlantingDate).add(110, 'days').add(1, 'hour').format('yyyy-MM-DD');
 
   useEffect(() => {
+    if (!N || !biomass) return;
     const validity = start !== 'Invalid date' && end !== 'Invalid date' && moment(end) > moment(start);
     setIsDatesValid(validity);
     if (!validity) {
@@ -341,7 +342,18 @@ const fetchPrescription = async (
       dispatch(set.biomassGeojson(biomassGeojson));
       dispatch(set.nitrogenTaskResults({ minN: geojsonData, reqN: reqnGeojson }));
 
-      if (response.data?.n > 0) dispatch(set.N(response.data.n.toFixed(2)));
+      const fieldSummary = response.data?.field_summary;
+      const biomassVal = fieldSummary?.avg_biomass ?? 0;
+      const nVal = fieldSummary?.avg_n ?? 0;
+      const carbVal = fieldSummary?.avg_carb ?? 0;
+      const cellVal = fieldSummary?.avg_cell ?? 0;
+      const lignVal = fieldSummary?.avg_lign ?? 0;
+
+      dispatch(set.biomass(Number(biomassVal.toFixed(2))));
+      dispatch(set.N(Number(nVal.toFixed(2))));
+      dispatch(set.carb(Number(carbVal.toFixed(2))));
+      dispatch(set.cell(Number(cellVal.toFixed(2))));
+      dispatch(set.lign(Number(lignVal.toFixed(2))));
     } else {
       dispatch(set.nitrogenFetchIsFailed(true));
     }
@@ -354,6 +366,45 @@ const fetchPrescription = async (
   }
 };
 
+const prepareExportData = (reqnGeojson) => {
+  if (!reqnGeojson || !reqnGeojson.features) return null;
+
+  const exportedFeatures = reqnGeojson.features.map((feature) => ({
+    type: 'Feature',
+    geometry: feature.geometry,
+    properties: {
+      RATE: feature.properties.value ?? 0,
+    },
+  }));
+
+  return {
+    type: 'FeatureCollection',
+    features: exportedFeatures,
+  };
+};
+
+const downloadPrescriptionShapefile = async (reqnGeojson, dispatch) => {
+  const filteredData = prepareExportData(reqnGeojson);
+  if (!filteredData) {
+    dispatch(set.user.alertMessage('No prescription data available for download.'));
+    dispatch(set.user.showAlert(true));
+    return;
+  }
+
+  try {
+    const response = await axios.post(`${PLANTFACTORS_API_URL}/export-shapefile`, { geojson: filteredData }, { responseType: 'blob' });
+    const blob = new Blob([response.data], { type: 'application/zip' });
+    const url = window.URL.createObjectURL(blob);
+    const link = document.createElement('a');
+    link.href = url;
+    link.setAttribute('download', 'prescription_rate.zip');
+    document.body.appendChild(link);
+    link.click();
+    link.remove();
+  } catch (error) {
+    console.error('Export failed:', error);
+  }
+};
 /// Desc: useFetchPlantFactors
 /// ..............................................................................
 /// ..............................................................................
@@ -571,5 +622,5 @@ const useFetchPlantFactors = () => {
 // }; // useFetchNitrogenArray
 
 export {
-  useFetchModel, useFetchSSURGO, useFetchCornN, useFetchPlantFactors, fetchNitrogenData,
+  useFetchModel, useFetchSSURGO, useFetchCornN, useFetchPlantFactors, fetchNitrogenData, downloadPrescriptionShapefile,
 };
