@@ -205,8 +205,9 @@ const AddField = () => {
 
   const handleSaveField = async () => {
     // Validate form fields
+    // coverCropPlantingDate is temporarily not a required field
     if (!program || !grower || !farm || !field || !cashCrop || !coverCrops || coverCrops.length < 1
-      || !cashCropPlantingDate || !cashCropHarvestingDate || !coverCropPlantingDate || !coverCropTerminationDate) {
+      || !cashCropPlantingDate || !cashCropHarvestingDate || !coverCropTerminationDate) {
       alert('Please fill in all the fields');
       return;
     }
@@ -461,6 +462,9 @@ const AddField = () => {
                     setCoverCropPlantingDate(newValue ? newValue.format('YYYY-MM-DD') : null);
                     return null;
                   }}
+                  slotProps={{
+                    field: { clearable: true, onClear: () => setCoverCropTerminationDate(null) },
+                  }}
                   sx={{ width: '100%' }}
 
                 />
@@ -611,7 +615,7 @@ const AddField = () => {
               variant="contained"
               onClick={handleSaveField}
               disabled={isSaving || !program || !grower || !farm || !field || !cashCrop || !coverCrops || coverCrops.length < 1
-                || !cashCropPlantingDate || !cashCropHarvestingDate || !coverCropPlantingDate || !coverCropTerminationDate
+                || !cashCropPlantingDate || !cashCropHarvestingDate || !coverCropTerminationDate
                 || !features || features.length < 1}
               sx={{
                 minWidth: '150px',
