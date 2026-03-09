@@ -4,17 +4,19 @@ import { createStore } from './redux-autosetters';
 import initialState from './inits';
 
 const afterChange = {
-  N: (state, { payload }) => {
-    if (!state.edited) {
+  N: (state, { payload }, oldValue) => {
+    if (payload === oldValue) return;
+
+    if (!state.edited && state.biomassCalcMode === 'sampled') {
       state.carb = Math.min(100, Math.max(0, (24.7 + 10.5 * payload))).toFixed(0);
       state.cell = Math.min(100, Math.max(0, (69 - 10.2 * payload))).toFixed(0);
       state.lign = 100 - (+state.carb + +state.cell);
     }
     state.model = null;
   },
-  carb: (state, { payload }) => { if (payload !== null) { state.model = null; state.edited = true; }},
-  cell: (state, { payload }) => { if (payload !== null) { state.model = null; state.edited = true; }},
-  lign: (state, { payload }) => { if (payload !== null) { state.model = null; state.edited = true; }},
+  carb: (state, { payload }, oldValue) => { if (payload !== null && oldValue !== payload) { state.model = null; state.edited = true; }},
+  cell: (state, { payload }, oldValue) => { if (payload !== null && oldValue !== payload) { state.model = null; state.edited = true; }},
+  lign: (state, { payload }, oldValue) => { if (payload !== null && oldValue !== payload) { state.model = null; state.edited = true; }},
   lat: (state) => { state.model = null; },
   lon: (state) => { state.model = null; },
   lwc: (state) => { state.model = null; },

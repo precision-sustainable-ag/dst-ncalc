@@ -144,7 +144,7 @@ const initialState = {
   yield: 150,
   residue: 'surface',
   NContent: '',
-  residueC: '30',
+  residueN: '30',
   outputN: 1,
   SSURGO: null,
   updateSSURGO: false,

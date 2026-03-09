@@ -72,6 +72,8 @@ export const createStore = (initialState, { afterChange = {}, reducers = {} }) =
             // eslint-disable-next-line no-restricted-syntax
             for (const k of parents) st = st[k];
 
+            const oldValue = st[key];
+
             if (isArray && Number.isFinite(action.payload.index)) {
               const { index, value } = action.payload;
               st[key][index] = value;
@@ -80,9 +82,9 @@ export const createStore = (initialState, { afterChange = {}, reducers = {} }) =
             }
 
             if (afterChange[fullkey]) {
-              const ac = afterChange[fullkey](state, action);
+              const ac = afterChange[fullkey](state, action, oldValue);
               if (ac) {
-                ac.forEach((parm) => afterChange[parm](state, action));
+                ac.forEach((parm) => afterChange[parm](state, action, oldValue));
               }
             }
 

@@ -38,7 +38,7 @@ const NitrogenMapWidget = ({ refVal }) => {
   const isPM3DMode = useSelector(get.biomassCalcMode) === 'pm3d';
   const nitrogenFetchIsLoading = useSelector(get.nitrogenFetchIsLoading);
   const nitrogenTaskResults = useSelector(get.nitrogenTaskResults);
-  const [layer, setLayer] = useState('reqN');
+  const [layer, setLayer] = useState('prescription');
 
   const handleDownloadClick = () => {
     downloadPrescriptionShapefile(nitrogenTaskResults?.reqN, dispatch);
@@ -48,7 +48,7 @@ const NitrogenMapWidget = ({ refVal }) => {
     <Card sx={CardStyles} elevation={8} ref={refVal}>
       <CardContent sx={cardContentStyles}>
         <Typography sx={{ fontSize: 22 }} color="text.secondary" gutterBottom textAlign="center">
-          Nitrogen Map
+          Field Map
         </Typography>
         {nitrogenFetchIsLoading && (
         <Box>
@@ -73,7 +73,7 @@ const NitrogenMapWidget = ({ refVal }) => {
         </Box>
         )}
         <Box sx={{ height: '90%', width: '100%', marginBottom: 2 }}>
-          <Map variant="nitrogen" nitrogenLayer={layer} />
+          <Map variant="nitrogen" layer={layer} />
         </Box>
 
         <Box sx={{
@@ -89,8 +89,9 @@ const NitrogenMapWidget = ({ refVal }) => {
         >
           <PSARadioButton
             options={[
-              { label: 'Prescription Map', value: 'reqN' },
-              { label: 'Nitrogen Credit Map', value: 'minN' },
+              { label: 'Prescription', value: 'prescription' },
+              { label: 'Nitrogen Credit', value: 'credit' },
+              { label: 'Biomass', value: 'biomass' },
             ]}
             selectedValue={layer}
             onChange={(value) => setLayer(value)}

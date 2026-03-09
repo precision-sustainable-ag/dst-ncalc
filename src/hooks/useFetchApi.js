@@ -59,8 +59,8 @@ const useFetchModel = ({
   lat, lon, N, OM, BD, unit, coverCropTerminationDate, cashCropPlantingDate, carb, cell, lign, biomass, lwc, InorganicN,
 }) => {
   // eslint-disable-next-line no-unused-vars
-  const [isDatesValid, setIsDatesValid] = useState(null);
-  const [model, setModel] = useState(null);
+  // const [isDatesValid, setIsDatesValid] = useState(null);
+  const model = useSelector(get.model);
   const dispatch = useDispatch();
 
   const start = moment(coverCropTerminationDate).add(1, 'hour').format('yyyy-MM-DD');
@@ -69,7 +69,7 @@ const useFetchModel = ({
   useEffect(() => {
     if (!N || !biomass) return;
     const validity = start !== 'Invalid date' && end !== 'Invalid date' && moment(end) > moment(start);
-    setIsDatesValid(validity);
+    // setIsDatesValid(validity);
     if (!validity) {
       console.log('invalid dates for fetch Model'); // eslint-disable-line no-console
     } else {
@@ -126,7 +126,7 @@ const useFetchModel = ({
               ).fill(modelData.s[col]);
             });
           dispatch(set.model(modelData));
-          setModel(modelData);
+          // setModel(modelData);
           // useFetchCornN();
         })
         .catch((error) => {

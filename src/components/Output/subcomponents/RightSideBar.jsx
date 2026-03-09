@@ -5,7 +5,7 @@ import { useDispatch, useSelector } from 'react-redux';
 import { useNavigate } from 'react-router-dom';
 import NitrogenCard from './NitrogenWidget';
 import ResidueCard from './ResidueWidget';
-import BiomassMapWidget from './BiomassMapWidget';
+// import BiomassMapWidget from './BiomassMapWidget';
 import { SummaryCard } from './SummaryWidget';
 import NitrogenMapWidget from './NitrogenMapWidget';
 import { get, set } from '../../../store/redux-autosetters';
@@ -40,17 +40,21 @@ const RightSideBar = ({ summaryData, refs }) => {
         <Grid item sm={12} width="100%" mt="1rem">
           <SummaryCard refVal={refs[0]} data={summaryData} />
         </Grid>
+        {!isPM3DMode && (
         <Grid item sm={12} lg={6} width="100%">
           <NitrogenCard refVal={refs[1]} />
         </Grid>
+        )}
+        {!isPM3DMode && (
         <Grid item sm={12} lg={6} width="100%">
           <ResidueCard refVal={refs[2]} />
         </Grid>
-        {(isSatelliteMode || isPM3DMode) && (
+        )}
+        {/* {(isSatelliteMode || isPM3DMode) && (
           <Grid item sm={12} lg={12} width="100%">
             <BiomassMapWidget refVal={refs[3]} />
           </Grid>
-        )}
+        )} */}
         {(isSatelliteMode || isPM3DMode) && (
           <Grid item sm={12} lg={12} width="100%">
             <NitrogenMapWidget refVal={refs[4]} />
@@ -63,7 +67,7 @@ const RightSideBar = ({ summaryData, refs }) => {
             nextDisabled={!model || !model.s}
             back="back"
             backOnClick={() => {
-              if (isPM3DMode) {
+              if (isPM3DMode || isSatelliteMode) {
                 dispatch(set.activeStep(5));
                 navigate('/fertilizer');
               } else {

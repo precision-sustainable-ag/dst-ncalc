@@ -5,12 +5,13 @@ import { Stack } from '@mui/material';
 import React, { useEffect, useRef, useState } from 'react';
 import { useSelector } from 'react-redux';
 import dayjs from 'dayjs';
-import LeftSideBar from './subcomponents/LeftSideBar';
+// import LeftSideBar from './subcomponents/LeftSideBar';
 import RightSideBar from './subcomponents/RightSideBar';
 import { get } from '../../store/redux-autosetters';
 import useStoreMem from '../../hooks/useStoreMem';
 // import { useFetchNitrogenArray } from '../../hooks/useFetchApi';
 import { sidebarListData, summaryDataDefaults } from '../../constants';
+import { useFetchModel } from '../../hooks/useFetchApi';
 
 const Output = () => {
   const [summaryData, setSummaryData] = useState(summaryDataDefaults);
@@ -18,18 +19,27 @@ const Output = () => {
   const field = useSelector(get.field);
   const coverCrop = useSelector(get.coverCrop);
   const coverCropTerminationDate = useSelector(get.coverCropTerminationDate);
+  const cashCropPlantingDate = useSelector(get.cashCropPlantingDate);
   const biomass = useSelector(get.biomass);
-  const residueC = useSelector(get.residueC);
+  const residueN = useSelector(get.residueN);
   const N = useSelector(get.N);
   const carb = useSelector(get.carb);
   const cell = useSelector(get.cell);
   const lign = useSelector(get.lign);
   const unit = useSelector(get.unit);
+  const lat = useSelector(get.lat);
+  const lon = useSelector(get.lon);
+  const OM = useSelector(get.OM);
+  const lwc = useSelector(get.lwc);
+  const BD = useSelector(get.BD);
+  const InorganicN = useSelector(get.InorganicN);
 
   // TODO: save the current field to localStorage
   useStoreMem();
-  //
-  // useFetchNitrogenArray();
+
+  useFetchModel({
+    lat, lon, N, OM, BD, unit, coverCropTerminationDate, cashCropPlantingDate, carb, cell, lign, biomass, lwc, InorganicN,
+  });
 
   useEffect(() => {
     const tempSummaryData = { ...summaryData };
@@ -37,7 +47,7 @@ const Output = () => {
     tempSummaryData.Species.value = coverCrop;
     tempSummaryData['Termination Date'].value = dayjs(coverCropTerminationDate, 'YYYY-MM-DD').format('MMM DD YYYY');
     tempSummaryData['Dry Biomass'].value = String(biomass).concat(' ').concat(unit);
-    tempSummaryData['Residue N Content'].value = String(residueC).concat(' ').concat(unit);
+    tempSummaryData['Residue N Content'].value = String(residueN).concat(' ').concat(unit);
     tempSummaryData.Carbohydrates.value = String(carb).concat(' %');
     tempSummaryData['Holo-cellulose'].value = String(cell).concat(' %');
     tempSummaryData.Lignin.value = String(lign).concat(' %');
@@ -46,8 +56,8 @@ const Output = () => {
   }, [field, biomass]);
 
   return (
-    <Stack direction="row" justifyContent="space-between">
-      <LeftSideBar sidebarListData={sidebarListData} refs={refs} />
+    <Stack direction="row" justifyContent="center">
+      {/* <LeftSideBar sidebarListData={sidebarListData} refs={refs} /> */}
       <RightSideBar sidebarListData={sidebarListData} summaryData={summaryData} refs={refs} />
     </Stack>
   );
