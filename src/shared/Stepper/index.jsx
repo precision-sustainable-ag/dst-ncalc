@@ -43,7 +43,7 @@ const NcalcStepper = () => {
     if (biomassCalcMode === 'pm3d') {
       return updatedSteps.filter((s) => s.id !== 'location' && s.id !== 'soil' && s.id !== 'sidedress');
     } if (biomassCalcMode === 'satellite') {
-      return updatedSteps.filter((s) => s.id !== 'upload' && s.id !== 'soil' && s.id !== 'fertilizer');
+      return updatedSteps.filter((s) => s.id !== 'upload' && s.id !== 'soil' && s.id !== 'sidedress');
     } if (biomassCalcMode === 'sampled') {
       return updatedSteps.filter((s) => s.id !== 'upload' && s.id !== 'fertilizer');
     }
@@ -85,6 +85,7 @@ const NcalcStepper = () => {
         mobile={matchesMd}
         // TODO: add disable next logic
         nextButtonDisabled={visualStepIndex === visibleSteps.length - 1}
+        maxAvailableStep={visualStepIndex}
       />
     </Box>
   );

@@ -61,7 +61,7 @@ const NitrogenFertilizer = () => {
   const [isFetching, setIsFetching] = useState(false);
   const [fertilizers, setFertilizers] = useState([]);
 
-  const [fertilizerType, setFertilizerType] = useState('liquid');
+  const fertilizerType = useSelector(get.fertilizerType);
   const [granularFertilizer, setGranularFertilizer] = useState(null);
   const [otherGranularFertilizerName, setOtherGranularFertilizerName] = useState(null);
   const [otherGranularFertilizerNPercentage, setOtherGranularFertilizerNPercentage] = useState(null);
@@ -304,7 +304,7 @@ const NitrogenFertilizer = () => {
                 { label: 'Granular Fertilizer', value: 'granular' },
               ]}
               selectedValue={fertilizerType}
-              onChange={(value) => setFertilizerType(value)}
+              onChange={(value) => dispatch(set.fertilizerType(value))}
               row
             />
           </Box>
@@ -323,6 +323,26 @@ const NitrogenFertilizer = () => {
                   setOtherGranularFertilizerName(null);
                   setOtherGranularFertilizerNPercentage(null);
                 }
+              }}
+              renderOption={(props, option) => {
+                const selected = fertilizers.find((f) => f.name === option);
+                return (
+                  <Box component="li" {...props}>
+                    <Stack>
+                      <Typography variant="subtitle1" sx={{ fontWeight: 'bold' }}>
+                        {option}
+                      </Typography>
+                      {selected && (
+                        <Typography variant="caption" color="textSecondary">
+                          Nitrogen Content:
+                          {' '}
+                          {selected.n_percent}
+                          %
+                        </Typography>
+                      )}
+                    </Stack>
+                  </Box>
+                );
               }}
               renderInput={(params) => <PSATextField {...params} label="Granular Fertilizer" placeholder="Select a granular fertilizer" />}
             />
@@ -373,6 +393,32 @@ const NitrogenFertilizer = () => {
                   setOtherLiquidFertilizerNPercentage(null);
                 }
               }}
+              renderOption={(props, option) => {
+                const selected = fertilizers.find((f) => f.name === option);
+                return (
+                  <Box component="li" {...props}>
+                    <Stack>
+                      <Typography variant="subtitle1" sx={{ fontWeight: 'bold' }}>
+                        {option}
+                      </Typography>
+                      {selected && (
+                        <Typography variant="caption" color="textSecondary">
+                          Nitrogen Content:
+                          {' '}
+                          {selected.n_percent}
+                          %
+                          {' - '}
+                          Density:
+                          {' '}
+                          {selected.density}
+                          {' '}
+                          lb/gal
+                        </Typography>
+                      )}
+                    </Stack>
+                  </Box>
+                );
+              }}
               renderInput={(params) => <PSATextField {...params} label="Liquid Fertilizer" placeholder="Select a liquid fertilizer" />}
             />
 
@@ -388,7 +434,7 @@ const NitrogenFertilizer = () => {
               />
               <PSATextField
                 fullWidth
-                label="Liquid Fertilizer Density"
+                label="Density (lb/gal)"
                 type="number"
                 value={otherLiquidFertilizerDensity || ''}
                 onChange={(e) => setOtherLiquidFertilizerDensity(e.target.value)}
@@ -461,7 +507,7 @@ const NitrogenFertilizer = () => {
                 options={properties}
                 value={nitrogenSprayMapProperty}
                 onChange={(e, val) => dispatch(set.nitrogenSprayMapProperty(val))}
-                renderInput={(params) => <PSATextField {...params} label="Select a Property name" />}
+                renderInput={(params) => <PSATextField {...params} label="Select the N rate column name" />}
               />
               )}
             </Stack>

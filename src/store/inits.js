@@ -190,7 +190,9 @@ const initialState = {
   nitrogenSprayMap: null,
   nitrogenSprayMapProperty: null,
   multiplier: 1,
-  hasFixedNRate: 'variable',
+  fertilizers: [],
+  fertilizerType: 'liquid',
+  hasFixedNRate: 'fixed',
   user: {
     historyState: historyStates.none,
     selectedHistory: null,

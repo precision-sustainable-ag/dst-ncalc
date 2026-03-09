@@ -34,6 +34,7 @@ const GrowthStageInput = () => {
 
         return (
           <Autocomplete
+            key={species}
             placeholder={`Select a cover crop Growth Stage for ${species}`}
             options={options}
             value={value}

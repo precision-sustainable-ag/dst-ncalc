@@ -42,6 +42,7 @@ const Home = () => {
   const matchesMd = useMediaQuery((theme) => theme.breakpoints.down('md'));
   // const privacy = useSelector(get.privacy);
   const biomassCalcMode = useSelector(get.biomassCalcMode);
+  const isPM3DMode = biomassCalcMode === 'pm3d';
 
   useEffect(() => {
     if (window.location.toString().includes('PSA')) {
@@ -85,7 +86,9 @@ const Home = () => {
             </Typography>
           </Box>
         </Stack>
+        {!isPM3DMode && (
         <HistorySelect />
+        )}
         <Box sx={{ height: '2rem' }} />
         <Stack spacing={2} direction="column">
           <Stack justifyContent="space-around" alignItems="center" sx={{ flexDirection: { sm: 'column', md: 'row' } }}>
@@ -100,9 +103,9 @@ const Home = () => {
         </Stack>
         <Box sx={{ height: '1rem' }} />
         <NavigateBar
-          next="Get Started"
+          next={!isPM3DMode ? 'Get Started' : 'Get Prescription'}
           nextOnClick={() => {
-            if (biomassCalcMode !== 'pm3d') {
+            if (!isPM3DMode) {
               navigate('/location');
               dispatch(set.activeStep(2));
             } else {

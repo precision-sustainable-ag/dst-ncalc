@@ -102,7 +102,9 @@ const Upload = () => {
   };
 
   useEffect(() => {
-    dispatch(set.selectedBiomassFile(null));
+    if (selectedBiomassFile && selectedField && selectedBiomassFile.field_id !== selectedField._id) {
+      dispatch(set.selectedBiomassFile(null));
+    }
     if (!selectedField) {
       dispatch(set.coverCrop([]));
       dispatch(set.coverCropPlantingDate(null));
@@ -236,8 +238,8 @@ const Upload = () => {
             renderInput={(params) => (
               <PSATextField
                 {...params}
-                label="Select biomass file"
-                placeholder="Choose biomass file..."
+                label="What date was the field sprayed"
+                placeholder="Select a date..."
               />
             )}
             sx={{ mt: 2 }}

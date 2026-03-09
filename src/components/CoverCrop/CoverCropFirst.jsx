@@ -13,7 +13,9 @@ import Stack from '@mui/material/Stack';
 // import Modal from '@mui/material/Modal';
 import Alert from '@mui/material/Alert';
 import Slide from '@mui/material/Slide';
-import { Grid, styled, useMediaQuery } from '@mui/material';
+import {
+ Grid, LinearProgress, styled, useMediaQuery,
+} from '@mui/material';
 import { get, set } from '../../store/Store';
 import CoverCropsInput from './CoverCropsInput';
 import GrowthStageInput from './GrowthStageInput';
@@ -22,7 +24,7 @@ import Help from '../../shared/Help';
 import BiomassData from '../../shared/BiomassData';
 import Required from '../../shared/Required';
 import NavigateBar from '../../shared/Navigate';
-import { useFetchPlantFactors } from '../../hooks/useFetchApi';
+// import { useFetchPlantFactors } from '../../hooks/useFetchApi';
 
 const UGA_LINK = 'https://extension.uga.edu/publications/detail.html?number=C1077';
 
@@ -60,6 +62,7 @@ const CoverCropFirst = () => {
   const lwc = useSelector(get.lwc);
   const [disableNextButton, setDisableNextButton] = useState(true);
   const [terminationDate, setTerminationDate] = useState(coverCropTerminationDate);
+  const biomassFetchIsLoading = useSelector(get.biomassFetchIsLoading);
 
   const matchesMd = useMediaQuery((theme) => theme.breakpoints.down('md'));
 
@@ -107,7 +110,7 @@ const CoverCropFirst = () => {
         }}
       >
         <Typography variant="h4">Tell us about your Cover Crop</Typography>
-        <Stack direction="column" spacing={2} m={2}>
+        <Stack direction="column" spacing={2} m={2} width="100%" maxWidth="600px">
           <Stack direction="row" alignItems="center">
             {/* <CustomInputText>Cover Crop Species:</CustomInputText> */}
             {(!coverCrop || coverCrop.length === 0) && <Required />}
@@ -138,10 +141,11 @@ const CoverCropFirst = () => {
                   aria-label="position"
                   name="position"
                 />
+                <BiomassData minified={false} />
               </Stack>
-              <BiomassData minified={false} />
+              {biomassFetchIsLoading && <LinearProgress />}
             </Paper>
-          )} 
+          )}
           {!isSatelliteMode && (
             <>
               <Stack direction="row" alignItems="center">
@@ -157,8 +161,7 @@ const CoverCropFirst = () => {
               }}
               />
             </>
-            )
-          }
+            )}
           {!isPM3DMode && !isSatelliteMode && (
             <>
               <Box
@@ -249,12 +252,11 @@ const CoverCropFirst = () => {
           nextOnClick={() => {
             if (isSatelliteMode) {
               dispatch(set.activeStep(5));
-              navigate('/sidedress')
+              navigate('/fertilizer');
             } else if (isPM3DMode) {
               dispatch(set.activeStep(5));
-              navigate('/fertilizer')
-            }
-            else navigate('/covercrop2')
+              navigate('/fertilizer');
+            } else navigate('/covercrop2');
           }}
           nextDisabled={disableNextButton}
           back="back"
