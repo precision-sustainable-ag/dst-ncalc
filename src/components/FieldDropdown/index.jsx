@@ -140,7 +140,7 @@ const FieldDropdown = () => {
     dispatch(set.yield(150));
     dispatch(set.targetN(150));
     dispatch(set.nitrogenTaskResults(null));
-    dispatch(set.user.historyState(historyStates.imported));
+    dispatch(set.user.historyState(historyStates.none));
   }, [biomassCalcMode, dispatch]);
 
   /// ///// JSX RENDER ///// ////
