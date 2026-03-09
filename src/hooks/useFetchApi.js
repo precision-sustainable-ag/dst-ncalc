@@ -195,7 +195,11 @@ const fetchNitrogenData = async (
   cashCropPlantingDate,
   targetN,
   biomassCalcMode,
-  speciesBiomassAverage,
+  fieldGeometry,
+  nitrogenSprayMap,
+  nitrogenSprayMapProperty,
+  multiplier,
+  hasFixedNRate,
   dispatch,
 ) => {
   const url = `${PLANTFACTORS_API_URL}/nitrogen`;
@@ -223,9 +227,15 @@ const fetchNitrogenData = async (
       growth_stage: growthStage,
       start: coverCropTerminationDate,
       end: cashCropPlantingDate,
-      target_n: targetN,
       mode: biomassCalcMode,
-      species_biomass_average: speciesBiomassAverage,
+      field_geometry: fieldGeometry,
+      multiplier,
+      has_fixed_rate: hasFixedNRate === 'fixed',
+      ...(hasFixedNRate === 'fixed' && { target_n: targetN }),
+      ...((hasFixedNRate === 'variable') && {
+        feature_collection: nitrogenSprayMap,
+        property_key: nitrogenSprayMapProperty,
+      }),
     });
 
     dispatch(set.nitrogenFetchIsLoading(false));
@@ -255,8 +265,6 @@ const fetchNitrogenData = async (
       });
 
       dispatch(set.nitrogenTaskResults({ minN: geojsonData, reqN: reqnGeojson }));
-
-      if (response.data?.n > 0) dispatch(set.N(response.data.n.toFixed(2)));
     } else {
       dispatch(set.nitrogenFetchIsFailed(true));
     }
@@ -281,7 +289,7 @@ const fetchPrescription = async (
   targetN,
   dispatch,
 ) => {
-  const url = `${PLANTFACTORS_API_URL}/grid`;
+  const url = `${PLANTFACTORS_API_URL}/prescription`;
   const growthStage = coverCrop.map(
     (item) => coverCropGrowthStage?.[item] || 'Unknown growth stage',
   );
@@ -348,12 +356,14 @@ const fetchPrescription = async (
       const carbVal = fieldSummary?.avg_carb ?? 0;
       const cellVal = fieldSummary?.avg_cell ?? 0;
       const lignVal = fieldSummary?.avg_lign ?? 0;
+      const residueNVal = biomassVal * nVal * 0.01;
 
       dispatch(set.biomass(Number(biomassVal.toFixed(2))));
       dispatch(set.N(Number(nVal.toFixed(2))));
       dispatch(set.carb(Number(carbVal.toFixed(2))));
       dispatch(set.cell(Number(cellVal.toFixed(2))));
       dispatch(set.lign(Number(lignVal.toFixed(2))));
+      dispatch(set.residueN(Number(residueNVal.toFixed(2))));
     } else {
       dispatch(set.nitrogenFetchIsFailed(true));
     }
@@ -428,7 +438,6 @@ const useFetchPlantFactors = () => {
   const nitrogenTaskResults = useSelector(get.nitrogenTaskResults);
   const isSatelliteMode = useSelector(get.biomassCalcMode) === 'satellite';
   const biomassCalcMode = useSelector(get.biomassCalcMode);
-  const speciesBiomassAverage = useSelector(get.speciesBiomassAverage);
   const selectedBiomassFile = useSelector(get.selectedBiomassFile);
   const selectedField = useSelector(get.selectedField);
   const nitrogenSprayMap = useSelector(get.nitrogenSprayMap);
@@ -436,6 +445,8 @@ const useFetchPlantFactors = () => {
   const multiplier = useSelector(get.multiplier);
   const hasFixedNRate = useSelector(get.hasFixedNRate);
   const activeExample = useSelector(get.activeExample);
+  const mapPolygon = useSelector(get.mapPolygon);
+  const biomass = useSelector(get.biomass);
 
   useEffect(() => {
     if (activeExample) return;
@@ -450,6 +461,7 @@ const useFetchPlantFactors = () => {
             dispatch(set.carb(Number(data.data.mean_carb.toFixed(2))));
             dispatch(set.cell(Number(data.data.mean_holocellulose.toFixed(2))));
             dispatch(set.lign(Number(data.data.mean_lignin.toFixed(2))));
+            if (biomass && biomass > 0) dispatch(set.residueN(Number((biomass * data.data.mean_n * 0.01).toFixed(2))));
           }
         })
         .catch((error) => {
@@ -460,6 +472,7 @@ const useFetchPlantFactors = () => {
       dispatch(set.carb(null));
       dispatch(set.cell(null));
       dispatch(set.lign(null));
+      dispatch(set.residueN(null));
     }
   }, [dispatch, coverCrop, coverCropGrowthStage]);
 
@@ -504,11 +517,12 @@ const useFetchPlantFactors = () => {
     if (
       biomassTaskResults
       && !nitrogenTaskResults
-      && species
+      && mapPolygon?.[0]?.geometry
+      && coverCrop
       && plantGrowthStages
       && coverCropTerminationDate
       && cashCropPlantingDate
-      && targetN
+      && ((hasFixedNRate === 'variable' && nitrogenSprayMap && nitrogenSprayMapProperty) || (hasFixedNRate === 'fixed' && targetN > 0))
       && activeStep > 5
     ) {
       fetchNitrogenData(
@@ -519,7 +533,11 @@ const useFetchPlantFactors = () => {
         cashCropPlantingDate,
         targetN,
         biomassCalcMode,
-        speciesBiomassAverage,
+        mapPolygon?.[0].geometry,
+        nitrogenSprayMap,
+        nitrogenSprayMapProperty,
+        multiplier,
+        hasFixedNRate,
         dispatch,
       );
     }
@@ -535,6 +553,10 @@ const useFetchPlantFactors = () => {
     carb,
     cell,
     lign,
+    nitrogenSprayMap,
+    nitrogenSprayMapProperty,
+    multiplier,
+    hasFixedNRate,
     activeStep,
   ]);
 
