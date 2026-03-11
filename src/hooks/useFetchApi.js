@@ -200,6 +200,7 @@ const fetchNitrogenData = async (
   nitrogenSprayMapProperty,
   multiplier,
   hasFixedNRate,
+  gridSize,
   dispatch,
 ) => {
   const url = `${PLANTFACTORS_API_URL}/nitrogen`;
@@ -236,6 +237,7 @@ const fetchNitrogenData = async (
         feature_collection: nitrogenSprayMap,
         property_key: nitrogenSprayMapProperty,
       }),
+      grid_size: gridSize,
     });
 
     dispatch(set.nitrogenFetchIsLoading(false));
@@ -244,7 +246,17 @@ const fetchNitrogenData = async (
       const geojsonData = response.data?.geojson_data;
       delete geojsonData.properties;
 
+      const biomassGeojson = JSON.parse(JSON.stringify(geojsonData));
       const reqnGeojson = JSON.parse(JSON.stringify(geojsonData));
+
+      biomassGeojson.features.forEach((feature) => {
+        if (
+          feature.properties
+          && feature.properties.ReqN !== undefined
+        ) {
+          feature.properties.value = feature.properties.biomass_average;
+        }
+      });
 
       geojsonData.features.forEach((feature) => {
         if (
@@ -264,6 +276,7 @@ const fetchNitrogenData = async (
         }
       });
 
+      dispatch(set.biomassGeojson(biomassGeojson));
       dispatch(set.nitrogenTaskResults({ minN: geojsonData, reqN: reqnGeojson }));
     } else {
       dispatch(set.nitrogenFetchIsFailed(true));
@@ -444,6 +457,7 @@ const useFetchPlantFactors = () => {
   const nitrogenSprayMapProperty = useSelector(get.nitrogenSprayMapProperty);
   const multiplier = useSelector(get.multiplier);
   const hasFixedNRate = useSelector(get.hasFixedNRate);
+  const gridSize = useSelector(get.gridSize);
   const activeExample = useSelector(get.activeExample);
   const mapPolygon = useSelector(get.mapPolygon);
   const biomass = useSelector(get.biomass);
@@ -523,6 +537,7 @@ const useFetchPlantFactors = () => {
       && coverCropTerminationDate
       && cashCropPlantingDate
       && ((hasFixedNRate === 'variable' && nitrogenSprayMap && nitrogenSprayMapProperty) || (hasFixedNRate === 'fixed' && targetN > 0))
+      && gridSize > 0
       && activeStep > 5
     ) {
       fetchNitrogenData(
@@ -538,6 +553,7 @@ const useFetchPlantFactors = () => {
         nitrogenSprayMapProperty,
         multiplier,
         hasFixedNRate,
+        gridSize,
         dispatch,
       );
     }
@@ -557,6 +573,7 @@ const useFetchPlantFactors = () => {
     nitrogenSprayMapProperty,
     multiplier,
     hasFixedNRate,
+    gridSize,
     activeStep,
   ]);
 

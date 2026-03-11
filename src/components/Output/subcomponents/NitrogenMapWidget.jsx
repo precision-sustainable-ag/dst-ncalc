@@ -36,6 +36,7 @@ const cardContentStyles = {
 const NitrogenMapWidget = ({ refVal }) => {
   const dispatch = useDispatch();
   const isPM3DMode = useSelector(get.biomassCalcMode) === 'pm3d';
+  const isSatelliteMode = useSelector(get.biomassCalcMode) === 'satellite';
   const nitrogenFetchIsLoading = useSelector(get.nitrogenFetchIsLoading);
   const nitrogenTaskResults = useSelector(get.nitrogenTaskResults);
   const [layer, setLayer] = useState('prescription');
@@ -97,7 +98,7 @@ const NitrogenMapWidget = ({ refVal }) => {
             onChange={(value) => setLayer(value)}
             row
           />
-          {isPM3DMode && (
+          {(isPM3DMode || isSatelliteMode) && (
           <NavButton
             onClick={handleDownloadClick}
             disabled={!nitrogenTaskResults?.reqN || nitrogenFetchIsLoading}

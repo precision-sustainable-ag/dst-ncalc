@@ -35,5 +35,6 @@ module.exports = {
         unnamedComponents: "arrow-function",
       },
     ],
+    'linebreak-style': 0,
   },
 };

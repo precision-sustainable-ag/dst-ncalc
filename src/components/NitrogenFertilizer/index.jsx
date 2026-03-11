@@ -53,6 +53,7 @@ const NitrogenFertilizer = () => {
   } = useAuth0();
   const navigate = useNavigate();
   const dispatch = useDispatch();
+  const isSatelliteMode = useSelector(get.biomassCalcMode) === 'satellite';
   //   const unit = useSelector(get.unit);
   const targetN = useSelector(get.targetN);
   const cashCropPlantingDate = useSelector(get.cashCropPlantingDate);
@@ -78,6 +79,8 @@ const NitrogenFertilizer = () => {
   const nitrogenSprayMap = useSelector(get.nitrogenSprayMap);
   const [properties, setProperties] = useState([]);
   const nitrogenSprayMapProperty = useSelector(get.nitrogenSprayMapProperty);
+
+  const gridSize = useSelector(get.gridSize);
 
   const granularOptions = !isFetching
     ? [...fertilizers.filter((f) => f.type === 'granular').map((f) => f.name), 'Other']
@@ -115,6 +118,8 @@ const NitrogenFertilizer = () => {
     if (hasFixedNRate === 'fixed') {
       if (!targetN || targetN <= 0) return true;
     } else if (!nitrogenSprayMap || !nitrogenSprayMapProperty) return true;
+
+    if (isSatelliteMode && (!gridSize || gridSize < 0.5 || gridSize > 5)) return true;
 
     return false;
   })();
@@ -531,6 +536,28 @@ const NitrogenFertilizer = () => {
               />
             </LocalizationProvider>
           </Box>
+
+          <Box sx={{ borderBottom: '1px solid #eee', mt: 4, mb: 2 }} />
+
+          {isSatelliteMode && (
+          <Box>
+            <Stack direction="row" alignItems="center">
+              <CustomInputText>Grid Size:</CustomInputText>
+              {(!gridSize || gridSize < 0.5) && <Required />}
+            </Stack>
+            <PSATextField
+              variant="standard"
+              value={gridSize}
+              disabled
+              InputProps={{
+                endAdornment: <InputAdornment position="end">acre</InputAdornment>,
+              }}
+              sx={{ mt: 0 }}
+            />
+            <Myslider id="gridSize" min={0.5} max={5} step={0.5} marks noTextfield />
+            <Box sx={{ borderBottom: '1px solid #eee', mt: 4, mb: 2 }} />
+          </Box>
+          )}
         </MainContentBox>
 
         <NavigateBar

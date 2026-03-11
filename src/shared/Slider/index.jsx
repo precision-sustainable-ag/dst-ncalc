@@ -7,7 +7,7 @@ import { get, set } from '../../store/Store';
 import './index.scss';
 
 const Myslider = ({
-  id, min, max, step = 1, disabled,
+  id, min, max, step = 1, disabled, marks = false, noTextfield = false,
 }) => {
   const dispatch = useDispatch();
   const val = +useSelector(get[id]);
@@ -22,6 +22,7 @@ const Myslider = ({
 
   return (
     <div className="slider">
+      {!noTextfield && (
       <PSATextField
         variant="standard"
         disabled={disabled}
@@ -31,6 +32,7 @@ const Myslider = ({
           dispatch(set[id](e.target.value));
         }}
       />
+      )}
       <span>
         <div style={{ display: 'flex', gap: '10px' }}>
           <span className="tiny" aria-label={`Minimun value: ${min}`}>
@@ -48,8 +50,9 @@ const Myslider = ({
             min={min}
             max={max}
             step={step}
-            valueLabelDisplay={val <= max ? 'off' : 'off'}
+            valueLabelDisplay={val <= max ? 'auto' : 'off'}
             disabled={disabled}
+            marks={marks}
           />
           <span className="tiny" aria-label={`Maximun value: ${max}`}>
             <span aria-hidden>{max}</span>

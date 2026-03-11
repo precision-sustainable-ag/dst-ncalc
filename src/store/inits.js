@@ -193,6 +193,7 @@ const initialState = {
   fertilizers: [],
   fertilizerType: 'liquid',
   hasFixedNRate: 'fixed',
+  gridSize: 1,
   user: {
     historyState: historyStates.none,
     selectedHistory: null,
