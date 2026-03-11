@@ -192,6 +192,17 @@ const initialState = {
   multiplier: 1,
   fertilizers: [],
   fertilizerType: 'liquid',
+  granularFertilizer: null,
+  otherGranularFertilizer: {
+    fertilizerName: null,
+    NPercent: null,
+  },
+  liquidFertilizer: null,
+  otherLiquidFertilizer: {
+    fertilizerName: null,
+    NPercent: null,
+    density: null,
+  },
   hasFixedNRate: 'fixed',
   gridSize: 1,
   user: {

@@ -60,16 +60,13 @@ const NitrogenFertilizer = () => {
   const coverCropTerminationDate = useSelector(get.coverCropTerminationDate);
 
   const [isFetching, setIsFetching] = useState(false);
-  const [fertilizers, setFertilizers] = useState([]);
+  const fertilizers = useSelector(get.fertilizers);
 
   const fertilizerType = useSelector(get.fertilizerType);
-  const [granularFertilizer, setGranularFertilizer] = useState(null);
-  const [otherGranularFertilizerName, setOtherGranularFertilizerName] = useState(null);
-  const [otherGranularFertilizerNPercentage, setOtherGranularFertilizerNPercentage] = useState(null);
-  const [liquidFertilizer, setLiquidFertilizer] = useState(null);
-  const [otherLiquidFertilizerName, setOtherLiquidFertilizerName] = useState(null);
-  const [otherLiquidFertilizerDensity, setOtherLiquidFertilizerDensity] = useState(null);
-  const [otherLiquidFertilizerNPercentage, setOtherLiquidFertilizerNPercentage] = useState(null);
+  const granularFertilizer = useSelector(get.granularFertilizer);
+  const otherGranularFertilizer = useSelector(get.otherGranularFertilizer);
+  const liquidFertilizer = useSelector(get.liquidFertilizer);
+  const otherLiquidFertilizer = useSelector(get.otherLiquidFertilizer);
 
   const hasFixedNRate = useSelector(get.hasFixedNRate);
 
@@ -92,11 +89,11 @@ const NitrogenFertilizer = () => {
 
   const granularExists = fertilizerType === 'granular' &&
   fertilizers.some((f) => f.type === 'granular' &&
-    f.name.toLowerCase() === otherGranularFertilizerName?.toLowerCase().trim());
+    f.name.toLowerCase() === otherGranularFertilizer.fertilizerName?.toLowerCase().trim());
 
   const liquidExists = fertilizerType === 'liquid' &&
   fertilizers.some((f) => f.type === 'liquid' &&
-    f.name.toLowerCase() === otherLiquidFertilizerName?.toLowerCase().trim());
+    f.name.toLowerCase() === otherLiquidFertilizer.fertilizerName?.toLowerCase().trim());
 
   const matchesMd = useMediaQuery((theme) => theme.breakpoints.down('md'));
 
@@ -107,17 +104,17 @@ const NitrogenFertilizer = () => {
     // Fertilizer specific requirements
     if (fertilizerType === 'granular') {
       if (!granularFertilizer) return true;
-      if (granularFertilizer === 'Other' && (!otherGranularFertilizerName || !otherGranularFertilizerNPercentage)) return true;
+      if (granularFertilizer === 'Other' && (!otherGranularFertilizer.fertilizerName || !otherGranularFertilizer.NPercent)) return true;
     } else if (fertilizerType === 'liquid') {
       if (!liquidFertilizer) return true;
       if (liquidFertilizer === 'Other' &&
-        (!otherLiquidFertilizerName || !otherLiquidFertilizerDensity || !otherLiquidFertilizerNPercentage)) return true;
+        (!otherLiquidFertilizer.fertilizerName || !otherLiquidFertilizer.density || !otherLiquidFertilizer.NPercent)) return true;
     }
 
     // Rate specific requirements
     if (hasFixedNRate === 'fixed') {
       if (!targetN || targetN <= 0) return true;
-    } else if (!nitrogenSprayMap || !nitrogenSprayMapProperty) return true;
+    } else if (!nitrogenSprayMap || !nitrogenSprayMapProperty || fileName === '') return true;
 
     if (isSatelliteMode && (!gridSize || gridSize < 0.5 || gridSize > 5)) return true;
 
@@ -136,24 +133,24 @@ const NitrogenFertilizer = () => {
       try {
         setIsFetching(true);
         const response = await axios.get(`${API_BASE_URL}/fertilizers`);
-        setFertilizers(response.data?.data || []);
+        dispatch(set.fertilizers(response.data?.data || []));
       } catch (e) {
         // console.error('Failed to load options', e);
-        setFertilizers([]);
+        dispatch(set.fertilizers([]));
       } finally {
         setIsFetching(false);
       }
     };
 
     fetchFertilizers();
-  }, [isAuthenticated, getAccessTokenSilently]);
+  }, [isAuthenticated, getAccessTokenSilently, dispatch]);
 
   useEffect(() => {
     let newMultiplier = 1;
 
     if (fertilizerType === 'granular') {
       const selected = fertilizers.find((f) => f.name === granularFertilizer);
-      const nPercent = granularFertilizer === 'Other' ? parseFloat(otherGranularFertilizerNPercentage) / 100 || 0 : (selected?.n_percent || 0) / 100;
+      const nPercent = granularFertilizer === 'Other' ? parseFloat(otherGranularFertilizer.NPercent) / 100 || 0 : (selected?.n_percent || 0) / 100;
 
       newMultiplier = CONVERSION_FACTOR * nPercent;
     } else if (fertilizerType === 'liquid') {
@@ -163,8 +160,8 @@ const NitrogenFertilizer = () => {
       let density = 0;
 
       if (liquidFertilizer === 'Other') {
-        nPercent = parseFloat(otherLiquidFertilizerNPercentage) / 100 || 0;
-        density = parseFloat(otherLiquidFertilizerDensity) || 0;
+        nPercent = parseFloat(otherLiquidFertilizer.NPercent) / 100 || 0;
+        density = parseFloat(otherLiquidFertilizer.density) || 0;
       } else {
         nPercent = (selected?.n_percent || 0) / 100;
         density = selected?.density || 0;
@@ -178,25 +175,25 @@ const NitrogenFertilizer = () => {
     fertilizerType,
     granularFertilizer,
     liquidFertilizer,
-    otherLiquidFertilizerNPercentage,
-    otherLiquidFertilizerDensity,
-    otherGranularFertilizerNPercentage,
+    otherLiquidFertilizer.NPercent,
+    otherLiquidFertilizer.density,
+    otherGranularFertilizer.NPercent,
     fertilizers,
     dispatch,
   ]);
 
   useEffect(() => {
     if (fertilizerType === 'granular') {
-      setLiquidFertilizer(null);
-      setOtherLiquidFertilizerName(null);
-      setOtherLiquidFertilizerDensity(null);
-      setOtherLiquidFertilizerNPercentage(null);
+      dispatch(set.liquidFertilizer(null));
+      dispatch(set.otherLiquidFertilizer.fertilizerName(null));
+      dispatch(set.otherLiquidFertilizer.density(null));
+      dispatch(set.otherLiquidFertilizer.NPercent(null));
     } else if (fertilizerType === 'liquid') {
-      setGranularFertilizer(null);
-      setOtherGranularFertilizerName(null);
-      setOtherGranularFertilizerNPercentage(null);
+      dispatch(set.granularFertilizer(null));
+      dispatch(set.otherGranularFertilizer.fertilizerName(null));
+      dispatch(set.otherGranularFertilizer.NPercent(null));
     }
-  }, [fertilizerType]);
+  }, [dispatch, fertilizerType]);
 
   const handleFileSelect = (event) => {
     const file = event.target.files[0];
@@ -254,18 +251,23 @@ const NitrogenFertilizer = () => {
       const payload = fertilizerType === 'granular'
         ? {
           type: 'granular',
-          name: otherGranularFertilizerName,
-          n_percent: parseFloat(otherGranularFertilizerNPercentage),
+          name: otherGranularFertilizer.fertilizerName,
+          n_percent: parseFloat(otherGranularFertilizer.NPercent),
         }
         : {
           type: 'liquid',
-          name: otherLiquidFertilizerName,
-          n_percent: parseFloat(otherLiquidFertilizerNPercentage),
-          density: parseFloat(otherLiquidFertilizerDensity),
+          name: otherLiquidFertilizer.fertilizerName,
+          n_percent: parseFloat(otherLiquidFertilizer.NPercent),
+          density: parseFloat(otherLiquidFertilizer.density),
         };
 
       axios.post(`${API_BASE_URL}/fertilizers`, payload);
-    } catch (err) { /* empty */ }
+    } catch (err) { /* empty */ } finally {
+      dispatch(set.otherGranularFertilizer({ fertilizerName: null, NPercent: null }));
+      dispatch(set.otherLiquidFertilizer({ fertilizerName: null, NPercent: null, density: null }));
+      dispatch(set.granularFertilizer(null));
+      dispatch(set.liquidFertilizer(null));
+    }
   };
 
   return (
@@ -314,10 +316,10 @@ const NitrogenFertilizer = () => {
               options={granularOptions}
               value={granularFertilizer}
               onChange={(e, val) => {
-                setGranularFertilizer(val);
+                dispatch(set.granularFertilizer(val));
                 if (val !== 'Other') {
-                  setOtherGranularFertilizerName(null);
-                  setOtherGranularFertilizerNPercentage(null);
+                  dispatch(set.otherGranularFertilizer.fertilizerName(null));
+                  dispatch(set.otherGranularFertilizer.NPercent(null));
                 }
               }}
               renderOption={(props, option) => {
@@ -348,20 +350,20 @@ const NitrogenFertilizer = () => {
               <PSATextField
                 fullWidth
                 label="Fertilizer Name"
-                value={otherGranularFertilizerName || ''}
+                value={otherGranularFertilizer.fertilizerName || ''}
                 error={granularExists}
                 helperText={granularExists ? 'This fertilizer already exists in the list.' : ''}
-                onChange={(e) => setOtherGranularFertilizerName(e.target.value)}
+                onChange={(e) => dispatch(set.otherGranularFertilizer.fertilizerName(e.target.value))}
               />
               <PSATextField
                 fullWidth
                 label="Nitrogen Content (%)"
                 type="number"
-                value={otherGranularFertilizerNPercentage || ''}
+                value={otherGranularFertilizer.NPercent || ''}
                 onChange={(e) => {
                   const val = e.target.value;
                   if (val === '' || (Number(val) >= 0 && Number(val) <= 100)) {
-                    setOtherGranularFertilizerNPercentage(val);
+                    dispatch(set.otherGranularFertilizer.NPercent(val));
                   }
                 }}
                 InputProps={{
@@ -382,11 +384,11 @@ const NitrogenFertilizer = () => {
               options={liquidOptions}
               value={liquidFertilizer}
               onChange={(e, val) => {
-                setLiquidFertilizer(val);
+                dispatch(set.liquidFertilizer(val));
                 if (val !== 'Other') {
-                  setOtherLiquidFertilizerName(null);
-                  setOtherLiquidFertilizerDensity(null);
-                  setOtherLiquidFertilizerNPercentage(null);
+                  dispatch(set.otherLiquidFertilizer.fertilizerName(null));
+                  dispatch(set.otherLiquidFertilizer.density(null));
+                  dispatch(set.otherLiquidFertilizer.NPercent(null));
                 }
               }}
               renderOption={(props, option) => {
@@ -423,27 +425,27 @@ const NitrogenFertilizer = () => {
               <PSATextField
                 fullWidth
                 label="Liquid Fertilizer Name"
-                value={otherLiquidFertilizerName || ''}
+                value={otherLiquidFertilizer.fertilizerName || ''}
                 error={liquidExists}
                 helperText={liquidExists ? 'This fertilizer already exists in the list.' : ''}
-                onChange={(e) => setOtherLiquidFertilizerName(e.target.value)}
+                onChange={(e) => dispatch(set.otherLiquidFertilizer.fertilizerName(e.target.value))}
               />
               <PSATextField
                 fullWidth
                 label="Density (lb/gal)"
                 type="number"
-                value={otherLiquidFertilizerDensity || ''}
-                onChange={(e) => setOtherLiquidFertilizerDensity(e.target.value)}
+                value={otherLiquidFertilizer.density || ''}
+                onChange={(e) => dispatch(set.otherLiquidFertilizer.density(e.target.value))}
               />
               <PSATextField
                 fullWidth
                 label="Nitrogen Content (%)"
                 type="number"
-                value={otherLiquidFertilizerNPercentage || ''}
+                value={otherLiquidFertilizer.NPercent || ''}
                 onChange={(e) => {
                   const val = e.target.value;
                   if (val === '' || (Number(val) >= 0 && Number(val) <= 100)) {
-                    setOtherLiquidFertilizerNPercentage(val);
+                    dispatch(set.otherLiquidFertilizer.NPercent(val));
                   }
                 }}
                 InputProps={{

@@ -523,8 +523,10 @@ const useFetchPlantFactors = () => {
   }, [dispatch]);
 
   useEffect(() => {
+    dispatch(set.biomassGeojson(null));
     dispatch(set.nitrogenTaskResults(null));
-  }, [biomassTaskResults, coverCrop, coverCropGrowthStage, coverCropTerminationDate, cashCropPlantingDate, targetN]);
+  }, [biomassTaskResults, coverCrop, coverCropGrowthStage, coverCropTerminationDate, cashCropPlantingDate, targetN,
+    gridSize, multiplier, hasFixedNRate, nitrogenSprayMap, nitrogenSprayMapProperty]);
 
   useEffect(() => {
     if (activeExample) return;
@@ -581,7 +583,8 @@ const useFetchPlantFactors = () => {
     if (activeExample || biomassCalcMode !== 'pm3d') return;
 
     if (
-      selectedBiomassFile
+      !nitrogenTaskResults
+      && selectedBiomassFile
       && selectedBiomassFile.points
       && selectedField.geometry
       && ((hasFixedNRate === 'variable' && nitrogenSprayMap && nitrogenSprayMapProperty) || (hasFixedNRate === 'fixed' && targetN > 0))

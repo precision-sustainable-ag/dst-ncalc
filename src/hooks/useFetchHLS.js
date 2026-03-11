@@ -140,8 +140,8 @@ const useFetchHLS = () => {
       const values = JSON.parse(data.task_result.replace(/\bNaN\b/g, 'null'));
       // eslint-disable-next-line no-console
       const rasterObject = { data_array: values.data_array, bbox: values.bbox };
-      const biomassGeojson = values.biomass_geojson;
-      dispatch(set.biomassGeojson(biomassGeojson));
+      // const biomassGeojson = values.biomass_geojson;
+      // dispatch(set.biomassGeojson(biomassGeojson));
       dispatch(set.biomassTaskResults(rasterObject));
     }
   }, [data, isSatelliteMode]);
