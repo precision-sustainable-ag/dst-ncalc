@@ -14,7 +14,7 @@ import {
 import { deepmerge } from '@mui/utils';
 import ChatBubbleOutlineIcon from '@mui/icons-material/ChatBubbleOutline';
 import AccountBoxOutlinedIcon from '@mui/icons-material/AccountBoxOutlined';
-import GrassOutlinedIcon from '@mui/icons-material/GrassOutlined';
+// import GrassOutlinedIcon from '@mui/icons-material/GrassOutlined';
 import CloudUploadOutlinedIcon from '@mui/icons-material/CloudUploadOutlined';
 // import ResponsiveNavBar from './components/ResponsiveNavBar';
 import Feedback from './components/Feedback';
@@ -27,6 +27,7 @@ import NcalcStepper from './shared/Stepper';
 import Auth0ProviderWithNavigate from './shared/AuthProvider';
 import useFetchHLS from './hooks/useFetchHLS';
 import { useFetchPlantFactors } from './hooks/useFetchApi';
+import ProtectedPage from './shared/ProtectedPage/ProtectedPage';
 
 const screens = {
   init: () => null,
@@ -176,7 +177,7 @@ const App = () => {
         dispatch(set.user.alertMessage(null));
       }, 5000);
     }
-  }, [showAlert]);
+  }, [dispatch, showAlert]);
 
   return (
     <ThemeProvider theme={dstTheme}>
@@ -220,9 +221,23 @@ const App = () => {
             }}
           >
             <Routes>
-              {Object.keys(screens).map((scr) => (
-                <Route key={scr} path={scr.toLowerCase()} element={<Screen />} />
-              ))}
+              {Object.keys(screens).map((scr) => {
+                const ScreenComponent = screens[scr];
+
+                const protectedPaths = ['upload', 'field', 'fileupload'];
+                if (isPM3DMode) {
+                  protectedPaths.push('covercrop', 'fertilizer', 'output');
+                }
+
+                const element = protectedPaths.includes(scr.toLowerCase()) ? (
+                  <ProtectedPage>
+                    <ScreenComponent />
+                  </ProtectedPage>
+                ) : (
+                  <ScreenComponent />
+                );
+                return <Route key={scr} path={scr.toLowerCase()} element={element} />;
+              })}
               <Route path="" element={<Screen />} />
             </Routes>
             <Feedback />

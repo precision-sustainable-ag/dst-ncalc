@@ -10,7 +10,6 @@ import {
   Typography,
   MenuItem,
   TextField,
-  Box,
   useMediaQuery,
   ListItemText,
   ListItemIcon,
@@ -25,10 +24,9 @@ import FieldDropdown from '../../shared/FieldDropdown/FieldDropdown';
 import { get, set } from '../../store/redux-autosetters';
 
 const MAP_TYPES = ['Spray Map', 'Yield Map'];
-const ROLES = ['NIFA-Soy', 'Willard', 'Growmark'];
 
 const UploadMap = () => {
-  const { user, isAuthenticated, isLoading } = useAuth0();
+  const { isAuthenticated } = useAuth0();
 
   const dispatch = useDispatch();
   const matchesMd = useMediaQuery((theme) => theme.breakpoints.down('md'));
@@ -42,9 +40,6 @@ const UploadMap = () => {
   const [selectedFile, setSelectedFile] = useState(null);
   const [isUploading, setIsUploading] = useState(false);
   const [uploadProgress, setUploadProgress] = useState(0);
-
-  const roles = user?.['https://dst-ncalc.org/claims'] || [];
-  const isAllowed = isAuthenticated && (roles.includes('admin') || roles.some((r) => ROLES.includes(r)));
 
   useEffect(() => {
     setSelectedSeason(null);
@@ -244,48 +239,6 @@ const UploadMap = () => {
       alert('Unsupported file type. Please upload .geojson or .shp');
     }
   };
-
-  if (isLoading) {
-    return (
-      <Box display="flex" justifyContent="center" alignItems="center" minHeight="100vh">
-        <CircularProgress />
-      </Box>
-    );
-  }
-
-  if (!isAuthenticated) {
-    return (
-      <Grid container justifyContent="center">
-        <Grid
-          item
-          xs={12}
-          md={10}
-          sx={{
-            marginTop: '1rem', padding: '2rem', backgroundColor: 'white', borderRadius: 5,
-          }}
-        >
-          <Typography variant="h6" align="center">Please log in to upload a file</Typography>
-        </Grid>
-      </Grid>
-    );
-  }
-
-  if (!isAllowed) {
-    return (
-      <Grid container justifyContent="center">
-        <Grid
-          item
-          xs={12}
-          md={10}
-          sx={{
-            marginTop: '1rem', padding: '2rem', backgroundColor: 'white', borderRadius: 5,
-          }}
-        >
-          <Typography variant="h6" align="center">Access denied</Typography>
-        </Grid>
-      </Grid>
-    );
-  }
 
   return (
     <Grid container justifyContent="center">

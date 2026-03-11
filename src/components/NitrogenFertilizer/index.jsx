@@ -135,10 +135,7 @@ const NitrogenFertilizer = () => {
     const fetchFertilizers = async () => {
       try {
         setIsFetching(true);
-        const token = await getAccessTokenSilently();
-        const response = await axios.get(`${API_BASE_URL}/fertilizers`, {
-          headers: { Authorization: `Bearer ${token}` },
-        });
+        const response = await axios.get(`${API_BASE_URL}/fertilizers`);
         setFertilizers(response.data?.data || []);
       } catch (e) {
         // console.error('Failed to load options', e);
@@ -148,9 +145,7 @@ const NitrogenFertilizer = () => {
       }
     };
 
-    if (isAuthenticated) {
-      fetchFertilizers();
-    }
+    fetchFertilizers();
   }, [isAuthenticated, getAccessTokenSilently]);
 
   useEffect(() => {
@@ -256,8 +251,6 @@ const NitrogenFertilizer = () => {
     if (!isOtherGranular && !isOtherLiquid) return;
 
     try {
-      const token = await getAccessTokenSilently();
-
       const payload = fertilizerType === 'granular'
         ? {
           type: 'granular',
@@ -271,9 +264,7 @@ const NitrogenFertilizer = () => {
           density: parseFloat(otherLiquidFertilizerDensity),
         };
 
-      axios.post(`${API_BASE_URL}/fertilizers`, payload, {
-        headers: { Authorization: `Bearer ${token}` },
-      });
+      axios.post(`${API_BASE_URL}/fertilizers`, payload);
     } catch (err) { /* empty */ }
   };
 
