@@ -586,6 +586,7 @@ const useFetchPlantFactors = () => {
       !nitrogenTaskResults
       && selectedBiomassFile
       && selectedBiomassFile.points
+      && selectedField
       && selectedField.geometry
       && ((hasFixedNRate === 'variable' && nitrogenSprayMap && nitrogenSprayMapProperty) || (hasFixedNRate === 'fixed' && targetN > 0))
       && coverCrop
