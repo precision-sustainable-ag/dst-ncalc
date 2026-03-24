@@ -70,7 +70,7 @@ const fieldIcon = (
 
 const AddField = () => {
   const {
-    user, isAuthenticated, isLoading, getAccessTokenSilently,
+    user, isAuthenticated, getAccessTokenSilently,
   } = useAuth0();
 
   const navigate = useNavigate();
@@ -107,7 +107,6 @@ const AddField = () => {
   const [loadingOptions, setLoadingOptions] = useState(true);
 
   const roles = user?.['https://dst-ncalc.org/claims'] || [];
-  const isAllowed = isAuthenticated && (roles.includes('admin') || roles.some((r) => ROLES.includes(r)));
   const isAdmin = roles.includes('admin');
   const allowedPrograms = isAdmin
     ? ROLES
@@ -127,10 +126,10 @@ const AddField = () => {
       setCashCropPlantingDate(null);
       setCashCropHarvestingDate(null);
     }
-    if (coverCropTerminationDate && cashCropPlantingDate && dayjs(coverCropTerminationDate) > dayjs(cashCropPlantingDate)) {
-      setCashCropPlantingDate(null);
-      setCashCropHarvestingDate(null);
-    }
+    // if (coverCropTerminationDate && cashCropPlantingDate && dayjs(coverCropTerminationDate) > dayjs(cashCropPlantingDate)) {
+    //   setCashCropPlantingDate(null);
+    //   setCashCropHarvestingDate(null);
+    // }
     if (cashCropHarvestingDate && cashCropPlantingDate && dayjs(cashCropPlantingDate) > dayjs(cashCropHarvestingDate)) {
       setCashCropHarvestingDate(null);
     }
@@ -302,48 +301,6 @@ const AddField = () => {
     }
   };
 
-  if (isLoading) {
-    return (
-      <Box display="flex" justifyContent="center" alignItems="center" minHeight="100vh">
-        <CircularProgress />
-      </Box>
-    );
-  }
-
-  if (!isAuthenticated) {
-    return (
-      <Grid container justifyContent="center">
-        <Grid
-          item
-          xs={12}
-          md={10}
-          sx={{
-            marginTop: '1rem', padding: '2rem', backgroundColor: 'white', borderRadius: 5,
-          }}
-        >
-          <Typography variant="h6" align="center">Please log in to enroll a field</Typography>
-        </Grid>
-      </Grid>
-    );
-  }
-
-  if (!isAllowed) {
-    return (
-      <Grid container justifyContent="center">
-        <Grid
-          item
-          xs={12}
-          md={10}
-          sx={{
-            marginTop: '1rem', padding: '2rem', backgroundColor: 'white', borderRadius: 5,
-          }}
-        >
-          <Typography variant="h6" align="center">Access denied</Typography>
-        </Grid>
-      </Grid>
-    );
-  }
-
   return (
     <Grid container justifyContent="center">
       <Grid
@@ -498,7 +455,7 @@ const AddField = () => {
                   views={['year', 'month']}
                   openTo="month"
                   format="YYYY-MM"
-                  minDate={dayjs(coverCropTerminationDate).add(1, 'day')}
+                  minDate={dayjs(coverCropTerminationDate).startOf('month')}
                   value={cashCropPlantingDate ? dayjs(cashCropPlantingDate) : null}
                   onChange={(newValue) => {
                     setCashCropPlantingDate(newValue ? newValue.startOf('month').format('YYYY-MM-DD') : null);
@@ -616,7 +573,6 @@ const AddField = () => {
               hasFullScreen
               hasGeolocate
               hasDrawing
-              hasFindField
               scrollZoom
               dragRotate
               dragPan

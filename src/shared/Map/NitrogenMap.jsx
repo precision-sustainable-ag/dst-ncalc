@@ -5,7 +5,7 @@ import React, { useState, useEffect } from 'react';
 import { useSelector, useDispatch } from 'react-redux';
 import { PSAReduxMap } from 'shared-react-components/src';
 import { Paper } from '@mui/material';
-// import { NcalcMap } from './mock/ncalc-map';
+import { bbox } from '@turf/turf';
 import { get, set } from '../../store/Store';
 import { mapboxToken } from '../../utils/keys';
 
@@ -16,7 +16,7 @@ import { mapboxToken } from '../../utils/keys';
 const biomassRasterColors = ['#d73027', '#f46d43', '#fdae61', '#fee08b', '#a6d96a', '#1a9850'];
 const nitrogenRasterColors = ['#762a83', '#af8dc3', '#e7d4e8', '#d9f0d3', '#7fbf7b', '#1b7837'];
 
-const NitrogenMapComp = ({ variant, nitrogenLayer = 'reqN' }) => {
+const NitrogenMapComp = ({ variant, layer = 'prescription' }) => {
   const [address, setAddress] = useState({});
   const dispatch = useDispatch();
   const lat = useSelector(get.lat);
@@ -27,9 +27,11 @@ const NitrogenMapComp = ({ variant, nitrogenLayer = 'reqN' }) => {
   const mapZoom = useSelector(get.mapZoom);
   const mapPolygon = useSelector(get.mapPolygon);
   const unit = useSelector(get.unit);
+  const fertilizerType = useSelector(get.fertilizerType);
   const [features, setFeatures] = useState(mapPolygon);
   const [zoom, setZoom] = useState(null);
   const [latLon, setLatLon] = useState([lat, lon]);
+  const [bounds, setBounds] = useState(null);
 
   const updateProperties = (properties) => {
     setAddress(properties?.address);
@@ -58,6 +60,12 @@ const NitrogenMapComp = ({ variant, nitrogenLayer = 'reqN' }) => {
     if (zoom) dispatch(set.mapZoom(zoom));
   }, [zoom]);
 
+  useEffect(() => {
+    if (!biomassGeojson) return;
+    const newBounds = bbox(biomassGeojson);
+    setBounds(newBounds);
+  }, [biomassGeojson]);
+
   return (
     <Paper>
       <PSAReduxMap
@@ -69,10 +77,10 @@ const NitrogenMapComp = ({ variant, nitrogenLayer = 'reqN' }) => {
         initStartZoom={mapZoom}
         initFeatures={mapPolygon}
         initAddress={mapAddress}
+        initBounds={bounds}
         hasSearchBar
-        hasClear
-        hasMarker
-        hasMarkerPopup
+        // hasMarker
+        // hasMarkerPopup
         hasMarkerMovable
         hasNavigation
         hasFullScreen
@@ -84,11 +92,16 @@ const NitrogenMapComp = ({ variant, nitrogenLayer = 'reqN' }) => {
         keyboard
         doubleClickZoom={false}
         touchZoomRotate
-        initRasterObject={variant === 'biomass' ? biomassGeojson : nitrogenTaskResults?.[nitrogenLayer]}
-        rasterColors={variant === 'biomass' ? biomassRasterColors : nitrogenRasterColors}
+        initRasterObject={(layer === 'biomass' ? biomassGeojson : (layer === 'prescription' ? nitrogenTaskResults?.reqN : nitrogenTaskResults?.minN)) || { type: 'FeatureCollection', features: [{ 
+          type: 'Feature',
+          geometry: { type: 'Point', coordinates: [0, 0] },
+          properties: { value: 0 },
+        }],
+        }}
+        rasterColors={layer === 'biomass' ? biomassRasterColors : nitrogenRasterColors}
         color_steps={7}
-        unit={unit}
-        material={variant}
+        unit={layer === 'biomass' ? 'lb/ac' : (layer === 'prescription' ? (fertilizerType === 'liquid' ? 'gal/ac' : 'lb/ac') : 'lb/ac')}
+        material=""
         mapboxToken={mapboxToken}
       />
     </Paper>

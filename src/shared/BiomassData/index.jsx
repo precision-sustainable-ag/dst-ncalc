@@ -25,12 +25,12 @@ const BiomassData = () => {
   // useFetchHLS();
 
   return (
-    <Box pb={2}>
+    <Box>
       {polyDrawTooBig && <AreaErrorModal />}
       {biomassFetchIsFailed && <TaskFailModal task="biomass" />}
       <Box sx={{ margin: 2 }}>
         <Grid container spacing={2} alignItems="flex-end" justify="center">
-          {!isPM3DMode && (
+          {/* {!isPM3DMode && (
             <>
               <Grid item xs={12}>
                 <Typography variant="h5" gutterBottom>
@@ -60,7 +60,7 @@ const BiomassData = () => {
                 </Box>
               </Grid>
             </>
-          )}
+          )} */}
           {biomassTotalValue && (
             <Grid item xs={12} display="flex" justifyContent="center">
               <Box sx={{ border: 1, maxWidth: 200, padding: '0.3rem 1.2rem', textAlign: 'center' }}>

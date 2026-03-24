@@ -1,3 +1,4 @@
+/* eslint-disable consistent-return */
 /* eslint-disable operator-linebreak */
 /* eslint-disable indent */
 import React, { useEffect, useState } from 'react';
@@ -13,7 +14,11 @@ import Stack from '@mui/material/Stack';
 // import Modal from '@mui/material/Modal';
 import Alert from '@mui/material/Alert';
 import Slide from '@mui/material/Slide';
-import { Grid, styled, useMediaQuery } from '@mui/material';
+import {
+ Grid, LinearProgress, styled, useMediaQuery,
+} from '@mui/material';
+import { useAuth0 } from '@auth0/auth0-react';
+import axios from 'axios';
 import { get, set } from '../../store/Store';
 import CoverCropsInput from './CoverCropsInput';
 import GrowthStageInput from './GrowthStageInput';
@@ -22,7 +27,8 @@ import Help from '../../shared/Help';
 import BiomassData from '../../shared/BiomassData';
 import Required from '../../shared/Required';
 import NavigateBar from '../../shared/Navigate';
-import { useFetchPlantFactors } from '../../hooks/useFetchApi';
+import { ncalcApiUrl } from '../../utils/keys';
+// import { useFetchPlantFactors } from '../../hooks/useFetchApi';
 
 const UGA_LINK = 'https://extension.uga.edu/publications/detail.html?number=C1077';
 
@@ -34,7 +40,10 @@ const CustomInputText = styled(Typography)({
   marginBottom: '0.2rem',
 });
 
+const API_BASE_URL = ncalcApiUrl;
+
 const CoverCropFirst = () => {
+  const { getAccessTokenSilently } = useAuth0();
   const dispatch = useDispatch();
   const navigate = useNavigate();
   const maxBiomass = useSelector(get.maxBiomass);
@@ -60,6 +69,9 @@ const CoverCropFirst = () => {
   const lwc = useSelector(get.lwc);
   const [disableNextButton, setDisableNextButton] = useState(true);
   const [terminationDate, setTerminationDate] = useState(coverCropTerminationDate);
+  const biomassFetchIsLoading = useSelector(get.biomassFetchIsLoading);
+  const selectedField = useSelector(get.selectedField);
+  const [isLoading, setIsLoading] = useState(false);
 
   const matchesMd = useMediaQuery((theme) => theme.breakpoints.down('md'));
 
@@ -82,11 +94,63 @@ const CoverCropFirst = () => {
       const allStagesSelected = Array.isArray(coverCrop) && coverCrop.length > 0 &&
         coverCrop.every((species) => coverCropGrowthStage?.[species] && coverCropGrowthStage[species] !== '');
 
-      setDisableNextButton(!biomassTotalValue || !coverCrop || coverCrop.length === 0 || !allStagesSelected);
+      setDisableNextButton((isSatelliteMode && !biomassTotalValue) || !coverCrop || coverCrop.length === 0 || !allStagesSelected);
     } else {
       setDisableNextButton(!biomass || coverCrop.length === 0 || !coverCropTerminationDate || !lwc);
     }
   }, [isSatelliteMode, isPM3DMode, biomass, coverCrop, coverCropGrowthStage, coverCropTerminationDate, lwc, biomassTotalValue]);
+
+  const syncFieldData = async () => {
+  if (!isPM3DMode || !selectedField) return;
+
+  const originalCoverCrops = selectedField.properties?.coverCrop || [];
+  const originalTerminationDate = selectedField.properties?.coverCropTerminationDate;
+
+  const cropsChanged = JSON.stringify(originalCoverCrops) !== JSON.stringify(coverCrop);
+  const dateChanged = originalTerminationDate !== coverCropTerminationDate;
+
+  if (cropsChanged || dateChanged) {
+    setIsLoading(true);
+    try {
+      const token = await getAccessTokenSilently();
+
+      const payload = {
+        programName: selectedField.properties.programName,
+        growerName: selectedField.properties.growerName,
+        farmName: selectedField.properties.farmName,
+        fieldName: selectedField.properties.fieldName,
+        geometry: selectedField.geometry,
+        coverCrop,
+        coverCropTerminationDate,
+        cashCrop: selectedField.properties.cashCrop,
+        cashCropPlantingDate: selectedField.properties.cashCropPlantingDate,
+        cashCropHarvestingDate: selectedField.properties.cashCropHarvestingDate,
+        coverCropPlantingDate: selectedField.properties.coverCropPlantingDate,
+      };
+
+      await axios.put(`${API_BASE_URL}/fields`, payload, {
+        headers: { Authorization: `Bearer ${token}` },
+      });
+
+      const updatedField = {
+        ...selectedField,
+        properties: {
+          ...selectedField.properties,
+          coverCrop,
+          coverCropTerminationDate,
+        },
+      };
+      dispatch(set.selectedField(updatedField));
+    } catch (err) {
+      dispatch(set.user.showAlert(true));
+      dispatch(set.user.alertMessage('Failed to update field data. Try again.'));
+      return false;
+    } finally {
+      setIsLoading(false);
+    }
+  }
+  return true;
+};
 
   return (
     <Grid container justifyContent="center">
@@ -107,7 +171,7 @@ const CoverCropFirst = () => {
         }}
       >
         <Typography variant="h4">Tell us about your Cover Crop</Typography>
-        <Stack direction="column" spacing={2} m={2}>
+        <Stack direction="column" spacing={2} m={2} width="100%" maxWidth="600px">
           <Stack direction="row" alignItems="center">
             {/* <CustomInputText>Cover Crop Species:</CustomInputText> */}
             {(!coverCrop || coverCrop.length === 0) && <Required />}
@@ -138,10 +202,11 @@ const CoverCropFirst = () => {
                   aria-label="position"
                   name="position"
                 />
+                <BiomassData minified={false} />
               </Stack>
-              <BiomassData minified={false} />
+              {biomassFetchIsLoading && <LinearProgress />}
             </Paper>
-          )} 
+          )}
           {!isSatelliteMode && (
             <>
               <Stack direction="row" alignItems="center">
@@ -157,8 +222,7 @@ const CoverCropFirst = () => {
               }}
               />
             </>
-            )
-          }
+            )}
           {!isPM3DMode && !isSatelliteMode && (
             <>
               <Box
@@ -246,14 +310,19 @@ const CoverCropFirst = () => {
 
         <NavigateBar
           next="next"
-          nextOnClick={() => {
-            if (isSatelliteMode || isPM3DMode) {
+          nextOnClick={async () => {
+            if (isSatelliteMode) {
               dispatch(set.activeStep(5));
-              navigate('/sidedress')
-            }
-            else navigate('/covercrop2')
+              navigate('/fertilizer');
+            } else if (isPM3DMode) {
+              const isSuccess = await syncFieldData();
+              if (isSuccess) {
+                dispatch(set.activeStep(5));
+                navigate('/fertilizer');
+              }
+            } else navigate('/covercrop2');
           }}
-          nextDisabled={disableNextButton}
+          nextDisabled={disableNextButton || isLoading}
           back="back"
           backOnClick={() => {
             if (isSatelliteMode) {

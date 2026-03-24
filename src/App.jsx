@@ -14,7 +14,7 @@ import {
 import { deepmerge } from '@mui/utils';
 import ChatBubbleOutlineIcon from '@mui/icons-material/ChatBubbleOutline';
 import AccountBoxOutlinedIcon from '@mui/icons-material/AccountBoxOutlined';
-import GrassOutlinedIcon from '@mui/icons-material/GrassOutlined';
+// import GrassOutlinedIcon from '@mui/icons-material/GrassOutlined';
 import CloudUploadOutlinedIcon from '@mui/icons-material/CloudUploadOutlined';
 // import ResponsiveNavBar from './components/ResponsiveNavBar';
 import Feedback from './components/Feedback';
@@ -27,6 +27,7 @@ import NcalcStepper from './shared/Stepper';
 import Auth0ProviderWithNavigate from './shared/AuthProvider';
 import useFetchHLS from './hooks/useFetchHLS';
 import { useFetchPlantFactors } from './hooks/useFetchApi';
+import ProtectedPage from './shared/ProtectedPage/ProtectedPage';
 
 const screens = {
   init: () => null,
@@ -46,6 +47,7 @@ screens.advanced = require('./components/Advanced').default;
 screens.upload = require('./components/Upload').default;
 screens.field = require('./components/AddField').default;
 screens.fileupload = require('./components/FileUpload').default;
+screens.fertilizer = require('./components/NitrogenFertilizer').default;
 
 screens.profile = () => <PSAProfile styles={{ backgroundColor: 'white' }} />;
 
@@ -102,8 +104,8 @@ const App = () => {
   const { showAlert, alertSeverity, alertMessage } = useSelector(get.user);
   const isPM3DMode = useSelector(get.biomassCalcMode) === 'pm3d';
 
-  const noStepperPaths = ['/profile', '/field', '/fileupload'];
-  const showStepper = !isPM3DMode && !noStepperPaths.includes(location.pathname.toLowerCase());
+  const noStepperPaths = ['/profile', '/field', '/editfield', '/fileupload'];
+  const showStepper = !noStepperPaths.includes(location.pathname.toLowerCase());
 
   const navContent = [
     {
@@ -175,7 +177,7 @@ const App = () => {
         dispatch(set.user.alertMessage(null));
       }, 5000);
     }
-  }, [showAlert]);
+  }, [dispatch, showAlert]);
 
   return (
     <ThemeProvider theme={dstTheme}>
@@ -219,9 +221,23 @@ const App = () => {
             }}
           >
             <Routes>
-              {Object.keys(screens).map((scr) => (
-                <Route key={scr} path={scr.toLowerCase()} element={<Screen />} />
-              ))}
+              {Object.keys(screens).map((scr) => {
+                const ScreenComponent = screens[scr];
+
+                const protectedPaths = ['upload', 'field', 'fileupload'];
+                if (isPM3DMode) {
+                  protectedPaths.push('covercrop', 'fertilizer', 'output');
+                }
+
+                const element = protectedPaths.includes(scr.toLowerCase()) ? (
+                  <ProtectedPage>
+                    <ScreenComponent />
+                  </ProtectedPage>
+                ) : (
+                  <ScreenComponent />
+                );
+                return <Route key={scr} path={scr.toLowerCase()} element={element} />;
+              })}
               <Route path="" element={<Screen />} />
             </Routes>
             <Feedback />
