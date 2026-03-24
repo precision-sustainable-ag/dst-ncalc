@@ -37,11 +37,31 @@ const MainContentBox = styled(Box)({
   flexDirection: 'column',
 });
 
-// const UAN_DATA = {
-//   'UAN 28%': { n: 0.28, density: 10.67 },
-//   'UAN 30%': { n: 0.3, density: 10.86 },
-//   'UAN 32%': { n: 0.32, density: 11.08 },
-// };
+const FERTILIZER_DATA = [
+  {
+    type: 'granular',
+    name: 'Urea',
+    n_percent: 46,
+  },
+  {
+    type: 'liquid',
+    name: 'UAN 28%',
+    n_percent: 28,
+    density: 10.67,
+  },
+  {
+    type: 'liquid',
+    name: 'UAN 30%',
+    n_percent: 30,
+    density: 10.86,
+  },
+  {
+    type: 'liquid',
+    name: 'UAN 32%',
+    n_percent: 32,
+    density: 11.08,
+  },
+];
 
 const CONVERSION_FACTOR = 1.12085; // lb n/acre -> kg n/ha
 
@@ -60,7 +80,7 @@ const NitrogenFertilizer = () => {
   const coverCropTerminationDate = useSelector(get.coverCropTerminationDate);
 
   const [isFetching, setIsFetching] = useState(false);
-  const fertilizers = useSelector(get.fertilizers);
+  const fertilizers = FERTILIZER_DATA;
 
   const fertilizerType = useSelector(get.fertilizerType);
   const granularFertilizer = useSelector(get.granularFertilizer);
@@ -80,11 +100,11 @@ const NitrogenFertilizer = () => {
   const gridSize = useSelector(get.gridSize);
 
   const granularOptions = !isFetching
-    ? [...fertilizers.filter((f) => f.type === 'granular').map((f) => f.name), 'Other']
+    ? [...fertilizers.filter((f) => f.type === 'granular').map((f) => f.name)]
     : [];
 
   const liquidOptions = !isFetching
-    ? [...fertilizers.filter((f) => f.type === 'liquid').map((f) => f.name), 'Other']
+    ? [...fertilizers.filter((f) => f.type === 'liquid').map((f) => f.name)]
     : [];
 
   const granularExists = fertilizerType === 'granular' &&
@@ -142,7 +162,7 @@ const NitrogenFertilizer = () => {
       }
     };
 
-    fetchFertilizers();
+    // fetchFertilizers();
   }, [isAuthenticated, getAccessTokenSilently, dispatch]);
 
   useEffect(() => {
