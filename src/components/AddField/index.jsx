@@ -126,10 +126,10 @@ const AddField = () => {
       setCashCropPlantingDate(null);
       setCashCropHarvestingDate(null);
     }
-    if (coverCropTerminationDate && cashCropPlantingDate && dayjs(coverCropTerminationDate) > dayjs(cashCropPlantingDate)) {
-      setCashCropPlantingDate(null);
-      setCashCropHarvestingDate(null);
-    }
+    // if (coverCropTerminationDate && cashCropPlantingDate && dayjs(coverCropTerminationDate) > dayjs(cashCropPlantingDate)) {
+    //   setCashCropPlantingDate(null);
+    //   setCashCropHarvestingDate(null);
+    // }
     if (cashCropHarvestingDate && cashCropPlantingDate && dayjs(cashCropPlantingDate) > dayjs(cashCropHarvestingDate)) {
       setCashCropHarvestingDate(null);
     }
@@ -455,7 +455,7 @@ const AddField = () => {
                   views={['year', 'month']}
                   openTo="month"
                   format="YYYY-MM"
-                  minDate={dayjs(coverCropTerminationDate).add(1, 'day')}
+                  minDate={dayjs(coverCropTerminationDate).startOf('month')}
                   value={cashCropPlantingDate ? dayjs(cashCropPlantingDate) : null}
                   onChange={(newValue) => {
                     setCashCropPlantingDate(newValue ? newValue.startOf('month').format('YYYY-MM-DD') : null);
@@ -573,7 +573,6 @@ const AddField = () => {
               hasFullScreen
               hasGeolocate
               hasDrawing
-              hasFindField
               scrollZoom
               dragRotate
               dragPan
