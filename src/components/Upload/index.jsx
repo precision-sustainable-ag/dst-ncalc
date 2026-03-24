@@ -106,6 +106,7 @@ const Upload = () => {
       dispatch(set.selectedBiomassFile(null));
     }
     if (!selectedField) {
+      dispatch(set.selectedBiomassFile(null));
       dispatch(set.coverCrop([]));
       dispatch(set.coverCropPlantingDate(null));
       dispatch(set.coverCropTerminationDate(null));
@@ -172,14 +173,17 @@ const Upload = () => {
     setError('');
     if (!selectedBiomassFile) {
       dispatch(set.biomassPoints(null));
+      dispatch(set.coverCropGrowthStage(null));
       return;
     }
     const isValidated = validateData(selectedBiomassFile?.points);
     if (!isValidated) {
       dispatch(set.biomassPoints(null));
+      dispatch(set.coverCropGrowthStage(null));
       return;
     }
     dispatch(set.biomassPoints(selectedBiomassFile?.points));
+    dispatch(set.coverCropGrowthStage(selectedBiomassFile?.growthStages));
   }, [selectedBiomassFile]);
 
   return (
