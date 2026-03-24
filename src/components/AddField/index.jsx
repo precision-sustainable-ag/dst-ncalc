@@ -90,6 +90,7 @@ const AddField = () => {
   const [cashCropHarvestingDate, setCashCropHarvestingDate] = useState(null);
   const [coverCropPlantingDate, setCoverCropPlantingDate] = useState(null);
   const [coverCropTerminationDate, setCoverCropTerminationDate] = useState(null);
+  const [comments, setComments] = useState(null);
   const [isSaving, setIsSaving] = useState(false);
 
   // MAP STATE VARIABLES
@@ -204,8 +205,9 @@ const AddField = () => {
 
   const handleSaveField = async () => {
     // Validate form fields
+    // coverCropPlantingDate is temporarily not a required field
     if (!program || !grower || !farm || !field || !cashCrop || !coverCrops || coverCrops.length < 1
-      || !cashCropPlantingDate || !cashCropHarvestingDate || !coverCropPlantingDate || !coverCropTerminationDate) {
+      || !cashCropPlantingDate || !cashCropHarvestingDate || !coverCropTerminationDate) {
       alert('Please fill in all the fields');
       return;
     }
@@ -233,6 +235,7 @@ const AddField = () => {
         cashCropHarvestingDate,
         coverCropPlantingDate,
         coverCropTerminationDate,
+        comments,
       };
 
       await axios.post(`${API_BASE_URL}/fields`, payload, {
@@ -247,6 +250,7 @@ const AddField = () => {
       setFarm(null);
       setField(null);
       setFeatures(null);
+      setComments(null);
 
       alert('Field saved successfully!');
       navigate('/home');
@@ -418,6 +422,9 @@ const AddField = () => {
                     setCoverCropPlantingDate(newValue ? newValue.format('YYYY-MM-DD') : null);
                     return null;
                   }}
+                  slotProps={{
+                    field: { clearable: true, onClear: () => setCoverCropTerminationDate(null) },
+                  }}
                   sx={{ width: '100%' }}
 
                 />
@@ -475,6 +482,21 @@ const AddField = () => {
                   sx={{ width: '100%' }}
                 />
               </LocalizationProvider>
+            </Grid>
+          </Grid>
+
+          <Grid container spacing={2}>
+            <Grid item xs={12} md={6}>
+              <PSATextField
+                label="Additional comments (optional)"
+                value={comments}
+                onChange={(e) => setComments(e.target.value)}
+                fullWidth
+                autoComplete="off"
+                sx={{
+                  '& .MuiInputBase-root': { padding: 1 },
+                }}
+              />
             </Grid>
           </Grid>
 
@@ -568,7 +590,7 @@ const AddField = () => {
               variant="contained"
               onClick={handleSaveField}
               disabled={isSaving || !program || !grower || !farm || !field || !cashCrop || !coverCrops || coverCrops.length < 1
-                || !cashCropPlantingDate || !cashCropHarvestingDate || !coverCropPlantingDate || !coverCropTerminationDate
+                || !cashCropPlantingDate || !cashCropHarvestingDate || !coverCropTerminationDate
                 || !features || features.length < 1}
               sx={{
                 minWidth: '150px',
