@@ -116,6 +116,7 @@ const CoverCropFirst = () => {
 
       const payload = {
         programName: selectedField.properties.programName,
+        groupName: selectedField.properties.groupName,
         growerName: selectedField.properties.growerName,
         farmName: selectedField.properties.farmName,
         fieldName: selectedField.properties.fieldName,

@@ -14,6 +14,11 @@ import { get, set } from '../../store/Store';
 import { ncalcApiUrl } from '../../utils/keys';
 
 const API_BASE_URL = ncalcApiUrl;
+const PROGRAM_GROUPS = {
+  'NIFA-Soy': 'NIFA-Soy',
+  Willard: 'RCPP',
+  Growmark: 'RCPP',
+};
 
 const FieldDropdown = () => {
   const { isAuthenticated, getAccessTokenSilently } = useAuth0();
@@ -21,7 +26,7 @@ const FieldDropdown = () => {
   const dispatch = useDispatch();
   const [fieldOptions, setFieldOptions] = useState([]);
   const [isFetching, setIsFetching] = useState(null);
-  const [filterProgram, setFilterProgram] = useState(null);
+  const [filterGroup, setFilterGroup] = useState(null);
   const [filterGrower, setFilterGrower] = useState(null);
   const selectedField = useSelector(get.selectedField);
 
@@ -37,32 +42,32 @@ const FieldDropdown = () => {
     }).sort();
   };
 
-  const uniquePrograms = useMemo(() => {
-    const programs = fieldOptions.map((f) => f.properties.programName);
-    return getUniqueCaseInsensitive(programs);
+  const uniqueGroups = useMemo(() => {
+    const groups = fieldOptions.map((f) => f.properties.groupName);
+    return getUniqueCaseInsensitive(groups);
   }, [fieldOptions]);
 
   const uniqueGrowers = useMemo(() => {
     let filtered = fieldOptions;
-    if (filterProgram) {
-      filtered = filtered.filter((f) => f.properties.programName?.toLowerCase() === filterProgram.toLowerCase());
+    if (filterGroup) {
+      filtered = filtered.filter((f) => f.properties.groupName?.toLowerCase() === filterGroup.toLowerCase());
     }
     const growers = filtered.map((f) => f.properties.growerName);
     return getUniqueCaseInsensitive(growers);
-  }, [fieldOptions, filterProgram]);
+  }, [fieldOptions, filterGroup]);
 
   const filteredFieldList = useMemo(() => fieldOptions.filter((f) => {
-    const pName = f.properties.programName;
-    const gName = f.properties.growerName;
+    const grpName = f.properties.groupName;
+    const grwName = f.properties.growerName;
 
-    const matchProgram = !filterProgram || (pName && pName.toLowerCase() === filterProgram.toLowerCase());
-    const matchGrower = !filterGrower || (gName && gName.toLowerCase() === filterGrower.toLowerCase());
+    const matchGroup = !filterGroup || (grpName && grpName.toLowerCase() === filterGroup.toLowerCase());
+    const matchGrower = !filterGrower || (grwName && grwName.toLowerCase() === filterGrower.toLowerCase());
 
-    return matchProgram && matchGrower;
-  }), [fieldOptions, filterProgram, filterGrower]);
+    return matchGroup && matchGrower;
+  }), [fieldOptions, filterGroup, filterGrower]);
 
-  const handleProgramFilterChange = (newVal) => {
-    setFilterProgram(newVal);
+  const handleGroupFilterChange = (newVal) => {
+    setFilterGroup(newVal);
     setFilterGrower(null);
     dispatch(set.selectedField(null));
   };
@@ -99,9 +104,13 @@ const FieldDropdown = () => {
       <Grid container>
         <Grid item xs={12} md={6} sx={{ pr: { md: 1 }, pb: { xs: 2 } }}>
           <Autocomplete
-            options={uniquePrograms}
-            value={filterProgram}
-            onChange={(e, val) => handleProgramFilterChange(val)}
+            options={uniqueGroups}
+            value={filterGroup}
+            getOptionLabel={(option) => {
+              const p = PROGRAM_GROUPS[option] || option;
+              return p !== option ? `${p} - ${option}` : `${p}`;
+            }}
+            onChange={(e, val) => handleGroupFilterChange(val)}
             renderInput={(params) => <PSATextField {...params} label="Filter by Program" />}
           />
         </Grid>
@@ -110,7 +119,7 @@ const FieldDropdown = () => {
             options={uniqueGrowers}
             value={filterGrower}
             onChange={(e, val) => handleGrowerFilterChange(val)}
-            disabled={!filterProgram && uniqueGrowers.length > 50}
+            disabled={!filterGroup && uniqueGrowers.length > 50}
             renderInput={(params) => <PSATextField {...params} label="Filter by Grower" />}
           />
         </Grid>
@@ -121,13 +130,13 @@ const FieldDropdown = () => {
         loadingText="Loading fields..."
         options={filteredFieldList}
         value={selectedField}
-        key={`${filterProgram}-${filterGrower}`}
+        key={`${filterGroup}-${filterGrower}`}
         onChange={(event, newValue) => {
           dispatch(set.selectedField(newValue));
         }}
         getOptionLabel={(option) => {
           const p = option.properties;
-          return `${p.programName} / ${p.growerName} / ${p.farmName} / ${p.fieldName}`;
+          return `${p.programName} / ${p.groupName} / ${p.growerName} / ${p.farmName} / ${p.fieldName}`;
         }}
         renderOption={(props, option) => (
           <Box component="li" {...props}>
@@ -137,6 +146,8 @@ const FieldDropdown = () => {
               </Typography>
               <Typography variant="caption" color="textSecondary">
                 {option.properties.programName}
+                {' - '}
+                {option.properties.groupName}
                 {' - '}
                 {option.properties.growerName}
                 {' - '}
@@ -148,7 +159,7 @@ const FieldDropdown = () => {
         renderInput={(params) => (
           <PSATextField
             {...params}
-            label="Select Field (Program / Grower / Farm / Field)"
+            label="Select Field (Program / Group / Grower / Farm / Field)"
             placeholder="Type to search..."
             InputProps={{
               ...params.InputProps,

@@ -22,6 +22,11 @@ import { geometriesToFeatures, processGeometries, validateAndProcessGeoJSON } fr
 
 const API_BASE_URL = ncalcApiUrl;
 const ROLES = ['NIFA-Soy', 'Willard', 'Growmark'];
+const PROGRAM_GROUPS = {
+  'NIFA-Soy': 'NIFA-Soy',
+  Willard: 'RCPP',
+  Growmark: 'RCPP',
+};
 
 // TODO: Placeholder values - to be updated
 const CASH_CROP_OPTIONS = ['Corn', 'Soybeans', 'Wheat', 'Cotton'];
@@ -82,7 +87,7 @@ const AddField = () => {
   const COVER_CROP_OPTIONS = useSelector(get.species) || [];
 
   // FORM DATA STATE VARIABLES
-  const [program, setProgram] = useState(null);
+  const [group, setGroup] = useState(null);
   const [grower, setGrower] = useState(null);
   const [farm, setFarm] = useState(null);
   const [field, setField] = useState(null);
@@ -115,7 +120,7 @@ const AddField = () => {
 
   const roles = user?.['https://dst-ncalc.org/claims'] || [];
   const isAdmin = roles.includes('admin');
-  const allowedPrograms = isAdmin
+  const allowedGroups = isAdmin
     ? ROLES
     : ROLES.filter((role) => roles.includes(role));
 
@@ -147,7 +152,8 @@ const AddField = () => {
       try {
         setLoadingOptions(true);
         const token = await getAccessTokenSilently();
-        const response = await axios.get(`${API_BASE_URL}/fields-identifiers?mode=edit`, {
+        const url = isEdit ? `${API_BASE_URL}/fields-identifiers?mode=edit` : `${API_BASE_URL}/fields-identifiers`;
+        const response = await axios.get(url, {
           headers: { Authorization: `Bearer ${token}` },
         });
         // setOptions(response.data);
@@ -162,12 +168,12 @@ const AddField = () => {
     if (isAuthenticated) {
       fetchOptions();
     }
-  }, [isAuthenticated, getAccessTokenSilently]);
+  }, [isAuthenticated, getAccessTokenSilently, isEdit]);
 
   useEffect(() => {
     if (!selectedField) return;
 
-    setProgram(selectedField?.properties.programName);
+    setGroup(selectedField?.properties.groupName);
     setGrower(selectedField?.properties.growerName);
     setFarm(selectedField?.properties.farmName);
     setField(selectedField?.properties.fieldName);
@@ -185,7 +191,7 @@ const AddField = () => {
   useEffect(() => {
     if (isEdit && selectedField) return;
 
-    setProgram(null);
+    setGroup(null);
     setGrower(null);
     setFarm(null);
     setField(null);
@@ -202,56 +208,50 @@ const AddField = () => {
   }, [isEdit, selectedField]);
 
   const {
-    programOptions, growerOptions, farmOptions, fieldOptions,
+    groupOptions, growerOptions, farmOptions, fieldOptions,
   } = useMemo(() => {
     // Helper to extract unique values from a filtered list
     const getUnique = (list, key) => [...new Set(list.map((item) => item.properties[key]).filter(Boolean))].sort();
 
     // A. Programs: Show programs list according to the user's role
-    const uniquePrograms = allowedPrograms;
+    const uniqueGroups = allowedGroups;
 
     // B. Growers: Filter master list by Selected Program
-    const validGrowersList = allFields.filter((f) => !program || f.properties.programName.toLowerCase() === program.toLowerCase());
+    const validGrowersList = allFields.filter((f) => !group || f.properties.groupName?.toLowerCase() === group.toLowerCase());
     const uniqueGrowers = getUnique(validGrowersList, 'growerName');
 
     // C. Farms: Filter by Selected Program AND Selected Grower
-    const validFarmsList = validGrowersList.filter((f) => !grower || f.properties.growerName.toLowerCase() === grower.toLowerCase());
+    const validFarmsList = validGrowersList.filter((f) => !grower || f.properties.growerName?.toLowerCase() === grower.toLowerCase());
     const uniqueFarms = getUnique(validFarmsList, 'farmName');
 
     // D. Fields: Filter by Program AND Grower AND Farm
-    const validFieldsList = validFarmsList.filter((f) => !farm || f.properties.farmName.toLowerCase() === farm.toLowerCase());
+    const validFieldsList = validFarmsList.filter((f) => !farm || f.properties.farmName?.toLowerCase() === farm.toLowerCase());
     const uniqueFields = getUnique(validFieldsList, 'fieldName');
 
     return {
-      programOptions: uniquePrograms,
+      groupOptions: uniqueGroups,
       growerOptions: uniqueGrowers,
       farmOptions: uniqueFarms,
       fieldOptions: uniqueFields,
     };
-  }, [allowedPrograms, allFields, program, grower, farm]);
+  }, [allowedGroups, allFields, group, grower, farm]);
 
-  const handleProgramChange = (newVal) => {
-    setProgram(newVal);
-    setGrower(null);
-    setFarm(null);
-    setField(null);
+  const handleGroupChange = (newVal) => {
+    setGroup(newVal);
   };
 
   const handleGrowerChange = (newVal) => {
     setGrower(newVal);
-    setFarm(null);
-    setField(null);
   };
 
   const handleFarmChange = (newVal) => {
     setFarm(newVal);
-    setField(null);
   };
 
   const handleSaveField = async () => {
     // Validate form fields
     // coverCropPlantingDate is temporarily not a required field
-    if (!program || !grower || !farm || !field || !cashCrop || !coverCrops || coverCrops.length < 1
+    if (!group || !grower || !farm || !field || !cashCrop || !coverCrops || coverCrops.length < 1
       || !cashCropPlantingDate || !cashCropHarvestingDate || !coverCropTerminationDate) {
       alert('Please fill in all the fields');
       return;
@@ -269,7 +269,8 @@ const AddField = () => {
       const token = await getAccessTokenSilently();
 
       const payload = {
-        programName: program,
+        programName: PROGRAM_GROUPS[group] || group,
+        groupName: group,
         farmName: farm,
         growerName: grower,
         fieldName: field,
@@ -290,7 +291,7 @@ const AddField = () => {
         },
       });
 
-      setProgram(null);
+      setGroup(null);
       setGrower(null);
       setFarm(null);
       setField(null);
@@ -314,7 +315,7 @@ const AddField = () => {
 
   const handleUpdateField = async () => {
     // Validate form fields
-    if (!program || !grower || !farm || !field || !cashCrop || !coverCrops || coverCrops.length < 1
+    if (!group || !grower || !farm || !field || !cashCrop || !coverCrops || coverCrops.length < 1
       || !cashCropPlantingDate || !cashCropHarvestingDate || !coverCropTerminationDate) {
       alert('Please fill in all the fields');
       return;
@@ -332,7 +333,8 @@ const AddField = () => {
       const token = await getAccessTokenSilently();
 
       const payload = {
-        programName: program,
+        programName: PROGRAM_GROUPS[group] || group,
+        groupName: group,
         farmName: farm,
         growerName: grower,
         fieldName: field,
@@ -353,7 +355,7 @@ const AddField = () => {
         },
       });
 
-      setProgram(null);
+      setGroup(null);
       setGrower(null);
       setFarm(null);
       setField(null);
@@ -495,13 +497,13 @@ const AddField = () => {
                   loadingText="Loading fields..."
                   options={allFields}
                   value={selectedField}
-                  key={`${allFields.programName}-${allFields.growerName}`}
+                  key={`${allFields.groupName}-${allFields.growerName}`}
                   onChange={(event, newValue) => {
                     setSelectedField(newValue);
                   }}
                   getOptionLabel={(option) => {
                     const p = option.properties;
-                    return `${p.programName} / ${p.growerName} / ${p.farmName} / ${p.fieldName}`;
+                    return `${p.programName} / ${p.groupName} / ${p.growerName} / ${p.farmName} / ${p.fieldName}`;
                   }}
                   renderOption={(props, option) => (
                     <Box component="li" {...props}>
@@ -511,6 +513,8 @@ const AddField = () => {
                         </Typography>
                         <Typography variant="caption" color="textSecondary">
                           {option.properties.programName}
+                          {' - '}
+                          {option.properties.groupName}
                           {' - '}
                           {option.properties.growerName}
                           {' - '}
@@ -524,7 +528,7 @@ const AddField = () => {
                   renderInput={(params) => (
                     <PSATextField
                       {...params}
-                      label="Select Field (Program / Grower / Farm / Field)"
+                      label="Select Field (Program / Group / Grower / Farm / Field)"
                       placeholder="Type to search..."
                       InputProps={{
                         ...params.InputProps,
@@ -549,19 +553,23 @@ const AddField = () => {
           <Grid container spacing={2}>
             <Grid item xs={12} md={6}>
               <Autocomplete
+                key={group}
                 freeSolo={isEdit}
                 loading={loadingOptions}
-                options={programOptions}
-                value={program}
-                onChange={(e, val) => handleProgramChange(val)}
-                onInputChange={(e, newInputValue) => handleProgramChange(newInputValue)}
+                options={groupOptions}
+                value={group}
+                getOptionLabel={(option) => {
+                  const p = PROGRAM_GROUPS[option] || option;
+                  return p !== option ? `${p} - ${option}` : `${p}`;
+                }}
+                onChange={(e, val) => handleGroupChange(val)}
                 renderInput={(params) => <PSATextField {...params} label="Select a Program name" />}
                 disabled={isEdit}
               />
             </Grid>
             <Grid item xs={12} md={6}>
               <Autocomplete
-                key={program}
+                key={group}
                 freeSolo
                 loading={loadingOptions}
                 options={growerOptions}
@@ -755,6 +763,7 @@ const AddField = () => {
             You can double click inside the field to edit the boundaries.
           </Typography>
 
+          {!isEdit && (
           <Stack direction="row" justifyContent="flex-end">
             <input
               id="upload-input"
@@ -781,6 +790,7 @@ const AddField = () => {
               }}
             />
           </Stack>
+          )}
 
           <Box sx={{ position: 'relative' }}>
             <PSAReduxMap
@@ -801,7 +811,7 @@ const AddField = () => {
               hasNavigation
               hasFullScreen
               hasGeolocate
-              hasDrawing
+              hasDrawing={!isEdit}
               scrollZoom
               dragRotate
               dragPan
@@ -818,7 +828,7 @@ const AddField = () => {
               title={isSaving ? <CircularProgress size={24} color="inherit" /> : isEdit ? 'Update Field' : 'Save Field'}
               variant="contained"
               onClick={isEdit ? handleUpdateField : handleSaveField}
-              disabled={isSaving || isDeleting || !program || !grower || !farm || !field || !cashCrop || !coverCrops || coverCrops.length < 1
+              disabled={isSaving || isDeleting || !group || !grower || !farm || !field || !cashCrop || !coverCrops || coverCrops.length < 1
                 || !cashCropPlantingDate || !cashCropHarvestingDate || !coverCropTerminationDate
                 || !features || features.length < 1}
               sx={{
@@ -840,7 +850,7 @@ const AddField = () => {
               title={isDeleting ? <CircularProgress size={24} color="inherit" /> : 'Delete Field'}
               variant="contained"
               onClick={handleDeleteField}
-              disabled={isSaving || isDeleting}
+              disabled={isSaving || isDeleting || !selectedField}
               sx={{
                 minWidth: '150px',
                 color: 'white',

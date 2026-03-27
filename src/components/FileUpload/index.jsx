@@ -59,10 +59,10 @@ const UploadMap = () => {
         const containerClient = blobServiceClient.getContainerClient(containerName);
 
         const {
-          programName, growerName, farmName, fieldName,
+          groupName, growerName, farmName, fieldName,
         } = selectedField.properties;
 
-        const folderName = `${programName}_${growerName}_${farmName}_${fieldName}_${selectedSeason}`;
+        const folderName = `${groupName}_${growerName}_${farmName}_${fieldName}_${selectedSeason}`;
         const safeFolderName = folderName.replace(/\s+/g, '_');
 
         const foundTypes = new Set();
@@ -158,16 +158,16 @@ const UploadMap = () => {
       const containerClient = blobServiceClient.getContainerClient(containerName);
 
       const {
-        programName, growerName, farmName, fieldName,
+        groupName, growerName, farmName, fieldName,
       } = selectedField.properties;
 
       /**
        * Construct Folder/File Path
-       * Folder format: programName_growerName_farmName_fieldName_seaspn
+       * Folder format: groupName_growerName_farmName_fieldName_seaspn
        * File format: mapType_filename
        * Example: NIFA_Midwest_Ohio_Field_A_Spring_2025/Yield_Map_data.zip
        */
-      const folderName = `${programName}_${growerName}_${farmName}_${fieldName}_${selectedSeason}`;
+      const folderName = `${groupName}_${growerName}_${farmName}_${fieldName}_${selectedSeason}`;
       const cleanFileName = selectedFile.name.replace(/\s+/g, '_');
       const blobName = `${folderName.replace(/\s+/g, '_')}/${mapType.replace(/\s+/g, '_')}_${cleanFileName}`;
 
