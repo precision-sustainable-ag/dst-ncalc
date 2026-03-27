@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { useNavigate } from 'react-router-dom';
 import Box from '@mui/material/Box';
@@ -27,9 +27,14 @@ const CoverCropSecond = () => {
   const carb = useSelector(get.carb);
   const cell = useSelector(get.cell);
   const lign = useSelector(get.lign);
+  const biomass = useSelector(get.biomass);
   const isSatelliteMode = useSelector(get.biomassCalcMode) === 'satellite';
 
   const matchesMd = useMediaQuery((theme) => theme.breakpoints.down('md'));
+
+  useEffect(() => {
+    dispatch(set.residueN(Number((N * biomass * 0.01).toFixed(2))));
+  }, [N, biomass, dispatch]);
 
   return (
     <Grid container justifyContent="center">

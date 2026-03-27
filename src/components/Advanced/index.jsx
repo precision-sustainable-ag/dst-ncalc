@@ -7,6 +7,8 @@ import Highcharts from '../../utils/highchartsConfig';
 import { get, missingData } from '../../store/Store';
 
 import './styles.scss';
+import NitrogenCard from '../Output/subcomponents/NitrogenWidget';
+import ResidueCard from '../Output/subcomponents/ResidueWidget';
 
 const Advanced = () => {
   // const BD = useSelector(get.BD);
@@ -21,6 +23,7 @@ const Advanced = () => {
   // const InorganicN = useSelector(get.InorganicN);
   // const gotModel = useSelector(get.gotModel);
   const model = useSelector(get.model);
+  const isUserSampledMode = useSelector(get.biomassCalcMode) === 'sampled';
 
   // const navigate = useNavigate();
 
@@ -292,6 +295,24 @@ const Advanced = () => {
             .map((parm) => <Chart key={parm} parm={parm} />)
         }
       </div>
+
+      {!isUserSampledMode && (
+        <div style={{
+          display: 'flex',
+          flexWrap: 'wrap',
+          justifyContent: 'center',
+          gap: '30px',
+          marginBottom: '40px',
+        }}
+        >
+          <div style={{ width: '100%', maxWidth: '500px' }}>
+            <NitrogenCard />
+          </div>
+          <div style={{ width: '100%', maxWidth: '500px' }}>
+            <ResidueCard />
+          </div>
+        </div>
+      )}
 
       <div style={{ paddingBottom: '50px' }}>
         <Link className="link" to="/output">BACK</Link>

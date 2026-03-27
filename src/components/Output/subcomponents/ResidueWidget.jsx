@@ -78,25 +78,26 @@ const ResidueCard = ({ refVal }) => {
   const InorganicN = useSelector(get.InorganicN);
   const chartRef1 = useRef(null);
   const chartRef2 = useRef(null);
+  const model = useSelector(get.model);
 
   // /// /// HOOKS /// ///
 
-  const model = useFetchModel({
-    lat,
-    lon,
-    N,
-    OM,
-    BD,
-    lwc,
-    unit,
-    carb,
-    cell,
-    lign,
-    biomass,
-    coverCropTerminationDate,
-    InorganicN,
-    cashCropPlantingDate,
-  });
+  // const model = useFetchModel({
+  //   lat,
+  //   lon,
+  //   N,
+  //   OM,
+  //   BD,
+  //   lwc,
+  //   unit,
+  //   carb,
+  //   cell,
+  //   lign,
+  //   biomass,
+  //   coverCropTerminationDate,
+  //   InorganicN,
+  //   cashCropPlantingDate,
+  // });
 
   const {
     maxSurface,

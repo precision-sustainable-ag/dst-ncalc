@@ -1,24 +1,35 @@
+/* eslint-disable no-console */
 /* eslint-disable react-hooks/exhaustive-deps */
-import React, { useRef, useState } from 'react';
+import React, { useEffect, useState } from 'react';
+import { useAuth0 } from '@auth0/auth0-react';
 import { useDispatch, useSelector } from 'react-redux';
 import {
-  Alert,
-  Box, Grid, Stack, Typography,
-  useMediaQuery,
+  Alert, Autocomplete, Box, Grid, Stack, Typography, useMediaQuery,
 } from '@mui/material';
 import { useNavigate } from 'react-router-dom';
+import axios from 'axios';
+import { PSATextField } from 'shared-react-components/src';
+import dayjs from 'dayjs';
+import centroid from '@turf/centroid';
 import { get, set } from '../../store/Store';
 import NavigateBar from '../../shared/Navigate';
-import NavButton from '../../shared/Navigate/NavButton';
+import { ncalcApiUrl } from '../../utils/keys';
+import FieldDropdown from '../../shared/FieldDropdown/FieldDropdown';
+
+const API_BASE_URL = ncalcApiUrl;
 
 const Upload = () => {
+  const { isAuthenticated, getAccessTokenSilently } = useAuth0();
+
   const dispatch = useDispatch();
   const matchesMd = useMediaQuery((theme) => theme.breakpoints.down('md'));
-  const pm3dData = useSelector(get.pm3dData);
-  const [data, setData] = useState(pm3dData);
-  const [fileName, setFileName] = useState('');
+  const [isFetchingBiomass, setIsFetchingBiomass] = useState(null);
+  const selectedField = useSelector(get.selectedField);
+  const [biomassFiles, setBiomassFiles] = useState([]);
+  const selectedBiomassFile = useSelector(get.selectedBiomassFile);
+
+  const biomassPoints = useSelector(get.biomassPoints);
   const [error, setError] = useState('');
-  const fileInputRef = useRef(null);
 
   const navigate = useNavigate();
 
@@ -69,54 +80,111 @@ const Upload = () => {
 
   // Validates the json file
   const validateData = (parsedData) => {
-    if (!Array.isArray(parsedData)) {
-      throw new Error('File must contain an array of points');
-    }
+    setError('');
+    try {
+      if (!Array.isArray(parsedData)) {
+        throw new Error('File must contain an array of points');
+      }
 
-    if (parsedData.length === 0) {
-      throw new Error('File contains no data points');
-    }
+      if (parsedData.length === 0) {
+        throw new Error('File contains no data points');
+      }
 
-    parsedData.forEach((point, index) => validatePoint(point, index));
+      parsedData.forEach((point, index) => validatePoint(point, index));
 
-    return true;
-  };
-
-  const handleFileSelect = (event) => {
-    const file = event.target.files[0];
-    if (file) {
-      setError('');
-      setFileName(file.name);
-
-      const reader = new FileReader();
-      reader.onload = (e) => {
-        try {
-          const content = e.target.result;
-          const parsedData = JSON.parse(content);
-          validateData(parsedData);
-          setData(parsedData);
-          dispatch(set.pm3dData(parsedData));
-        } catch (err) {
-          setData(null);
-          dispatch(set.pm3dData(null));
-          setFileName('');
-          setError(err.message || 'Invalid file format');
-        }
-      };
-
-      reader.onerror = () => {
-        setError('Error reading file');
-        setData(null);
-        dispatch(set.pm3dData(null));
-        setFileName('');
-      };
-      reader.readAsText(file);
+      return true;
+    } catch (e) {
+      const errorMessage = e.message || 'An unknown validation error occurred';
+      console.error('Validation failed:', errorMessage);
+      setError(errorMessage);
+      return false;
     }
   };
 
-  const handleUploadClick = () => {
-    fileInputRef.current.click();
-  };
+  useEffect(() => {
+    if (selectedBiomassFile && selectedField && selectedBiomassFile.field_id !== selectedField._id) {
+      dispatch(set.selectedBiomassFile(null));
+    }
+    if (!selectedField) {
+      dispatch(set.selectedBiomassFile(null));
+      dispatch(set.coverCrop([]));
+      dispatch(set.coverCropPlantingDate(null));
+      dispatch(set.coverCropTerminationDate(null));
+      return;
+    }
+
+    if (selectedField && selectedField.properties?.coverCrop) {
+      dispatch(set.coverCrop(selectedField.properties.coverCrop));
+    }
+    if (selectedField && selectedField.properties?.coverCropTerminationDate) {
+      dispatch(set.coverCropPlantingDate(selectedField.properties.coverCropPlantingDate));
+      dispatch(set.coverCropTerminationDate(selectedField.properties.coverCropTerminationDate));
+    }
+    if (selectedField && selectedField.geometry) {
+      const featuresToSet = { type: 'Feature', geometry: selectedField.geometry };
+      try {
+        const centerPoint = centroid({
+          type: 'FeatureCollection',
+          features: [featuresToSet],
+        });
+        const [centerLon, centerLat] = centerPoint.geometry.coordinates;
+        dispatch(set.lat(centerLat));
+        dispatch(set.lon(centerLon));
+        // dispatch(set.mapPolygon([featuresToSet]));
+
+        // const newBounds = bbox({
+        //   type: 'FeatureCollection',
+        //   features: featuresToSet,
+        // });
+        // setBounds(newBounds);
+      } catch (e) {
+        console.warn('Could not calculate bounds', e);
+      }
+    }
+  }, [selectedField]);
+
+  // Fetch Biomass Files for selected field
+  useEffect(() => {
+    const fetchBiomassFiles = async () => {
+      try {
+        if (!selectedField) return;
+        setIsFetchingBiomass(true);
+        const token = await getAccessTokenSilently();
+        const { _id: fieldId } = selectedField;
+        if (!fieldId) return;
+        const response = await axios.get(`${API_BASE_URL}/biomass/field/${fieldId}`, {
+          headers: { Authorization: `Bearer ${token}` },
+        });
+        setBiomassFiles(response.data?.data);
+      } catch (e) {
+        console.error('Failed to load options', e);
+        setBiomassFiles([]);
+      } finally {
+        setIsFetchingBiomass(false);
+      }
+    };
+
+    if (isAuthenticated) {
+      fetchBiomassFiles();
+    }
+  }, [isAuthenticated, getAccessTokenSilently, selectedField]);
+
+  useEffect(() => {
+    setError('');
+    if (!selectedBiomassFile) {
+      dispatch(set.biomassPoints(null));
+      dispatch(set.coverCropGrowthStage(null));
+      return;
+    }
+    const isValidated = validateData(selectedBiomassFile?.points);
+    if (!isValidated) {
+      dispatch(set.biomassPoints(null));
+      dispatch(set.coverCropGrowthStage(null));
+      return;
+    }
+    dispatch(set.biomassPoints(selectedBiomassFile?.points));
+    dispatch(set.coverCropGrowthStage(selectedBiomassFile?.growthStages));
+  }, [selectedBiomassFile]);
 
   return (
     <Grid container justifyContent="center">
@@ -134,46 +202,73 @@ const Upload = () => {
         }}
       >
         <Stack spacing={2} direction="column">
-          <Box>
-            <Typography variant="h4" align="center">Upload your PlantMap3D output file</Typography>
-          </Box>
-        </Stack>
-        <Box sx={{ height: '2rem' }} />
+          <Typography variant="h4" align="center">Select your field</Typography>
 
-        {error && (
+          <FieldDropdown />
+
+          {selectedField && (
+          <Autocomplete
+            loading={isFetchingBiomass}
+            loadingText="Loading biomass files..."
+            options={biomassFiles}
+            value={selectedBiomassFile}
+            onChange={(event, newValue) => {
+              dispatch(set.selectedBiomassFile(newValue));
+            }}
+            getOptionLabel={(option) => (option?.createdAt
+              ? `${dayjs(option.createdAt).format('MMM D, YYYY')} (${option.points?.length || 0} points)` : '')}
+            renderOption={(props, option) => (
+              <Box component="li" {...props}>
+                <Stack>
+                  <Typography variant="subtitle1" sx={{ fontWeight: 'bold' }}>
+                    {dayjs(option.createdAt).format('MMM D, YYYY')}
+                  </Typography>
+                  <Stack direction="row" spacing={2}>
+                    <Typography variant="body2" color="text.secondary">
+                      Time:
+                      {' '}
+                      <b>{dayjs(option.createdAt).format('h:mm A')}</b>
+                    </Typography>
+
+                    <Typography variant="body2" color="text.secondary">
+                      Points:
+                      {' '}
+                      <b>{option.points?.length || 0}</b>
+                    </Typography>
+                  </Stack>
+                </Stack>
+              </Box>
+            )}
+            renderInput={(params) => (
+              <PSATextField
+                {...params}
+                label="What date was the field sprayed"
+                placeholder="Select a date..."
+              />
+            )}
+            sx={{ mt: 2 }}
+          />
+          )}
+
+          {error && (
           <Box sx={{ marginBottom: '1rem' }}>
             <Alert severity="error">{error}</Alert>
           </Box>
-        )}
+          )}
 
-        {data && (
-          <Box sx={{ marginBottom: '1rem' }}>
-            <Alert severity="success">
-              Successfully loaded
-              {' '}
-              {data.length}
-              {' '}
-              data points.
-            </Alert>
-          </Box>
-        )}
-        <Stack spacing={2} direction="column">
-          <Stack justifyContent="space-around" alignItems="center" sx={{ flexDirection: { sm: 'column', md: 'row' } }}>
-            <Typography variant="h6">
-              {' '}
-              {fileName ? `Selected file: ${fileName}` : 'Select file'}
-              {' '}
-            </Typography>
-            <NavButton onClick={handleUploadClick}>Upload</NavButton>
-            <input
-              ref={fileInputRef}
-              type="file"
-              accept=".json"
-              style={{ display: 'none' }}
-              onChange={handleFileSelect}
-            />
-          </Stack>
+          {biomassPoints && (
+            <Box sx={{ marginBottom: '1rem' }}>
+              <Alert severity="success">
+                Successfully loaded
+                {' '}
+                {biomassPoints.length}
+                {' '}
+                data points.
+              </Alert>
+            </Box>
+          )}
         </Stack>
+
         <Box sx={{ height: '1rem' }} />
         <NavigateBar
           next="Next"
@@ -181,8 +276,8 @@ const Upload = () => {
             navigate('/covercrop');
             dispatch(set.activeStep(4));
           }}
-          nextDisabled={!data}
-          nextTooltip={!data ? 'Upload a file' : ''}
+          nextDisabled={!biomassPoints}
+          nextTooltip={!biomassPoints ? 'Upload a file' : ''}
           back="Back"
           backOnClick={() => {
             navigate('/home');

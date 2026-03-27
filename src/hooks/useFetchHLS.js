@@ -34,6 +34,7 @@ const useFetchHLS = () => {
   const isPM3DMode = useSelector(get.biomassCalcMode) === 'pm3d';
   const pm3dData = useSelector(get.pm3dData);
   const activeStep = useSelector(get.activeStep);
+  const N = useSelector(get.N);
 
   useEffect(() => {
     if (!activeExample && isSatelliteMode) {
@@ -41,6 +42,7 @@ const useFetchHLS = () => {
       dispatch(set.biomassTaskResults(null));
       dispatch(set.biomassTotalValue(null));
       dispatch(set.biomass(null));
+      dispatch(set.residueN(null));
     }
   }, [JSON.stringify(mapPolygon), coverCropPlantingDate, coverCropTerminationDate]);
 
@@ -50,6 +52,7 @@ const useFetchHLS = () => {
       dispatch(set.biomassTaskResults(null));
       dispatch(set.biomassTotalValue(null));
       dispatch(set.biomass(null));
+      dispatch(set.residueN(null));
     }
   }, [JSON.stringify(pm3dData)]);
 
@@ -137,8 +140,8 @@ const useFetchHLS = () => {
       const values = JSON.parse(data.task_result.replace(/\bNaN\b/g, 'null'));
       // eslint-disable-next-line no-console
       const rasterObject = { data_array: values.data_array, bbox: values.bbox };
-      const biomassGeojson = values.biomass_geojson;
-      dispatch(set.biomassGeojson(biomassGeojson));
+      // const biomassGeojson = values.biomass_geojson;
+      // dispatch(set.biomassGeojson(biomassGeojson));
       dispatch(set.biomassTaskResults(rasterObject));
     }
   }, [data, isSatelliteMode]);
@@ -149,7 +152,8 @@ const useFetchHLS = () => {
   useEffect(() => {
     if ((isSatelliteMode || isPM3DMode) && biomassTaskResults && biomassTaskResults.data_array) {
       const flattenedBiomass = biomassTaskResults.data_array.flat(1).filter((el) => el !== 0);
-      const factor = unit === 'lb/ac' ? 1 : 1.12085;
+      // biomass is received in kg/ha
+      const factor = unit === 'lb/ac' ? 0.8922 : 1;
       const biomassAVG = arrayAverage(flattenedBiomass) * factor;
       dispatch(set.biomassTotalValue(Math.round(biomassAVG, 0)));
     }
@@ -163,6 +167,7 @@ const useFetchHLS = () => {
   useEffect(() => {
     if (biomassTotalValue) {
       dispatch(set.biomass(biomassTotalValue));
+      dispatch(set.residueN(Number((biomassTotalValue * N * 0.01).toFixed(2))));
     }
   }, [biomassTotalValue, unit]);
 
@@ -178,7 +183,7 @@ const useFetchHLS = () => {
 
           if (response.status === 200 && response.data) {
             const biomassData = response.data;
-            const bbox = biomassData.bbox;
+            const { bbox } = biomassData;
             const rasterObject = { data_array: biomassData.data_array, bbox: biomassData.bbox };
             const biomassGeojson = biomassData.biomass_geojson;
             const coverCrop = biomassData.species;
