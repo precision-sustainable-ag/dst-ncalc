@@ -80,7 +80,7 @@ const NitrogenFertilizer = () => {
   const coverCropTerminationDate = useSelector(get.coverCropTerminationDate);
 
   const [isFetching, setIsFetching] = useState(false);
-  const fertilizers = FERTILIZER_DATA;
+  const fertilizers = useSelector(get.fertilizers);
 
   const fertilizerType = useSelector(get.fertilizerType);
   const granularFertilizer = useSelector(get.granularFertilizer);
@@ -100,11 +100,11 @@ const NitrogenFertilizer = () => {
   const gridSize = useSelector(get.gridSize);
 
   const granularOptions = !isFetching
-    ? [...fertilizers.filter((f) => f.type === 'granular').map((f) => f.name)]
+    ? [...fertilizers.filter((f) => f.type === 'granular').map((f) => f.name), 'Other']
     : [];
 
   const liquidOptions = !isFetching
-    ? [...fertilizers.filter((f) => f.type === 'liquid').map((f) => f.name)]
+    ? [...fertilizers.filter((f) => f.type === 'liquid').map((f) => f.name), 'Other']
     : [];
 
   const granularExists = fertilizerType === 'granular' &&
@@ -162,7 +162,7 @@ const NitrogenFertilizer = () => {
       }
     };
 
-    // fetchFertilizers();
+    fetchFertilizers();
   }, [isAuthenticated, getAccessTokenSilently, dispatch]);
 
   useEffect(() => {
