@@ -68,6 +68,9 @@ const CONVERSION_FACTOR = 1.12085; // lb n/acre -> kg n/ha
 const API_BASE_URL = ncalcApiUrl;
 
 const NitrogenFertilizer = () => {
+  const isDevelopOrLocal = window.location.hostname === 'localhost'
+    || window.location.hostname === '127.0.0.1'
+    || window.location.href.includes('develop');
   const {
     isAuthenticated, getAccessTokenSilently,
   } = useAuth0();
@@ -100,11 +103,11 @@ const NitrogenFertilizer = () => {
   const gridSize = useSelector(get.gridSize);
 
   const granularOptions = !isFetching
-    ? [...fertilizers.filter((f) => f.type === 'granular').map((f) => f.name), 'Other']
+    ? [...fertilizers.filter((f) => f.type === 'granular').map((f) => f.name), ...(isDevelopOrLocal ? ['Other'] : [])]
     : [];
 
   const liquidOptions = !isFetching
-    ? [...fertilizers.filter((f) => f.type === 'liquid').map((f) => f.name), 'Other']
+    ? [...fertilizers.filter((f) => f.type === 'liquid').map((f) => f.name), ...(isDevelopOrLocal ? ['Other'] : [])]
     : [];
 
   const granularExists = fertilizerType === 'granular' &&
@@ -161,9 +164,9 @@ const NitrogenFertilizer = () => {
         setIsFetching(false);
       }
     };
-
-    fetchFertilizers();
-  }, [isAuthenticated, getAccessTokenSilently, dispatch]);
+    if (isDevelopOrLocal) fetchFertilizers();
+    else dispatch(set.fertilizers(FERTILIZER_DATA));
+  }, [isAuthenticated, getAccessTokenSilently, dispatch, isDevelopOrLocal]);
 
   useEffect(() => {
     let newMultiplier = 1;
