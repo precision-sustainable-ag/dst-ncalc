@@ -95,6 +95,7 @@ const AddField = () => {
   const [coverCropTerminationDate, setCoverCropTerminationDate] = useState(null);
   const [comments, setComments] = useState(null);
   const [isSaving, setIsSaving] = useState(false);
+  const [isDeleting, setIsDeleting] = useState(false);
 
   // MAP STATE VARIABLES
   const defaultLat = useSelector(get.lat);
@@ -146,7 +147,7 @@ const AddField = () => {
       try {
         setLoadingOptions(true);
         const token = await getAccessTokenSilently();
-        const response = await axios.get(`${API_BASE_URL}/fields-identifiers`, {
+        const response = await axios.get(`${API_BASE_URL}/fields-identifiers?mode=edit`, {
           headers: { Authorization: `Bearer ${token}` },
         });
         // setOptions(response.data);
@@ -176,11 +177,14 @@ const AddField = () => {
     setCoverCropTerminationDate(selectedField?.properties.coverCropTerminationDate);
     setCashCropPlantingDate(selectedField?.properties.cashCropPlantingDate);
     setCashCropHarvestingDate(selectedField?.properties.cashCropHarvestingDate);
+    setComments(selectedField?.properties.comments);
     geometriesToFeatures(selectedField?.geometry, setFeatures, setLatLon, setBounds);
   }, [selectedField]);
 
   // Reset states when switching between create and edit
   useEffect(() => {
+    if (isEdit && selectedField) return;
+
     setProgram(null);
     setGrower(null);
     setFarm(null);
@@ -191,10 +195,11 @@ const AddField = () => {
     setCoverCropTerminationDate(null);
     setCashCropPlantingDate(null);
     setCashCropHarvestingDate(null);
+    setComments(null);
     setFeatures(null);
     setAddress({});
     setZoom(13);
-  }, [isEdit]);
+  }, [isEdit, selectedField]);
 
   const {
     programOptions, growerOptions, farmOptions, fieldOptions,
@@ -310,7 +315,7 @@ const AddField = () => {
   const handleUpdateField = async () => {
     // Validate form fields
     if (!program || !grower || !farm || !field || !cashCrop || !coverCrops || coverCrops.length < 1
-      || !cashCropPlantingDate || !cashCropHarvestingDate || !coverCropPlantingDate || !coverCropTerminationDate) {
+      || !cashCropPlantingDate || !cashCropHarvestingDate || !coverCropTerminationDate) {
       alert('Please fill in all the fields');
       return;
     }
@@ -338,6 +343,7 @@ const AddField = () => {
         cashCropHarvestingDate,
         coverCropPlantingDate,
         coverCropTerminationDate,
+        comments,
       };
 
       await axios.put(`${API_BASE_URL}/fields`, payload, {
@@ -365,6 +371,37 @@ const AddField = () => {
       }
     } finally {
       setIsSaving(false);
+    }
+  };
+
+  const handleDeleteField = async () => {
+    const confirmDelete = window.confirm('Are you sure you want to delete this field? This will deactivate the current seasonal data.');
+
+    if (!confirmDelete) return;
+
+    setIsDeleting(true);
+
+    try {
+      const token = await getAccessTokenSilently();
+
+      const fieldId = selectedField?._id;
+      const response = await axios.delete(`${API_BASE_URL}/fields/${fieldId}`, {
+        headers: {
+          Authorization: `Bearer ${token}`,
+          'Content-Type': 'application/json',
+        },
+      });
+
+      if (response.status === 200) {
+        setSelectedField(null);
+        alert('Field deactivated successfully.');
+        navigate('/home');
+      }
+    } catch (err) {
+      const errorMessage = err.response?.data?.message || 'Error deleting field. Please try again.';
+      alert(errorMessage);
+    } finally {
+      setIsDeleting(false);
     }
   };
 
@@ -775,13 +812,13 @@ const AddField = () => {
             />
           </Box>
 
-          <Stack direction="row" justifyContent="center" sx={{ mt: 2 }}>
+          <Stack direction="row" justifyContent="center" spacing={2} sx={{ mt: 2 }}>
             <PSAButton
               // eslint-disable-next-line no-nested-ternary
               title={isSaving ? <CircularProgress size={24} color="inherit" /> : isEdit ? 'Update Field' : 'Save Field'}
               variant="contained"
               onClick={isEdit ? handleUpdateField : handleSaveField}
-              disabled={isSaving || !program || !grower || !farm || !field || !cashCrop || !coverCrops || coverCrops.length < 1
+              disabled={isSaving || isDeleting || !program || !grower || !farm || !field || !cashCrop || !coverCrops || coverCrops.length < 1
                 || !cashCropPlantingDate || !cashCropHarvestingDate || !coverCropTerminationDate
                 || !features || features.length < 1}
               sx={{
@@ -797,6 +834,27 @@ const AddField = () => {
                 },
               }}
             />
+            {isEdit
+            && (
+            <PSAButton
+              title={isDeleting ? <CircularProgress size={24} color="inherit" /> : 'Delete Field'}
+              variant="contained"
+              onClick={handleDeleteField}
+              disabled={isSaving || isDeleting}
+              sx={{
+                minWidth: '150px',
+                color: 'white',
+                padding: '0.8rem 1.5rem',
+                borderRadius: '2rem',
+                backgroundColor: '#D32F2F',
+                '&:hover': {
+                  backgroundColor: '#B71C1C',
+                  textDecoration: 'underline',
+                  boxShadow: '0px 2px 2px rgba(160, 160, 160, 0.3)',
+                },
+              }}
+            />
+            )}
           </Stack>
         </Stack>
       </Grid>
