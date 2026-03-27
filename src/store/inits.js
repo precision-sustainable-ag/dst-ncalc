@@ -148,6 +148,8 @@ const initialState = {
   outputN: 1,
   SSURGO: null,
   updateSSURGO: false,
+  SSURGOisLoading: false,
+  SSURGOisFailed: false,
   gotModel: false,
   cornN: [],
   state: '',
