@@ -38,6 +38,8 @@ const cardContentStyles = {
 /// /// /// RETURN JSX /// /// ///
 const NitrogenMapWidget = ({ refVal }) => {
   const dispatch = useDispatch();
+  const selectedField = useSelector(get.selectedField);
+  const isRCPP = selectedField?.properties?.programName === 'RCPP';
   const isPM3DMode = useSelector(get.biomassCalcMode) === 'pm3d';
   const isSatelliteMode = useSelector(get.biomassCalcMode) === 'satellite';
   const nitrogenFetchIsLoading = useSelector(get.nitrogenFetchIsLoading);
@@ -104,15 +106,17 @@ const NitrogenMapWidget = ({ refVal }) => {
           />
           {(isPM3DMode || isSatelliteMode) && (
           <Stack direction="column" alignItems="center" spacing={1}>
-            <FormControlLabel
-              control={(
-                <Checkbox
-                  checked={applyRCPP}
-                  onChange={(e) => setApplyRCPP(e.target.checked)}
-                />
-                  )}
-              label="Apply RCPP Treatment?"
-            />
+            {isRCPP && (
+              <FormControlLabel
+                control={(
+                  <Checkbox
+                    checked={applyRCPP}
+                    onChange={(e) => setApplyRCPP(e.target.checked)}
+                  />
+              )}
+                label="Apply RCPP Treatment?"
+              />
+            )}
             <NavButton
               onClick={handleDownloadClick}
               disabled={(!nitrogenTaskResults?.reqN && !nitrogenTaskResults?.reqNWithoutTreatment) || nitrogenFetchIsLoading}
