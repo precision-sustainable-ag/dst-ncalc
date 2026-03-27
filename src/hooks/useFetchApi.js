@@ -159,12 +159,14 @@ const useFetchSSURGO = () => {
     }
     // exclude example fields
     if ((!SSURGO || updateSSURGO)) {
+      dispatch(set.SSURGOisLoading(true));
+      dispatch(set.SSURGOisFailed(false));
       const url = `${SSURGO_API_URL}/?lat=${lat}&lon=${lon}&component=major`;
       axios
         .get(url)
         .then((data) => {
           if (data.ERROR || !data.data || !data.data.length) {
-            throw new Error('No SSURGO data found for this location');
+            dispatch(set.SSURGOisFailed(true));
           } if (!SSURGO || updateSSURGO) {
             // } else {
             let filteredData = data.data.filter((d) => d.desgnmaster !== 'O');
@@ -179,9 +181,18 @@ const useFetchSSURGO = () => {
           }
         })
         .catch((error) => {
-          console.log(error);
-          dispatch(set.user.alertMessage(`Error: ${error.message}. Please use a different location or try again later!`));
-          dispatch(set.user.showAlert(true));
+          // console.log(error);
+          if (error?.response?.data?.ERROR === 'No data found') {
+            dispatch(set.OM(1));
+            dispatch(set.BD(1.6));
+            dispatch(set.InorganicN(1));
+            dispatch(set.SSURGOisFailed(true));
+          } else {
+            dispatch(set.user.alertMessage(`Error: ${error.message}. Please use a different location or try again later!`));
+            dispatch(set.user.showAlert(true));
+          }
+        }).finally(() => {
+          dispatch(set.SSURGOisLoading(false));
         });
     }
   }, [updateSSURGO, field]);
