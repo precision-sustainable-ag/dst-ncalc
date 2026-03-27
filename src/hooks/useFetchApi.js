@@ -332,6 +332,7 @@ const fetchPrescription = async (
 
       const biomassGeojson = JSON.parse(JSON.stringify(geojsonData));
       const reqnGeojson = JSON.parse(JSON.stringify(geojsonData));
+      const reqnWithoutTreatmentGeojson = JSON.parse(JSON.stringify(geojsonData));
 
       biomassGeojson.features.forEach((feature) => {
         if (
@@ -360,8 +361,17 @@ const fetchPrescription = async (
         }
       });
 
+      reqnWithoutTreatmentGeojson.features.forEach((feature) => {
+        if (
+          feature.properties
+          && feature.properties.ReqN !== undefined
+        ) {
+          feature.properties.value = feature.properties.ReqNWithoutTreatment;
+        }
+      });
+
       dispatch(set.biomassGeojson(biomassGeojson));
-      dispatch(set.nitrogenTaskResults({ minN: geojsonData, reqN: reqnGeojson }));
+      dispatch(set.nitrogenTaskResults({ minN: geojsonData, reqN: reqnGeojson, reqNWithoutTreatment: reqnWithoutTreatmentGeojson }));
 
       const fieldSummary = response.data?.field_summary;
       const biomassVal = fieldSummary?.avg_biomass ?? 0;

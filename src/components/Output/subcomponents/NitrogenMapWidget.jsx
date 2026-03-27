@@ -7,6 +7,9 @@ import {
   CardContent,
   Typography,
   Grid,
+  Stack,
+  FormControlLabel,
+  Checkbox,
 } from '@mui/material';
 import { PSALoadingSpinner, PSARadioButton } from 'shared-react-components/src';
 import { useDispatch, useSelector } from 'react-redux';
@@ -40,9 +43,10 @@ const NitrogenMapWidget = ({ refVal }) => {
   const nitrogenFetchIsLoading = useSelector(get.nitrogenFetchIsLoading);
   const nitrogenTaskResults = useSelector(get.nitrogenTaskResults);
   const [layer, setLayer] = useState('prescription');
+  const [applyRCPP, setApplyRCPP] = useState(true);
 
   const handleDownloadClick = () => {
-    downloadPrescriptionShapefile(nitrogenTaskResults?.reqN, dispatch);
+    downloadPrescriptionShapefile(applyRCPP ? nitrogenTaskResults?.reqN : nitrogenTaskResults?.reqNWithoutTreatment, dispatch);
   };
 
   return (
@@ -74,7 +78,7 @@ const NitrogenMapWidget = ({ refVal }) => {
         </Box>
         )}
         <Box sx={{ height: '90%', width: '100%', marginBottom: 2 }}>
-          <Map variant="nitrogen" layer={layer} />
+          <Map layer={layer} applyRCPP={applyRCPP} />
         </Box>
 
         <Box sx={{
@@ -99,13 +103,24 @@ const NitrogenMapWidget = ({ refVal }) => {
             row
           />
           {(isPM3DMode || isSatelliteMode) && (
-          <NavButton
-            onClick={handleDownloadClick}
-            disabled={!nitrogenTaskResults?.reqN || nitrogenFetchIsLoading}
-            sx={{ mt: 2 }}
-          >
-            Download Prescription
-          </NavButton>
+          <Stack direction="column" alignItems="center" spacing={1}>
+            <FormControlLabel
+              control={(
+                <Checkbox
+                  checked={applyRCPP}
+                  onChange={(e) => setApplyRCPP(e.target.checked)}
+                />
+                  )}
+              label="Apply RCPP Treatment?"
+            />
+            <NavButton
+              onClick={handleDownloadClick}
+              disabled={(!nitrogenTaskResults?.reqN && !nitrogenTaskResults?.reqNWithoutTreatment) || nitrogenFetchIsLoading}
+              sx={{ mt: 2 }}
+            >
+              Download Prescription
+            </NavButton>
+          </Stack>
           )}
         </Box>
       </CardContent>

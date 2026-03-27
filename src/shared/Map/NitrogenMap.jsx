@@ -1,3 +1,4 @@
+/* eslint-disable no-nested-ternary */
 /* eslint-disable react-hooks/exhaustive-deps */
 /* eslint-disable no-console */
 import React, { useState, useEffect } from 'react';
@@ -16,7 +17,7 @@ import { mapboxToken } from '../../utils/keys';
 const biomassRasterColors = ['#d73027', '#f46d43', '#fdae61', '#fee08b', '#a6d96a', '#1a9850'];
 const nitrogenRasterColors = ['#762a83', '#af8dc3', '#e7d4e8', '#d9f0d3', '#7fbf7b', '#1b7837'];
 
-const NitrogenMapComp = ({ variant, layer = 'prescription' }) => {
+const NitrogenMapComp = ({ layer = 'prescription', applyRCPP = true }) => {
   const [address, setAddress] = useState({});
   const dispatch = useDispatch();
   const lat = useSelector(get.lat);
@@ -26,7 +27,7 @@ const NitrogenMapComp = ({ variant, layer = 'prescription' }) => {
   const mapAddress = useSelector(get.mapAddress);
   const mapZoom = useSelector(get.mapZoom);
   const mapPolygon = useSelector(get.mapPolygon);
-  const unit = useSelector(get.unit);
+  // const unit = useSelector(get.unit);
   const fertilizerType = useSelector(get.fertilizerType);
   const [features, setFeatures] = useState(mapPolygon);
   const [zoom, setZoom] = useState(null);
@@ -92,15 +93,27 @@ const NitrogenMapComp = ({ variant, layer = 'prescription' }) => {
         keyboard
         doubleClickZoom={false}
         touchZoomRotate
-        initRasterObject={(layer === 'biomass' ? biomassGeojson : (layer === 'prescription' ? nitrogenTaskResults?.reqN : nitrogenTaskResults?.minN)) || { type: 'FeatureCollection', features: [{ 
-          type: 'Feature',
-          geometry: { type: 'Point', coordinates: [0, 0] },
-          properties: { value: 0 },
-        }],
-        }}
+        initRasterObject={
+          (layer === 'biomass'
+            ? biomassGeojson
+            : layer === 'prescription'
+              ? applyRCPP
+                ? nitrogenTaskResults?.reqN
+                : nitrogenTaskResults?.reqNWithoutTreatment
+              : nitrogenTaskResults?.minN) || {
+            type: 'FeatureCollection',
+            features: [
+              {
+                type: 'Feature',
+                geometry: { type: 'Point', coordinates: [0, 0] },
+                properties: { value: 0 },
+              },
+            ],
+          }
+        }
         rasterColors={layer === 'biomass' ? biomassRasterColors : nitrogenRasterColors}
         color_steps={7}
-        unit={layer === 'biomass' ? 'lb/ac' : (layer === 'prescription' ? (fertilizerType === 'liquid' ? 'gal/ac' : 'lb/ac') : 'lb/ac')}
+        unit={layer === 'biomass' ? 'lb/ac' : layer === 'prescription' ? (fertilizerType === 'liquid' ? 'gal/ac' : 'lb/ac') : 'lb/ac'}
         material=""
         mapboxToken={mapboxToken}
       />
