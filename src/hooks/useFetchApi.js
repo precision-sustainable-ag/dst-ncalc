@@ -486,10 +486,10 @@ const useFetchPlantFactors = () => {
   useEffect(() => {
     if (activeExample) return;
 
-    if (isSatelliteMode && coverCrop && coverCropGrowthStage[coverCrop]) {
+    if (isSatelliteMode && coverCrop?.[0] && coverCropGrowthStage?.[coverCrop[0]]) {
       const url = `${PLANTFACTORS_API_URL}/plantfactors`;
       axios
-        .get(url, { params: { plant_species: coverCrop[0], growth_stage: coverCropGrowthStage[coverCrop] } })
+        .get(url, { params: { plant_species: coverCrop[0], growth_stage: coverCropGrowthStage[coverCrop[0]] } })
         .then((data) => {
           if (data.data) {
             dispatch(set.N(Number(data.data.mean_n.toFixed(2))));

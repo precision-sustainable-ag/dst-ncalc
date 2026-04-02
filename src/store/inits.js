@@ -179,6 +179,7 @@ const initialState = {
   maxBiomass: initMaxBiomass,
   biomassFetchIsFailed: false,
   biomassFetchIsLoading: false,
+  biomassFetchFailMessage: null,
   biomassTaskIsDone: true,
   polyDrawTooBig: false,
   nitrogenFetchIsFailed: false,
