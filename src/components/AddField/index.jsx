@@ -1,3 +1,4 @@
+/* eslint-disable no-underscore-dangle */
 /* eslint-disable no-alert */
 import React, { useEffect, useMemo, useState } from 'react';
 import { useAuth0 } from '@auth0/auth0-react';
@@ -202,7 +203,7 @@ const AddField = () => {
     setCashCropPlantingDate(null);
     setCashCropHarvestingDate(null);
     setComments(null);
-    setFeatures(null);
+    setFeatures([]);
     setAddress({});
     setZoom(13);
   }, [isEdit, selectedField]);

@@ -1,7 +1,7 @@
 /* eslint-disable no-nested-ternary */
 /* eslint-disable react-hooks/exhaustive-deps */
 /* eslint-disable no-console */
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useMemo } from 'react';
 // import mapboxgl from 'mapbox-gl';
 import { useSelector, useDispatch } from 'react-redux';
 import { PSAReduxMap } from 'shared-react-components/src';
@@ -67,6 +67,44 @@ const NitrogenMapComp = ({ layer = 'prescription', applyRCPP = true }) => {
     setBounds(newBounds);
   }, [biomassGeojson]);
 
+  const valueKey = useMemo(() => {
+    if (layer === 'biomass') return 'biomass_average';
+    if (layer === 'prescription') return applyRCPP ? 'ReqN' : 'ReqNWithoutTreatment';
+    if (layer === 'credit') return 'MinNfromFOM';
+    return 'category'; // treatment
+  }, [layer, applyRCPP]);
+
+  const rasterColors = useMemo(() => {
+    if (layer === 'biomass') return biomassRasterColors;
+    if (layer === 'treatment') return null;
+    return nitrogenRasterColors;
+  }, [layer]);
+
+  const unit = useMemo(() => {
+    if (layer === 'biomass') return 'lb/ac';
+    if (layer === 'prescription') return fertilizerType === 'liquid' ? 'gal/ac' : 'lb/ac';
+    if (layer === 'credit') return 'lb/ac';
+    return '';
+  }, [layer, fertilizerType]);
+
+  const discreteLabels = useMemo(() => {
+    if (layer !== 'treatment') return null;
+    return {
+      1: 'Control',
+      2: 'Full',
+      3: 'Average',
+      4: 'Cap',
+      _colors: {
+        1: '#ff5286', 2: '#fff83b', 3: '#50ff24', 4: '#3689ff',
+      },
+    };
+  }, [layer]);
+
+  const initRasterObject = useMemo(() => {
+    if (layer === 'biomass') return biomassGeojson;
+    return nitrogenTaskResults?.reqN;
+  }, [layer, biomassGeojson, nitrogenTaskResults?.reqN]);
+
   return (
     <Paper>
       <PSAReduxMap
@@ -93,28 +131,13 @@ const NitrogenMapComp = ({ layer = 'prescription', applyRCPP = true }) => {
         keyboard
         doubleClickZoom={false}
         touchZoomRotate
-        initRasterObject={
-          (layer === 'biomass'
-            ? biomassGeojson
-            : layer === 'prescription'
-              ? applyRCPP
-                ? nitrogenTaskResults?.reqN
-                : nitrogenTaskResults?.reqNWithoutTreatment
-              : nitrogenTaskResults?.minN) || {
-            type: 'FeatureCollection',
-            features: [
-              {
-                type: 'Feature',
-                geometry: { type: 'Point', coordinates: [0, 0] },
-                properties: { value: 0 },
-              },
-            ],
-          }
-        }
-        rasterColors={layer === 'biomass' ? biomassRasterColors : nitrogenRasterColors}
+        initRasterObject={initRasterObject}
+        valueKey={valueKey}
+        rasterColors={rasterColors}
         color_steps={7}
-        unit={layer === 'biomass' ? 'lb/ac' : layer === 'prescription' ? (fertilizerType === 'liquid' ? 'gal/ac' : 'lb/ac') : 'lb/ac'}
-        material=""
+        unit={unit}
+        material={layer}
+        discreteLabels={discreteLabels}
         mapboxToken={mapboxToken}
       />
     </Paper>
