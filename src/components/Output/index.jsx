@@ -2,19 +2,20 @@
 /* eslint-disable react-hooks/exhaustive-deps */
 /* eslint-disable no-console */
 import { Stack } from '@mui/material';
-import React, { useEffect, useRef, useState } from 'react';
-import { useSelector } from 'react-redux';
+import React, { useEffect, useRef } from 'react';
+import { useDispatch, useSelector } from 'react-redux';
 import dayjs from 'dayjs';
 // import LeftSideBar from './subcomponents/LeftSideBar';
 import RightSideBar from './subcomponents/RightSideBar';
-import { get } from '../../store/redux-autosetters';
+import { get, set } from '../../store/redux-autosetters';
 import useStoreMem from '../../hooks/useStoreMem';
 // import { useFetchNitrogenArray } from '../../hooks/useFetchApi';
 import { sidebarListData, summaryDataDefaults } from '../../constants';
 import { useFetchModel } from '../../hooks/useFetchApi';
 
 const Output = () => {
-  const [summaryData, setSummaryData] = useState(summaryDataDefaults);
+  const dispatch = useDispatch();
+  const summaryData = useSelector(get.summaryData);
   const refs = sidebarListData.map(() => useRef(null));
   const field = useSelector(get.field);
   const coverCrop = useSelector(get.coverCrop);
@@ -42,7 +43,7 @@ const Output = () => {
   });
 
   useEffect(() => {
-    const tempSummaryData = { ...summaryData };
+    const tempSummaryData = JSON.parse(JSON.stringify(summaryData || summaryDataDefaults));
     tempSummaryData['Field name'].value = field;
     tempSummaryData.Species.value = coverCrop;
     tempSummaryData['Termination Date'].value = dayjs(coverCropTerminationDate, 'YYYY-MM-DD').format('MMM DD YYYY');
@@ -52,7 +53,7 @@ const Output = () => {
     tempSummaryData['Holo-cellulose'].value = String(cell).concat(' %');
     tempSummaryData.Lignin.value = String(lign).concat(' %');
     tempSummaryData.Nitrogen.value = String(N).concat(' %');
-    setSummaryData({ ...tempSummaryData });
+    dispatch(set.summaryData({ ...tempSummaryData }));
   }, [field, biomass]);
 
   return (

@@ -2,7 +2,7 @@
 /* eslint-disable no-alert */
 /* eslint-disable no-unused-vars */
 /* eslint-disable arrow-body-style */
-import { React, useState } from 'react';
+import { React, useState, useRef } from 'react';
 import {
   Box,
   Card,
@@ -24,6 +24,7 @@ import NavButton from '../../../shared/Navigate/NavButton';
 import ActionModal from '../../../shared/Modal';
 import { downloadPrescriptionShapefile } from '../../../hooks/useFetchApi';
 import { ncalcApiUrl } from '../../../utils/keys';
+import buildPdfReportHtml from '../../../utils/pdfUtils';
 
 /// /// /// STYLES /// /// ///
 const CardStyles = {
@@ -41,22 +42,27 @@ const cardContentStyles = {
 };
 
 const API_BASE_URL = ncalcApiUrl;
+const PDF_BASE_URL = 'https://pdf.covercrop-data.org/api';
 
 const NitrogenMapWidget = ({ refVal }) => {
   const { getAccessTokenSilently } = useAuth0();
   const dispatch = useDispatch();
-  const selectedField = useSelector(get.selectedField);
-  const isRCPP = selectedField?.properties?.programName === 'RCPP';
+  const mapRef = useRef(null);
   const isPM3DMode = useSelector(get.biomassCalcMode) === 'pm3d';
   const isSatelliteMode = useSelector(get.biomassCalcMode) === 'satellite';
-  const biomassGeojson = useSelector(get.biomassGeojson);
+  const selectedField = useSelector(get.selectedField);
+  const isRCPP = selectedField?.properties?.programName === 'RCPP';
   const nitrogenFetchIsLoading = useSelector(get.nitrogenFetchIsLoading);
+  const biomassGeojson = useSelector(get.biomassGeojson);
   const nitrogenTaskResults = useSelector(get.nitrogenTaskResults);
+  const summaryData = useSelector(get.summaryData);
+
   const [layer, setLayer] = useState('prescription');
   const [applyRCPP, setApplyRCPP] = useState(true);
 
   const [modalConfig, setModalConfig] = useState({ open: false });
-  const [isLoading, setIsLoading] = useState(false);
+  const [isSaving, setIsSaving] = useState(false);
+  const [isPdfLoading, setIsPdfLoading] = useState(false);
   const closeModal = () => setModalConfig({ open: false });
   const showModal = (config) => setModalConfig({ ...config, open: true });
 
@@ -98,7 +104,7 @@ const NitrogenMapWidget = ({ refVal }) => {
 
   const handleSaveAndDownload = async () => {
     try {
-      setIsLoading(true);
+      setIsSaving(true);
 
       if (isSatelliteMode) {
         handleDownloadClick();
@@ -132,7 +138,37 @@ const NitrogenMapWidget = ({ refVal }) => {
         message: 'Failed to check for existing prescription data.',
       });
     } finally {
-      setIsLoading(false);
+      setIsSaving(false);
+    }
+  };
+
+  /**
+   * Captures all map layers as images, builds an HTML report and POSTs it to the PDF-generation endpoint.
+   */
+  const handlePrintPDF = async () => {
+    if (isPdfLoading) return;
+    setIsPdfLoading(true);
+    try {
+      const mapCaptures = await mapRef.current?.captureAllLayers({ applyRCPP });
+
+      if (!mapCaptures?.length) {
+        alert('Map not ready for capture.');
+        return;
+      }
+
+      const fieldName = selectedField?.properties?.fieldName ?? 'Field';
+      const html = buildPdfReportHtml({ fieldName, mapCaptures, summaryData });
+
+      const { data } = await axios.post(`${PDF_BASE_URL}/generate-pdf`, { html, filename: `prescription-${fieldName}.pdf` });
+      window.open(data.fileUrl, '_blank');
+    } catch (err) {
+      showModal({
+        type: 'error',
+        title: 'PDF Export Error',
+        message: err?.response?.data?.error || 'There was an error generating the PDF.',
+      });
+    } finally {
+      setIsPdfLoading(false);
     }
   };
 
@@ -166,7 +202,7 @@ const NitrogenMapWidget = ({ refVal }) => {
           </Box>
           )}
           <Box sx={{ height: '90%', width: '100%', marginBottom: 2 }}>
-            <Map layer={layer} applyRCPP={applyRCPP} />
+            <Map layer={layer} setLayer={setLayer} applyRCPP={applyRCPP} ref={mapRef} />
           </Box>
 
           <Box sx={{
@@ -204,15 +240,27 @@ const NitrogenMapWidget = ({ refVal }) => {
                 label="Apply RCPP Treatment?"
               />
               )}
-              <NavButton
-                onClick={handleSaveAndDownload}
-                disabled={(!nitrogenTaskResults?.reqN && !nitrogenTaskResults?.reqNWithoutTreatment) || nitrogenFetchIsLoading || isLoading}
-                sx={{ mt: 2 }}
-              >
-                {isLoading ? <CircularProgress size={24} color="inherit" /> : null}
-                {' '}
-                Download Prescription
-              </NavButton>
+              <Stack direction="row" spacing={3}>
+                <NavButton
+                  onClick={handleSaveAndDownload}
+                  disabled={(!nitrogenTaskResults?.reqN && !nitrogenTaskResults?.reqNWithoutTreatment) || nitrogenFetchIsLoading || isSaving}
+                  sx={{ mt: 2 }}
+                >
+                  {isSaving ? <CircularProgress size={24} color="inherit" /> : null}
+                  {' '}
+                  Download Prescription
+                </NavButton>
+                {isPM3DMode && (
+                  <NavButton
+                    onClick={handlePrintPDF}
+                    disabled={(!nitrogenTaskResults?.reqN && !nitrogenTaskResults?.reqNWithoutTreatment) || nitrogenFetchIsLoading || isPdfLoading}
+                  >
+                    {isPdfLoading ? <CircularProgress size={24} color="inherit" /> : null}
+                    {' '}
+                    Print Report
+                  </NavButton>
+                )}
+              </Stack>
             </Stack>
             )}
           </Box>

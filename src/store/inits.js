@@ -1,10 +1,11 @@
 import dayjs from 'dayjs';
 import { query } from '../hooks/helpers';
+import { summaryDataDefaults } from '../constants';
 
 const now = dayjs();
 
-const coverCropPlantingDate =
-  now.month() < 6 ? now.subtract(2, 'year').startOf('month').month(10) : now.subtract(1, 'year').startOf('month').month(10);
+const coverCropPlantingDate = now.month() < 6
+  ? now.subtract(2, 'year').startOf('month').month(10) : now.subtract(1, 'year').startOf('month').month(10);
 const coverCropTerminationDate = coverCropPlantingDate.add(6, 'month');
 // const cashCropPlantingDate = coverCropTerminationDate.add(1, 'week');
 
@@ -208,6 +209,7 @@ const initialState = {
   },
   hasFixedNRate: 'fixed',
   gridSize: 1,
+  summaryData: summaryDataDefaults,
   user: {
     historyState: historyStates.none,
     selectedHistory: null,
