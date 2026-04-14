@@ -117,7 +117,17 @@ export const processGeometries = (featuresArray) => {
   }
 
   // Case 2: Multiple Shapes -> Merge into MultiPolygon
-  const cleanCoords = featuresArray.map((f) => f.geometry.coordinates);
+  const cleanCoords = [];
+
+  featuresArray.forEach((f) => {
+    const { type, coordinates } = f.geometry;
+
+    if (type === 'Polygon') {
+      cleanCoords.push(coordinates);
+    } else if (type === 'MultiPolygon') {
+      cleanCoords.push(...coordinates);
+    }
+  });
 
   return {
     type: 'MultiPolygon',
