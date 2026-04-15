@@ -95,7 +95,7 @@ const Upload = () => {
       return true;
     } catch (e) {
       const errorMessage = e.message || 'An unknown validation error occurred';
-      console.error('Validation failed:', errorMessage);
+      // console.error('Validation failed:', errorMessage);
       setError(errorMessage);
       return false;
     }
@@ -157,7 +157,13 @@ const Upload = () => {
         });
         setBiomassFiles(response.data?.data);
       } catch (e) {
-        console.error('Failed to load options', e);
+        // console.error('Failed to load options', e);
+        dispatch(set.actionModal({
+          open: true,
+          type: 'error',
+          title: 'Failed to load biomass files',
+          message: e?.response?.data?.message || e?.response?.data?.error || 'An error occurred while fetching biomass files.',
+        }));
         setBiomassFiles([]);
       } finally {
         setIsFetchingBiomass(false);

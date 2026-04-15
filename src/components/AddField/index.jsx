@@ -9,7 +9,7 @@ import {
   Grid, Stack, SvgIcon, Typography, useMediaQuery,
 } from '@mui/material';
 import { PSAButton, PSAReduxMap, PSATextField } from 'shared-react-components/src';
-import { useSelector } from 'react-redux';
+import { useDispatch, useSelector } from 'react-redux';
 import shpjs from 'shpjs';
 import axios from 'axios';
 import { useLocation, useNavigate } from 'react-router-dom';
@@ -17,7 +17,7 @@ import { DatePicker } from '@mui/x-date-pickers/DatePicker';
 import { LocalizationProvider } from '@mui/x-date-pickers';
 import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
 import dayjs from 'dayjs';
-import { get } from '../../store/redux-autosetters';
+import { get, set } from '../../store/redux-autosetters';
 import { mapboxToken, ncalcApiUrl } from '../../utils/keys';
 import { geometriesToFeatures, processGeometries, validateAndProcessGeoJSON } from '../../utils/geojsonUtils';
 
@@ -81,6 +81,7 @@ const AddField = () => {
 
   const navigate = useNavigate();
   const location = useLocation();
+  const dispatch = useDispatch();
   const isEdit = location.pathname === '/editfield';
 
   const matchesMd = useMediaQuery((theme) => theme.breakpoints.down('md'));
@@ -157,10 +158,14 @@ const AddField = () => {
         const response = await axios.get(url, {
           headers: { Authorization: `Bearer ${token}` },
         });
-        // setOptions(response.data);
         setAllFields(response.data);
       } catch (error) {
-        console.error('Failed to load dropdown options', error);
+        dispatch(set.actionModal({
+          open: true,
+          type: 'error',
+          title: 'Error',
+          message: 'Failed to load dropdown options. Please refresh the page or try again later.',
+        }));
       } finally {
         setLoadingOptions(false);
       }
@@ -169,7 +174,7 @@ const AddField = () => {
     if (isAuthenticated) {
       fetchOptions();
     }
-  }, [isAuthenticated, getAccessTokenSilently, isEdit]);
+  }, [isAuthenticated, getAccessTokenSilently, isEdit, dispatch]);
 
   useEffect(() => {
     if (!selectedField) return;
@@ -255,6 +260,12 @@ const AddField = () => {
     if (!group || !grower || !farm || !field || !cashCrop || !coverCrops || coverCrops.length < 1
       || !cashCropPlantingDate || !cashCropHarvestingDate || !coverCropTerminationDate) {
       alert('Please fill in all the fields');
+      dispatch(set.actionModal({
+        open: true,
+        type: 'error',
+        title: 'Missing required fields',
+        message: 'Please fill in all the fields',
+      }));
       return;
     }
 
@@ -299,16 +310,29 @@ const AddField = () => {
       setFeatures(null);
       setComments(null);
 
-      alert('Field saved successfully!');
+      // alert('Field saved successfully!');
+      dispatch(set.actionModal({
+        open: true,
+        type: 'info',
+        title: 'Field Saved',
+        message: 'Field saved successfully!',
+      }));
       navigate('/home');
     } catch (error) {
+      let message = '';
       if (error.response?.data?.message) {
-        alert(`Error: ${error.response.data.message}`);
+        message = `Error: ${error.response.data.message}`;
       } else if (error.response) {
-        alert(`Error: ${error.response.data?.error || 'Failed to save field'}`);
+        message = `Error: ${error.response.data?.error || 'Failed to save field'}`;
       } else {
-        alert('Network error. Could not connect to server.');
+        message = 'Network error. Could not connect to server.';
       }
+      dispatch(set.actionModal({
+        open: true,
+        type: 'error',
+        title: 'Error',
+        message,
+      }));
     } finally {
       setIsSaving(false);
     }
@@ -318,7 +342,12 @@ const AddField = () => {
     // Validate form fields
     if (!group || !grower || !farm || !field || !cashCrop || !coverCrops || coverCrops.length < 1
       || !cashCropPlantingDate || !cashCropHarvestingDate || !coverCropTerminationDate) {
-      alert('Please fill in all the fields');
+      dispatch(set.actionModal({
+        open: true,
+        type: 'error',
+        title: 'Missing required fields',
+        message: 'Please fill in all the fields',
+      }));
       return;
     }
 
@@ -362,16 +391,29 @@ const AddField = () => {
       setField(null);
       setFeatures(null);
 
-      alert('Field updated successfully!');
+      // alert('Field updated successfully!');
+      dispatch(set.actionModal({
+        open: true,
+        type: 'info',
+        title: 'Field Updated',
+        message: 'Field updated successfully!',
+      }));
       navigate('/home');
     } catch (error) {
+      let message = '';
       if (error.response?.data?.message) {
-        alert(`Error: ${error.response.data.message}`);
+        message = `Error: ${error.response.data.message}`;
       } else if (error.response) {
-        alert(`Error: ${error.response.data?.error || 'Failed to update field'}`);
+        message = `Error: ${error.response.data?.error || 'Failed to update field'}`;
       } else {
-        alert('Network error. Could not connect to server.');
+        message = 'Network error. Could not connect to server.';
       }
+      dispatch(set.actionModal({
+        open: true,
+        type: 'error',
+        title: 'Error',
+        message,
+      }));
     } finally {
       setIsSaving(false);
     }

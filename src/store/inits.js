@@ -218,6 +218,14 @@ const initialState = {
     alertSeverity: 'error',
     alertMessage: null,
   },
+  actionModal: {
+    open: false,
+    type: 'info',
+    title: '',
+    message: '',
+    confirmText: 'Confirm',
+    onConfirm: null,
+  },
 };
 
 export default initialState;

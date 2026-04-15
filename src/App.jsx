@@ -28,6 +28,7 @@ import Auth0ProviderWithNavigate from './shared/AuthProvider';
 import useFetchHLS from './hooks/useFetchHLS';
 import { useFetchPlantFactors } from './hooks/useFetchApi';
 import ProtectedPage from './shared/ProtectedPage/ProtectedPage';
+import ActionModal from './shared/Modal';
 
 const screens = {
   init: () => null,
@@ -104,6 +105,7 @@ const App = () => {
 
   const { showAlert, alertSeverity, alertMessage } = useSelector(get.user);
   const isPM3DMode = useSelector(get.biomassCalcMode) === 'pm3d';
+  const actionModal = useSelector(get.actionModal);
 
   const noStepperPaths = ['/profile', '/field', '/editfield', '/editfield', '/fileupload'];
   const showStepper = !noStepperPaths.includes(location.pathname.toLowerCase());
@@ -241,6 +243,7 @@ const App = () => {
               })}
               <Route path="" element={<Screen />} />
             </Routes>
+            <ActionModal {...actionModal} onClose={() => { dispatch(set.actionModal({ ...actionModal, open: false })); }} />
             <Feedback />
             <SnackbarMessage />
             <Box sx={{ position: 'fixed', bottom: matchesMd ? '45px' : 0, zIndex: 1000 }}>

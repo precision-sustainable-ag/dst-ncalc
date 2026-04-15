@@ -19,7 +19,7 @@ import { useDispatch, useSelector } from 'react-redux';
 import axios from 'axios';
 import { useAuth0 } from '@auth0/auth0-react';
 import Map from '../../../shared/Map/NitrogenMap';
-import { get } from '../../../store/redux-autosetters';
+import { get, set } from '../../../store/redux-autosetters';
 import NavButton from '../../../shared/Navigate/NavButton';
 import ActionModal from '../../../shared/Modal';
 import { downloadPrescriptionShapefile } from '../../../hooks/useFetchApi';
@@ -60,18 +60,15 @@ const NitrogenMapWidget = ({ refVal }) => {
   const [layer, setLayer] = useState('prescription');
   const [applyRCPP, setApplyRCPP] = useState(true);
 
-  const [modalConfig, setModalConfig] = useState({ open: false });
   const [isSaving, setIsSaving] = useState(false);
   const [isPdfLoading, setIsPdfLoading] = useState(false);
-  const closeModal = () => setModalConfig({ open: false });
-  const showModal = (config) => setModalConfig({ ...config, open: true });
 
   const handleDownloadClick = () => {
     downloadPrescriptionShapefile(applyRCPP ? nitrogenTaskResults?.reqN : nitrogenTaskResults?.reqNWithoutTreatment, dispatch);
   };
 
   const saveFiles = async () => {
-    showModal({ type: 'loading', message: 'Saving prescription data...' });
+    dispatch(set.actionModal({ open: true, type: 'loading', message: 'Saving prescription data...' }));
     try {
       const fieldId = selectedField._id;
       const token = await getAccessTokenSilently();
@@ -86,19 +83,21 @@ const NitrogenMapWidget = ({ refVal }) => {
           { headers: { Authorization: `Bearer ${token}` } },
         )),
       );
-      showModal({
+      dispatch(set.actionModal({
+        open: true,
         type: 'success',
         title: 'Saved Successfully',
         message: 'Your prescription has been saved and your download will begin shortly.',
-      });
+      }));
       handleDownloadClick();
     } catch (err) {
       const serverMessage = err?.response?.data?.message || err?.response?.data?.error;
-      showModal({
+      dispatch(set.actionModal({
+        open: true,
         type: 'error',
         title: 'Something Went Wrong',
         message: serverMessage || 'There was an error saving the prescription data.',
-      });
+      }));
     }
   };
 
@@ -120,23 +119,25 @@ const NitrogenMapWidget = ({ refVal }) => {
       });
 
       if (checkRes.data?.data) {
-        showModal({
+        dispatch(set.actionModal({
+          open: true,
           type: 'confirm',
           title: 'Overwrite Existing Prescription?',
           message: 'A prescription for this field already exists. Would you like to overwrite it with the current data?',
           confirmText: 'Overwrite',
           cancelText: 'Cancel',
           onConfirm: saveFiles,
-        });
+        }));
       } else {
         await saveFiles();
       }
     } catch (err) {
-      showModal({
+      dispatch(set.actionModal({
+        open: true,
         type: 'error',
         title: 'Error',
         message: 'Failed to check for existing prescription data.',
-      });
+      }));
     } finally {
       setIsSaving(false);
     }
@@ -162,85 +163,86 @@ const NitrogenMapWidget = ({ refVal }) => {
       const { data } = await axios.post(`${PDF_BASE_URL}/generate-pdf`, { html, filename: `prescription-${fieldName}.pdf` });
       window.open(data.fileUrl, '_blank');
     } catch (err) {
-      showModal({
+      dispatch(set.actionModal({
+        open: true,
         type: 'error',
         title: 'PDF Export Error',
         message: err?.response?.data?.error || 'There was an error generating the PDF.',
-      });
+      }));
     } finally {
       setIsPdfLoading(false);
     }
   };
 
   return (
-    <>
-      <Card sx={CardStyles} elevation={8} ref={refVal}>
-        <CardContent sx={cardContentStyles}>
-          <Typography sx={{ fontSize: 22 }} color="text.secondary" gutterBottom textAlign="center">
-            Field Map
-          </Typography>
-          {nitrogenFetchIsLoading && (
-          <Box>
-            <Grid
-              item
-              container
-              spacing={1}
-              justifyContent="center"
-              alignItems="center"
-              sx={{
-                display: 'flex',
-                justifyContent: 'center',
-                alignItems: 'center',
-                minHeight: '100px',
-              }}
-            >
-              <PSALoadingSpinner />
-            </Grid>
-            <Typography variant="h6" fontWeight="bold" gutterBottom textAlign="center">
-              Calculating Nitrogen ...
-            </Typography>
-          </Box>
-          )}
-          <Box sx={{ height: '90%', width: '100%', marginBottom: 2 }}>
-            <Map layer={layer} setLayer={setLayer} applyRCPP={applyRCPP} ref={mapRef} />
-          </Box>
-
-          <Box sx={{
-            width: '100%',
-            p: 2,
-            bgcolor: '#f9f9f9',
-            borderRadius: 3,
-            display: 'flex',
-            flexDirection: 'column',
-            alignItems: 'center',
-            gap: 2,
-          }}
+    <Card sx={CardStyles} elevation={8} ref={refVal}>
+      <CardContent sx={cardContentStyles}>
+        <Typography sx={{ fontSize: 22 }} color="text.secondary" gutterBottom textAlign="center">
+          Field Map
+        </Typography>
+        {nitrogenFetchIsLoading && (
+        <Box>
+          <Grid
+            item
+            container
+            spacing={1}
+            justifyContent="center"
+            alignItems="center"
+            sx={{
+              display: 'flex',
+              justifyContent: 'center',
+              alignItems: 'center',
+              minHeight: '100px',
+            }}
           >
-            <PSARadioButton
-              options={[
-                { label: 'Prescription', value: 'prescription' },
-                { label: 'Nitrogen Credit', value: 'credit' },
-                { label: 'Biomass', value: 'biomass' },
-                ...(isPM3DMode ? [{ label: 'Treatment', value: 'treatment' }] : []),
-              ]}
-              selectedValue={layer}
-              onChange={(value) => setLayer(value)}
-              row
+            <PSALoadingSpinner />
+          </Grid>
+          <Typography variant="h6" fontWeight="bold" gutterBottom textAlign="center">
+            Calculating Nitrogen ...
+          </Typography>
+        </Box>
+        )}
+        <Box sx={{ height: '90%', width: '100%', marginBottom: 2 }}>
+          <Map layer={layer} setLayer={setLayer} applyRCPP={applyRCPP} ref={mapRef} />
+        </Box>
+
+        <Box sx={{
+          width: '100%',
+          p: 2,
+          bgcolor: '#f9f9f9',
+          borderRadius: 3,
+          display: 'flex',
+          flexDirection: 'column',
+          alignItems: 'center',
+          gap: 2,
+        }}
+        >
+          <PSARadioButton
+            options={[
+              { label: 'Prescription', value: 'prescription' },
+              { label: 'Nitrogen Credit', value: 'credit' },
+              { label: 'Biomass', value: 'biomass' },
+              ...(isPM3DMode ? [{ label: 'Treatment', value: 'treatment' }] : []),
+            ]}
+            selectedValue={layer}
+            onChange={(value) => setLayer(value)}
+            row
+          />
+          {(isPM3DMode || isSatelliteMode) && (
+          <Stack direction="column" alignItems="center" spacing={1}>
+            {isRCPP && (
+            <FormControlLabel
+              control={(
+                <Checkbox
+                  checked={applyRCPP}
+                  onChange={(e) => setApplyRCPP(e.target.checked)}
+                />
+            )}
+              label="Apply RCPP Treatment?"
             />
-            {(isPM3DMode || isSatelliteMode) && (
-            <Stack direction="column" alignItems="center" spacing={1}>
-              {isRCPP && (
-              <FormControlLabel
-                control={(
-                  <Checkbox
-                    checked={applyRCPP}
-                    onChange={(e) => setApplyRCPP(e.target.checked)}
-                  />
-              )}
-                label="Apply RCPP Treatment?"
-              />
-              )}
-              <Stack direction="row" spacing={3}>
+            )}
+            <Stack direction="row" spacing={3}>
+              {isPM3DMode && (
                 <NavButton
                   onClick={handleSaveAndDownload}
                   disabled={(!nitrogenTaskResults?.reqN && !nitrogenTaskResults?.reqNWithoutTreatment) || nitrogenFetchIsLoading || isSaving}
@@ -250,24 +252,23 @@ const NitrogenMapWidget = ({ refVal }) => {
                   {' '}
                   Download Prescription
                 </NavButton>
-                {isPM3DMode && (
-                  <NavButton
-                    onClick={handlePrintPDF}
-                    disabled={(!nitrogenTaskResults?.reqN && !nitrogenTaskResults?.reqNWithoutTreatment) || nitrogenFetchIsLoading || isPdfLoading}
-                  >
-                    {isPdfLoading ? <CircularProgress size={24} color="inherit" /> : null}
-                    {' '}
-                    Print Report
-                  </NavButton>
-                )}
-              </Stack>
+              )}
+              {isPM3DMode && (
+                <NavButton
+                  onClick={handlePrintPDF}
+                  disabled={(!nitrogenTaskResults?.reqN && !nitrogenTaskResults?.reqNWithoutTreatment) || nitrogenFetchIsLoading || isPdfLoading}
+                >
+                  {isPdfLoading ? <CircularProgress size={24} color="inherit" /> : null}
+                  {' '}
+                  Print Report
+                </NavButton>
+              )}
             </Stack>
-            )}
-          </Box>
-        </CardContent>
-      </Card>
-      <ActionModal {...modalConfig} onClose={closeModal} />
-    </>
+          </Stack>
+          )}
+        </Box>
+      </CardContent>
+    </Card>
   );
 };
 
