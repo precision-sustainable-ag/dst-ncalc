@@ -9,8 +9,8 @@ const buildPdfReportHtml = ({ fieldName, mapCaptures, summaryData }) => {
     .map(
       ([key, item]) => `
         <div class="summary-item">
-        <span class="summary-key">${key}:</span>
-        <span class="summary-value">${Array.isArray(item.value) ? item.value.join(', ') : item.value}</span>
+          <span class="summary-key">${key}:</span>
+          <span class="summary-value">${Array.isArray(item.value) ? item.value.join(', ') : item.value}</span>
         </div>
     `,
     )
@@ -32,7 +32,7 @@ const buildPdfReportHtml = ({ fieldName, mapCaptures, summaryData }) => {
 
       return `
       <div class="map-card">
-        <h2 class="map-title">${label}</h2>
+        <h3 class="map-title">${label}</h3>
         <div class="map-body">
           <img class="map-img" src="${mapImage}" alt="${label} map" />
           <div class="legend">
@@ -74,6 +74,13 @@ const buildPdfReportHtml = ({ fieldName, mapCaptures, summaryData }) => {
                 margin-top: 4px;
             }
 
+            .section-heading {
+                font-size: 16px;
+                font-weight: 700;
+                color: #2e7d32;
+                margin-bottom: 12px;
+            }
+
             .summary-container {
                 display: grid;
                 grid-template-columns: repeat(2, 1fr);
@@ -82,7 +89,7 @@ const buildPdfReportHtml = ({ fieldName, mapCaptures, summaryData }) => {
                 padding: 15px;
                 border-radius: 8px;
                 border: 1px solid #ddd;
-                margin-bottom: 24px;
+                margin-bottom: 32px;
             }
             .summary-item {
                 font-size: 12px;
@@ -185,13 +192,19 @@ const buildPdfReportHtml = ({ fieldName, mapCaptures, summaryData }) => {
                 <p>Generated: ${new Date().toLocaleString()}</p>
             </header>
 
-            <div class="summary-container">
-                ${summaryRows}
-            </div>
+            <section>
+                <h2 class="section-heading">Average Field Properties</h2>
+                <div class="summary-container">
+                    ${summaryRows}
+                </div>
+            </section>
         
-            <div class="maps-grid">
-                ${mapCards}
-            </div>
+            <section>
+                <h2 class="section-heading">Maps</h2>
+                <div class="maps-grid">
+                    ${mapCards}
+                </div>
+            </section>
         
             <footer>Precision Sustainable Agriculture - Nitrogen Calculator</footer>
         </body>
