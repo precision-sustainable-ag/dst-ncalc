@@ -22,16 +22,20 @@ import { mapboxToken, ncalcApiUrl } from '../../utils/keys';
 import { geometriesToFeatures, processGeometries, validateAndProcessGeoJSON } from '../../utils/geojsonUtils';
 
 const API_BASE_URL = ncalcApiUrl;
+
+// Roles are assigned in auth0 and included in the user's ID token. They are the 'groups' that the user has access to.
 const ROLES = ['NIFA-Soy', 'Willard', 'Growmark'];
-const PROGRAM_GROUPS = {
-  'NIFA-Soy': 'NIFA-Soy',
-  Willard: 'RCPP',
-  Growmark: 'RCPP',
-};
+
+const PROGRAM_GROUP_OPTIONS = [
+  { label: 'Willard - RCPP', group: 'Willard', program: 'RCPP' },
+  { label: 'Willard - RCPP Report Only', group: 'Willard', program: 'RCPP-Report-Only' },
+  { label: 'Growmark - RCPP', group: 'Growmark', program: 'RCPP' },
+  { label: 'Growmark - RCPP Report Only', group: 'Growmark', program: 'RCPP-Report-Only' },
+  { label: 'NIFA-Soy', group: 'NIFA-Soy', program: 'NIFA-Soy' },
+];
 
 // TODO: Placeholder values - to be updated
 const CASH_CROP_OPTIONS = ['Corn', 'Soybeans', 'Wheat', 'Cotton'];
-// const SEASONS = ['Spring 2025', 'Fall 2025', 'Spring 2026', 'Fall 2026'];
 
 const polygonIcon = (
   <SvgIcon
@@ -89,6 +93,7 @@ const AddField = () => {
   const COVER_CROP_OPTIONS = useSelector(get.species) || [];
 
   // FORM DATA STATE VARIABLES
+  const [programGroupLabel, setProgramGroupLabel] = useState(null);
   const [group, setGroup] = useState(null);
   const [grower, setGrower] = useState(null);
   const [farm, setFarm] = useState(null);
@@ -179,6 +184,11 @@ const AddField = () => {
   useEffect(() => {
     if (!selectedField) return;
 
+    const programGroup = PROGRAM_GROUP_OPTIONS.find(
+      (option) => option.group === selectedField.properties.groupName && option.program === selectedField.properties.programName,
+    );
+
+    setProgramGroupLabel(programGroup);
     setGroup(selectedField?.properties.groupName);
     setGrower(selectedField?.properties.growerName);
     setFarm(selectedField?.properties.farmName);
@@ -197,6 +207,7 @@ const AddField = () => {
   useEffect(() => {
     if (isEdit && selectedField) return;
 
+    setProgramGroupLabel(null);
     setGroup(null);
     setGrower(null);
     setFarm(null);
@@ -243,7 +254,8 @@ const AddField = () => {
   }, [allowedGroups, allFields, group, grower, farm]);
 
   const handleGroupChange = (newVal) => {
-    setGroup(newVal);
+    setProgramGroupLabel(newVal);
+    setGroup(newVal ? newVal.group : null);
   };
 
   const handleGrowerChange = (newVal) => {
@@ -281,7 +293,7 @@ const AddField = () => {
       const token = await getAccessTokenSilently();
 
       const payload = {
-        programName: PROGRAM_GROUPS[group] || group,
+        programName: programGroupLabel?.program,
         groupName: group,
         farmName: farm,
         growerName: grower,
@@ -303,6 +315,7 @@ const AddField = () => {
         },
       });
 
+      setProgramGroupLabel(null);
       setGroup(null);
       setGrower(null);
       setFarm(null);
@@ -363,7 +376,7 @@ const AddField = () => {
       const token = await getAccessTokenSilently();
 
       const payload = {
-        programName: PROGRAM_GROUPS[group] || group,
+        programName: programGroupLabel?.program,
         groupName: group,
         farmName: farm,
         growerName: grower,
@@ -385,6 +398,7 @@ const AddField = () => {
         },
       });
 
+      setProgramGroupLabel(null);
       setGroup(null);
       setGrower(null);
       setFarm(null);
@@ -599,12 +613,9 @@ const AddField = () => {
                 key={group}
                 freeSolo={isEdit}
                 loading={loadingOptions}
-                options={groupOptions}
-                value={group}
-                getOptionLabel={(option) => {
-                  const p = PROGRAM_GROUPS[option] || option;
-                  return p !== option ? `${p} - ${option}` : `${p}`;
-                }}
+                options={PROGRAM_GROUP_OPTIONS.filter((option) => groupOptions.includes(option.group))}
+                value={programGroupLabel}
+                getOptionLabel={(option) => option?.label || ''}
                 onChange={(e, val) => handleGroupChange(val)}
                 renderInput={(params) => <PSATextField {...params} label="Select a Program name" />}
                 disabled={isEdit}

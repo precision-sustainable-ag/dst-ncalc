@@ -189,6 +189,7 @@ const initialState = {
   activeStep: 0,
   pm3dData: null,
   selectedField: null,
+  isRCPPReportOnly: false,
   selectedBiomassFile: null,
   biomassPoints: null,
   nitrogenSprayMap: null,

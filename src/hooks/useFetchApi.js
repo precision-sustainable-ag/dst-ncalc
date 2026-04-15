@@ -3,6 +3,7 @@
 import { useEffect, useState } from 'react';
 import axios from 'axios';
 import moment from 'moment';
+import dayjs from 'dayjs';
 import { useDispatch, useSelector } from 'react-redux';
 import { get, set } from '../store/Store';
 import { weightedAverage } from './helpers';
@@ -260,40 +261,19 @@ const fetchNitrogenData = async (
       const biomassGeojson = JSON.parse(JSON.stringify(geojsonData));
       const reqnGeojson = JSON.parse(JSON.stringify(geojsonData));
 
-      biomassGeojson.features.forEach((feature) => {
-        if (
-          feature.properties
-          && feature.properties.ReqN !== undefined
-        ) {
-          feature.properties.value = feature.properties.biomass_average;
-        }
-      });
-
-      geojsonData.features.forEach((feature) => {
-        if (
-          feature.properties
-          && feature.properties.MinNfromFOM !== undefined
-        ) {
-          feature.properties.value = feature.properties.MinNfromFOM;
-        }
-      });
-
-      reqnGeojson.features.forEach((feature) => {
-        if (
-          feature.properties
-          && feature.properties.ReqN !== undefined
-        ) {
-          feature.properties.value = feature.properties.ReqN;
-        }
-      });
-
       dispatch(set.biomassGeojson(biomassGeojson));
-      dispatch(set.nitrogenTaskResults({ minN: geojsonData, reqN: reqnGeojson }));
+      dispatch(set.nitrogenTaskResults({ reqN: reqnGeojson }));
     } else {
       dispatch(set.nitrogenFetchIsFailed(true));
     }
   } catch (error) {
-    console.log(error);
+    // console.error(error);
+    dispatch(set.actionModal({
+      open: true,
+      type: 'error',
+      title: 'Error',
+      message: error?.response?.data?.message || 'An error occurred while fetching the prescription data.',
+    }));
     dispatch(set.nitrogenFetchIsLoading(false));
     dispatch(set.nitrogenFetchIsFailed(true));
   }
@@ -311,9 +291,15 @@ const fetchPrescription = async (
   multiplier,
   hasFixedNRate,
   targetN,
+  isRCPPReportOnly,
   dispatch,
 ) => {
   const url = `${PLANTFACTORS_API_URL}/prescription`;
+  let finalCashCropDate = cashCropPlantingDate;
+  if (!finalCashCropDate) {
+    finalCashCropDate = dayjs().format('YYYY-MM-DD');
+    dispatch(set.cashCropPlantingDate(finalCashCropDate));
+  }
   const growthStage = coverCrop.map(
     (item) => coverCropGrowthStage?.[item] || 'Unknown growth stage',
   );
@@ -326,63 +312,31 @@ const fetchPrescription = async (
       species: coverCrop,
       growth_stage: growthStage,
       start: coverCropTerminationDate,
-      end: cashCropPlantingDate,
-      multiplier,
-      has_fixed_rate: hasFixedNRate === 'fixed',
-      ...(hasFixedNRate === 'fixed' && { target_n: targetN }),
-      ...((hasFixedNRate === 'variable') && {
-        feature_collection: nitrogenSprayMap,
-        property_key: nitrogenSprayMapProperty,
-      }),
+      end: finalCashCropDate,
+      no_prescription: isRCPPReportOnly,
     };
+
+    if (!isRCPPReportOnly) {
+      payload.multiplier = multiplier;
+      payload.has_fixed_rate = hasFixedNRate === 'fixed';
+
+      if (hasFixedNRate === 'fixed') {
+        payload.target_n = targetN;
+      } else if (hasFixedNRate === 'variable') {
+        payload.feature_collection = nitrogenSprayMap;
+        payload.property_key = nitrogenSprayMapProperty;
+      }
+    }
     const response = await axios.post(url, payload);
     if (response.status === 200 && response.data) {
-      // console.log('prescription response', response.data);
       const geojsonData = response.data?.geojson_data;
       delete geojsonData.properties;
 
       const biomassGeojson = JSON.parse(JSON.stringify(geojsonData));
       const reqnGeojson = JSON.parse(JSON.stringify(geojsonData));
-      const reqnWithoutTreatmentGeojson = JSON.parse(JSON.stringify(geojsonData));
-
-      biomassGeojson.features.forEach((feature) => {
-        if (
-          feature.properties
-          && feature.properties.ReqN !== undefined
-        ) {
-          feature.properties.value = feature.properties.biomass_average;
-        }
-      });
-
-      geojsonData.features.forEach((feature) => {
-        if (
-          feature.properties
-          && feature.properties.MinNfromFOM !== undefined
-        ) {
-          feature.properties.value = feature.properties.MinNfromFOM;
-        }
-      });
-
-      reqnGeojson.features.forEach((feature) => {
-        if (
-          feature.properties
-          && feature.properties.ReqN !== undefined
-        ) {
-          feature.properties.value = feature.properties.ReqN;
-        }
-      });
-
-      reqnWithoutTreatmentGeojson.features.forEach((feature) => {
-        if (
-          feature.properties
-          && feature.properties.ReqN !== undefined
-        ) {
-          feature.properties.value = feature.properties.ReqNWithoutTreatment;
-        }
-      });
 
       dispatch(set.biomassGeojson(biomassGeojson));
-      dispatch(set.nitrogenTaskResults({ minN: geojsonData, reqN: reqnGeojson, reqNWithoutTreatment: reqnWithoutTreatmentGeojson }));
+      dispatch(set.nitrogenTaskResults({ reqN: reqnGeojson }));
 
       const fieldSummary = response.data?.field_summary;
       const biomassVal = fieldSummary?.avg_biomass ?? 0;
@@ -402,7 +356,13 @@ const fetchPrescription = async (
       dispatch(set.nitrogenFetchIsFailed(true));
     }
   } catch (error) {
-    console.error(error);
+    // console.error(error);
+    dispatch(set.actionModal({
+      open: true,
+      type: 'error',
+      title: 'Error',
+      message: error?.response?.data?.message || 'An error occurred while fetching the prescription data.',
+    }));
     dispatch(set.nitrogenFetchIsFailed(true));
   } finally {
     dispatch(set.biomassFetchIsLoading(false));
@@ -474,6 +434,7 @@ const useFetchPlantFactors = () => {
   const biomassCalcMode = useSelector(get.biomassCalcMode);
   const selectedBiomassFile = useSelector(get.selectedBiomassFile);
   const selectedField = useSelector(get.selectedField);
+  const isRCPPReportOnly = useSelector(get.isRCPPReportOnly);
   const nitrogenSprayMap = useSelector(get.nitrogenSprayMap);
   const nitrogenSprayMapProperty = useSelector(get.nitrogenSprayMapProperty);
   const multiplier = useSelector(get.multiplier);
@@ -609,12 +570,13 @@ const useFetchPlantFactors = () => {
       && selectedBiomassFile.points
       && selectedField
       && selectedField.geometry
-      && ((hasFixedNRate === 'variable' && nitrogenSprayMap && nitrogenSprayMapProperty) || (hasFixedNRate === 'fixed' && targetN > 0))
       && coverCrop
       && plantGrowthStages
       && coverCropTerminationDate
-      && cashCropPlantingDate
-      && multiplier
+      && ((!isRCPPReportOnly
+        && ((hasFixedNRate === 'variable' && multiplier && nitrogenSprayMap && nitrogenSprayMapProperty)
+          || (hasFixedNRate === 'fixed' && multiplier && targetN > 0)))
+        || isRCPPReportOnly)
       && activeStep > 5
     ) {
       fetchPrescription(
@@ -629,6 +591,7 @@ const useFetchPlantFactors = () => {
         multiplier,
         hasFixedNRate,
         targetN,
+        isRCPPReportOnly,
         dispatch,
       );
     }
@@ -643,6 +606,7 @@ const useFetchPlantFactors = () => {
     cashCropPlantingDate,
     multiplier,
     activeStep,
+    isRCPPReportOnly,
   ]);
 }; // useFetchPlantFactors
 

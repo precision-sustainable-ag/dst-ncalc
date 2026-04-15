@@ -1,7 +1,4 @@
 /* eslint-disable no-underscore-dangle */
-/* eslint-disable no-alert */
-/* eslint-disable no-unused-vars */
-/* eslint-disable arrow-body-style */
 import { React, useState, useRef } from 'react';
 import {
   Box,
@@ -10,8 +7,6 @@ import {
   Typography,
   Grid,
   Stack,
-  FormControlLabel,
-  Checkbox,
   CircularProgress,
 } from '@mui/material';
 import { PSALoadingSpinner, PSARadioButton } from 'shared-react-components/src';
@@ -21,7 +16,6 @@ import { useAuth0 } from '@auth0/auth0-react';
 import Map from '../../../shared/Map/NitrogenMap';
 import { get, set } from '../../../store/redux-autosetters';
 import NavButton from '../../../shared/Navigate/NavButton';
-import ActionModal from '../../../shared/Modal';
 import { downloadPrescriptionShapefile } from '../../../hooks/useFetchApi';
 import { ncalcApiUrl } from '../../../utils/keys';
 import buildPdfReportHtml from '../../../utils/pdfUtils';
@@ -51,20 +45,19 @@ const NitrogenMapWidget = ({ refVal }) => {
   const isPM3DMode = useSelector(get.biomassCalcMode) === 'pm3d';
   const isSatelliteMode = useSelector(get.biomassCalcMode) === 'satellite';
   const selectedField = useSelector(get.selectedField);
-  const isRCPP = selectedField?.properties?.programName === 'RCPP';
+  const isRCPPReportOnly = useSelector(get.isRCPPReportOnly);
   const nitrogenFetchIsLoading = useSelector(get.nitrogenFetchIsLoading);
   const biomassGeojson = useSelector(get.biomassGeojson);
   const nitrogenTaskResults = useSelector(get.nitrogenTaskResults);
   const summaryData = useSelector(get.summaryData);
 
-  const [layer, setLayer] = useState('prescription');
-  const [applyRCPP, setApplyRCPP] = useState(true);
+  const [layer, setLayer] = useState(!isRCPPReportOnly ? 'prescription' : 'credit');
 
   const [isSaving, setIsSaving] = useState(false);
   const [isPdfLoading, setIsPdfLoading] = useState(false);
 
   const handleDownloadClick = () => {
-    downloadPrescriptionShapefile(applyRCPP ? nitrogenTaskResults?.reqN : nitrogenTaskResults?.reqNWithoutTreatment, dispatch);
+    downloadPrescriptionShapefile(nitrogenTaskResults?.reqN, dispatch);
   };
 
   const saveFiles = async () => {
@@ -73,7 +66,7 @@ const NitrogenMapWidget = ({ refVal }) => {
       const fieldId = selectedField._id;
       const token = await getAccessTokenSilently();
       const filesToSave = [
-        { file_type: 'prescription', geojson: applyRCPP ? nitrogenTaskResults?.reqN : nitrogenTaskResults?.reqNWithoutTreatment },
+        { file_type: 'prescription', geojson: nitrogenTaskResults?.reqN },
         { file_type: 'biomass', geojson: biomassGeojson },
       ];
       await Promise.all(
@@ -150,10 +143,15 @@ const NitrogenMapWidget = ({ refVal }) => {
     if (isPdfLoading) return;
     setIsPdfLoading(true);
     try {
-      const mapCaptures = await mapRef.current?.captureAllLayers({ applyRCPP });
+      const mapCaptures = await mapRef.current?.captureAllLayers();
 
       if (!mapCaptures?.length) {
-        alert('Map not ready for capture.');
+        dispatch(set.actionModal({
+          open: true,
+          type: 'error',
+          title: 'PDF Export Error',
+          message: 'There was an error generating the PDF. Try again.',
+        }));
         return;
       }
 
@@ -181,71 +179,60 @@ const NitrogenMapWidget = ({ refVal }) => {
           Field Map
         </Typography>
         {nitrogenFetchIsLoading && (
-        <Box>
-          <Grid
-            item
-            container
-            spacing={1}
-            justifyContent="center"
-            alignItems="center"
-            sx={{
-              display: 'flex',
-              justifyContent: 'center',
-              alignItems: 'center',
-              minHeight: '100px',
-            }}
-          >
-            <PSALoadingSpinner />
-          </Grid>
-          <Typography variant="h6" fontWeight="bold" gutterBottom textAlign="center">
-            Calculating Nitrogen ...
-          </Typography>
-        </Box>
+          <Box>
+            <Grid
+              item
+              container
+              spacing={1}
+              justifyContent="center"
+              alignItems="center"
+              sx={{
+                display: 'flex',
+                justifyContent: 'center',
+                alignItems: 'center',
+                minHeight: '100px',
+              }}
+            >
+              <PSALoadingSpinner />
+            </Grid>
+            <Typography variant="h6" fontWeight="bold" gutterBottom textAlign="center">
+              Calculating Nitrogen ...
+            </Typography>
+          </Box>
         )}
         <Box sx={{ height: '90%', width: '100%', marginBottom: 2 }}>
-          <Map layer={layer} setLayer={setLayer} applyRCPP={applyRCPP} ref={mapRef} />
+          <Map layer={layer} setLayer={setLayer} ref={mapRef} />
         </Box>
 
-        <Box sx={{
-          width: '100%',
-          p: 2,
-          bgcolor: '#f9f9f9',
-          borderRadius: 3,
-          display: 'flex',
-          flexDirection: 'column',
-          alignItems: 'center',
-          gap: 2,
-        }}
+        <Box
+          sx={{
+            width: '100%',
+            p: 2,
+            bgcolor: '#f9f9f9',
+            borderRadius: 3,
+            display: 'flex',
+            flexDirection: 'column',
+            alignItems: 'center',
+            gap: 2,
+          }}
         >
           <PSARadioButton
             options={[
-              { label: 'Prescription', value: 'prescription' },
+              ...(isSatelliteMode || (isPM3DMode && !isRCPPReportOnly) ? [{ label: 'Prescription', value: 'prescription' }] : []),
               { label: 'Nitrogen Credit', value: 'credit' },
               { label: 'Biomass', value: 'biomass' },
-              ...(isPM3DMode ? [{ label: 'Treatment', value: 'treatment' }] : []),
+              ...(isPM3DMode && !isRCPPReportOnly ? [{ label: 'Treatment', value: 'treatment' }] : []),
             ]}
             selectedValue={layer}
             onChange={(value) => setLayer(value)}
             row
           />
           {(isPM3DMode || isSatelliteMode) && (
-          <Stack direction="column" alignItems="center" spacing={1}>
-            {isRCPP && (
-            <FormControlLabel
-              control={(
-                <Checkbox
-                  checked={applyRCPP}
-                  onChange={(e) => setApplyRCPP(e.target.checked)}
-                />
-            )}
-              label="Apply RCPP Treatment?"
-            />
-            )}
             <Stack direction="row" spacing={3}>
-              {isPM3DMode && (
+              {isPM3DMode && !isRCPPReportOnly && (
                 <NavButton
                   onClick={handleSaveAndDownload}
-                  disabled={(!nitrogenTaskResults?.reqN && !nitrogenTaskResults?.reqNWithoutTreatment) || nitrogenFetchIsLoading || isSaving}
+                  disabled={!nitrogenTaskResults?.reqN || nitrogenFetchIsLoading || isSaving}
                   sx={{ mt: 2 }}
                 >
                   {isSaving ? <CircularProgress size={24} color="inherit" /> : null}
@@ -256,7 +243,7 @@ const NitrogenMapWidget = ({ refVal }) => {
               {isPM3DMode && (
                 <NavButton
                   onClick={handlePrintPDF}
-                  disabled={(!nitrogenTaskResults?.reqN && !nitrogenTaskResults?.reqNWithoutTreatment) || nitrogenFetchIsLoading || isPdfLoading}
+                  disabled={!nitrogenTaskResults?.reqN || nitrogenFetchIsLoading || isPdfLoading}
                 >
                   {isPdfLoading ? <CircularProgress size={24} color="inherit" /> : null}
                   {' '}
@@ -264,7 +251,6 @@ const NitrogenMapWidget = ({ refVal }) => {
                 </NavButton>
               )}
             </Stack>
-          </Stack>
           )}
         </Box>
       </CardContent>

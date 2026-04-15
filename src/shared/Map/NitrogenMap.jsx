@@ -69,10 +69,11 @@ function extractLegend(containerEl) {
   return { legendTitle, legendItems };
 }
 
-const NitrogenMapComp = forwardRef(({ layer = 'prescription', setLayer, applyRCPP = true }, ref) => {
+const NitrogenMapComp = forwardRef(({ layer = 'prescription', setLayer }, ref) => {
   const [address, setAddress] = useState({});
   const dispatch = useDispatch();
   const isPM3DMode = useSelector(get.biomassCalcMode) === 'pm3d';
+  const isRCPPReportOnly = useSelector(get.isRCPPReportOnly);
   const lat = useSelector(get.lat);
   const lon = useSelector(get.lon);
   const biomassGeojson = useSelector(get.biomassGeojson);
@@ -99,10 +100,10 @@ const NitrogenMapComp = forwardRef(({ layer = 'prescription', setLayer, applyRCP
       if (!mapInstance) return [];
 
       const layers = [
-        { value: 'prescription', label: 'Prescription' },
+        ...(isPM3DMode && !isRCPPReportOnly ? [{ value: 'prescription', label: 'Prescription' }] : []),
         { value: 'credit', label: 'Nitrogen Credit' },
         { value: 'biomass', label: 'Biomass' },
-        ...(isPM3DMode ? [{ value: 'treatment', label: 'Treatment' }] : []),
+        ...(isPM3DMode && !isRCPPReportOnly ? [{ value: 'treatment', label: 'Treatment' }] : []),
       ];
 
       return layers.reduce(async (prevPromise, { value, label }) => {
@@ -159,10 +160,10 @@ const NitrogenMapComp = forwardRef(({ layer = 'prescription', setLayer, applyRCP
 
   const valueKey = useMemo(() => {
     if (layer === 'biomass') return 'biomass_average';
-    if (layer === 'prescription') return applyRCPP ? 'ReqN' : 'ReqNWithoutTreatment';
+    if (layer === 'prescription') return 'ReqN';
     if (layer === 'credit') return 'MinNfromFOM';
     return 'category'; // treatment
-  }, [layer, applyRCPP]);
+  }, [layer]);
 
   const rasterColors = useMemo(() => {
     if (layer === 'biomass') return biomassRasterColors;

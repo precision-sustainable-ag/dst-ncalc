@@ -26,6 +26,7 @@ const NcalcStepper = () => {
 
   const currentGlobalStep = useSelector(get.activeStep);
   const biomassCalcMode = useSelector(get.biomassCalcMode);
+  const isRCPPReportOnly = useSelector(get.isRCPPReportOnly);
 
   const location = useLocation();
   const navigate = useNavigate();
@@ -41,14 +42,17 @@ const NcalcStepper = () => {
     });
 
     if (biomassCalcMode === 'pm3d') {
-      return updatedSteps.filter((s) => s.id !== 'location' && s.id !== 'soil' && s.id !== 'sidedress');
+      if (!isRCPPReportOnly) {
+        return updatedSteps.filter((s) => s.id !== 'location' && s.id !== 'soil' && s.id !== 'sidedress');
+      }
+      return updatedSteps.filter((s) => s.id !== 'location' && s.id !== 'soil' && s.id !== 'sidedress' && s.id !== 'fertilizer');
     } if (biomassCalcMode === 'satellite') {
       return updatedSteps.filter((s) => s.id !== 'upload' && s.id !== 'soil' && s.id !== 'sidedress');
     } if (biomassCalcMode === 'sampled') {
       return updatedSteps.filter((s) => s.id !== 'upload' && s.id !== 'fertilizer');
     }
     return updatedSteps;
-  }, [biomassCalcMode]);
+  }, [biomassCalcMode, isRCPPReportOnly]);
 
   const titles = visibleSteps.map((s) => s.title);
 
