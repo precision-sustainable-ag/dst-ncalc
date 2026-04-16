@@ -375,6 +375,8 @@ const AddField = () => {
     try {
       const token = await getAccessTokenSilently();
 
+      const fieldId = selectedField?._id;
+
       const payload = {
         programName: programGroupLabel?.program,
         groupName: group,
@@ -391,7 +393,7 @@ const AddField = () => {
         comments,
       };
 
-      await axios.put(`${API_BASE_URL}/fields`, payload, {
+      await axios.put(`${API_BASE_URL}/fields/${fieldId}`, payload, {
         headers: {
           Authorization: `Bearer ${token}`,
           'Content-Type': 'application/json',
@@ -453,12 +455,24 @@ const AddField = () => {
 
       if (response.status === 200) {
         setSelectedField(null);
-        alert('Field deactivated successfully.');
+        // alert('Field deactivated successfully.');
+        dispatch(set.actionModal({
+          open: true,
+          type: 'info',
+          title: 'Field Deleted',
+          message: 'Field deleted successfully!',
+        }));
         navigate('/home');
       }
     } catch (err) {
       const errorMessage = err.response?.data?.message || 'Error deleting field. Please try again.';
-      alert(errorMessage);
+      // alert(errorMessage);
+      dispatch(set.actionModal({
+        open: true,
+        type: 'error',
+        title: 'Error',
+        errorMessage,
+      }));
     } finally {
       setIsDeleting(false);
     }
@@ -618,7 +632,7 @@ const AddField = () => {
                 getOptionLabel={(option) => option?.label || ''}
                 onChange={(e, val) => handleGroupChange(val)}
                 renderInput={(params) => <PSATextField {...params} label="Select a Program name" />}
-                disabled={isEdit}
+                // disabled={isEdit}
               />
             </Grid>
             <Grid item xs={12} md={6}>
@@ -631,7 +645,7 @@ const AddField = () => {
                 onChange={(e, val) => handleGrowerChange(val)}
                 onInputChange={(e, newInputValue) => handleGrowerChange(newInputValue)}
                 renderInput={(params) => <PSATextField {...params} label="Select or enter a Grower name" />}
-                disabled={isEdit}
+                // disabled={isEdit}
               />
             </Grid>
           </Grid>
@@ -647,7 +661,7 @@ const AddField = () => {
                 onChange={(e, val) => handleFarmChange(val)}
                 onInputChange={(e, newInputValue) => handleFarmChange(newInputValue)}
                 renderInput={(params) => <PSATextField {...params} label="Select or enter a Farm name" />}
-                disabled={isEdit}
+                // disabled={isEdit}
               />
             </Grid>
             <Grid item xs={12} md={6}>
@@ -660,7 +674,7 @@ const AddField = () => {
                 onChange={(e, val) => setField(val)}
                 onInputChange={(e, newInputValue) => setField(newInputValue)}
                 renderInput={(params) => <PSATextField {...params} label="Select or enter a Field name" />}
-                disabled={isEdit}
+                // disabled={isEdit}
               />
             </Grid>
           </Grid>
