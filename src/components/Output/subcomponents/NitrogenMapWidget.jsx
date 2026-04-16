@@ -229,7 +229,7 @@ const NitrogenMapWidget = ({ refVal }) => {
           />
           {(isPM3DMode || isSatelliteMode) && (
             <Stack direction="row" spacing={3}>
-              {isPM3DMode && !isRCPPReportOnly && (
+              {(isSatelliteMode || (isPM3DMode && !isRCPPReportOnly)) && (
                 <NavButton
                   onClick={handleSaveAndDownload}
                   disabled={!nitrogenTaskResults?.reqN || nitrogenFetchIsLoading || isSaving}

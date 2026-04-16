@@ -17,7 +17,9 @@ const Output = () => {
   const dispatch = useDispatch();
   const summaryData = useSelector(get.summaryData);
   const refs = sidebarListData.map(() => useRef(null));
-  const field = useSelector(get.field);
+  const isPM3DMode = useSelector(get.biomassCalcMode) === 'pm3d';
+  const selectedField = useSelector(get.selectedField);
+  const field = isPM3DMode ? selectedField?.properties?.fieldName : useSelector(get.field);
   const coverCrop = useSelector(get.coverCrop);
   const coverCropTerminationDate = useSelector(get.coverCropTerminationDate);
   const cashCropPlantingDate = useSelector(get.cashCropPlantingDate);
