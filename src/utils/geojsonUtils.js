@@ -4,6 +4,23 @@ import centroid from '@turf/centroid';
 import { bbox } from '@turf/turf';
 
 /**
+ * Recursively removes altitude/Z-coordinates from GeoJSON coordinate arrays
+ * @param {Array} coords - Coordinates array (Point, Line, or Polygon depth)
+ * @returns {Array} - Cleaned 2D coordinates [lon, lat]
+ */
+const cleanTo2D = (coords) => {
+  if (!Array.isArray(coords)) return coords;
+
+  // If the first element is not an array, we are at the coordinate pair level [x, y, z]
+  if (!Array.isArray(coords[0])) {
+    return coords.slice(0, 2);
+  }
+
+  // Else, go deeper into the array
+  return coords.map((element) => cleanTo2D(element));
+};
+
+/**
  * Validates if the provided data is valid GeoJSON
  * @param {object} data - Data to validate
  * @returns {boolean} - True if valid GeoJSON, false otherwise
@@ -82,7 +99,15 @@ export const validateAndProcessGeoJSON = (geojson, setFeatures, setLatLon, setBo
     return;
   }
 
-  setFeatures(featuresToSet);
+  const cleanedFeatures = featuresToSet.map((feature) => ({
+    ...feature,
+    geometry: {
+      ...feature.geometry,
+      coordinates: cleanTo2D(feature.geometry.coordinates),
+    },
+  }));
+
+  setFeatures(cleanedFeatures);
 
   try {
     const centerPoint = centroid({
