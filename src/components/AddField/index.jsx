@@ -195,10 +195,10 @@ const AddField = () => {
     setField(selectedField?.properties.fieldName);
     setCoverCrops(selectedField?.properties.coverCrop);
     setCashCrop(selectedField?.properties.cashCrop);
-    setCoverCropPlantingDate(selectedField?.properties.coverCropPlantingDate);
-    setCoverCropTerminationDate(selectedField?.properties.coverCropTerminationDate);
-    setCashCropPlantingDate(selectedField?.properties.cashCropPlantingDate);
-    setCashCropHarvestingDate(selectedField?.properties.cashCropHarvestingDate);
+    setCoverCropPlantingDate(selectedField?.properties.coverCropPlantingDate || null);
+    setCoverCropTerminationDate(selectedField?.properties.coverCropTerminationDate || null);
+    setCashCropPlantingDate(selectedField?.properties.cashCropPlantingDate || null);
+    setCashCropHarvestingDate(selectedField?.properties.cashCropHarvestingDate || null);
     setComments(selectedField?.properties.comments);
     geometriesToFeatures(selectedField?.geometry, setFeatures, setLatLon, setBounds);
   }, [selectedField]);
