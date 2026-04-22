@@ -65,19 +65,6 @@ const gpsIcon = (
   </SvgIcon>
 );
 
-const fieldIcon = (
-  <SvgIcon
-    viewBox="0 0 24 24"
-    fontSize="small"
-    sx={{ verticalAlign: 'middle', mx: 0.5 }}
-  >
-    <path
-      d="M19 19H15V21H19C20.1 21 21 20.1 21 19V15H19M19 3H15V5H19V9H21V5C21 3.9 20.1 3 19 3M5 5H9V3H5C3.9 3 3 3.9 3
-      5V9H5M5 15H3V19C3 20.1 3.9 21 5 21H9V19H5V15M7 11H9V13H7V11M11 11H13V13H11V11M15 11H17V13H15V11Z"
-    />
-  </SvgIcon>
-);
-
 const AddField = () => {
   const {
     user, isAuthenticated, getAccessTokenSilently,
@@ -632,7 +619,7 @@ const AddField = () => {
                 getOptionLabel={(option) => option?.label || ''}
                 onChange={(e, val) => handleGroupChange(val)}
                 renderInput={(params) => <PSATextField {...params} label="Select a Program name" />}
-                // disabled={isEdit}
+                disabled={isEdit && !selectedField}
               />
             </Grid>
             <Grid item xs={12} md={6}>
@@ -645,7 +632,7 @@ const AddField = () => {
                 onChange={(e, val) => handleGrowerChange(val)}
                 onInputChange={(e, newInputValue) => handleGrowerChange(newInputValue)}
                 renderInput={(params) => <PSATextField {...params} label="Select or enter a Grower name" />}
-                // disabled={isEdit}
+                disabled={isEdit && !selectedField}
               />
             </Grid>
           </Grid>
@@ -661,7 +648,7 @@ const AddField = () => {
                 onChange={(e, val) => handleFarmChange(val)}
                 onInputChange={(e, newInputValue) => handleFarmChange(newInputValue)}
                 renderInput={(params) => <PSATextField {...params} label="Select or enter a Farm name" />}
-                // disabled={isEdit}
+                disabled={isEdit && !selectedField}
               />
             </Grid>
             <Grid item xs={12} md={6}>
@@ -674,7 +661,7 @@ const AddField = () => {
                 onChange={(e, val) => setField(val)}
                 onInputChange={(e, newInputValue) => setField(newInputValue)}
                 renderInput={(params) => <PSATextField {...params} label="Select or enter a Field name" />}
-                // disabled={isEdit}
+                disabled={isEdit && !selectedField}
               />
             </Grid>
           </Grid>
@@ -704,6 +691,7 @@ const AddField = () => {
                 renderInput={(params) => (
                   <PSATextField {...params} label="What cover crop species are planted in this field?" />
                 )}
+                disabled={isEdit && !selectedField}
               />
             </Grid>
 
@@ -713,6 +701,7 @@ const AddField = () => {
                 value={cashCrop}
                 onChange={(e, val) => setCashCrop(val)}
                 renderInput={(params) => <PSATextField {...params} label="What cash crop will be planted next?" />}
+                disabled={isEdit && !selectedField}
               />
             </Grid>
           </Grid>
@@ -730,8 +719,8 @@ const AddField = () => {
                   slotProps={{
                     field: { clearable: true, onClear: () => setCoverCropTerminationDate(null) },
                   }}
+                  disabled={isEdit && !selectedField}
                   sx={{ width: '100%' }}
-
                 />
               </LocalizationProvider>
             </Grid>
@@ -748,8 +737,8 @@ const AddField = () => {
                     setCoverCropTerminationDate(newValue ? newValue.endOf('month').format('YYYY-MM-DD') : null);
                     return null;
                   }}
+                  disabled={isEdit && !selectedField}
                   sx={{ width: '100%' }}
-
                 />
               </LocalizationProvider>
             </Grid>
@@ -766,6 +755,7 @@ const AddField = () => {
                     setCashCropPlantingDate(newValue ? newValue.startOf('month').format('YYYY-MM-DD') : null);
                     return null;
                   }}
+                  disabled={isEdit && !selectedField}
                   sx={{ width: '100%' }}
                 />
               </LocalizationProvider>
@@ -784,6 +774,7 @@ const AddField = () => {
                     setCashCropHarvestingDate(newValue ? newValue.endOf('month').format('YYYY-MM-DD') : null);
                     return null;
                   }}
+                  disabled={isEdit && !selectedField}
                   sx={{ width: '100%' }}
                 />
               </LocalizationProvider>
@@ -798,6 +789,7 @@ const AddField = () => {
                 onChange={(e) => setComments(e.target.value)}
                 fullWidth
                 autoComplete="off"
+                disabled={isEdit && !selectedField}
                 sx={{
                   '& .MuiInputBase-root': { padding: 1 },
                 }}
@@ -821,14 +813,6 @@ const AddField = () => {
             {polygonIcon}
             (Click twice or press enter to finish).
             Alternatively, upload a shape file or GeoJSON of your field boundaries.
-          </Typography>
-
-          <Typography variant="h6" align="center" sx={{ mt: 2 }}>
-            You can also use the
-            {fieldIcon}
-            to guess the field boundaries of your current marker location. When clicked
-            it will populate the map with the USDA Crop Sequence Boundary for your field if one exists.
-            You can double click inside the field to edit the boundaries.
           </Typography>
 
           {!isEdit && (
