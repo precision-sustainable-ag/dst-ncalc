@@ -10,17 +10,16 @@ import {
 import { PSAButton, PSAReduxMap, PSATextField } from 'shared-react-components/src';
 import { useSelector } from 'react-redux';
 import shpjs from 'shpjs';
-import axios from 'axios';
 import { useNavigate } from 'react-router-dom';
 import { DatePicker } from '@mui/x-date-pickers/DatePicker';
 import { LocalizationProvider } from '@mui/x-date-pickers';
 import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
 import dayjs from 'dayjs';
 import { get } from '../../store/redux-autosetters';
-import { mapboxToken, ncalcApiUrl } from '../../utils/keys';
+import { mapboxToken } from '../../utils/keys';
 import { processGeometries, validateAndProcessGeoJSON } from '../../utils/geojsonUtils';
+import { privateApi } from '../../utils/apiClient';
 
-const API_BASE_URL = ncalcApiUrl;
 const ROLES = ['NIFA-Soy', 'Willard', 'Growmark'];
 
 // TODO: Placeholder values - to be updated
@@ -69,9 +68,7 @@ const fieldIcon = (
 );
 
 const AddField = () => {
-  const {
-    user, isAuthenticated, getAccessTokenSilently,
-  } = useAuth0();
+  const { user, isAuthenticated } = useAuth0();
 
   const navigate = useNavigate();
   const matchesMd = useMediaQuery((theme) => theme.breakpoints.down('md'));
@@ -138,13 +135,11 @@ const AddField = () => {
   useEffect(() => {
     const fetchOptions = async () => {
       try {
-        const token = await getAccessTokenSilently();
-        const response = await axios.get(`${API_BASE_URL}/fields-identifiers`, {
-          headers: { Authorization: `Bearer ${token}` },
-        });
+        const response = await privateApi.get('/fields-identifiers');
         // setOptions(response.data);
         setAllFields(response.data);
       } catch (error) {
+        if (error.isAuthRedirect) return;
         console.error('Failed to load dropdown options', error);
       } finally {
         setLoadingOptions(false);
@@ -154,7 +149,7 @@ const AddField = () => {
     if (isAuthenticated) {
       fetchOptions();
     }
-  }, [isAuthenticated, getAccessTokenSilently]);
+  }, [isAuthenticated]);
 
   const {
     programOptions, growerOptions, farmOptions, fieldOptions,
@@ -221,8 +216,6 @@ const AddField = () => {
     setIsSaving(true);
 
     try {
-      const token = await getAccessTokenSilently();
-
       const payload = {
         programName: program,
         farmName: farm,
@@ -238,12 +231,7 @@ const AddField = () => {
         comments,
       };
 
-      await axios.post(`${API_BASE_URL}/fields`, payload, {
-        headers: {
-          Authorization: `Bearer ${token}`,
-          'Content-Type': 'application/json',
-        },
-      });
+      await privateApi.post('/fields', payload);
 
       setProgram(null);
       setGrower(null);
@@ -255,6 +243,7 @@ const AddField = () => {
       alert('Field saved successfully!');
       navigate('/home');
     } catch (error) {
+      if (error.isAuthRedirect) return;
       if (error.response?.data?.message) {
         alert(`Error: ${error.response.data.message}`);
       } else if (error.response) {
