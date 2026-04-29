@@ -618,7 +618,7 @@ const AddField = () => {
                 value={programGroupLabel}
                 getOptionLabel={(option) => option?.label || ''}
                 onChange={(e, val) => handleGroupChange(val)}
-                renderInput={(params) => <PSATextField {...params} label="Select a Program name" />}
+                renderInput={(params) => <PSATextField {...params} label="Select a Program name" required />}
                 disabled={isEdit && !selectedField}
               />
             </Grid>
@@ -631,7 +631,7 @@ const AddField = () => {
                 value={grower}
                 onChange={(e, val) => handleGrowerChange(val)}
                 onInputChange={(e, newInputValue) => handleGrowerChange(newInputValue)}
-                renderInput={(params) => <PSATextField {...params} label="Select or enter a Grower name" />}
+                renderInput={(params) => <PSATextField {...params} label="Select or enter a Grower name" required />}
                 disabled={isEdit && !selectedField}
               />
             </Grid>
@@ -647,7 +647,7 @@ const AddField = () => {
                 value={farm}
                 onChange={(e, val) => handleFarmChange(val)}
                 onInputChange={(e, newInputValue) => handleFarmChange(newInputValue)}
-                renderInput={(params) => <PSATextField {...params} label="Select or enter a Farm name" />}
+                renderInput={(params) => <PSATextField {...params} label="Select or enter a Farm name" required />}
                 disabled={isEdit && !selectedField}
               />
             </Grid>
@@ -660,7 +660,7 @@ const AddField = () => {
                 value={field}
                 onChange={(e, val) => setField(val)}
                 onInputChange={(e, newInputValue) => setField(newInputValue)}
-                renderInput={(params) => <PSATextField {...params} label="Select or enter a Field name" />}
+                renderInput={(params) => <PSATextField {...params} label="Select or enter a Field name" required />}
                 disabled={isEdit && !selectedField}
               />
             </Grid>
@@ -689,7 +689,7 @@ const AddField = () => {
                 value={coverCrops}
                 onChange={(e, val) => setCoverCrops(val)}
                 renderInput={(params) => (
-                  <PSATextField {...params} label="What cover crop species are planted in this field?" />
+                  <PSATextField {...params} label="What cover crop species are planted in this field?" required />
                 )}
                 disabled={isEdit && !selectedField}
               />
@@ -700,7 +700,7 @@ const AddField = () => {
                 options={CASH_CROP_OPTIONS}
                 value={cashCrop}
                 onChange={(e, val) => setCashCrop(val)}
-                renderInput={(params) => <PSATextField {...params} label="What cash crop will be planted next?" />}
+                renderInput={(params) => <PSATextField {...params} label="What cash crop will be planted next?" required />}
                 disabled={isEdit && !selectedField}
               />
             </Grid>
@@ -737,6 +737,7 @@ const AddField = () => {
                     setCoverCropTerminationDate(newValue ? newValue.endOf('month').format('YYYY-MM-DD') : null);
                     return null;
                   }}
+                  slotProps={{ textField: { required: true } }}
                   disabled={isEdit && !selectedField}
                   sx={{ width: '100%' }}
                 />
@@ -755,6 +756,7 @@ const AddField = () => {
                     setCashCropPlantingDate(newValue ? newValue.startOf('month').format('YYYY-MM-DD') : null);
                     return null;
                   }}
+                  slotProps={{ textField: { required: true } }}
                   disabled={isEdit && !selectedField}
                   sx={{ width: '100%' }}
                 />
@@ -774,6 +776,7 @@ const AddField = () => {
                     setCashCropHarvestingDate(newValue ? newValue.endOf('month').format('YYYY-MM-DD') : null);
                     return null;
                   }}
+                  slotProps={{ textField: { required: true } }}
                   disabled={isEdit && !selectedField}
                   sx={{ width: '100%' }}
                 />
