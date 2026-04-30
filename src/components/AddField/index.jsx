@@ -11,17 +11,15 @@ import {
 import { PSAButton, PSAReduxMap, PSATextField } from 'shared-react-components/src';
 import { useDispatch, useSelector } from 'react-redux';
 import shpjs from 'shpjs';
-import axios from 'axios';
 import { useLocation, useNavigate } from 'react-router-dom';
 import { DatePicker } from '@mui/x-date-pickers/DatePicker';
 import { LocalizationProvider } from '@mui/x-date-pickers';
 import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
 import dayjs from 'dayjs';
 import { get, set } from '../../store/redux-autosetters';
-import { mapboxToken, ncalcApiUrl } from '../../utils/keys';
+import { mapboxToken } from '../../utils/keys';
 import { geometriesToFeatures, processGeometries, validateAndProcessGeoJSON } from '../../utils/geojsonUtils';
-
-const API_BASE_URL = ncalcApiUrl;
+import { privateApi } from '../../utils/apiClient';
 
 // Roles are assigned in auth0 and included in the user's ID token. They are the 'groups' that the user has access to.
 const ROLES = ['NIFA-Soy', 'Willard', 'Growmark'];
@@ -66,9 +64,7 @@ const gpsIcon = (
 );
 
 const AddField = () => {
-  const {
-    user, isAuthenticated, getAccessTokenSilently,
-  } = useAuth0();
+  const { user, isAuthenticated } = useAuth0();
 
   const navigate = useNavigate();
   const location = useLocation();
@@ -145,13 +141,11 @@ const AddField = () => {
     const fetchOptions = async () => {
       try {
         setLoadingOptions(true);
-        const token = await getAccessTokenSilently();
-        const url = isEdit ? `${API_BASE_URL}/fields-identifiers?mode=edit` : `${API_BASE_URL}/fields-identifiers`;
-        const response = await axios.get(url, {
-          headers: { Authorization: `Bearer ${token}` },
-        });
+        const url = isEdit ? '/fields-identifiers?mode=edit' : '/fields-identifiers';
+        const response = await privateApi.get(url);
         setAllFields(response.data);
       } catch (error) {
+        if (error.isAuthRedirect) return;
         dispatch(set.actionModal({
           open: true,
           type: 'error',
@@ -166,7 +160,7 @@ const AddField = () => {
     if (isAuthenticated) {
       fetchOptions();
     }
-  }, [isAuthenticated, getAccessTokenSilently, isEdit, dispatch]);
+  }, [isAuthenticated, isEdit, dispatch]);
 
   useEffect(() => {
     if (!selectedField) return;
@@ -277,8 +271,6 @@ const AddField = () => {
     setIsSaving(true);
 
     try {
-      const token = await getAccessTokenSilently();
-
       const payload = {
         programName: programGroupLabel?.program,
         groupName: group,
@@ -295,12 +287,7 @@ const AddField = () => {
         comments,
       };
 
-      await axios.post(`${API_BASE_URL}/fields`, payload, {
-        headers: {
-          Authorization: `Bearer ${token}`,
-          'Content-Type': 'application/json',
-        },
-      });
+      await privateApi.post('/fields', payload);
 
       setProgramGroupLabel(null);
       setGroup(null);
@@ -319,6 +306,7 @@ const AddField = () => {
       }));
       navigate('/home');
     } catch (error) {
+      if (error.isAuthRedirect) return;
       let message = '';
       if (error.response?.data?.message) {
         message = `Error: ${error.response.data.message}`;
@@ -360,8 +348,6 @@ const AddField = () => {
     setIsSaving(true);
 
     try {
-      const token = await getAccessTokenSilently();
-
       const fieldId = selectedField?._id;
 
       const payload = {
@@ -380,12 +366,7 @@ const AddField = () => {
         comments,
       };
 
-      await axios.put(`${API_BASE_URL}/fields/${fieldId}`, payload, {
-        headers: {
-          Authorization: `Bearer ${token}`,
-          'Content-Type': 'application/json',
-        },
-      });
+      await privateApi.put(`/fields/${fieldId}`, payload);
 
       setProgramGroupLabel(null);
       setGroup(null);
@@ -403,6 +384,7 @@ const AddField = () => {
       }));
       navigate('/home');
     } catch (error) {
+      if (error.isAuthRedirect) return;
       let message = '';
       if (error.response?.data?.message) {
         message = `Error: ${error.response.data.message}`;
@@ -430,15 +412,8 @@ const AddField = () => {
     setIsDeleting(true);
 
     try {
-      const token = await getAccessTokenSilently();
-
       const fieldId = selectedField?._id;
-      const response = await axios.delete(`${API_BASE_URL}/fields/${fieldId}`, {
-        headers: {
-          Authorization: `Bearer ${token}`,
-          'Content-Type': 'application/json',
-        },
-      });
+      const response = await privateApi.delete(`/fields/${fieldId}`);
 
       if (response.status === 200) {
         setSelectedField(null);
@@ -452,6 +427,7 @@ const AddField = () => {
         navigate('/home');
       }
     } catch (err) {
+      if (err.isAuthRedirect) return;
       const errorMessage = err.response?.data?.message || 'Error deleting field. Please try again.';
       // alert(errorMessage);
       dispatch(set.actionModal({

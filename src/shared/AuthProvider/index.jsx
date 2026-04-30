@@ -9,7 +9,12 @@ const Auth0ProviderWithNavigate = ({ children }) => {
   const redirectUri = window.location.origin;
 
   const onRedirectCallback = (appState) => {
-    navigate(appState?.returnTo || window.location.pathname);
+    window.history.replaceState(
+      {},
+      document.title,
+      `${window.location.origin}/#${appState?.returnTo || '/'}`,
+    );
+    navigate(appState?.returnTo || '/');
   };
 
   if (!(auth0Domain && auth0ClientId && auth0Audience)) {

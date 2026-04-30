@@ -8,12 +8,10 @@ import {
   Autocomplete,
   Box, CircularProgress, Grid, Stack, Typography,
 } from '@mui/material';
-import axios from 'axios';
 import { PSATextField } from 'shared-react-components/src';
 import { get, set } from '../../store/Store';
-import { ncalcApiUrl } from '../../utils/keys';
+import { privateApi } from '../../utils/apiClient';
 
-const API_BASE_URL = ncalcApiUrl;
 const PROGRAM_GROUPS = {
   'NIFA-Soy': 'NIFA-Soy',
   Willard: 'RCPP',
@@ -21,7 +19,7 @@ const PROGRAM_GROUPS = {
 };
 
 const FieldDropdown = () => {
-  const { isAuthenticated, getAccessTokenSilently } = useAuth0();
+  const { isAuthenticated } = useAuth0();
 
   const dispatch = useDispatch();
   const [fieldOptions, setFieldOptions] = useState([]);
@@ -82,12 +80,10 @@ const FieldDropdown = () => {
     const fetchFields = async () => {
       try {
         setIsFetching(true);
-        const token = await getAccessTokenSilently();
-        const response = await axios.get(`${API_BASE_URL}/fields-identifiers`, {
-          headers: { Authorization: `Bearer ${token}` },
-        });
+        const response = await privateApi.get('/fields-identifiers');
         setFieldOptions(response.data);
       } catch (e) {
+        if (e.isAuthRedirect) return;
         // console.error('Failed to load options', e);
       } finally {
         setIsFetching(false);
@@ -97,7 +93,7 @@ const FieldDropdown = () => {
     if (isAuthenticated) {
       fetchFields();
     }
-  }, [isAuthenticated, getAccessTokenSilently]);
+  }, [isAuthenticated]);
 
   return (
     <>
