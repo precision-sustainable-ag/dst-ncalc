@@ -89,6 +89,7 @@ const AddField = () => {
   const [coverCropPlantingDate, setCoverCropPlantingDate] = useState(null);
   const [coverCropTerminationDate, setCoverCropTerminationDate] = useState(null);
   const [comments, setComments] = useState(null);
+  const [email, setEmail] = useState(null);
   const [isSaving, setIsSaving] = useState(false);
   const [isDeleting, setIsDeleting] = useState(false);
 
@@ -113,6 +114,8 @@ const AddField = () => {
   const allowedGroups = isAdmin
     ? ROLES
     : ROLES.filter((role) => roles.includes(role));
+
+  const isEmailValid = email && email !== '' && /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
 
   const updateProperties = (properties) => {
     setAddress(properties?.address);
@@ -181,6 +184,7 @@ const AddField = () => {
     setCashCropPlantingDate(selectedField?.properties.cashCropPlantingDate || null);
     setCashCropHarvestingDate(selectedField?.properties.cashCropHarvestingDate || null);
     setComments(selectedField?.properties.comments);
+    setEmail(selectedField?.properties.email);
     geometriesToFeatures(selectedField?.geometry, setFeatures, setLatLon, setBounds);
   }, [selectedField]);
 
@@ -200,6 +204,7 @@ const AddField = () => {
     setCashCropPlantingDate(null);
     setCashCropHarvestingDate(null);
     setComments(null);
+    setEmail(null);
     setFeatures([]);
     setAddress({});
     setZoom(13);
@@ -365,6 +370,8 @@ const AddField = () => {
         coverCropTerminationDate,
         comments,
       };
+
+      if (isAdmin && isEdit) payload.email = email;
 
       await privateApi.put(`/fields/${fieldId}`, payload);
 
@@ -776,6 +783,25 @@ const AddField = () => {
             </Grid>
           </Grid>
 
+          {isAdmin && isEdit && (
+            <Grid container spacing={2}>
+              <Grid item xs={12} md={6}>
+                <PSATextField
+                  label="Email"
+                  value={email}
+                  onChange={(e) => setEmail(e.target.value)}
+                  fullWidth
+                  autoComplete="off"
+                  error={!isEmailValid}
+                  disabled={isEdit && !selectedField}
+                  sx={{
+                    '& .MuiInputBase-root': { padding: 1 },
+                  }}
+                />
+              </Grid>
+            </Grid>
+          )}
+
           <Typography variant="h4" align="center">
             Where is your Field located?
           </Typography>
@@ -861,6 +887,7 @@ const AddField = () => {
               onClick={isEdit ? handleUpdateField : handleSaveField}
               disabled={isSaving || isDeleting || !group || !grower || !farm || !field || !cashCrop || !coverCrops || coverCrops.length < 1
                 || !cashCropPlantingDate || !cashCropHarvestingDate || !coverCropTerminationDate
+                || (isEdit && isAdmin && !isEmailValid)
                 || !features || features.length < 1}
               sx={{
                 minWidth: '150px',
