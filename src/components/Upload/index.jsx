@@ -220,16 +220,14 @@ const Upload = () => {
             onChange={(event, newValue) => {
               dispatch(set.selectedBiomassFile(newValue));
             }}
-            getOptionLabel={(option) => (option?.model_version
-              ? `Version : ${option.model_version} (${option.points?.length || 0} points)` : '')}
+            getOptionLabel={(option) => (option?.date
+              ? `${option.date} (${option.points?.length || 0} points)` : '')}
             renderOption={(props, option) => (
               <Box component="li" {...props}>
                 <Stack>
                   <Typography variant="subtitle1" sx={{ fontWeight: 'bold' }}>
                     {/* {dayjs(option.createdAt).format('MMM D, YYYY')} */}
-                    Version :
-                    {' '}
-                    {option.model_version}
+                    {option.date}
                   </Typography>
                   <Stack direction="row" spacing={2}>
                     {/* <Typography variant="body2" color="text.secondary">
