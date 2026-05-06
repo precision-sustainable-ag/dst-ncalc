@@ -107,7 +107,7 @@ const Home = () => {
         </Stack>
         <Box sx={{ height: '1rem' }} />
         <NavigateBar
-          next={!isPM3DMode ? 'Get Started' : 'Enroll Field'}
+          next={!isPM3DMode ? 'Get Started' : 'Manage Fields'}
           nextOnClick={() => {
             if (!isPM3DMode) {
               navigate('/location');
