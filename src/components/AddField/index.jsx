@@ -6,7 +6,7 @@ import {
   Autocomplete,
   Box,
   CircularProgress,
-  Grid, Stack, SvgIcon, Typography, useMediaQuery,
+  Grid, Stack, SvgIcon, Tab, Tabs, Typography, useMediaQuery,
 } from '@mui/material';
 import { PSAButton, PSAReduxMap, PSATextField } from 'shared-react-components/src';
 import { useDispatch, useSelector } from 'react-redux';
@@ -63,13 +63,23 @@ const gpsIcon = (
   </SvgIcon>
 );
 
+// Maps each route to a tab index so the Tabs component stays in sync with the URL
+const PATH_TO_TAB = {
+  '/field': 0,
+  '/editfield': 1,
+  '/viewfield': 2,
+};
+
 const AddField = () => {
   const { user, isAuthenticated } = useAuth0();
 
   const navigate = useNavigate();
   const location = useLocation();
   const dispatch = useDispatch();
+
   const isEdit = location.pathname === '/editfield';
+  const isView = location.pathname === '/viewfield';
+  const currentTab = PATH_TO_TAB[location.pathname] ?? 0;
 
   const matchesMd = useMediaQuery((theme) => theme.breakpoints.down('md'));
 
@@ -106,12 +116,13 @@ const AddField = () => {
   const [allFields, setAllFields] = useState([]);
   const [loadingOptions, setLoadingOptions] = useState(true);
 
-  // SELECTED FIELD (USED FOR EDIT FIELD METADATA)
+  // SELECTED FIELD (USED FOR EDIT/VIEW FIELD METADATA)
   const [selectedField, setSelectedField] = useState(null);
 
   const roles = user?.['https://dst-ncalc.org/claims'] || [];
-  const isAdmin = roles.includes('admin');
-  const allowedGroups = isAdmin
+  const isAdmin = roles.includes('ncalc-admin');
+  const isSuperAdmin = roles.includes('ncalc-super-admin');
+  const allowedGroups = (isSuperAdmin || isAdmin)
     ? ROLES
     : ROLES.filter((role) => roles.includes(role));
 
@@ -188,9 +199,9 @@ const AddField = () => {
     geometriesToFeatures(selectedField?.geometry, setFeatures, setLatLon, setBounds);
   }, [selectedField]);
 
-  // Reset states when switching between create and edit
+  // Reset states when switching between create and edit/view
   useEffect(() => {
-    if (isEdit && selectedField) return;
+    if ((isEdit || isView) && selectedField) return;
 
     setProgramGroupLabel(null);
     setGroup(null);
@@ -208,7 +219,11 @@ const AddField = () => {
     setFeatures([]);
     setAddress({});
     setZoom(13);
-  }, [isEdit, selectedField]);
+  }, [isEdit, isView, selectedField]);
+
+  useEffect(() => {
+    setSelectedField(null);
+  }, [location.pathname]);
 
   const {
     groupOptions, growerOptions, farmOptions, fieldOptions,
@@ -371,7 +386,7 @@ const AddField = () => {
         comments,
       };
 
-      if (isAdmin && isEdit) payload.email = email;
+      if (isSuperAdmin && isEdit) payload.email = email;
 
       await privateApi.put(`/fields/${fieldId}`, payload);
 
@@ -482,6 +497,9 @@ const AddField = () => {
     }
   };
 
+  // Shared disabled logic: inputs lock when a field hasn't been selected yet in edit/view mode
+  const inputDisabled = isView || (isEdit && !selectedField);
+
   return (
     <Grid container justifyContent="center">
       <Grid
@@ -492,45 +510,37 @@ const AddField = () => {
           position: 'relative',
           marginTop: '1rem',
           padding: `2rem ${matchesMd ? '1rem' : '4rem'}`,
+          paddingTop: '1rem',
           boxShadow: 5,
           borderRadius: 5,
           opacity: 0.9,
           backgroundColor: 'white',
         }}
       >
-        <Stack
-          direction="row"
-          sx={{
-            position: 'absolute',
-            top: '1.5rem',
-            right: '1.5rem',
-          }}
-        >
-          <PSAButton
-            title={isEdit ? 'Go To Create Field' : 'Go To Edit Field'}
-            variant="contained"
-            onClick={isEdit ? () => navigate('/field') : () => navigate('/editfield')}
+        <Box sx={{ borderBottom: 1, borderColor: 'divider', mb: 3 }}>
+          <Tabs
+            value={currentTab}
+            onChange={(_, newTab) => navigate(Object.keys(PATH_TO_TAB)[newTab])}
+            centered
+            textColor="inherit"
             sx={{
-              minWidth: '150px',
-              color: 'white',
-              padding: '0.8rem 1.5rem',
-              borderRadius: '2rem',
-              backgroundColor: '#60802D',
-              '&:hover': {
-                backgroundColor: '#60802D',
-                textDecoration: 'underline',
-                boxShadow: '0px 2px 2px rgba(160, 160, 160, 0.3)',
-              },
+              '& .MuiTab-root': { fontWeight: 600, textTransform: 'none', fontSize: '0.95rem' },
+              '& .Mui-selected': { color: '#60802D' },
+              '& .MuiTabs-indicator': { backgroundColor: '#60802D' },
             }}
-          />
-        </Stack>
+          >
+            <Tab label="Create Field" />
+            <Tab label="Edit Field" />
+            <Tab label="View Field" />
+          </Tabs>
+        </Box>
 
         <Stack spacing="1.5rem">
-          {isEdit
+          {(isEdit || isView)
             ? (
               <>
                 <Typography variant="h4" sx={{ fontWeight: 'bold', color: '#60802D' }}>
-                  Edit Field Details
+                  {isEdit ? 'Edit Field Details' : 'View Field Details'}
                 </Typography>
 
                 <Autocomplete
@@ -602,7 +612,7 @@ const AddField = () => {
                 getOptionLabel={(option) => option?.label || ''}
                 onChange={(e, val) => handleGroupChange(val)}
                 renderInput={(params) => <PSATextField {...params} label="Select a Program name" required />}
-                disabled={isEdit && !selectedField}
+                disabled={inputDisabled}
               />
             </Grid>
             <Grid item xs={12} md={6}>
@@ -615,7 +625,7 @@ const AddField = () => {
                 onChange={(e, val) => handleGrowerChange(val)}
                 onInputChange={(e, newInputValue) => handleGrowerChange(newInputValue)}
                 renderInput={(params) => <PSATextField {...params} label="Select or enter a Grower name" required />}
-                disabled={isEdit && !selectedField}
+                disabled={inputDisabled}
               />
             </Grid>
           </Grid>
@@ -631,7 +641,7 @@ const AddField = () => {
                 onChange={(e, val) => handleFarmChange(val)}
                 onInputChange={(e, newInputValue) => handleFarmChange(newInputValue)}
                 renderInput={(params) => <PSATextField {...params} label="Select or enter a Farm name" required />}
-                disabled={isEdit && !selectedField}
+                disabled={inputDisabled}
               />
             </Grid>
             <Grid item xs={12} md={6}>
@@ -644,7 +654,7 @@ const AddField = () => {
                 onChange={(e, val) => setField(val)}
                 onInputChange={(e, newInputValue) => setField(newInputValue)}
                 renderInput={(params) => <PSATextField {...params} label="Select or enter a Field name" required />}
-                disabled={isEdit && !selectedField}
+                disabled={inputDisabled}
               />
             </Grid>
           </Grid>
@@ -674,7 +684,7 @@ const AddField = () => {
                 renderInput={(params) => (
                   <PSATextField {...params} label="What cover crop species are planted in this field?" required />
                 )}
-                disabled={isEdit && !selectedField}
+                disabled={inputDisabled}
               />
             </Grid>
 
@@ -684,7 +694,7 @@ const AddField = () => {
                 value={cashCrop}
                 onChange={(e, val) => setCashCrop(val)}
                 renderInput={(params) => <PSATextField {...params} label="What cash crop will be planted next?" required />}
-                disabled={isEdit && !selectedField}
+                disabled={inputDisabled}
               />
             </Grid>
           </Grid>
@@ -702,7 +712,7 @@ const AddField = () => {
                   slotProps={{
                     field: { clearable: true, onClear: () => setCoverCropTerminationDate(null) },
                   }}
-                  disabled={isEdit && !selectedField}
+                  disabled={inputDisabled}
                   sx={{ width: '100%' }}
                 />
               </LocalizationProvider>
@@ -721,7 +731,7 @@ const AddField = () => {
                     return null;
                   }}
                   slotProps={{ textField: { required: true } }}
-                  disabled={isEdit && !selectedField}
+                  disabled={inputDisabled}
                   sx={{ width: '100%' }}
                 />
               </LocalizationProvider>
@@ -740,7 +750,7 @@ const AddField = () => {
                     return null;
                   }}
                   slotProps={{ textField: { required: true } }}
-                  disabled={isEdit && !selectedField}
+                  disabled={inputDisabled}
                   sx={{ width: '100%' }}
                 />
               </LocalizationProvider>
@@ -760,7 +770,7 @@ const AddField = () => {
                     return null;
                   }}
                   slotProps={{ textField: { required: true } }}
-                  disabled={isEdit && !selectedField}
+                  disabled={inputDisabled}
                   sx={{ width: '100%' }}
                 />
               </LocalizationProvider>
@@ -775,7 +785,7 @@ const AddField = () => {
                 onChange={(e) => setComments(e.target.value)}
                 fullWidth
                 autoComplete="off"
-                disabled={isEdit && !selectedField}
+                disabled={inputDisabled}
                 sx={{
                   '& .MuiInputBase-root': { padding: 1 },
                 }}
@@ -783,7 +793,7 @@ const AddField = () => {
             </Grid>
           </Grid>
 
-          {isAdmin && isEdit && (
+          {isSuperAdmin && isEdit && (
             <Grid container spacing={2}>
               <Grid item xs={12} md={6}>
                 <PSATextField
@@ -793,7 +803,7 @@ const AddField = () => {
                   fullWidth
                   autoComplete="off"
                   error={!isEmailValid}
-                  disabled={isEdit && !selectedField}
+                  disabled={inputDisabled}
                   sx={{
                     '& .MuiInputBase-root': { padding: 1 },
                   }}
@@ -820,37 +830,38 @@ const AddField = () => {
             Alternatively, upload a shape file or GeoJSON of your field boundaries.
           </Typography>
 
-          {!isEdit && (
-          <Stack direction="row" justifyContent="flex-end">
-            <input
-              id="upload-input"
-              type="file"
-              hidden
-              accept=".geojson,.shp,.zip"
-              onChange={handleFileUpload}
-            />
-            <PSAButton
-              title="Upload Shapefile / GeoJSON"
-              variant="contained"
-              onClick={() => document.getElementById('upload-input').click()}
-              sx={{
-                minWidth: '150px',
-                color: 'white',
-                padding: '0.8rem 1.5rem',
-                borderRadius: '2rem',
-                backgroundColor: '#60802D',
-                '&:hover': {
+          {!isEdit && !isView && (
+            <Stack direction="row" justifyContent="flex-end">
+              <input
+                id="upload-input"
+                type="file"
+                hidden
+                accept=".geojson,.shp,.zip"
+                onChange={handleFileUpload}
+              />
+              <PSAButton
+                title="Upload Shapefile / GeoJSON"
+                variant="contained"
+                onClick={() => document.getElementById('upload-input').click()}
+                sx={{
+                  minWidth: '150px',
+                  color: 'white',
+                  padding: '0.8rem 1.5rem',
+                  borderRadius: '2rem',
                   backgroundColor: '#60802D',
-                  textDecoration: 'underline',
-                  boxShadow: '0px 2px 2px rgba(160, 160, 160, 0.3)',
-                },
-              }}
-            />
-          </Stack>
+                  '&:hover': {
+                    backgroundColor: '#60802D',
+                    textDecoration: 'underline',
+                    boxShadow: '0px 2px 2px rgba(160, 160, 160, 0.3)',
+                  },
+                }}
+              />
+            </Stack>
           )}
 
           <Box sx={{ position: 'relative' }}>
             <PSAReduxMap
+              key={location.pathname}
               setProperties={updateProperties}
               initWidth="100%"
               initHeight="380px"
@@ -860,15 +871,15 @@ const AddField = () => {
               initFeatures={features}
               initAddress={address?.address}
               initBounds={bounds}
-              hasSearchBar
-              hasClear
+              hasSearchBar={!isEdit && !isView}
+              hasClear={!isEdit && !isView}
               hasMarker
               hasMarkerPopup
               hasMarkerMovable
               hasNavigation
               hasFullScreen
-              hasGeolocate
-              hasDrawing={!isEdit}
+              hasGeolocate={!isEdit && !isView}
+              hasDrawing={!isEdit && !isView}
               scrollZoom
               dragRotate
               dragPan
@@ -879,51 +890,53 @@ const AddField = () => {
             />
           </Box>
 
-          <Stack direction="row" justifyContent="center" spacing={2} sx={{ mt: 2 }}>
-            <PSAButton
-              // eslint-disable-next-line no-nested-ternary
-              title={isSaving ? <CircularProgress size={24} color="inherit" /> : isEdit ? 'Update Field' : 'Save Field'}
-              variant="contained"
-              onClick={isEdit ? handleUpdateField : handleSaveField}
-              disabled={isSaving || isDeleting || !group || !grower || !farm || !field || !cashCrop || !coverCrops || coverCrops.length < 1
-                || !cashCropPlantingDate || !cashCropHarvestingDate || !coverCropTerminationDate
-                || (isEdit && isAdmin && !isEmailValid)
-                || !features || features.length < 1}
-              sx={{
-                minWidth: '150px',
-                color: 'white',
-                padding: '0.8rem 1.5rem',
-                borderRadius: '2rem',
-                backgroundColor: '#60802D',
-                '&:hover': {
+          {!isView && (
+            <Stack direction="row" justifyContent="center" spacing={2} sx={{ mt: 2 }}>
+              <PSAButton
+                // eslint-disable-next-line no-nested-ternary
+                title={isSaving ? <CircularProgress size={24} color="inherit" /> : isEdit ? 'Update Field' : 'Save Field'}
+                variant="contained"
+                onClick={isEdit ? handleUpdateField : handleSaveField}
+                disabled={isSaving || isDeleting || !group || !grower || !farm || !field || !cashCrop || !coverCrops || coverCrops.length < 1
+                  || !cashCropPlantingDate || !cashCropHarvestingDate || !coverCropTerminationDate
+                  || (isEdit && isSuperAdmin && !isEmailValid)
+                  || !features || features.length < 1}
+                sx={{
+                  minWidth: '150px',
+                  color: 'white',
+                  padding: '0.8rem 1.5rem',
+                  borderRadius: '2rem',
                   backgroundColor: '#60802D',
-                  textDecoration: 'underline',
-                  boxShadow: '0px 2px 2px rgba(160, 160, 160, 0.3)',
-                },
-              }}
-            />
-            {isEdit
-            && (
-            <PSAButton
-              title={isDeleting ? <CircularProgress size={24} color="inherit" /> : 'Delete Field'}
-              variant="contained"
-              onClick={handleDeleteField}
-              disabled={isSaving || isDeleting || !selectedField}
-              sx={{
-                minWidth: '150px',
-                color: 'white',
-                padding: '0.8rem 1.5rem',
-                borderRadius: '2rem',
-                backgroundColor: '#D32F2F',
-                '&:hover': {
-                  backgroundColor: '#B71C1C',
-                  textDecoration: 'underline',
-                  boxShadow: '0px 2px 2px rgba(160, 160, 160, 0.3)',
-                },
-              }}
-            />
-            )}
-          </Stack>
+                  '&:hover': {
+                    backgroundColor: '#60802D',
+                    textDecoration: 'underline',
+                    boxShadow: '0px 2px 2px rgba(160, 160, 160, 0.3)',
+                  },
+                }}
+              />
+              {isEdit
+              && (
+              <PSAButton
+                title={isDeleting ? <CircularProgress size={24} color="inherit" /> : 'Delete Field'}
+                variant="contained"
+                onClick={handleDeleteField}
+                disabled={isSaving || isDeleting || !selectedField}
+                sx={{
+                  minWidth: '150px',
+                  color: 'white',
+                  padding: '0.8rem 1.5rem',
+                  borderRadius: '2rem',
+                  backgroundColor: '#D32F2F',
+                  '&:hover': {
+                    backgroundColor: '#B71C1C',
+                    textDecoration: 'underline',
+                    boxShadow: '0px 2px 2px rgba(160, 160, 160, 0.3)',
+                  },
+                }}
+              />
+              )}
+            </Stack>
+          )}
         </Stack>
       </Grid>
     </Grid>

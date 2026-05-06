@@ -17,7 +17,7 @@ const ProtectedPage = ({ children }) => {
 
   const roles = user?.['https://dst-ncalc.org/claims'] || [];
   const isAllowed = isAuthenticated && (
-    roles.includes('admin') || roles.some((r) => ROLES.includes(r))
+    roles.includes('ncalc-super-admin') || roles.includes('ncalc-admin') || roles.some((r) => ROLES.includes(r))
   );
 
   if (isLoading) {
