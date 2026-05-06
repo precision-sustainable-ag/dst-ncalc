@@ -22,6 +22,7 @@ import { isValidGeoJSON } from '../../utils/geojsonUtils';
 import { azureSASToken, containerName, storageAccountName } from '../../utils/keys';
 import FieldDropdown from '../../shared/FieldDropdown/FieldDropdown';
 import { get, set } from '../../store/redux-autosetters';
+import { handleError } from '../../utils/apiError';
 
 const MAP_TYPES = ['Spray Map', 'Yield Map'];
 
@@ -83,18 +84,18 @@ const UploadMap = () => {
 
         setExistingMapTypes(foundTypes);
       } catch (error) {
-        console.error('Error checking existing maps:', error);
+        handleError(error, dispatch, 'Error checking existing maps');
       } finally {
         setCheckingMapTypes(false);
       }
     };
 
     checkExistingMaps();
-  }, [selectedField, selectedSeason, isAuthenticated]);
+  }, [selectedField, selectedSeason, isAuthenticated, dispatch]);
 
   const handleUpload = async () => {
     if (!selectedFile || !selectedField || !selectedSeason) {
-      alert('Please select a field and a valid file.');
+      handleError(null, dispatch, 'Please select a field and a valid file.');
       return;
     }
 
@@ -181,7 +182,7 @@ const UploadMap = () => {
         blobHTTPHeaders: { blobContentType: selectedFile.type },
       });
 
-      alert(`File uploaded successfully to folder: ${folderName}`);
+      handleError(null, dispatch, `File uploaded successfully to folder: ${folderName}`);
 
       // Reset file input
       setSelectedFile(null);
@@ -189,7 +190,7 @@ const UploadMap = () => {
       dispatch(set.selectedField(null));
       setMapType(MAP_TYPES[0]);
     } catch (error) {
-      alert(`Upload failed: ${error.message || 'Unknown error occurred'}`);
+      handleError(error, dispatch, 'Unknown error occurred');
     } finally {
       setIsUploading(false);
     }
@@ -211,10 +212,10 @@ const UploadMap = () => {
           if (isValidGeoJSON(geojson)) {
             setSelectedFile(file);
           } else {
-            alert('Invalid GeoJSON. Please try again with a different file.');
+            handleError(null, dispatch, 'Invalid GeoJSON. Please try again with a different file.');
           }
         } catch (err) {
-          alert('Error parsing GeoJSON file');
+          handleError(err, dispatch, 'Error parsing GeoJSON file');
         }
       };
       reader.readAsText(file);
@@ -228,15 +229,15 @@ const UploadMap = () => {
           if (isValidGeoJSON(geojson)) {
             setSelectedFile(file);
           } else {
-            alert('Invalid GeoJSON. Please try again with a different file.');
+            handleError(null, dispatch, 'Invalid GeoJSON. Please try again with a different file.');
           }
         } catch (err) {
-          alert('Error parsing Shapefile. Please ensure it is a valid .zip containing .shp, .shx, and .dbf files.');
+          handleError(err, dispatch, 'Error parsing Shapefile. Please ensure it is a valid .zip containing .shp, .shx, and .dbf files.');
         }
       };
       reader.readAsArrayBuffer(file);
     } else {
-      alert('Unsupported file type. Please upload .geojson or .shp');
+      handleError(null, dispatch, 'Unsupported file type. Please upload .geojson or .shp');
     }
   };
 

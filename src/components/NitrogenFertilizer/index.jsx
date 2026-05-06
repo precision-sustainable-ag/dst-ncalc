@@ -20,6 +20,7 @@ import Required from '../../shared/Required';
 import NavigateBar from '../../shared/Navigate';
 import NavButton from '../../shared/Navigate/NavButton';
 import { ncalcApiUrl } from '../../utils/keys';
+import { handleError } from '../../utils/apiError';
 
 const CustomInputText = styled(Typography)({
   fontSize: '1.2rem',
@@ -157,9 +158,9 @@ const NitrogenFertilizer = () => {
         setIsFetching(true);
         const response = await axios.get(`${API_BASE_URL}/fertilizers`);
         dispatch(set.fertilizers(response.data?.data || []));
-      } catch (e) {
-        // console.error('Failed to load options', e);
+      } catch (err) {
         dispatch(set.fertilizers([]));
+        handleError(err, dispatch, 'Failed to load list of fertilizers.');
       } finally {
         setIsFetching(false);
       }
@@ -243,7 +244,7 @@ const NitrogenFertilizer = () => {
         // console.log('Feature Collection:', featureCollection);
         // console.log('Property Keys:', propertyKeys);
       } catch (err) {
-        setError(err.message || 'Invalid file format');
+        setError('Invalid file format. Try uploading a different file.');
         setFileName('');
         dispatch(set.nitrogenSprayMap(null));
         setProperties([]);

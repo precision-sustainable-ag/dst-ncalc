@@ -19,6 +19,7 @@ import NavButton from '../../../shared/Navigate/NavButton';
 import { downloadPrescriptionShapefile } from '../../../hooks/useFetchApi';
 import { ncalcApiUrl } from '../../../utils/keys';
 import buildPdfReportHtml from '../../../utils/pdfUtils';
+import { handleError } from '../../../utils/apiError';
 
 /// /// /// STYLES /// /// ///
 const CardStyles = {
@@ -84,13 +85,7 @@ const NitrogenMapWidget = ({ refVal }) => {
       }));
       handleDownloadClick();
     } catch (err) {
-      const serverMessage = err?.response?.data?.message || err?.response?.data?.error;
-      dispatch(set.actionModal({
-        open: true,
-        type: 'error',
-        title: 'Something Went Wrong',
-        message: serverMessage || 'There was an error saving the prescription data.',
-      }));
+      handleError(err, dispatch, '', 'There was an error in saving the prescription data.');
     }
   };
 
@@ -125,12 +120,7 @@ const NitrogenMapWidget = ({ refVal }) => {
         await saveFiles();
       }
     } catch (err) {
-      dispatch(set.actionModal({
-        open: true,
-        type: 'error',
-        title: 'Error',
-        message: 'Failed to check for existing prescription data.',
-      }));
+      handleError(err, dispatch, 'Failed to check for existing prescription data.');
     } finally {
       setIsSaving(false);
     }
@@ -161,12 +151,7 @@ const NitrogenMapWidget = ({ refVal }) => {
       const { data } = await axios.post(`${PDF_BASE_URL}/generate-pdf`, { html, filename: `prescription-${fieldName}.pdf` });
       window.open(data.fileUrl, '_blank');
     } catch (err) {
-      dispatch(set.actionModal({
-        open: true,
-        type: 'error',
-        title: 'PDF Export Error',
-        message: err?.response?.data?.error || 'There was an error generating the PDF.',
-      }));
+      handleError(err, dispatch, '', 'There was an error while generating the PDF.');
     } finally {
       setIsPdfLoading(false);
     }

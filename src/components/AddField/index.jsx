@@ -20,6 +20,7 @@ import { get, set } from '../../store/redux-autosetters';
 import { mapboxToken } from '../../utils/keys';
 import { geometriesToFeatures, processGeometries, validateAndProcessGeoJSON } from '../../utils/geojsonUtils';
 import { privateApi } from '../../utils/apiClient';
+import { handleError } from '../../utils/apiError';
 
 // Roles are assigned in auth0 and included in the user's ID token. They are the 'groups' that the user has access to.
 const ROLES = ['NIFA-Soy', 'Willard', 'Growmark'];
@@ -159,13 +160,7 @@ const AddField = () => {
         const response = await privateApi.get(url);
         setAllFields(response.data);
       } catch (error) {
-        if (error.isAuthRedirect) return;
-        dispatch(set.actionModal({
-          open: true,
-          type: 'error',
-          title: 'Error',
-          message: 'Failed to load dropdown options. Please refresh the page or try again later.',
-        }));
+        handleError(error, dispatch, 'Failed to load dropdown options. Please refresh the page or try again later.');
       } finally {
         setLoadingOptions(false);
       }
@@ -272,7 +267,6 @@ const AddField = () => {
     // coverCropPlantingDate is temporarily not a required field
     if (!group || !grower || !farm || !field || !cashCrop || !coverCrops || coverCrops.length < 1
       || !cashCropPlantingDate || !cashCropHarvestingDate || !coverCropTerminationDate) {
-      alert('Please fill in all the fields');
       dispatch(set.actionModal({
         open: true,
         type: 'error',
@@ -284,7 +278,7 @@ const AddField = () => {
 
     const finalGeometry = processGeometries(features);
     if (!finalGeometry) {
-      alert('Please draw a shape or upload a file.');
+      handleError(null, dispatch, 'Please draw a shape or upload a file.');
       return;
     }
 
@@ -317,7 +311,6 @@ const AddField = () => {
       setFeatures(null);
       setComments(null);
 
-      // alert('Field saved successfully!');
       dispatch(set.actionModal({
         open: true,
         type: 'info',
@@ -326,21 +319,7 @@ const AddField = () => {
       }));
       navigate('/home');
     } catch (error) {
-      if (error.isAuthRedirect) return;
-      let message = '';
-      if (error.response?.data?.message) {
-        message = `Error: ${error.response.data.message}`;
-      } else if (error.response) {
-        message = `Error: ${error.response.data?.error || 'Failed to save field'}`;
-      } else {
-        message = 'Network error. Could not connect to server.';
-      }
-      dispatch(set.actionModal({
-        open: true,
-        type: 'error',
-        title: 'Error',
-        message,
-      }));
+      handleError(error, dispatch);
     } finally {
       setIsSaving(false);
     }
@@ -361,7 +340,7 @@ const AddField = () => {
 
     const finalGeometry = processGeometries(features);
     if (!finalGeometry) {
-      alert('Please draw a shape or upload a file.');
+      handleError(null, dispatch, 'Please draw a shape or upload a file.');
       return;
     }
 
@@ -397,7 +376,6 @@ const AddField = () => {
       setField(null);
       setFeatures(null);
 
-      // alert('Field updated successfully!');
       dispatch(set.actionModal({
         open: true,
         type: 'info',
@@ -406,21 +384,7 @@ const AddField = () => {
       }));
       navigate('/home');
     } catch (error) {
-      if (error.isAuthRedirect) return;
-      let message = '';
-      if (error.response?.data?.message) {
-        message = `Error: ${error.response.data.message}`;
-      } else if (error.response) {
-        message = `Error: ${error.response.data?.error || 'Failed to update field'}`;
-      } else {
-        message = 'Network error. Could not connect to server.';
-      }
-      dispatch(set.actionModal({
-        open: true,
-        type: 'error',
-        title: 'Error',
-        message,
-      }));
+      handleError(error, dispatch);
     } finally {
       setIsSaving(false);
     }
@@ -439,7 +403,6 @@ const AddField = () => {
 
       if (response.status === 200) {
         setSelectedField(null);
-        // alert('Field deactivated successfully.');
         dispatch(set.actionModal({
           open: true,
           type: 'info',
@@ -448,16 +411,8 @@ const AddField = () => {
         }));
         navigate('/home');
       }
-    } catch (err) {
-      if (err.isAuthRedirect) return;
-      const errorMessage = err.response?.data?.message || 'Error deleting field. Please try again.';
-      // alert(errorMessage);
-      dispatch(set.actionModal({
-        open: true,
-        type: 'error',
-        title: 'Error',
-        errorMessage,
-      }));
+    } catch (error) {
+      handleError(error, dispatch);
     } finally {
       setIsDeleting(false);
     }
@@ -476,7 +431,7 @@ const AddField = () => {
           const geojson = JSON.parse(reader.result);
           validateAndProcessGeoJSON(geojson, setFeatures, setLatLon, setBounds);
         } catch (err) {
-          alert('Error parsing GeoJSON file');
+          handleError(err, dispatch, 'Error parsing GeoJSON file');
         }
       };
       reader.readAsText(file);
@@ -488,12 +443,12 @@ const AddField = () => {
           const geojson = await shpjs(arrayBuffer);
           validateAndProcessGeoJSON(geojson, setFeatures, setLatLon, setBounds);
         } catch (err) {
-          alert('Error parsing Shapefile. Please ensure it is a valid .zip containing .shp, .shx, and .dbf files.');
+          handleError(err, dispatch, 'Error parsing Shapefile. Please ensure it is a valid .zip containing .shp, .shx, and .dbf files.');
         }
       };
       reader.readAsArrayBuffer(file);
     } else {
-      alert('Unsupported file type. Please upload .geojson or .shp');
+      handleError(null, dispatch, 'Unsupported file type. Please upload .geojson or .shp');
     }
   };
 

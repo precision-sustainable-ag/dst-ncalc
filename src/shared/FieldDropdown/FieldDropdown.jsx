@@ -11,6 +11,7 @@ import {
 import { PSATextField } from 'shared-react-components/src';
 import { get, set } from '../../store/Store';
 import { privateApi } from '../../utils/apiClient';
+import { handleError } from '../../utils/apiError';
 
 const PROGRAM_GROUPS = {
   'NIFA-Soy': 'NIFA-Soy',
@@ -83,8 +84,7 @@ const FieldDropdown = () => {
         const response = await privateApi.get('/fields-identifiers');
         setFieldOptions(response.data);
       } catch (e) {
-        if (e.isAuthRedirect) return;
-        // console.error('Failed to load options', e);
+        handleError(e, dispatch, '', 'Failed to load dropdown options. Please refresh the page or try again later.');
       } finally {
         setIsFetching(false);
       }

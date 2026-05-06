@@ -8,6 +8,7 @@ import { useDispatch, useSelector } from 'react-redux';
 import { get, set } from '../store/Store';
 import { weightedAverage } from './helpers';
 import { historyStates } from '../store/inits';
+import { handleError } from '../utils/apiError';
 
 const NCAL_API_URL = 'https://api.covercrop-ncalc.org/surface';
 const SSURGO_API_URL = 'https://ssurgo.covercrop-data.org';
@@ -267,13 +268,7 @@ const fetchNitrogenData = async (
       dispatch(set.nitrogenFetchIsFailed(true));
     }
   } catch (error) {
-    // console.error(error);
-    dispatch(set.actionModal({
-      open: true,
-      type: 'error',
-      title: 'Error',
-      message: error?.response?.data?.message || 'An error occurred while fetching the prescription data.',
-    }));
+    handleError(error, dispatch, '', 'An error occurred while fetching the prescription data.');
     dispatch(set.nitrogenFetchIsLoading(false));
     dispatch(set.nitrogenFetchIsFailed(true));
   }
@@ -356,13 +351,7 @@ const fetchPrescription = async (
       dispatch(set.nitrogenFetchIsFailed(true));
     }
   } catch (error) {
-    // console.error(error);
-    dispatch(set.actionModal({
-      open: true,
-      type: 'error',
-      title: 'Error',
-      message: error?.response?.data?.message || 'An error occurred while fetching the prescription data.',
-    }));
+    handleError(error, dispatch, '', 'An error occurred while fetching the prescription data.');
     dispatch(set.nitrogenFetchIsFailed(true));
   } finally {
     dispatch(set.biomassFetchIsLoading(false));
