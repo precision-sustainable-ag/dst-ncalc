@@ -99,8 +99,8 @@ const AddField = () => {
   const [cashCropHarvestingDate, setCashCropHarvestingDate] = useState(null);
   const [coverCropPlantingDate, setCoverCropPlantingDate] = useState(null);
   const [coverCropTerminationDate, setCoverCropTerminationDate] = useState(null);
-  const [comments, setComments] = useState(null);
-  const [email, setEmail] = useState(null);
+  const [comments, setComments] = useState('');
+  const [email, setEmail] = useState('');
   const [isSaving, setIsSaving] = useState(false);
   const [isDeleting, setIsDeleting] = useState(false);
 
@@ -209,15 +209,18 @@ const AddField = () => {
     setCoverCropTerminationDate(null);
     setCashCropPlantingDate(null);
     setCashCropHarvestingDate(null);
-    setComments(null);
-    setEmail(null);
+    setComments('');
+    setEmail('');
     setFeatures([]);
     setAddress({});
     setZoom(13);
   }, [isEdit, isView, selectedField]);
 
+  // unselect any selected field and map data when switching tabs
   useEffect(() => {
     setSelectedField(null);
+    setFeatures([]);
+    setAddress({});
   }, [location.pathname]);
 
   const {
@@ -309,7 +312,7 @@ const AddField = () => {
       setFarm(null);
       setField(null);
       setFeatures(null);
-      setComments(null);
+      setComments('');
 
       dispatch(set.actionModal({
         open: true,
