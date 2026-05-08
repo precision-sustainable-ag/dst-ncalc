@@ -37,7 +37,7 @@ const AreaErrorModal = () => {
   );
 };
 
-const TaskFailModal = ({ task }) => {
+const TaskFailModal = ({ task, message }) => {
   const biomassFetchIsFailed = useSelector(get.biomassFetchIsFailed);
   const dispatch = useDispatch();
 
@@ -47,6 +47,7 @@ const TaskFailModal = ({ task }) => {
       onClose={() => {
         if (task === 'biomass') {
           dispatch(set.biomassFetchIsFailed(false));
+          dispatch(set.biomassFetchFailMessage(null));
         }
       }}
       aria-labelledby="alert-dialog-title"
@@ -54,7 +55,9 @@ const TaskFailModal = ({ task }) => {
     >
       <DialogTitle id="alert-dialog-title">Server Failed</DialogTitle>
       <DialogContent>
-        <DialogContentText id="alert-dialog-description">Task failed to complete. Please try again.</DialogContentText>
+        <DialogContentText id="alert-dialog-description">
+          {message || 'Task failed to complete. Please try again.'}
+        </DialogContentText>
       </DialogContent>
       <DialogActions>
         <PSAButton
@@ -62,6 +65,7 @@ const TaskFailModal = ({ task }) => {
           onClick={() => {
             if (task === 'biomass') {
               dispatch(set.biomassFetchIsFailed(false));
+              dispatch(set.biomassFetchFailMessage(null));
             }
           }}
           autoFocus

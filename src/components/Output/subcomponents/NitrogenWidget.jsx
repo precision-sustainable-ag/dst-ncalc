@@ -22,7 +22,7 @@ import {
 } from './chartsOptions';
 import { modelCalc } from './helpers';
 import { get, set } from '../../../store/redux-autosetters';
-import { useFetchCornN, useFetchModel } from '../../../hooks/useFetchApi';
+import { useFetchCornN } from '../../../hooks/useFetchApi';
 // import useFetchNitrogen from '../../../hooks/useFetchNitrogen';
 
 /// /// /// STYLES /// /// ///
@@ -74,12 +74,12 @@ const NitrogenCard = ({ refVal }) => {
   const nweeks = useSelector(get.nweeks);
   const targetN = useSelector(get.targetN);
   const mockup = useSelector(get.mockup);
-  const lat = useSelector(get.lat);
-  const lon = useSelector(get.lon);
-  const OM = useSelector(get.OM);
-  const lwc = useSelector(get.lwc);
-  const BD = useSelector(get.BD);
-  const InorganicN = useSelector(get.InorganicN);
+  // const lat = useSelector(get.lat);
+  // const lon = useSelector(get.lon);
+  // const OM = useSelector(get.OM);
+  // const lwc = useSelector(get.lwc);
+  // const BD = useSelector(get.BD);
+  // const InorganicN = useSelector(get.InorganicN);
   const chartRef1 = useRef(null);
   const chartRef2 = useRef(null);
   const model = useSelector(get.model);

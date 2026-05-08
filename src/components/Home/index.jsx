@@ -10,7 +10,7 @@ import { get, set } from '../../store/Store';
 import About from '../About';
 import HistorySelect from '../HistorySelect';
 import NavigateBar from '../../shared/Navigate';
-// import NavButton from '../../shared/Navigate/NavButton';
+import NavButton from '../../shared/Navigate/NavButton';
 
 const BiomassMethodButton = styled(ToggleButton)(() => ({
   '&.Mui-selected': {
@@ -43,6 +43,10 @@ const Home = () => {
   // const privacy = useSelector(get.privacy);
   const biomassCalcMode = useSelector(get.biomassCalcMode);
   const isPM3DMode = biomassCalcMode === 'pm3d';
+
+  const isDevelopOrLocal = window.location.hostname === 'localhost'
+    || window.location.hostname === '127.0.0.1'
+    || window.location.href.includes('develop');
 
   useEffect(() => {
     if (window.location.toString().includes('PSA')) {
@@ -103,25 +107,28 @@ const Home = () => {
         </Stack>
         <Box sx={{ height: '1rem' }} />
         <NavigateBar
-          next={!isPM3DMode ? 'Get Started' : 'Enroll Field'}
+          next={!isPM3DMode ? 'Get Started' : 'Manage Fields'}
           nextOnClick={() => {
             if (!isPM3DMode) {
               navigate('/location');
               dispatch(set.activeStep(2));
             } else {
               navigate('/field');
-              // dispatch(set.activeStep(1));
             }
           }}
           back="About"
           backOnClick={() => setAboutOpen(true)}
-          // extraAction={
-          //   biomassCalcMode === 'pm3d' && (
-          //     <NavButton onClick={() => navigate('/field')}>
-          //       Enroll Field
-          //     </NavButton>
-          //   )
-          // }
+          extraAction={
+            biomassCalcMode === 'pm3d' && isDevelopOrLocal && (
+              <NavButton onClick={() => {
+                navigate('/upload');
+                dispatch(set.activeStep(1));
+              }}
+              >
+                Get Prescription
+              </NavButton>
+            )
+          }
         />
         <About open={aboutOpen} setOpen={setAboutOpen} />
       </Grid>

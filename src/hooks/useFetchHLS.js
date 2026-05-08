@@ -121,8 +121,14 @@ const useFetchHLS = () => {
         if (task_status === 'PENDING') {
           setTimeout(() => fetchTask(taskId), fetchTimeout);
         } else if (task_status === 'SUCCESS') {
-          setData(response.data);
-          dispatch(set.biomassFetchIsLoading(false));
+          if (response.data.task_result.error === true) {
+            dispatch(set.biomassFetchIsLoading(false));
+            dispatch(set.biomassFetchIsFailed(true));
+            dispatch(set.biomassFetchFailMessage(response.data.task_result.message));
+          } else {
+            setData(response.data);
+            dispatch(set.biomassFetchIsLoading(false));
+          }
         } else if (task_status === 'FAILURE') {
           dispatch(set.biomassFetchIsLoading(false));
           dispatch(set.biomassFetchIsFailed(true));

@@ -69,7 +69,7 @@ const modelCalc = ({
   const dates = [];
 
   if (model) {
-    model.s[outputN === 1 ? 'MinNfromFOM' : 'FOM'].forEach(
+    model.s?.[outputN === 1 ? 'MinNfromFOM' : 'FOM'].forEach(
       (d, i, a) => {
         const value = +(d / factor).toFixed(2);
 
@@ -105,7 +105,7 @@ const modelCalc = ({
   const incorporatedData = [];
 
   if (model && doIncorporated) {
-    model.i[outputN === 1 ? 'FomCumN' : 'FOM'].forEach((d, i, a) => {
+    model.i?.[outputN === 1 ? 'FomCumN' : 'FOM'].forEach((d, i, a) => {
       const value = +(d / factor).toFixed(2);
       incorporatedData.push({
         x: +date,
@@ -138,7 +138,7 @@ const modelCalc = ({
   const minDate = new Date(coverCropTerminationDate);
 
   const surfaceNPredict = model ? Math.round(
-    model.s.MinNfromFOM.slice(-1) / factor,
+    (model.s?.MinNfromFOM.slice(-1) ?? 0) / factor,
   ) : 0;
 
   const incorporatedNPredict =

@@ -1,3 +1,4 @@
+/* eslint-disable no-underscore-dangle */
 /* eslint-disable no-alert */
 import React, { useEffect, useMemo, useState } from 'react';
 import { useAuth0 } from '@auth0/auth0-react';
@@ -5,26 +6,35 @@ import {
   Autocomplete,
   Box,
   CircularProgress,
-  Grid, Stack, SvgIcon, Typography, useMediaQuery,
+  Grid, Stack, SvgIcon, Tab, Tabs, Typography, useMediaQuery,
 } from '@mui/material';
 import { PSAButton, PSAReduxMap, PSATextField } from 'shared-react-components/src';
-import { useSelector } from 'react-redux';
+import { useDispatch, useSelector } from 'react-redux';
 import shpjs from 'shpjs';
-import { useNavigate } from 'react-router-dom';
+import { useLocation, useNavigate } from 'react-router-dom';
 import { DatePicker } from '@mui/x-date-pickers/DatePicker';
 import { LocalizationProvider } from '@mui/x-date-pickers';
 import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
 import dayjs from 'dayjs';
-import { get } from '../../store/redux-autosetters';
+import { get, set } from '../../store/redux-autosetters';
 import { mapboxToken } from '../../utils/keys';
-import { processGeometries, validateAndProcessGeoJSON } from '../../utils/geojsonUtils';
+import { geometriesToFeatures, processGeometries, validateAndProcessGeoJSON } from '../../utils/geojsonUtils';
 import { privateApi } from '../../utils/apiClient';
+import { handleError } from '../../utils/apiError';
 
+// Roles are assigned in auth0 and included in the user's ID token. They are the 'groups' that the user has access to.
 const ROLES = ['NIFA-Soy', 'Willard', 'Growmark'];
+
+const PROGRAM_GROUP_OPTIONS = [
+  { label: 'Willard - RCPP', group: 'Willard', program: 'RCPP' },
+  { label: 'Willard - RCPP Report Only', group: 'Willard', program: 'RCPP-Report-Only' },
+  { label: 'Growmark - RCPP', group: 'Growmark', program: 'RCPP' },
+  { label: 'Growmark - RCPP Report Only', group: 'Growmark', program: 'RCPP-Report-Only' },
+  { label: 'NIFA-Soy', group: 'NIFA-Soy', program: 'NIFA-Soy' },
+];
 
 // TODO: Placeholder values - to be updated
 const CASH_CROP_OPTIONS = ['Corn', 'Soybeans', 'Wheat', 'Cotton'];
-// const SEASONS = ['Spring 2025', 'Fall 2025', 'Spring 2026', 'Fall 2026'];
 
 const polygonIcon = (
   <SvgIcon
@@ -54,29 +64,31 @@ const gpsIcon = (
   </SvgIcon>
 );
 
-const fieldIcon = (
-  <SvgIcon
-    viewBox="0 0 24 24"
-    fontSize="small"
-    sx={{ verticalAlign: 'middle', mx: 0.5 }}
-  >
-    <path
-      d="M19 19H15V21H19C20.1 21 21 20.1 21 19V15H19M19 3H15V5H19V9H21V5C21 3.9 20.1 3 19 3M5 5H9V3H5C3.9 3 3 3.9 3
-      5V9H5M5 15H3V19C3 20.1 3.9 21 5 21H9V19H5V15M7 11H9V13H7V11M11 11H13V13H11V11M15 11H17V13H15V11Z"
-    />
-  </SvgIcon>
-);
+// Maps each route to a tab index so the Tabs component stays in sync with the URL
+const PATH_TO_TAB = {
+  '/field': 0,
+  '/editfield': 1,
+  '/viewfield': 2,
+};
 
 const AddField = () => {
   const { user, isAuthenticated } = useAuth0();
 
   const navigate = useNavigate();
+  const location = useLocation();
+  const dispatch = useDispatch();
+
+  const isEdit = location.pathname === '/editfield';
+  const isView = location.pathname === '/viewfield';
+  const currentTab = PATH_TO_TAB[location.pathname] ?? 0;
+
   const matchesMd = useMediaQuery((theme) => theme.breakpoints.down('md'));
 
   const COVER_CROP_OPTIONS = useSelector(get.species) || [];
 
   // FORM DATA STATE VARIABLES
-  const [program, setProgram] = useState(null);
+  const [programGroupLabel, setProgramGroupLabel] = useState(null);
+  const [group, setGroup] = useState(null);
   const [grower, setGrower] = useState(null);
   const [farm, setFarm] = useState(null);
   const [field, setField] = useState(null);
@@ -87,14 +99,16 @@ const AddField = () => {
   const [cashCropHarvestingDate, setCashCropHarvestingDate] = useState(null);
   const [coverCropPlantingDate, setCoverCropPlantingDate] = useState(null);
   const [coverCropTerminationDate, setCoverCropTerminationDate] = useState(null);
-  const [comments, setComments] = useState(null);
+  const [comments, setComments] = useState('');
+  const [email, setEmail] = useState('');
   const [isSaving, setIsSaving] = useState(false);
+  const [isDeleting, setIsDeleting] = useState(false);
 
   // MAP STATE VARIABLES
   const defaultLat = useSelector(get.lat);
   const defaultLon = useSelector(get.lon);
   const [address, setAddress] = useState({});
-  const [zoom, setZoom] = useState(13);
+  const [zoom, setZoom] = useState(16);
   const [features, setFeatures] = useState(null);
   const [latLon, setLatLon] = useState([defaultLat, defaultLon]);
   const [bounds, setBounds] = useState(null);
@@ -103,11 +117,17 @@ const AddField = () => {
   const [allFields, setAllFields] = useState([]);
   const [loadingOptions, setLoadingOptions] = useState(true);
 
+  // SELECTED FIELD (USED FOR EDIT/VIEW FIELD METADATA)
+  const [selectedField, setSelectedField] = useState(null);
+
   const roles = user?.['https://dst-ncalc.org/claims'] || [];
-  const isAdmin = roles.includes('admin');
-  const allowedPrograms = isAdmin
+  const isAdmin = roles.includes('ncalc-admin');
+  const isSuperAdmin = roles.includes('ncalc-super-admin');
+  const allowedGroups = (isSuperAdmin || isAdmin)
     ? ROLES
     : ROLES.filter((role) => roles.includes(role));
+
+  const isEmailValid = email && email !== '' && /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
 
   const updateProperties = (properties) => {
     setAddress(properties?.address);
@@ -135,12 +155,12 @@ const AddField = () => {
   useEffect(() => {
     const fetchOptions = async () => {
       try {
-        const response = await privateApi.get('/fields-identifiers');
-        // setOptions(response.data);
+        setLoadingOptions(true);
+        const url = isEdit ? '/fields-identifiers?mode=edit' : '/fields-identifiers';
+        const response = await privateApi.get(url);
         setAllFields(response.data);
       } catch (error) {
-        if (error.isAuthRedirect) return;
-        console.error('Failed to load dropdown options', error);
+        handleError(error, dispatch);
       } finally {
         setLoadingOptions(false);
       }
@@ -149,67 +169,114 @@ const AddField = () => {
     if (isAuthenticated) {
       fetchOptions();
     }
-  }, [isAuthenticated]);
+  }, [isAuthenticated, isEdit, dispatch]);
+
+  // Function to clear all the form values
+  const resetForm = () => {
+    setSelectedField(null);
+    setProgramGroupLabel(null);
+    setGroup(null);
+    setGrower(null);
+    setFarm(null);
+    setField(null);
+    setCoverCrops([]);
+    setCashCrop(null);
+    setCoverCropPlantingDate(null);
+    setCoverCropTerminationDate(null);
+    setCashCropPlantingDate(null);
+    setCashCropHarvestingDate(null);
+    setComments('');
+    setEmail('');
+    setFeatures([]);
+    setAddress({});
+    setZoom(16);
+  };
+
+  useEffect(() => {
+    if (!selectedField) {
+      resetForm();
+      return;
+    }
+
+    const programGroup = PROGRAM_GROUP_OPTIONS.find(
+      (option) => option.group === selectedField.properties.groupName && option.program === selectedField.properties.programName,
+    );
+
+    setProgramGroupLabel(programGroup);
+    setGroup(selectedField?.properties.groupName);
+    setGrower(selectedField?.properties.growerName);
+    setFarm(selectedField?.properties.farmName);
+    setField(selectedField?.properties.fieldName);
+    setCoverCrops(selectedField?.properties.coverCrop);
+    setCashCrop(selectedField?.properties.cashCrop);
+    setCoverCropPlantingDate(selectedField?.properties.coverCropPlantingDate || null);
+    setCoverCropTerminationDate(selectedField?.properties.coverCropTerminationDate || null);
+    setCashCropPlantingDate(selectedField?.properties.cashCropPlantingDate || null);
+    setCashCropHarvestingDate(selectedField?.properties.cashCropHarvestingDate || null);
+    setComments(selectedField?.properties.comments);
+    setEmail(selectedField?.properties.email);
+    geometriesToFeatures(selectedField?.geometry, setFeatures, setLatLon, setBounds);
+  }, [selectedField]);
 
   const {
-    programOptions, growerOptions, farmOptions, fieldOptions,
+    groupOptions, growerOptions, farmOptions, fieldOptions,
   } = useMemo(() => {
     // Helper to extract unique values from a filtered list
     const getUnique = (list, key) => [...new Set(list.map((item) => item.properties[key]).filter(Boolean))].sort();
 
     // A. Programs: Show programs list according to the user's role
-    const uniquePrograms = allowedPrograms;
+    const uniqueGroups = allowedGroups;
 
     // B. Growers: Filter master list by Selected Program
-    const validGrowersList = allFields.filter((f) => !program || f.properties.programName.toLowerCase() === program.toLowerCase());
+    const validGrowersList = allFields.filter((f) => !group || f.properties.groupName?.toLowerCase() === group.toLowerCase());
     const uniqueGrowers = getUnique(validGrowersList, 'growerName');
 
     // C. Farms: Filter by Selected Program AND Selected Grower
-    const validFarmsList = validGrowersList.filter((f) => !grower || f.properties.growerName.toLowerCase() === grower.toLowerCase());
+    const validFarmsList = validGrowersList.filter((f) => !grower || f.properties.growerName?.toLowerCase() === grower.toLowerCase());
     const uniqueFarms = getUnique(validFarmsList, 'farmName');
 
     // D. Fields: Filter by Program AND Grower AND Farm
-    const validFieldsList = validFarmsList.filter((f) => !farm || f.properties.farmName.toLowerCase() === farm.toLowerCase());
+    const validFieldsList = validFarmsList.filter((f) => !farm || f.properties.farmName?.toLowerCase() === farm.toLowerCase());
     const uniqueFields = getUnique(validFieldsList, 'fieldName');
 
     return {
-      programOptions: uniquePrograms,
+      groupOptions: uniqueGroups,
       growerOptions: uniqueGrowers,
       farmOptions: uniqueFarms,
       fieldOptions: uniqueFields,
     };
-  }, [allowedPrograms, allFields, program, grower, farm]);
+  }, [allowedGroups, allFields, group, grower, farm]);
 
-  const handleProgramChange = (newVal) => {
-    setProgram(newVal);
-    setGrower(null);
-    setFarm(null);
-    setField(null);
+  const handleGroupChange = (newVal) => {
+    setProgramGroupLabel(newVal);
+    setGroup(newVal ? newVal.group : null);
   };
 
   const handleGrowerChange = (newVal) => {
     setGrower(newVal);
-    setFarm(null);
-    setField(null);
   };
 
   const handleFarmChange = (newVal) => {
     setFarm(newVal);
-    setField(null);
   };
 
   const handleSaveField = async () => {
     // Validate form fields
     // coverCropPlantingDate is temporarily not a required field
-    if (!program || !grower || !farm || !field || !cashCrop || !coverCrops || coverCrops.length < 1
+    if (!group || !grower || !farm || !field || !cashCrop || !coverCrops || coverCrops.length < 1
       || !cashCropPlantingDate || !cashCropHarvestingDate || !coverCropTerminationDate) {
-      alert('Please fill in all the fields');
+      dispatch(set.actionModal({
+        open: true,
+        type: 'error',
+        title: 'Missing required fields',
+        message: 'Please fill in all the fields',
+      }));
       return;
     }
 
     const finalGeometry = processGeometries(features);
     if (!finalGeometry) {
-      alert('Please draw a shape or upload a file.');
+      handleError(null, dispatch, 'Please draw a shape or upload a file.');
       return;
     }
 
@@ -217,7 +284,8 @@ const AddField = () => {
 
     try {
       const payload = {
-        programName: program,
+        programName: programGroupLabel?.program,
+        groupName: group,
         farmName: farm,
         growerName: grower,
         fieldName: field,
@@ -233,26 +301,118 @@ const AddField = () => {
 
       await privateApi.post('/fields', payload);
 
-      setProgram(null);
+      setProgramGroupLabel(null);
+      setGroup(null);
       setGrower(null);
       setFarm(null);
       setField(null);
       setFeatures(null);
-      setComments(null);
+      setComments('');
 
-      alert('Field saved successfully!');
+      dispatch(set.actionModal({
+        open: true,
+        type: 'info',
+        title: 'Field Saved',
+        message: 'Field saved successfully!',
+      }));
       navigate('/home');
     } catch (error) {
-      if (error.isAuthRedirect) return;
-      if (error.response?.data?.message) {
-        alert(`Error: ${error.response.data.message}`);
-      } else if (error.response) {
-        alert(`Error: ${error.response.data?.error || 'Failed to save field'}`);
-      } else {
-        alert('Network error. Could not connect to server.');
-      }
+      handleError(error, dispatch);
     } finally {
       setIsSaving(false);
+    }
+  };
+
+  const handleUpdateField = async () => {
+    // Validate form fields
+    if (!group || !grower || !farm || !field || !cashCrop || !coverCrops || coverCrops.length < 1
+      || !cashCropPlantingDate || !cashCropHarvestingDate || !coverCropTerminationDate) {
+      dispatch(set.actionModal({
+        open: true,
+        type: 'error',
+        title: 'Missing required fields',
+        message: 'Please fill in all the fields',
+      }));
+      return;
+    }
+
+    const finalGeometry = processGeometries(features);
+    if (!finalGeometry) {
+      handleError(null, dispatch, 'Please draw a shape or upload a file.');
+      return;
+    }
+
+    setIsSaving(true);
+
+    try {
+      const fieldId = selectedField?._id;
+
+      const payload = {
+        programName: programGroupLabel?.program,
+        groupName: group,
+        farmName: farm,
+        growerName: grower,
+        fieldName: field,
+        cashCrop,
+        coverCrop: coverCrops,
+        geometry: finalGeometry,
+        cashCropPlantingDate,
+        cashCropHarvestingDate,
+        coverCropPlantingDate,
+        coverCropTerminationDate,
+        comments,
+      };
+
+      if (isSuperAdmin && isEdit) payload.email = email;
+
+      await privateApi.put(`/fields/${fieldId}`, payload);
+
+      setProgramGroupLabel(null);
+      setGroup(null);
+      setGrower(null);
+      setFarm(null);
+      setField(null);
+      setFeatures(null);
+
+      dispatch(set.actionModal({
+        open: true,
+        type: 'info',
+        title: 'Field Updated',
+        message: 'Field updated successfully!',
+      }));
+      navigate('/home');
+    } catch (error) {
+      handleError(error, dispatch);
+    } finally {
+      setIsSaving(false);
+    }
+  };
+
+  const handleDeleteField = async () => {
+    const confirmDelete = window.confirm('Are you sure you want to delete this field? This will deactivate the current seasonal data.');
+
+    if (!confirmDelete) return;
+
+    setIsDeleting(true);
+
+    try {
+      const fieldId = selectedField?._id;
+      const response = await privateApi.delete(`/fields/${fieldId}`);
+
+      if (response.status === 200) {
+        setSelectedField(null);
+        dispatch(set.actionModal({
+          open: true,
+          type: 'info',
+          title: 'Field Deleted',
+          message: 'Field deleted successfully!',
+        }));
+        navigate('/home');
+      }
+    } catch (error) {
+      handleError(error, dispatch);
+    } finally {
+      setIsDeleting(false);
     }
   };
 
@@ -269,7 +429,7 @@ const AddField = () => {
           const geojson = JSON.parse(reader.result);
           validateAndProcessGeoJSON(geojson, setFeatures, setLatLon, setBounds);
         } catch (err) {
-          alert('Error parsing GeoJSON file');
+          handleError(err, dispatch, 'Error parsing GeoJSON file');
         }
       };
       reader.readAsText(file);
@@ -281,14 +441,17 @@ const AddField = () => {
           const geojson = await shpjs(arrayBuffer);
           validateAndProcessGeoJSON(geojson, setFeatures, setLatLon, setBounds);
         } catch (err) {
-          alert('Error parsing Shapefile. Please ensure it is a valid .zip containing .shp, .shx, and .dbf files.');
+          handleError(err, dispatch, 'Error parsing Shapefile. Please ensure it is a valid .zip containing .shp, .shx, and .dbf files.');
         }
       };
       reader.readAsArrayBuffer(file);
     } else {
-      alert('Unsupported file type. Please upload .geojson or .shp');
+      handleError(null, dispatch, 'Unsupported file type. Please upload .geojson or .shp');
     }
   };
+
+  // Shared disabled logic: inputs lock when a field hasn't been selected yet in edit/view mode
+  const inputDisabled = isView || (isEdit && !selectedField);
 
   return (
     <Grid container justifyContent="center">
@@ -297,15 +460,97 @@ const AddField = () => {
         xs={12}
         md={10}
         sx={{
+          position: 'relative',
           marginTop: '1rem',
           padding: `2rem ${matchesMd ? '1rem' : '4rem'}`,
+          paddingTop: '1rem',
           boxShadow: 5,
           borderRadius: 5,
           opacity: 0.9,
           backgroundColor: 'white',
         }}
       >
+        <Box sx={{ borderBottom: 1, borderColor: 'divider', mb: 3 }}>
+          <Tabs
+            value={currentTab}
+            onChange={(_, newTab) => {
+              resetForm(); navigate(Object.keys(PATH_TO_TAB)[newTab]);
+            }}
+            centered
+            textColor="inherit"
+            sx={{
+              '& .MuiTab-root': { fontWeight: 600, textTransform: 'none', fontSize: '0.95rem' },
+              '& .Mui-selected': { color: '#60802D' },
+              '& .MuiTabs-indicator': { backgroundColor: '#60802D' },
+            }}
+          >
+            <Tab label="Create Field" />
+            <Tab label="Edit Field" />
+            <Tab label="View Field" />
+          </Tabs>
+        </Box>
+
         <Stack spacing="1.5rem">
+          {(isEdit || isView)
+            ? (
+              <>
+                <Typography variant="h4" sx={{ fontWeight: 'bold', color: '#60802D' }}>
+                  {isEdit ? 'Edit Field Details' : 'View Field Details'}
+                </Typography>
+
+                <Autocomplete
+                  loading={loadingOptions}
+                  loadingText="Loading fields..."
+                  options={allFields}
+                  value={selectedField}
+                  key={`${allFields.groupName}-${allFields.growerName}`}
+                  onChange={(event, newValue) => {
+                    setSelectedField(newValue);
+                  }}
+                  getOptionLabel={(option) => {
+                    const p = option.properties;
+                    return `${p.programName} / ${p.groupName} / ${p.growerName} / ${p.farmName} / ${p.fieldName}`;
+                  }}
+                  renderOption={(props, option) => (
+                    <Box component="li" {...props}>
+                      <Stack>
+                        <Typography variant="subtitle1" sx={{ fontWeight: 'bold' }}>
+                          {option.properties.fieldName}
+                        </Typography>
+                        <Typography variant="caption" color="textSecondary">
+                          {option.properties.programName}
+                          {' - '}
+                          {option.properties.groupName}
+                          {' - '}
+                          {option.properties.growerName}
+                          {' - '}
+                          {option.properties.farmName}
+                          {/* {' - '}
+                      {option.properties.season} */}
+                        </Typography>
+                      </Stack>
+                    </Box>
+                  )}
+                  renderInput={(params) => (
+                    <PSATextField
+                      {...params}
+                      label="Select Field (Program / Group / Grower / Farm / Field)"
+                      placeholder="Type to search..."
+                      InputProps={{
+                        ...params.InputProps,
+                        endAdornment: (
+                          <>
+                            {loadingOptions ? <CircularProgress color="inherit" size={20} /> : null}
+                            {params.InputProps.endAdornment}
+                          </>
+                        ),
+                      }}
+                    />
+                  )}
+                />
+              </>
+            )
+            : null}
 
           <Typography variant="h5" sx={{ fontWeight: 'bold', color: '#60802D' }}>
             Field Metadata
@@ -314,24 +559,28 @@ const AddField = () => {
           <Grid container spacing={2}>
             <Grid item xs={12} md={6}>
               <Autocomplete
+                key={group}
+                freeSolo={isEdit}
                 loading={loadingOptions}
-                options={programOptions}
-                value={program}
-                onChange={(e, val) => handleProgramChange(val)}
-                onInputChange={(e, newInputValue) => handleProgramChange(newInputValue)}
-                renderInput={(params) => <PSATextField {...params} label="Select a Program name" />}
+                options={PROGRAM_GROUP_OPTIONS.filter((option) => groupOptions.includes(option.group))}
+                value={programGroupLabel}
+                getOptionLabel={(option) => option?.label || ''}
+                onChange={(e, val) => handleGroupChange(val)}
+                renderInput={(params) => <PSATextField {...params} label="Select a Program name" required />}
+                disabled={inputDisabled}
               />
             </Grid>
             <Grid item xs={12} md={6}>
               <Autocomplete
-                key={program}
+                key={group}
                 freeSolo
                 loading={loadingOptions}
                 options={growerOptions}
                 value={grower}
                 onChange={(e, val) => handleGrowerChange(val)}
                 onInputChange={(e, newInputValue) => handleGrowerChange(newInputValue)}
-                renderInput={(params) => <PSATextField {...params} label="Select or enter a Grower name" />}
+                renderInput={(params) => <PSATextField {...params} label="Select or enter a Grower name" required />}
+                disabled={inputDisabled}
               />
             </Grid>
           </Grid>
@@ -346,7 +595,8 @@ const AddField = () => {
                 value={farm}
                 onChange={(e, val) => handleFarmChange(val)}
                 onInputChange={(e, newInputValue) => handleFarmChange(newInputValue)}
-                renderInput={(params) => <PSATextField {...params} label="Select or enter a Farm name" />}
+                renderInput={(params) => <PSATextField {...params} label="Select or enter a Farm name" required />}
+                disabled={inputDisabled}
               />
             </Grid>
             <Grid item xs={12} md={6}>
@@ -358,7 +608,8 @@ const AddField = () => {
                 value={field}
                 onChange={(e, val) => setField(val)}
                 onInputChange={(e, newInputValue) => setField(newInputValue)}
-                renderInput={(params) => <PSATextField {...params} label="Select or enter a Field name" />}
+                renderInput={(params) => <PSATextField {...params} label="Select or enter a Field name" required />}
+                disabled={inputDisabled}
               />
             </Grid>
           </Grid>
@@ -386,8 +637,9 @@ const AddField = () => {
                 value={coverCrops}
                 onChange={(e, val) => setCoverCrops(val)}
                 renderInput={(params) => (
-                  <PSATextField {...params} label="What cover crop species are planted in this field?" />
+                  <PSATextField {...params} label="What cover crop species are planted in this field?" required />
                 )}
+                disabled={inputDisabled}
               />
             </Grid>
 
@@ -396,7 +648,8 @@ const AddField = () => {
                 options={CASH_CROP_OPTIONS}
                 value={cashCrop}
                 onChange={(e, val) => setCashCrop(val)}
-                renderInput={(params) => <PSATextField {...params} label="What cash crop will be planted next?" />}
+                renderInput={(params) => <PSATextField {...params} label="What cash crop will be planted next?" required />}
+                disabled={inputDisabled}
               />
             </Grid>
           </Grid>
@@ -414,8 +667,8 @@ const AddField = () => {
                   slotProps={{
                     field: { clearable: true, onClear: () => setCoverCropTerminationDate(null) },
                   }}
+                  disabled={inputDisabled}
                   sx={{ width: '100%' }}
-
                 />
               </LocalizationProvider>
             </Grid>
@@ -432,8 +685,9 @@ const AddField = () => {
                     setCoverCropTerminationDate(newValue ? newValue.endOf('month').format('YYYY-MM-DD') : null);
                     return null;
                   }}
+                  slotProps={{ textField: { required: true } }}
+                  disabled={inputDisabled}
                   sx={{ width: '100%' }}
-
                 />
               </LocalizationProvider>
             </Grid>
@@ -450,6 +704,8 @@ const AddField = () => {
                     setCashCropPlantingDate(newValue ? newValue.startOf('month').format('YYYY-MM-DD') : null);
                     return null;
                   }}
+                  slotProps={{ textField: { required: true } }}
+                  disabled={inputDisabled}
                   sx={{ width: '100%' }}
                 />
               </LocalizationProvider>
@@ -468,6 +724,8 @@ const AddField = () => {
                     setCashCropHarvestingDate(newValue ? newValue.endOf('month').format('YYYY-MM-DD') : null);
                     return null;
                   }}
+                  slotProps={{ textField: { required: true } }}
+                  disabled={inputDisabled}
                   sx={{ width: '100%' }}
                 />
               </LocalizationProvider>
@@ -482,12 +740,32 @@ const AddField = () => {
                 onChange={(e) => setComments(e.target.value)}
                 fullWidth
                 autoComplete="off"
+                disabled={inputDisabled}
                 sx={{
                   '& .MuiInputBase-root': { padding: 1 },
                 }}
               />
             </Grid>
           </Grid>
+
+          {isSuperAdmin && isEdit && (
+            <Grid container spacing={2}>
+              <Grid item xs={12} md={6}>
+                <PSATextField
+                  label="Email"
+                  value={email}
+                  onChange={(e) => setEmail(e.target.value)}
+                  fullWidth
+                  autoComplete="off"
+                  error={!isEmailValid}
+                  disabled={inputDisabled}
+                  sx={{
+                    '& .MuiInputBase-root': { padding: 1 },
+                  }}
+                />
+              </Grid>
+            </Grid>
+          )}
 
           <Typography variant="h4" align="center">
             Where is your Field located?
@@ -507,43 +785,38 @@ const AddField = () => {
             Alternatively, upload a shape file or GeoJSON of your field boundaries.
           </Typography>
 
-          <Typography variant="h6" align="center" sx={{ mt: 2 }}>
-            You can also use the
-            {fieldIcon}
-            to guess the field boundaries of your current marker location. When clicked
-            it will populate the map with the USDA Crop Sequence Boundary for your field if one exists.
-            You can double click inside the field to edit the boundaries.
-          </Typography>
-
-          <Stack direction="row" justifyContent="flex-end">
-            <input
-              id="upload-input"
-              type="file"
-              hidden
-              accept=".geojson,.shp,.zip"
-              onChange={handleFileUpload}
-            />
-            <PSAButton
-              title="Upload Shapefile / GeoJSON"
-              variant="contained"
-              onClick={() => document.getElementById('upload-input').click()}
-              sx={{
-                minWidth: '150px',
-                color: 'white',
-                padding: '0.8rem 1.5rem',
-                borderRadius: '2rem',
-                backgroundColor: '#60802D',
-                '&:hover': {
+          {!isEdit && !isView && (
+            <Stack direction="row" justifyContent="flex-end">
+              <input
+                id="upload-input"
+                type="file"
+                hidden
+                accept=".geojson,.shp,.zip"
+                onChange={handleFileUpload}
+              />
+              <PSAButton
+                title="Upload Shapefile / GeoJSON"
+                variant="contained"
+                onClick={() => document.getElementById('upload-input').click()}
+                sx={{
+                  minWidth: '150px',
+                  color: 'white',
+                  padding: '0.8rem 1.5rem',
+                  borderRadius: '2rem',
                   backgroundColor: '#60802D',
-                  textDecoration: 'underline',
-                  boxShadow: '0px 2px 2px rgba(160, 160, 160, 0.3)',
-                },
-              }}
-            />
-          </Stack>
+                  '&:hover': {
+                    backgroundColor: '#60802D',
+                    textDecoration: 'underline',
+                    boxShadow: '0px 2px 2px rgba(160, 160, 160, 0.3)',
+                  },
+                }}
+              />
+            </Stack>
+          )}
 
           <Box sx={{ position: 'relative' }}>
             <PSAReduxMap
+              key={location.pathname}
               setProperties={updateProperties}
               initWidth="100%"
               initHeight="380px"
@@ -553,15 +826,15 @@ const AddField = () => {
               initFeatures={features}
               initAddress={address?.address}
               initBounds={bounds}
-              hasSearchBar
-              hasClear
+              hasSearchBar={!isEdit && !isView}
+              hasClear={!isEdit && !isView}
               hasMarker
               hasMarkerPopup
               hasMarkerMovable
               hasNavigation
               hasFullScreen
-              hasGeolocate
-              hasDrawing
+              hasGeolocate={!isEdit && !isView}
+              hasDrawing={!isEdit && !isView}
               scrollZoom
               dragRotate
               dragPan
@@ -572,28 +845,53 @@ const AddField = () => {
             />
           </Box>
 
-          <Stack direction="row" justifyContent="center" sx={{ mt: 2 }}>
-            <PSAButton
-              title={isSaving ? <CircularProgress size={24} color="inherit" /> : 'Save Field'}
-              variant="contained"
-              onClick={handleSaveField}
-              disabled={isSaving || !program || !grower || !farm || !field || !cashCrop || !coverCrops || coverCrops.length < 1
-                || !cashCropPlantingDate || !cashCropHarvestingDate || !coverCropTerminationDate
-                || !features || features.length < 1}
-              sx={{
-                minWidth: '150px',
-                color: 'white',
-                padding: '0.8rem 1.5rem',
-                borderRadius: '2rem',
-                backgroundColor: '#60802D',
-                '&:hover': {
+          {!isView && (
+            <Stack direction="row" justifyContent="center" spacing={2} sx={{ mt: 2 }}>
+              <PSAButton
+                // eslint-disable-next-line no-nested-ternary
+                title={isSaving ? <CircularProgress size={24} color="inherit" /> : isEdit ? 'Update Field' : 'Save Field'}
+                variant="contained"
+                onClick={isEdit ? handleUpdateField : handleSaveField}
+                disabled={isSaving || isDeleting || !group || !grower || !farm || !field || !cashCrop || !coverCrops || coverCrops.length < 1
+                  || !cashCropPlantingDate || !cashCropHarvestingDate || !coverCropTerminationDate
+                  || (isEdit && isSuperAdmin && !isEmailValid)
+                  || !features || features.length < 1}
+                sx={{
+                  minWidth: '150px',
+                  color: 'white',
+                  padding: '0.8rem 1.5rem',
+                  borderRadius: '2rem',
                   backgroundColor: '#60802D',
-                  textDecoration: 'underline',
-                  boxShadow: '0px 2px 2px rgba(160, 160, 160, 0.3)',
-                },
-              }}
-            />
-          </Stack>
+                  '&:hover': {
+                    backgroundColor: '#60802D',
+                    textDecoration: 'underline',
+                    boxShadow: '0px 2px 2px rgba(160, 160, 160, 0.3)',
+                  },
+                }}
+              />
+              {isEdit
+              && (
+              <PSAButton
+                title={isDeleting ? <CircularProgress size={24} color="inherit" /> : 'Delete Field'}
+                variant="contained"
+                onClick={handleDeleteField}
+                disabled={isSaving || isDeleting || !selectedField}
+                sx={{
+                  minWidth: '150px',
+                  color: 'white',
+                  padding: '0.8rem 1.5rem',
+                  borderRadius: '2rem',
+                  backgroundColor: '#D32F2F',
+                  '&:hover': {
+                    backgroundColor: '#B71C1C',
+                    textDecoration: 'underline',
+                    boxShadow: '0px 2px 2px rgba(160, 160, 160, 0.3)',
+                  },
+                }}
+              />
+              )}
+            </Stack>
+          )}
         </Stack>
       </Grid>
     </Grid>

@@ -18,6 +18,7 @@ const BiomassData = () => {
   const biomassTotalValue = useSelector(get.biomassTotalValue);
   const biomassFetchIsFailed = useSelector(get.biomassFetchIsFailed);
   const biomassFetchIsLoading = useSelector(get.biomassFetchIsLoading);
+  const biomassFetchFailMessage = useSelector(get.biomassFetchFailMessage);
   const polyDrawTooBig = useSelector(get.polyDrawTooBig);
   const unit = useSelector(get.unit);
   const isPM3DMode = useSelector(get.biomassCalcMode) === 'pm3d';
@@ -27,7 +28,7 @@ const BiomassData = () => {
   return (
     <Box>
       {polyDrawTooBig && <AreaErrorModal />}
-      {biomassFetchIsFailed && <TaskFailModal task="biomass" />}
+      {biomassFetchIsFailed && <TaskFailModal task="biomass" message={biomassFetchFailMessage} />}
       <Box sx={{ margin: 2 }}>
         <Grid container spacing={2} alignItems="flex-end" justify="center">
           {/* {!isPM3DMode && (

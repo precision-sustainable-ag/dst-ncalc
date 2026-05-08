@@ -71,6 +71,7 @@ const CoverCropFirst = () => {
   const [terminationDate, setTerminationDate] = useState(coverCropTerminationDate);
   const biomassFetchIsLoading = useSelector(get.biomassFetchIsLoading);
   const selectedField = useSelector(get.selectedField);
+  const isRCPPReportOnly = useSelector(get.isRCPPReportOnly);
   const [isLoading, setIsLoading] = useState(false);
 
   const matchesMd = useMediaQuery((theme) => theme.breakpoints.down('md'));
@@ -116,6 +117,7 @@ const CoverCropFirst = () => {
 
       const payload = {
         programName: selectedField.properties.programName,
+        groupName: selectedField.properties.groupName,
         growerName: selectedField.properties.growerName,
         farmName: selectedField.properties.farmName,
         fieldName: selectedField.properties.fieldName,
@@ -317,8 +319,13 @@ const CoverCropFirst = () => {
             } else if (isPM3DMode) {
               const isSuccess = await syncFieldData();
               if (isSuccess) {
-                dispatch(set.activeStep(5));
-                navigate('/fertilizer');
+                if (isRCPPReportOnly) {
+                  dispatch(set.activeStep(6));
+                  navigate('/output');
+                } else {
+                  dispatch(set.activeStep(5));
+                  navigate('/fertilizer');
+                }
               }
             } else navigate('/covercrop2');
           }}

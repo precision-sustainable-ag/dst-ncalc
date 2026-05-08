@@ -29,6 +29,7 @@ import useFetchHLS from './hooks/useFetchHLS';
 import { useFetchPlantFactors } from './hooks/useFetchApi';
 import ProtectedPage from './shared/ProtectedPage/ProtectedPage';
 import { initAuth } from './utils/apiClient';
+import ActionModal from './shared/Modal';
 
 const screens = {
   init: () => null,
@@ -47,6 +48,8 @@ screens.feedback = require('./components/Feedback').default;
 screens.advanced = require('./components/Advanced').default;
 screens.upload = require('./components/Upload').default;
 screens.field = require('./components/AddField').default;
+screens.editfield = require('./components/AddField').default;
+screens.viewfield = require('./components/AddField').default;
 screens.fileupload = require('./components/FileUpload').default;
 screens.fertilizer = require('./components/NitrogenFertilizer').default;
 
@@ -105,8 +108,9 @@ const App = () => {
 
   const { showAlert, alertSeverity, alertMessage } = useSelector(get.user);
   const isPM3DMode = useSelector(get.biomassCalcMode) === 'pm3d';
+  const actionModal = useSelector(get.actionModal);
 
-  const noStepperPaths = ['/profile', '/field', '/editfield', '/fileupload'];
+  const noStepperPaths = ['/profile', '/field', '/editfield', '/viewfield', '/fileupload'];
   const showStepper = !noStepperPaths.includes(location.pathname.toLowerCase());
 
   const navContent = [
@@ -229,7 +233,7 @@ const App = () => {
             {Object.keys(screens).map((scr) => {
               const ScreenComponent = screens[scr];
 
-              const protectedPaths = ['upload', 'field', 'fileupload'];
+              const protectedPaths = ['upload', 'field', 'editfield', 'viewfield', 'fileupload'];
               if (isPM3DMode) {
                 protectedPaths.push('covercrop', 'fertilizer', 'output');
               }
@@ -245,6 +249,7 @@ const App = () => {
             })}
             <Route path="" element={<Screen />} />
           </Routes>
+          <ActionModal {...actionModal} onClose={() => { dispatch(set.actionModal({ ...actionModal, open: false })); }} />
           <Feedback />
           <SnackbarMessage />
           <Box sx={{ position: 'fixed', bottom: matchesMd ? '45px' : 0, zIndex: 1000 }}>

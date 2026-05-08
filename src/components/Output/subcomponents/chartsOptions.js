@@ -398,7 +398,7 @@ const getResidueChartOptions = ({
     title: {
       text: `
         <div class="caption">
-          Cover crop residue mass remaining<br>after ${model && Math.floor(model.s.Date.length / (24 * 7))} weeks past termination.
+          Cover crop residue mass remaining<br>after ${model && Math.floor((model?.s?.Date.length ?? 0) / (24 * 7))} weeks past termination.
         </div>
       `,
       verticalAlign: mockup === 1 ? 'bottom' : 'top',

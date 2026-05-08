@@ -1,10 +1,11 @@
 import dayjs from 'dayjs';
 import { query } from '../hooks/helpers';
+import { summaryDataDefaults } from '../constants';
 
 const now = dayjs();
 
-const coverCropPlantingDate =
-  now.month() < 6 ? now.subtract(2, 'year').startOf('month').month(10) : now.subtract(1, 'year').startOf('month').month(10);
+const coverCropPlantingDate = now.month() < 6
+  ? now.subtract(2, 'year').startOf('month').month(10) : now.subtract(1, 'year').startOf('month').month(10);
 const coverCropTerminationDate = coverCropPlantingDate.add(6, 'month');
 // const cashCropPlantingDate = coverCropTerminationDate.add(1, 'week');
 
@@ -179,6 +180,7 @@ const initialState = {
   maxBiomass: initMaxBiomass,
   biomassFetchIsFailed: false,
   biomassFetchIsLoading: false,
+  biomassFetchFailMessage: null,
   biomassTaskIsDone: true,
   polyDrawTooBig: false,
   nitrogenFetchIsFailed: false,
@@ -187,6 +189,7 @@ const initialState = {
   activeStep: 0,
   pm3dData: null,
   selectedField: null,
+  isRCPPReportOnly: false,
   selectedBiomassFile: null,
   biomassPoints: null,
   nitrogenSprayMap: null,
@@ -207,6 +210,7 @@ const initialState = {
   },
   hasFixedNRate: 'fixed',
   gridSize: 1,
+  summaryData: summaryDataDefaults,
   user: {
     historyState: historyStates.none,
     selectedHistory: null,
@@ -214,6 +218,14 @@ const initialState = {
     showAlert: false,
     alertSeverity: 'error',
     alertMessage: null,
+  },
+  actionModal: {
+    open: false,
+    type: 'info',
+    title: '',
+    message: '',
+    confirmText: 'Confirm',
+    onConfirm: null,
   },
 };
 
