@@ -108,7 +108,7 @@ const AddField = () => {
   const defaultLat = useSelector(get.lat);
   const defaultLon = useSelector(get.lon);
   const [address, setAddress] = useState({});
-  const [zoom, setZoom] = useState(13);
+  const [zoom, setZoom] = useState(16);
   const [features, setFeatures] = useState(null);
   const [latLon, setLatLon] = useState([defaultLat, defaultLon]);
   const [bounds, setBounds] = useState(null);
@@ -171,8 +171,32 @@ const AddField = () => {
     }
   }, [isAuthenticated, isEdit, dispatch]);
 
+  // Function to clear all the form values
+  const resetForm = () => {
+    setSelectedField(null);
+    setProgramGroupLabel(null);
+    setGroup(null);
+    setGrower(null);
+    setFarm(null);
+    setField(null);
+    setCoverCrops([]);
+    setCashCrop(null);
+    setCoverCropPlantingDate(null);
+    setCoverCropTerminationDate(null);
+    setCashCropPlantingDate(null);
+    setCashCropHarvestingDate(null);
+    setComments('');
+    setEmail('');
+    setFeatures([]);
+    setAddress({});
+    setZoom(16);
+  };
+
   useEffect(() => {
-    if (!selectedField) return;
+    if (!selectedField) {
+      resetForm();
+      return;
+    }
 
     const programGroup = PROGRAM_GROUP_OPTIONS.find(
       (option) => option.group === selectedField.properties.groupName && option.program === selectedField.properties.programName,
@@ -193,35 +217,6 @@ const AddField = () => {
     setEmail(selectedField?.properties.email);
     geometriesToFeatures(selectedField?.geometry, setFeatures, setLatLon, setBounds);
   }, [selectedField]);
-
-  // Reset states when switching between create and edit/view
-  useEffect(() => {
-    if ((isEdit || isView) && selectedField) return;
-
-    setProgramGroupLabel(null);
-    setGroup(null);
-    setGrower(null);
-    setFarm(null);
-    setField(null);
-    setCoverCrops([]);
-    setCashCrop(null);
-    setCoverCropPlantingDate(null);
-    setCoverCropTerminationDate(null);
-    setCashCropPlantingDate(null);
-    setCashCropHarvestingDate(null);
-    setComments('');
-    setEmail('');
-    setFeatures([]);
-    setAddress({});
-    setZoom(13);
-  }, [isEdit, isView, selectedField]);
-
-  // unselect any selected field and map data when switching tabs
-  useEffect(() => {
-    setSelectedField(null);
-    setFeatures([]);
-    setAddress({});
-  }, [location.pathname]);
 
   const {
     groupOptions, growerOptions, farmOptions, fieldOptions,
@@ -478,7 +473,9 @@ const AddField = () => {
         <Box sx={{ borderBottom: 1, borderColor: 'divider', mb: 3 }}>
           <Tabs
             value={currentTab}
-            onChange={(_, newTab) => navigate(Object.keys(PATH_TO_TAB)[newTab])}
+            onChange={(_, newTab) => {
+              resetForm(); navigate(Object.keys(PATH_TO_TAB)[newTab]);
+            }}
             centered
             textColor="inherit"
             sx={{
