@@ -160,7 +160,7 @@ const AddField = () => {
         const response = await privateApi.get(url);
         setAllFields(response.data);
       } catch (error) {
-        handleError(error, dispatch, 'Failed to load dropdown options. Please refresh the page or try again later.');
+        handleError(error, dispatch);
       } finally {
         setLoadingOptions(false);
       }

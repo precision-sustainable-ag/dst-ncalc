@@ -84,7 +84,7 @@ const FieldDropdown = () => {
         const response = await privateApi.get('/fields-identifiers');
         setFieldOptions(response.data);
       } catch (e) {
-        handleError(e, dispatch, '', 'Failed to load dropdown options. Please refresh the page or try again later.');
+        handleError(e, dispatch);
       } finally {
         setIsFetching(false);
       }
