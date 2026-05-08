@@ -44,6 +44,10 @@ const Home = () => {
   const biomassCalcMode = useSelector(get.biomassCalcMode);
   const isPM3DMode = biomassCalcMode === 'pm3d';
 
+  const isDevelopOrLocal = window.location.hostname === 'localhost'
+    || window.location.hostname === '127.0.0.1'
+    || window.location.href.includes('develop');
+
   useEffect(() => {
     if (window.location.toString().includes('PSA')) {
       dispatch(set.PSA(true));
@@ -103,22 +107,25 @@ const Home = () => {
         </Stack>
         <Box sx={{ height: '1rem' }} />
         <NavigateBar
-          next={!isPM3DMode ? 'Get Started' : 'Get Prescription'}
+          next={!isPM3DMode ? 'Get Started' : 'Manage Fields'}
           nextOnClick={() => {
             if (!isPM3DMode) {
               navigate('/location');
               dispatch(set.activeStep(2));
             } else {
-              navigate('/upload');
-              dispatch(set.activeStep(1));
+              navigate('/field');
             }
           }}
           back="About"
           backOnClick={() => setAboutOpen(true)}
           extraAction={
-            biomassCalcMode === 'pm3d' && (
-              <NavButton onClick={() => navigate('/field')}>
-                Enroll Field
+            biomassCalcMode === 'pm3d' && isDevelopOrLocal && (
+              <NavButton onClick={() => {
+                navigate('/upload');
+                dispatch(set.activeStep(1));
+              }}
+              >
+                Get Prescription
               </NavButton>
             )
           }

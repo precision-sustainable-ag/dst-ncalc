@@ -26,6 +26,7 @@ const RightSideBar = ({ summaryData, refs }) => {
   const isSatelliteMode = useSelector(get.biomassCalcMode) === 'satellite';
   const isPM3DMode = useSelector(get.biomassCalcMode) === 'pm3d';
   const model = useSelector(get.model);
+  const isRCPPReportOnly = useSelector(get.isRCPPReportOnly);
   useSelector(get.screen); // force render
   useSelector(get.biomassTaskResults); // force render
   useSelector(get.nitrogenTaskResults); // force render
@@ -68,8 +69,13 @@ const RightSideBar = ({ summaryData, refs }) => {
             back="back"
             backOnClick={() => {
               if (isPM3DMode || isSatelliteMode) {
-                dispatch(set.activeStep(5));
-                navigate('/fertilizer');
+                if (isPM3DMode && isRCPPReportOnly) {
+                  dispatch(set.activeStep(4));
+                  navigate('/covercrop');
+                } else {
+                  dispatch(set.activeStep(5));
+                  navigate('/fertilizer');
+                }
               } else {
                 dispatch(set.activeStep(5));
                 navigate('/sidedress');

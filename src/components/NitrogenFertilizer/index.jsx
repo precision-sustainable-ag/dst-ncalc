@@ -20,6 +20,7 @@ import Required from '../../shared/Required';
 import NavigateBar from '../../shared/Navigate';
 import NavButton from '../../shared/Navigate/NavButton';
 import { ncalcApiUrl } from '../../utils/keys';
+import { handleError } from '../../utils/apiError';
 
 const CustomInputText = styled(Typography)({
   fontSize: '1.2rem',
@@ -68,6 +69,9 @@ const CONVERSION_FACTOR = 1.12085; // lb n/acre -> kg n/ha
 const API_BASE_URL = ncalcApiUrl;
 
 const NitrogenFertilizer = () => {
+  const isDevelopOrLocal = window.location.hostname === 'localhost'
+    || window.location.hostname === '127.0.0.1'
+    || window.location.href.includes('develop');
   const {
     isAuthenticated, getAccessTokenSilently,
   } = useAuth0();
@@ -100,11 +104,11 @@ const NitrogenFertilizer = () => {
   const gridSize = useSelector(get.gridSize);
 
   const granularOptions = !isFetching
-    ? [...fertilizers.filter((f) => f.type === 'granular').map((f) => f.name), 'Other']
+    ? [...fertilizers.filter((f) => f.type === 'granular').map((f) => f.name), ...(isDevelopOrLocal ? ['Other'] : [])]
     : [];
 
   const liquidOptions = !isFetching
-    ? [...fertilizers.filter((f) => f.type === 'liquid').map((f) => f.name), 'Other']
+    ? [...fertilizers.filter((f) => f.type === 'liquid').map((f) => f.name), ...(isDevelopOrLocal ? ['Other'] : [])]
     : [];
 
   const granularExists = fertilizerType === 'granular' &&
@@ -154,16 +158,16 @@ const NitrogenFertilizer = () => {
         setIsFetching(true);
         const response = await axios.get(`${API_BASE_URL}/fertilizers`);
         dispatch(set.fertilizers(response.data?.data || []));
-      } catch (e) {
-        // console.error('Failed to load options', e);
+      } catch (err) {
         dispatch(set.fertilizers([]));
+        handleError(err, dispatch, 'Failed to load list of fertilizers.');
       } finally {
         setIsFetching(false);
       }
     };
-
-    fetchFertilizers();
-  }, [isAuthenticated, getAccessTokenSilently, dispatch]);
+    if (isDevelopOrLocal) fetchFertilizers();
+    else dispatch(set.fertilizers(FERTILIZER_DATA));
+  }, [isAuthenticated, getAccessTokenSilently, dispatch, isDevelopOrLocal]);
 
   useEffect(() => {
     let newMultiplier = 1;
@@ -240,7 +244,7 @@ const NitrogenFertilizer = () => {
         // console.log('Feature Collection:', featureCollection);
         // console.log('Property Keys:', propertyKeys);
       } catch (err) {
-        setError(err.message || 'Invalid file format');
+        setError('Invalid file format. Try uploading a different file.');
         setFileName('');
         dispatch(set.nitrogenSprayMap(null));
         setProperties([]);

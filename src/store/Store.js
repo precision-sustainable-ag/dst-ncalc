@@ -14,9 +14,9 @@ const afterChange = {
     }
     state.model = null;
   },
-  carb: (state, { payload }, oldValue) => { if (payload !== null && oldValue !== payload) { state.model = null; state.edited = true; }},
-  cell: (state, { payload }, oldValue) => { if (payload !== null && oldValue !== payload) { state.model = null; state.edited = true; }},
-  lign: (state, { payload }, oldValue) => { if (payload !== null && oldValue !== payload) { state.model = null; state.edited = true; }},
+  carb: (state, { payload }, oldValue) => { if (payload !== null && oldValue !== payload) { state.model = null; state.edited = true; } },
+  cell: (state, { payload }, oldValue) => { if (payload !== null && oldValue !== payload) { state.model = null; state.edited = true; } },
+  lign: (state, { payload }, oldValue) => { if (payload !== null && oldValue !== payload) { state.model = null; state.edited = true; } },
   lat: (state) => { state.model = null; },
   lon: (state) => { state.model = null; },
   lwc: (state) => { state.model = null; },
@@ -27,6 +27,9 @@ const afterChange = {
   BD: (state) => { state.model = null; },
   OM: (state) => { state.model = null; },
   InorganicN: (state) => { state.model = null; },
+  selectedField: (state, { payload }) => {
+    state.isRCPPReportOnly = payload?.properties?.programName === 'RCPP-Report-Only';
+  },
 }; // afterChange
 
 const reducers = {

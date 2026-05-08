@@ -5,6 +5,7 @@ import { useNavigate } from 'react-router-dom';
 import {
   Box, Stack, Typography, Grid,
   useMediaQuery,
+  Alert,
 } from '@mui/material';
 import { PSALoadingSpinner } from 'shared-react-components/src';
 import { get, set } from '../../store/Store';
@@ -19,6 +20,8 @@ const Soil = () => {
   const navigate = useNavigate();
   const dispatch = useDispatch();
   const ssurgo = useSelector(get.SSURGO);
+  const SSURGOisLoading = useSelector(get.SSURGOisLoading);
+  const SSURGOisFailed = useSelector(get.SSURGOisFailed);
   const isSatelliteMode = useSelector(get.biomassCalcMode) === 'satellite';
   const isPM3DMode = useSelector(get.biomassCalcMode) === 'pm3d';
   const matchesMd = useMediaQuery((theme) => theme.breakpoints.down('md'));
@@ -51,7 +54,13 @@ const Soil = () => {
       >
         <Stack spacing="1rem" sx={{ marginBottom: '1rem' }}>
           <Typography variant="h4" align="center">Tell us about your Soil</Typography>
-          {ssurgo ? (
+          {SSURGOisFailed && (
+          <Alert severity="warning">
+            Note that the NRCS Soil Survey Geographic database (SSURGO) does not have information for your location,
+            so please enter the soil information manually or choose a different location.
+          </Alert>
+          )}
+          {!SSURGOisLoading ? (
             isSatelliteMode ? (
               <Box>
                 <Typography variant="h6" my={2} align="center">
