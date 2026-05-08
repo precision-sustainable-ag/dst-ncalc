@@ -462,7 +462,7 @@ const useFetchPlantFactors = () => {
   }, [dispatch, coverCrop, coverCropGrowthStage]);
 
   useEffect(() => {
-    const satelliteSpecies = 'Winter cereals';
+    const satelliteSpecies = 'winter_cereals';
     const url = isSatelliteMode ? `${PLANTFACTORS_API_URL}/species/${satelliteSpecies}` : `${PLANTFACTORS_API_URL}/species`;
     axios
       .get(url)
