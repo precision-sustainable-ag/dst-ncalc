@@ -4,7 +4,7 @@ import React, { useEffect, useRef, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { useNavigate } from 'react-router-dom';
 import {
-  Box, Stack, Typography, styled, Grid, useMediaQuery, Autocomplete, InputAdornment,
+  Box, Stack, Typography, Grid, useMediaQuery, Autocomplete, InputAdornment,
   Alert,
 } from '@mui/material';
 import { PSARadioButton, PSATextField } from 'shared-react-components/src';
@@ -22,22 +22,6 @@ import NavigateBar from '../../shared/Navigate';
 import NavButton from '../../shared/Navigate/NavButton';
 import { ncalcApiUrl } from '../../utils/keys';
 import { handleError } from '../../utils/apiError';
-
-const CustomInputText = styled(Typography)({
-  fontSize: '1.2rem',
-  fontWeight: 400,
-  color: '#4f6b14',
-  marginTop: '0.5rem',
-  marginBottom: '0.2rem',
-});
-
-const MainContentBox = styled(Box)({
-  width: '100%',
-  maxWidth: '600px',
-  minHeight: '450px',
-  display: 'flex',
-  flexDirection: 'column',
-});
 
 const FERTILIZER_DATA = [
   {
@@ -322,14 +306,15 @@ const NitrogenFertilizer = () => {
           alignItems: 'center',
         }}
       >
-        <Typography variant="h4" gutterBottom>Tell us about your Fertilizer</Typography>
+        <Stack direction="column" spacing="2rem" width="100%" maxWidth="600px">
 
-        {error && (
-        <Alert severity="error" sx={{ width: '100%', mb: 2 }}>{error}</Alert>
-        )}
+          <Typography variant="h4" align="center" color="primary" gutterBottom>Tell us about your Fertilizer</Typography>
 
-        <MainContentBox>
-          <Box sx={{ mb: 2 }}>
+          {error && (
+          <Alert severity="error" sx={{ width: '100%', mb: 2 }}>{error}</Alert>
+          )}
+
+          <Stack gap={2}>
             <PSARadioButton
               options={[
                 { label: 'Liquid Fertilizer', value: 'liquid' },
@@ -339,172 +324,170 @@ const NitrogenFertilizer = () => {
               onChange={(value) => dispatch(set.fertilizerType(value))}
               row
             />
-          </Box>
 
-          {fertilizerType === 'granular' && (
-          <>
-            {/* <CustomInputText>Select a granular fertilizer:</CustomInputText> */}
-            <Autocomplete
-              fullWidth
-              loading={isFetching}
-              options={granularOptions}
-              value={granularFertilizer}
-              onChange={(e, val) => {
-                dispatch(set.granularFertilizer(val));
-                if (val !== 'Other') {
-                  dispatch(set.otherGranularFertilizer.fertilizerName(null));
-                  dispatch(set.otherGranularFertilizer.NPercent(null));
-                }
-              }}
-              renderOption={(props, option) => {
-                const selected = fertilizers.find((f) => f.name === option);
-                return (
-                  <Box component="li" {...props}>
-                    <Stack>
-                      <Typography variant="subtitle1" sx={{ fontWeight: 'bold' }}>
-                        {option}
-                      </Typography>
-                      {selected && (
-                        <Typography variant="caption" color="textSecondary">
-                          Nitrogen Content:
-                          {' '}
-                          {selected.n_percent}
-                          %
-                        </Typography>
-                      )}
-                    </Stack>
-                  </Box>
-                );
-              }}
-              renderInput={(params) => <PSATextField {...params} label="Granular Fertilizer" placeholder="Select a granular fertilizer" />}
-            />
-
-            {granularFertilizer && granularFertilizer === 'Other' && (
-            <Stack direction={{ xs: 'column', md: 'row' }} spacing={{ xs: 3, md: 2 }} mt={3}>
-              <PSATextField
+            {fertilizerType === 'granular' && (
+            <>
+              {/* <CustomInputText>Select a granular fertilizer:</CustomInputText> */}
+              <Autocomplete
                 fullWidth
-                label="Fertilizer Name"
-                value={otherGranularFertilizer.fertilizerName || ''}
-                error={granularExists}
-                helperText={granularExists ? 'This fertilizer already exists in the list.' : ''}
-                onChange={(e) => dispatch(set.otherGranularFertilizer.fertilizerName(e.target.value))}
-              />
-              <PSATextField
-                fullWidth
-                label="Nitrogen Content (%)"
-                type="number"
-                value={otherGranularFertilizer.NPercent || ''}
-                onChange={(e) => {
-                  const val = e.target.value;
-                  if (val === '' || (Number(val) >= 0 && Number(val) <= 100)) {
-                    dispatch(set.otherGranularFertilizer.NPercent(val));
+                loading={isFetching}
+                options={granularOptions}
+                value={granularFertilizer}
+                onChange={(e, val) => {
+                  dispatch(set.granularFertilizer(val));
+                  if (val !== 'Other') {
+                    dispatch(set.otherGranularFertilizer.fertilizerName(null));
+                    dispatch(set.otherGranularFertilizer.NPercent(null));
                   }
                 }}
-                InputProps={{
-                  endAdornment: <InputAdornment position="end">%</InputAdornment>,
-                }}
-              />
-            </Stack>
-            )}
-          </>
-          )}
-
-          {fertilizerType === 'liquid' && (
-          <>
-            {/* <CustomInputText>Select a liquid fertilizer:</CustomInputText> */}
-            <Autocomplete
-              fullWidth
-              loading={isFetching}
-              options={liquidOptions}
-              value={liquidFertilizer}
-              onChange={(e, val) => {
-                dispatch(set.liquidFertilizer(val));
-                if (val !== 'Other') {
-                  dispatch(set.otherLiquidFertilizer.fertilizerName(null));
-                  dispatch(set.otherLiquidFertilizer.density(null));
-                  dispatch(set.otherLiquidFertilizer.NPercent(null));
-                }
-              }}
-              renderOption={(props, option) => {
-                const selected = fertilizers.find((f) => f.name === option);
-                return (
-                  <Box component="li" {...props}>
-                    <Stack>
-                      <Typography variant="subtitle1" sx={{ fontWeight: 'bold' }}>
-                        {option}
-                      </Typography>
-                      {selected && (
-                        <Typography variant="caption" color="textSecondary">
-                          Nitrogen Content:
-                          {' '}
-                          {selected.n_percent}
-                          %
-                          {' - '}
-                          Density:
-                          {' '}
-                          {selected.density}
-                          {' '}
-                          lb/gal
+                renderOption={(props, option) => {
+                  const selected = fertilizers.find((f) => f.name === option);
+                  return (
+                    <Box component="li" {...props}>
+                      <Stack>
+                        <Typography variant="subtitle1" sx={{ fontWeight: 'bold' }}>
+                          {option}
                         </Typography>
-                      )}
-                    </Stack>
-                  </Box>
-                );
-              }}
-              renderInput={(params) => <PSATextField {...params} label="Liquid Fertilizer" placeholder="Select a liquid fertilizer" />}
-            />
+                        {selected && (
+                          <Typography variant="caption" color="textSecondary">
+                            Nitrogen Content:
+                            {' '}
+                            {selected.n_percent}
+                            %
+                          </Typography>
+                        )}
+                      </Stack>
+                    </Box>
+                  );
+                }}
+                renderInput={(params) => <PSATextField {...params} label="Granular Fertilizer" placeholder="Select a granular fertilizer" />}
+              />
 
-            {liquidFertilizer && liquidFertilizer === 'Other' && (
-            <Stack direction={{ xs: 'column', md: 'row' }} spacing={{ xs: 3, md: 2 }} mt={3}>
-              <PSATextField
+              {granularFertilizer && granularFertilizer === 'Other' && (
+              <Stack direction={{ xs: 'column', md: 'row' }} spacing={{ xs: 3, md: 2 }} mt={3}>
+                <PSATextField
+                  fullWidth
+                  label="Fertilizer Name"
+                  value={otherGranularFertilizer.fertilizerName || ''}
+                  error={granularExists}
+                  helperText={granularExists ? 'This fertilizer already exists in the list.' : ''}
+                  onChange={(e) => dispatch(set.otherGranularFertilizer.fertilizerName(e.target.value))}
+                />
+                <PSATextField
+                  fullWidth
+                  label="Nitrogen Content (%)"
+                  type="number"
+                  value={otherGranularFertilizer.NPercent || ''}
+                  onChange={(e) => {
+                    const val = e.target.value;
+                    if (val === '' || (Number(val) >= 0 && Number(val) <= 100)) {
+                      dispatch(set.otherGranularFertilizer.NPercent(val));
+                    }
+                  }}
+                  InputProps={{
+                    endAdornment: <InputAdornment position="end">%</InputAdornment>,
+                  }}
+                />
+              </Stack>
+              )}
+            </>
+            )}
+
+            {fertilizerType === 'liquid' && (
+            <>
+              {/* <CustomInputText>Select a liquid fertilizer:</CustomInputText> */}
+              <Autocomplete
                 fullWidth
-                label="Liquid Fertilizer Name"
-                value={otherLiquidFertilizer.fertilizerName || ''}
-                error={liquidExists}
-                helperText={liquidExists ? 'This fertilizer already exists in the list.' : ''}
-                onChange={(e) => dispatch(set.otherLiquidFertilizer.fertilizerName(e.target.value))}
-              />
-              <PSATextField
-                fullWidth
-                label="Density (lb/gal)"
-                type="number"
-                value={otherLiquidFertilizer.density || ''}
-                onChange={(e) => dispatch(set.otherLiquidFertilizer.density(e.target.value))}
-              />
-              <PSATextField
-                fullWidth
-                label="Nitrogen Content (%)"
-                type="number"
-                value={otherLiquidFertilizer.NPercent || ''}
-                onChange={(e) => {
-                  const val = e.target.value;
-                  if (val === '' || (Number(val) >= 0 && Number(val) <= 100)) {
-                    dispatch(set.otherLiquidFertilizer.NPercent(val));
+                loading={isFetching}
+                options={liquidOptions}
+                value={liquidFertilizer}
+                onChange={(e, val) => {
+                  dispatch(set.liquidFertilizer(val));
+                  if (val !== 'Other') {
+                    dispatch(set.otherLiquidFertilizer.fertilizerName(null));
+                    dispatch(set.otherLiquidFertilizer.density(null));
+                    dispatch(set.otherLiquidFertilizer.NPercent(null));
                   }
                 }}
-                InputProps={{
-                  endAdornment: <InputAdornment position="end">%</InputAdornment>,
+                renderOption={(props, option) => {
+                  const selected = fertilizers.find((f) => f.name === option);
+                  return (
+                    <Box component="li" {...props}>
+                      <Stack>
+                        <Typography variant="subtitle1" sx={{ fontWeight: 'bold' }}>
+                          {option}
+                        </Typography>
+                        {selected && (
+                          <Typography variant="caption" color="textSecondary">
+                            Nitrogen Content:
+                            {' '}
+                            {selected.n_percent}
+                            %
+                            {' - '}
+                            Density:
+                            {' '}
+                            {selected.density}
+                            {' '}
+                            lb/gal
+                          </Typography>
+                        )}
+                      </Stack>
+                    </Box>
+                  );
                 }}
+                renderInput={(params) => <PSATextField {...params} label="Liquid Fertilizer" placeholder="Select a liquid fertilizer" />}
               />
-            </Stack>
+
+              {liquidFertilizer && liquidFertilizer === 'Other' && (
+              <Stack direction={{ xs: 'column', md: 'row' }} spacing={{ xs: 3, md: 2 }} mt={3}>
+                <PSATextField
+                  fullWidth
+                  label="Liquid Fertilizer Name"
+                  value={otherLiquidFertilizer.fertilizerName || ''}
+                  error={liquidExists}
+                  helperText={liquidExists ? 'This fertilizer already exists in the list.' : ''}
+                  onChange={(e) => dispatch(set.otherLiquidFertilizer.fertilizerName(e.target.value))}
+                />
+                <PSATextField
+                  fullWidth
+                  label="Density (lb/gal)"
+                  type="number"
+                  value={otherLiquidFertilizer.density || ''}
+                  onChange={(e) => dispatch(set.otherLiquidFertilizer.density(e.target.value))}
+                />
+                <PSATextField
+                  fullWidth
+                  label="Nitrogen Content (%)"
+                  type="number"
+                  value={otherLiquidFertilizer.NPercent || ''}
+                  onChange={(e) => {
+                    const val = e.target.value;
+                    if (val === '' || (Number(val) >= 0 && Number(val) <= 100)) {
+                      dispatch(set.otherLiquidFertilizer.NPercent(val));
+                    }
+                  }}
+                  InputProps={{
+                    endAdornment: <InputAdornment position="end">%</InputAdornment>,
+                  }}
+                />
+              </Stack>
+              )}
+            </>
             )}
-          </>
-          )}
+          </Stack>
 
-          <Box sx={{ borderBottom: '1px solid #eee', my: 3 }} />
+          <Box sx={{ borderBottom: '1px solid #eee' }} />
 
-          <Box sx={{ minHeight: '140px' }}>
-            <Box sx={{ mb: 2 }}>
-              <PSARadioButton
-                options={[
-                  { label: 'Enter lbs N / acre', value: 'nitrogen' },
-                  { label: `Enter ${fertilizerType === 'granular' ? 'lbs/acre' : 'gals/acre'} of fertilizer`, value: 'fertilizer' },
-                ]}
-                selectedValue={inputMode}
-                onChange={(value) => dispatch(set.inputMode(value))}
-                row
-              />
-            </Box>
+          <Stack gap={2} sx={{ minHeight: '140px' }}>
+            <PSARadioButton
+              options={[
+                { label: 'Enter lbs N / acre', value: 'nitrogen' },
+                { label: `Enter ${fertilizerType === 'granular' ? 'lbs/acre' : 'gals/acre'} of fertilizer`, value: 'fertilizer' },
+              ]}
+              selectedValue={inputMode}
+              onChange={(value) => dispatch(set.inputMode(value))}
+              row
+            />
             <PSARadioButton
               options={[
                 { label: 'Fixed Rate', value: 'fixed' },
@@ -516,18 +499,16 @@ const NitrogenFertilizer = () => {
             />
 
             {hasFixedNRate === 'fixed' && (
-            <>
-              <Box mt={1}>
-                <Stack direction="row" alignItems="center">
-                  <CustomInputText>
-                    {inputMode === 'nitrogen'
-                      ? 'What is your Target N Rate? (lb N/ac):'
-                      : `What is your Target Nitrogen Fertilizer Rate? ${fertilizerType === 'granular' ? '(lb/ac)' : '(gal/ac)'}:`}
-                  </CustomInputText>
-                  <Help ariaLabel="Specify the target N rate for your region.">Specify the target N rate for your region.</Help>
-                  {(!targetN || targetN <= 0) && <Required />}
-                </Stack>
-              </Box>
+            <Stack gap={1}>
+              <Stack direction="row" alignItems="center">
+                <Typography variant="inputLabel">
+                  {inputMode === 'nitrogen'
+                    ? 'What is your Target N Rate? (lb N/ac):'
+                    : `What is your Target Nitrogen Fertilizer Rate? ${fertilizerType === 'granular' ? '(lb/ac)' : '(gal/ac)'}:`}
+                </Typography>
+                <Help ariaLabel="Specify the target N rate for your region.">Specify the target N rate for your region.</Help>
+                {(!targetN || targetN <= 0) && <Required />}
+              </Stack>
 
               <Myslider
                 id="targetN"
@@ -540,13 +521,13 @@ const NitrogenFertilizer = () => {
                       : 500
                 }
               />
-            </>
+            </Stack>
             )}
 
             {hasFixedNRate === 'variable' && (
-            <Stack spacing={2} mt={3}>
-              <Stack direction={{ sm: 'column', md: 'row' }} justifyContent="space-between">
-                <Typography variant="body1" sx={{ color: '#666', alignContent: 'center' }}>
+            <Stack gap={2}>
+              <Stack direction={{ sm: 'column', md: 'row' }} gap={1} justifyContent="space-between">
+                <Typography variant="body1" color="text.secondary" alignContent="center">
                   {' '}
                   {fileName ? `Selected file: ${fileName}` : 'No file selected'}
                   {' '}
@@ -564,57 +545,57 @@ const NitrogenFertilizer = () => {
               )}
             </Stack>
             )}
-          </Box>
+          </Stack>
 
-          <Box sx={{ borderBottom: '1px solid #eee', mt: 4, mb: 2 }} />
+          <Box sx={{ borderBottom: '1px solid #eee' }} />
 
           {!isSatelliteMode &&
           (
-            <Box>
-              <Box mt={0} sx={{ mt: 'auto' }}>
-                <CustomInputText>Side Dress Fertilization Date:</CustomInputText>
-                {!sidedressFertilizationDate && <Required />}
-                <LocalizationProvider dateAdapter={AdapterDayjs}>
-                  <DatePicker
-                    // minDate={dayjs(coverCropTerminationDate).add(7, 'day')}
-                    value={dayjs(sidedressFertilizationDate)}
-                    onChange={(newValue) => {
-                      dispatch(set.sidedressFertilizationDate(newValue.format('YYYY-MM-DD')));
-                      return null;
-                    }}
-                    shouldDisableDate={(date) => date.isBefore(dayjs(coverCropTerminationDate), 'day')}
-                  />
-                </LocalizationProvider>
+            <Stack gap={1}>
+              <Typography variant="inputLabel">Side Dress Fertilization Date</Typography>
+              {!sidedressFertilizationDate && <Required />}
+              <LocalizationProvider dateAdapter={AdapterDayjs}>
+                <DatePicker
+                  // minDate={dayjs(coverCropTerminationDate).add(7, 'day')}
+                  value={dayjs(sidedressFertilizationDate)}
+                  onChange={(newValue) => {
+                    dispatch(set.sidedressFertilizationDate(newValue.format('YYYY-MM-DD')));
+                    return null;
+                  }}
+                  shouldDisableDate={(date) => date.isBefore(dayjs(coverCropTerminationDate), 'day')}
+                />
+              </LocalizationProvider>
                 {showSidedressDateWarning && (
                 <Alert severity="warning" sx={{ mt: 1 }}>
                   The selected sidedress fertilization date is before the cash crop planting date.
                 </Alert>
                 )}
-              </Box>
               <Box sx={{ borderBottom: '1px solid #eee', mt: 4, mb: 2 }} />
-            </Box>
+            </Stack>
           )}
 
           {isSatelliteMode && (
-          <Box>
-            <Stack direction="row" alignItems="center">
-              <CustomInputText>Grid Size:</CustomInputText>
-              {(!gridSize || gridSize < 0.5) && <Required />}
+          <>
+            <Stack gap={1}>
+              <Stack direction="row" alignItems="center">
+                <Typography variant="inputLabel">Grid Size</Typography>
+                {(!gridSize || gridSize < 0.5) && <Required />}
+              </Stack>
+              <PSATextField
+                variant="standard"
+                value={gridSize}
+                disabled
+                InputProps={{
+                  endAdornment: <InputAdornment position="end">acre</InputAdornment>,
+                }}
+                sx={{ mt: 0, width: '25%' }}
+              />
+              <Myslider id="gridSize" min={0.5} max={5} step={0.5} marks noTextfield />
             </Stack>
-            <PSATextField
-              variant="standard"
-              value={gridSize}
-              disabled
-              InputProps={{
-                endAdornment: <InputAdornment position="end">acre</InputAdornment>,
-              }}
-              sx={{ mt: 0 }}
-            />
-            <Myslider id="gridSize" min={0.5} max={5} step={0.5} marks noTextfield />
-            <Box sx={{ borderBottom: '1px solid #eee', mt: 4, mb: 2 }} />
-          </Box>
+            <Box sx={{ borderBottom: '1px solid #eee' }} />
+          </>
           )}
-        </MainContentBox>
+        </Stack>
 
         <NavigateBar
           next="next"

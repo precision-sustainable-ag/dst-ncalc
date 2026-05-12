@@ -3,7 +3,7 @@ import React, { useEffect } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { useNavigate } from 'react-router-dom';
 import {
-  Box, Stack, Typography, styled, Grid,
+  Stack, Typography, Grid,
   useMediaQuery,
   Autocomplete,
 } from '@mui/material';
@@ -17,14 +17,6 @@ import Help from '../../shared/Help';
 import Required from '../../shared/Required';
 import { useFetchCropNames } from '../../hooks/useFetchStatic';
 import NavigateBar from '../../shared/Navigate';
-
-const CustomInputText = styled(Typography)({
-  fontSize: '1.2rem',
-  fontWeight: 400,
-  color: '#4f6b14',
-  marginTop: '1.3rem',
-  marginBottom: '0.2rem',
-});
 
 const CashCrop = () => {
   const navigate = useNavigate();
@@ -67,12 +59,14 @@ const CashCrop = () => {
           alignItems: 'center',
         }}
       >
-        <Typography variant="h4">Tell us about your Target Rate</Typography>
-        <Box m={2}>
+        <Stack spacing="2rem" width="100%" maxWidth="600px">
+
+          <Typography variant="h4" align="center" color="primary">Tell us about your Target Rate</Typography>
+
           {isUserSampledMode && (
-            <>
+            <Stack gap={0}>
               <Stack direction="row" alignItems="center">
-                <CustomInputText>Cash Crop: </CustomInputText>
+                <Typography variant="inputLabel">Cash Crop</Typography>
                 {!cashCrop && <Required />}
               </Stack>
               {crops && (
@@ -82,8 +76,7 @@ const CashCrop = () => {
                   id="combo-box-demo"
                   autoFocus
                   options={[...crops]}
-                  sx={{ width: '100%' }}
-                  // defaultValue={coverCrop ? coverCrop : ''}
+                  sx={{ mt: 0 }}
                   value={cashCrop}
                   renderInput={(params) => <PSATextField {...params} placeholder="Select a cash crop" />}
                   onChange={(el, va) => {
@@ -91,53 +84,54 @@ const CashCrop = () => {
                   }}
                 />
               )}
-            </>
+            </Stack>
           )}
-          <Stack direction="row" alignItems="center">
-            <CustomInputText>
-              Cash Crop Planting Date:
-            </CustomInputText>
-            {!cashCropPlantingDate && <Required />}
+
+          <Stack gap={1}>
+            <Stack direction="row" alignItems="center">
+              <Typography variant="inputLabel">Cash Crop Planting Date</Typography>
+              {!cashCropPlantingDate && <Required />}
+            </Stack>
+
+            <LocalizationProvider dateAdapter={AdapterDayjs}>
+              <DatePicker
+                minDate={dayjs(coverCropTerminationDate).add(7, 'day')}
+                value={dayjs(cashCropPlantingDate)}
+                onChange={(newValue) => {
+                  dispatch(set.cashCropPlantingDate(newValue.format('YYYY-MM-DD')));
+                  return null;
+                }}
+                shouldDisableDate={(date) => date.isBefore(dayjs(coverCropTerminationDate), 'day')}
+              />
+            </LocalizationProvider>
           </Stack>
-          <LocalizationProvider dateAdapter={AdapterDayjs}>
-            <DatePicker
-              minDate={dayjs(coverCropTerminationDate).add(7, 'day')}
-              value={dayjs(cashCropPlantingDate)}
-              onChange={(newValue) => {
-                dispatch(set.cashCropPlantingDate(newValue.format('YYYY-MM-DD')));
-                return null;
-              }}
-              shouldDisableDate={(date) => date.isBefore(dayjs(coverCropTerminationDate), 'day')}
-            />
-          </LocalizationProvider>
 
           {isUserSampledMode && cashCrop === 'Corn' && (
-            <Box mt={2}>
+            <Stack gap={1}>
               <Stack direction="row" alignItems="center">
-                <CustomInputText>Yield Goal (bu/ac):</CustomInputText>
+                <Typography variant="inputLabel">Yield Goal (bu/ac)</Typography>
                 {(!Yield || Yield <= 0) && <Required />}
               </Stack>
               <Myslider id="yield" min={0} max={300} />
-            </Box>
+            </Stack>
           )}
 
-          <Box mt={2} sx={{ display: 'flex', flexDirection: 'row', alignItems: 'center' }}>
+          <Stack gap={1}>
             <Stack direction="row" alignItems="center">
-              <CustomInputText>
+              <Typography variant="inputLabel">
                 What is your Target Nitrogen Fertilizer Rate? (
                 {unit}
-                ):
-              </CustomInputText>
+                )
+              </Typography>
               <Help ariaLabel="Specify the target N rate for your region.">
                 Specify the target N rate for your region.
               </Help>
               {(!targetN || targetN <= 0) && <Required />}
             </Stack>
-          </Box>
+            <Myslider id="targetN" min={0} max={300} />
+          </Stack>
 
-          <Myslider id="targetN" min={0} max={300} />
-
-        </Box>
+        </Stack>
 
         <NavigateBar
           next="next"
