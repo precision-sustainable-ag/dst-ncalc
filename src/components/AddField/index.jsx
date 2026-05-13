@@ -501,7 +501,7 @@ const AddField = () => {
           </Tabs>
         </Box>
 
-        <Stack spacing="1.5rem">
+        <Stack spacing="2rem">
           {(isEdit || isView)
             ? (
               <>
