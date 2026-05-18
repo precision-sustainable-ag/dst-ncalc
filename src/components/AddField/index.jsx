@@ -735,6 +735,7 @@ const AddField = () => {
           <Grid container spacing={2}>
             <Grid item xs={12} md={6}>
               <PSATextField
+                key={comments}
                 label="Additional comments (optional)"
                 value={comments}
                 onChange={(e) => setComments(e.target.value)}
@@ -752,6 +753,7 @@ const AddField = () => {
             <Grid container spacing={2}>
               <Grid item xs={12} md={6}>
                 <PSATextField
+                  key={email}
                   label="Email"
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
