@@ -1,6 +1,8 @@
 /* eslint-disable no-underscore-dangle */
 /* eslint-disable no-alert */
-import React, { useEffect, useMemo, useState } from 'react';
+import React, {
+  useCallback, useEffect, useMemo, useState,
+} from 'react';
 import { useAuth0 } from '@auth0/auth0-react';
 import {
   Autocomplete,
@@ -116,6 +118,7 @@ const AddField = () => {
   // DATA FOR ALL THE FIELDS
   const [allFields, setAllFields] = useState([]);
   const [loadingOptions, setLoadingOptions] = useState(true);
+  const [refreshOptions, setRefreshOptions] = useState(false);
 
   // SELECTED FIELD (USED FOR EDIT/VIEW FIELD METADATA)
   const [selectedField, setSelectedField] = useState(null);
@@ -152,8 +155,8 @@ const AddField = () => {
     }
   }, [cashCropPlantingDate, cashCropHarvestingDate, coverCropPlantingDate, coverCropTerminationDate]);
 
-  useEffect(() => {
-    const fetchOptions = async () => {
+  const fetchOptions = useCallback(async () => {
+    if (isAuthenticated) {
       try {
         setLoadingOptions(true);
         const url = isEdit ? '/fields-identifiers?mode=edit' : '/fields-identifiers';
@@ -164,12 +167,19 @@ const AddField = () => {
       } finally {
         setLoadingOptions(false);
       }
-    };
+    }
+  }, [dispatch, isAuthenticated, isEdit]);
 
-    if (isAuthenticated) {
+  useEffect(() => {
+    fetchOptions();
+  }, [isEdit, fetchOptions]);
+
+  useEffect(() => {
+    if (refreshOptions) {
+      setRefreshOptions(false);
       fetchOptions();
     }
-  }, [isAuthenticated, isEdit, dispatch]);
+  }, [refreshOptions, fetchOptions]);
 
   // Function to clear all the form values
   const resetForm = () => {
@@ -301,13 +311,9 @@ const AddField = () => {
 
       await privateApi.post('/fields', payload);
 
-      setProgramGroupLabel(null);
-      setGroup(null);
-      setGrower(null);
-      setFarm(null);
-      setField(null);
-      setFeatures(null);
-      setComments('');
+      resetForm();
+      setAllFields([]);
+      setRefreshOptions(true);
 
       dispatch(set.actionModal({
         open: true,
@@ -315,7 +321,6 @@ const AddField = () => {
         title: 'Field Saved',
         message: 'Field saved successfully!',
       }));
-      navigate('/home');
     } catch (error) {
       handleError(error, dispatch);
     } finally {
@@ -367,12 +372,9 @@ const AddField = () => {
 
       await privateApi.put(`/fields/${fieldId}`, payload);
 
-      setProgramGroupLabel(null);
-      setGroup(null);
-      setGrower(null);
-      setFarm(null);
-      setField(null);
-      setFeatures(null);
+      resetForm();
+      setAllFields([]);
+      setRefreshOptions(true);
 
       dispatch(set.actionModal({
         open: true,
@@ -380,7 +382,6 @@ const AddField = () => {
         title: 'Field Updated',
         message: 'Field updated successfully!',
       }));
-      navigate('/home');
     } catch (error) {
       handleError(error, dispatch);
     } finally {
@@ -400,14 +401,16 @@ const AddField = () => {
       const response = await privateApi.delete(`/fields/${fieldId}`);
 
       if (response.status === 200) {
-        setSelectedField(null);
+        resetForm();
+        setAllFields([]);
+        setRefreshOptions(true);
+
         dispatch(set.actionModal({
           open: true,
           type: 'info',
           title: 'Field Deleted',
           message: 'Field deleted successfully!',
         }));
-        navigate('/home');
       }
     } catch (error) {
       handleError(error, dispatch);
@@ -735,6 +738,7 @@ const AddField = () => {
           <Grid container spacing={2}>
             <Grid item xs={12} md={6}>
               <PSATextField
+                key={comments}
                 label="Additional comments (optional)"
                 value={comments}
                 onChange={(e) => setComments(e.target.value)}
@@ -752,6 +756,7 @@ const AddField = () => {
             <Grid container spacing={2}>
               <Grid item xs={12} md={6}>
                 <PSATextField
+                  key={email}
                   label="Email"
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
