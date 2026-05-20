@@ -16,7 +16,7 @@ const ALL_STEPS = [
   { id: 'location', title: 'Location', step: 2 },
   { id: 'soil', title: 'Soil', step: 3 },
   { id: 'covercrop', title: 'Cover Crop', step: 4 },
-  { id: 'sidedress', title: 'Side Dress Date', step: 5 },
+  { id: 'cashcrop', title: 'Cash Crop', step: 5 },
   { id: 'fertilizer', title: 'Nitrogen Fertilizer', step: 5 },
   { id: 'output', title: 'Output', step: 6 },
 ];
@@ -34,20 +34,15 @@ const NcalcStepper = () => {
 
   // Filter out the steps that are not needed
   const visibleSteps = useMemo(() => {
-    const updatedSteps = ALL_STEPS.map((s) => {
-      if (s.id === 'sidedress' && biomassCalcMode === 'sampled') {
-        return { ...s, title: 'Cash Crop' };
-      }
-      return s;
-    });
+    const updatedSteps = ALL_STEPS;
 
     if (biomassCalcMode === 'pm3d') {
       if (!isRCPPReportOnly) {
-        return updatedSteps.filter((s) => s.id !== 'location' && s.id !== 'soil' && s.id !== 'sidedress');
+        return updatedSteps.filter((s) => s.id !== 'location' && s.id !== 'soil' && s.id !== 'cashcrop');
       }
-      return updatedSteps.filter((s) => s.id !== 'location' && s.id !== 'soil' && s.id !== 'sidedress' && s.id !== 'fertilizer');
+      return updatedSteps.filter((s) => s.id !== 'location' && s.id !== 'soil' && s.id !== 'cashcrop' && s.id !== 'fertilizer');
     } if (biomassCalcMode === 'satellite') {
-      return updatedSteps.filter((s) => s.id !== 'upload' && s.id !== 'soil' && s.id !== 'sidedress');
+      return updatedSteps.filter((s) => s.id !== 'upload' && s.id !== 'soil' && s.id !== 'cashcrop');
     } if (biomassCalcMode === 'sampled') {
       return updatedSteps.filter((s) => s.id !== 'upload' && s.id !== 'fertilizer');
     }
