@@ -295,12 +295,7 @@ const NitrogenFertilizer = () => {
         };
 
       axios.post(`${API_BASE_URL}/fertilizers`, payload);
-    } catch (err) { /* empty */ } finally {
-      dispatch(set.otherGranularFertilizer({ fertilizerName: null, NPercent: null }));
-      dispatch(set.otherLiquidFertilizer({ fertilizerName: null, NPercent: null, density: null }));
-      dispatch(set.granularFertilizer(null));
-      dispatch(set.liquidFertilizer(null));
-    }
+    } catch (err) { /* empty */ }
   };
 
   return (

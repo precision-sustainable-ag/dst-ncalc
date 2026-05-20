@@ -51,6 +51,13 @@ const NitrogenMapWidget = ({ refVal }) => {
   const biomassGeojson = useSelector(get.biomassGeojson);
   const nitrogenTaskResults = useSelector(get.nitrogenTaskResults);
   const summaryData = useSelector(get.summaryData);
+  const sidedressFertilizationDate = useSelector(get.sidedressFertilizationDate);
+  const fertilizers = useSelector(get.fertilizers);
+  const fertilizerType = useSelector(get.fertilizerType);
+  const granularFertilizer = useSelector(get.granularFertilizer);
+  const otherGranularFertilizer = useSelector(get.otherGranularFertilizer);
+  const liquidFertilizer = useSelector(get.liquidFertilizer);
+  const otherLiquidFertilizer = useSelector(get.otherLiquidFertilizer);
 
   const [layer, setLayer] = useState(!isRCPPReportOnly ? 'prescription' : 'credit');
 
@@ -61,9 +68,59 @@ const NitrogenMapWidget = ({ refVal }) => {
     downloadPrescriptionShapefile(nitrogenTaskResults?.reqN, dispatch);
   };
 
+  const saveAdditionalMetadata = async () => {
+    if (!isPM3DMode || !selectedField) return;
+    try {
+      const token = await getAccessTokenSilently();
+
+      let fertilizerMeta = { type: fertilizerType };
+
+      // Create fertilizer metadata object
+      if (fertilizerType === 'granular') {
+        const selected = fertilizers.find((f) => f.name === granularFertilizer);
+        fertilizerMeta = {
+          ...fertilizerMeta,
+          name: granularFertilizer === 'Other' ? otherGranularFertilizer.fertilizerName : granularFertilizer,
+          n_percent: granularFertilizer === 'Other'
+            ? parseFloat(otherGranularFertilizer.NPercent) || 0
+            : selected?.n_percent || 0,
+        };
+      } else if (fertilizerType === 'liquid') {
+        const selected = fertilizers.find((f) => f.name === liquidFertilizer);
+        fertilizerMeta = {
+          ...fertilizerMeta,
+          name: liquidFertilizer === 'Other' ? otherLiquidFertilizer.fertilizerName : liquidFertilizer,
+          n_percent: liquidFertilizer === 'Other'
+            ? parseFloat(otherLiquidFertilizer.NPercent) || 0
+            : selected?.n_percent || 0,
+          density: liquidFertilizer === 'Other'
+            ? parseFloat(otherLiquidFertilizer.density) || 0
+            : selected?.density || 0,
+        };
+      }
+
+      const payload = {
+        field_id: selectedField._id,
+        sidedress_fertilization_date: sidedressFertilizationDate,
+        fertilizer: fertilizerMeta,
+      };
+
+      axios.post(`${API_BASE_URL}/additional-metadata`, payload, {
+        headers: { Authorization: `Bearer ${token}` },
+      });
+    } catch (err) { /* empty */ } finally {
+      dispatch(set.otherGranularFertilizer({ fertilizerName: null, NPercent: null }));
+      dispatch(set.otherLiquidFertilizer({ fertilizerName: null, NPercent: null, density: null }));
+      dispatch(set.granularFertilizer(null));
+      dispatch(set.liquidFertilizer(null));
+    }
+  };
+
   const saveFiles = async () => {
     dispatch(set.actionModal({ open: true, type: 'loading', message: 'Saving prescription data...' }));
     try {
+      // Save the sidedress date as additional metdata
+      saveAdditionalMetadata();
       const fieldId = selectedField._id;
       const token = await getAccessTokenSilently();
       const filesToSave = [
