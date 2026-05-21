@@ -1,3 +1,4 @@
+/* eslint-disable no-underscore-dangle */
 /* eslint-disable no-console */
 /* eslint-disable react-hooks/exhaustive-deps */
 import React, { useEffect, useState } from 'react';
@@ -14,6 +15,7 @@ import { get, set } from '../../store/Store';
 import NavigateBar from '../../shared/Navigate';
 import { ncalcApiUrl } from '../../utils/keys';
 import FieldDropdown from '../../shared/FieldDropdown/FieldDropdown';
+import { handleError } from '../../utils/apiError';
 
 const API_BASE_URL = ncalcApiUrl;
 
@@ -94,7 +96,6 @@ const Upload = () => {
       return true;
     } catch (e) {
       const errorMessage = e.message || 'An unknown validation error occurred';
-      // console.error('Validation failed:', errorMessage);
       setError(errorMessage);
       return false;
     }
@@ -115,9 +116,14 @@ const Upload = () => {
     if (selectedField && selectedField.properties?.coverCrop) {
       dispatch(set.coverCrop(selectedField.properties.coverCrop));
     }
-    if (selectedField && selectedField.properties?.coverCropTerminationDate) {
+    if (selectedField && selectedField.properties?.coverCropPlantingDate) {
       dispatch(set.coverCropPlantingDate(selectedField.properties.coverCropPlantingDate));
+    }
+    if (selectedField && selectedField.properties?.coverCropTerminationDate) {
       dispatch(set.coverCropTerminationDate(selectedField.properties.coverCropTerminationDate));
+    }
+    if (selectedField && selectedField.properties?.cashCropPlantingDate) {
+      dispatch(set.cashCropPlantingDate(selectedField.properties.cashCropPlantingDate));
     }
     if (selectedField && selectedField.geometry) {
       const featuresToSet = { type: 'Feature', geometry: selectedField.geometry };
@@ -156,13 +162,7 @@ const Upload = () => {
         });
         setBiomassFiles(response.data?.data);
       } catch (e) {
-        // console.error('Failed to load options', e);
-        dispatch(set.actionModal({
-          open: true,
-          type: 'error',
-          title: 'Failed to load biomass files',
-          message: e?.response?.data?.message || e?.response?.data?.error || 'An error occurred while fetching biomass files.',
-        }));
+        handleError(e, dispatch, '', 'An error occurred while fetching biomass files.');
         setBiomassFiles([]);
       } finally {
         setIsFetchingBiomass(false);

@@ -8,6 +8,7 @@ import { useDispatch, useSelector } from 'react-redux';
 import { get, set } from '../store/Store';
 import { weightedAverage } from './helpers';
 import { historyStates } from '../store/inits';
+import { handleError } from '../utils/apiError';
 
 const NCAL_API_URL = 'https://api.covercrop-ncalc.org/surface';
 const SSURGO_API_URL = 'https://ssurgo.covercrop-data.org';
@@ -61,11 +62,14 @@ const useFetchModel = ({
 }) => {
   // eslint-disable-next-line no-unused-vars
   // const [isDatesValid, setIsDatesValid] = useState(null);
-  const model = useSelector(get.model);
   const dispatch = useDispatch();
+  const model = useSelector(get.model);
+  const isSatelliteMode = useSelector(get.biomassCalcMode);
 
   const start = moment(coverCropTerminationDate).add(1, 'hour').format('yyyy-MM-DD');
-  const end = moment(cashCropPlantingDate).add(110, 'days').add(1, 'hour').format('yyyy-MM-DD');
+  let end;
+  if (isSatelliteMode) end = moment(coverCropTerminationDate).add(110, 'days').add(1, 'hour').format('yyyy-MM-DD');
+  else end = moment(cashCropPlantingDate).add(110, 'days').add(1, 'hour').format('yyyy-MM-DD');
 
   useEffect(() => {
     if (!N || !biomass) return;
@@ -204,7 +208,6 @@ const fetchNitrogenData = async (
   coverCrop,
   coverCropGrowthStage,
   coverCropTerminationDate,
-  cashCropPlantingDate,
   targetN,
   biomassCalcMode,
   fieldGeometry,
@@ -231,6 +234,7 @@ const fetchNitrogenData = async (
       (item) => coverCropGrowthStage?.[item] || 'Unknown growth stage',
     );
   }
+  const finalCashCropDate = dayjs(coverCropTerminationDate).add(90, 'day').format('YYYY-MM-DD');
 
   try {
     const response = await axios.post(url, {
@@ -239,7 +243,7 @@ const fetchNitrogenData = async (
       species,
       growth_stage: growthStage,
       start: coverCropTerminationDate,
-      end: cashCropPlantingDate,
+      end: finalCashCropDate,
       mode: biomassCalcMode,
       field_geometry: fieldGeometry,
       multiplier,
@@ -267,13 +271,7 @@ const fetchNitrogenData = async (
       dispatch(set.nitrogenFetchIsFailed(true));
     }
   } catch (error) {
-    // console.error(error);
-    dispatch(set.actionModal({
-      open: true,
-      type: 'error',
-      title: 'Error',
-      message: error?.response?.data?.message || 'An error occurred while fetching the prescription data.',
-    }));
+    handleError(error, dispatch, '', 'An error occurred while fetching the prescription data.');
     dispatch(set.nitrogenFetchIsLoading(false));
     dispatch(set.nitrogenFetchIsFailed(true));
   }
@@ -286,7 +284,6 @@ const fetchPrescription = async (
   coverCrop,
   coverCropGrowthStage,
   coverCropTerminationDate,
-  cashCropPlantingDate,
   nitrogenSprayMapProperty,
   multiplier,
   hasFixedNRate,
@@ -295,11 +292,7 @@ const fetchPrescription = async (
   dispatch,
 ) => {
   const url = `${PLANTFACTORS_API_URL}/prescription`;
-  let finalCashCropDate = cashCropPlantingDate;
-  if (!finalCashCropDate) {
-    finalCashCropDate = dayjs().format('YYYY-MM-DD');
-    dispatch(set.cashCropPlantingDate(finalCashCropDate));
-  }
+  const finalCashCropDate = dayjs(coverCropTerminationDate).add(90, 'day').format('YYYY-MM-DD');
   const growthStage = coverCrop.map(
     (item) => coverCropGrowthStage?.[item] || 'Unknown growth stage',
   );
@@ -356,13 +349,7 @@ const fetchPrescription = async (
       dispatch(set.nitrogenFetchIsFailed(true));
     }
   } catch (error) {
-    // console.error(error);
-    dispatch(set.actionModal({
-      open: true,
-      type: 'error',
-      title: 'Error',
-      message: error?.response?.data?.message || 'An error occurred while fetching the prescription data.',
-    }));
+    handleError(error, dispatch, '', 'An error occurred while fetching the prescription data.');
     dispatch(set.nitrogenFetchIsFailed(true));
   } finally {
     dispatch(set.biomassFetchIsLoading(false));
@@ -421,7 +408,6 @@ const useFetchPlantFactors = () => {
   const coverCrop = useSelector(get.coverCrop);
   const coverCropGrowthStage = useSelector(get.coverCropGrowthStage);
   const coverCropTerminationDate = useSelector(get.coverCropTerminationDate);
-  const cashCropPlantingDate = useSelector(get.cashCropPlantingDate);
   const N = useSelector(get.N);
   const carb = useSelector(get.carb);
   const cell = useSelector(get.cell);
@@ -473,7 +459,7 @@ const useFetchPlantFactors = () => {
   }, [dispatch, coverCrop, coverCropGrowthStage]);
 
   useEffect(() => {
-    const satelliteSpecies = 'Winter cereals';
+    const satelliteSpecies = 'winter_cereals';
     const url = isSatelliteMode ? `${PLANTFACTORS_API_URL}/species/${satelliteSpecies}` : `${PLANTFACTORS_API_URL}/species`;
     axios
       .get(url)
@@ -507,7 +493,7 @@ const useFetchPlantFactors = () => {
   useEffect(() => {
     dispatch(set.biomassGeojson(null));
     dispatch(set.nitrogenTaskResults(null));
-  }, [biomassTaskResults, coverCrop, coverCropGrowthStage, coverCropTerminationDate, cashCropPlantingDate, targetN,
+  }, [biomassTaskResults, coverCrop, coverCropGrowthStage, coverCropTerminationDate, targetN,
     gridSize, multiplier, hasFixedNRate, nitrogenSprayMap, nitrogenSprayMapProperty]);
 
   useEffect(() => {
@@ -519,7 +505,6 @@ const useFetchPlantFactors = () => {
       && coverCrop
       && plantGrowthStages
       && coverCropTerminationDate
-      && cashCropPlantingDate
       && ((hasFixedNRate === 'variable' && nitrogenSprayMap && nitrogenSprayMapProperty) || (hasFixedNRate === 'fixed' && targetN > 0))
       && gridSize > 0
       && activeStep > 5
@@ -529,7 +514,6 @@ const useFetchPlantFactors = () => {
         coverCrop,
         coverCropGrowthStage,
         coverCropTerminationDate,
-        cashCropPlantingDate,
         targetN,
         biomassCalcMode,
         mapPolygon?.[0].geometry,
@@ -547,7 +531,6 @@ const useFetchPlantFactors = () => {
     species,
     plantGrowthStages,
     coverCropTerminationDate,
-    cashCropPlantingDate,
     targetN,
     N,
     carb,
@@ -586,7 +569,6 @@ const useFetchPlantFactors = () => {
         coverCrop,
         coverCropGrowthStage,
         coverCropTerminationDate,
-        cashCropPlantingDate,
         nitrogenSprayMapProperty,
         multiplier,
         hasFixedNRate,
@@ -603,7 +585,6 @@ const useFetchPlantFactors = () => {
     coverCrop,
     plantGrowthStages,
     coverCropTerminationDate,
-    cashCropPlantingDate,
     multiplier,
     activeStep,
     isRCPPReportOnly,

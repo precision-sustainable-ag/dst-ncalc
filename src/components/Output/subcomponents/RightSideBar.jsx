@@ -78,7 +78,7 @@ const RightSideBar = ({ summaryData, refs }) => {
                 }
               } else {
                 dispatch(set.activeStep(5));
-                navigate('/sidedress');
+                navigate('/cashcrop');
               }
             }}
           />

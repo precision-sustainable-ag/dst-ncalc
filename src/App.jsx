@@ -11,6 +11,7 @@ import {
 import {
   PSATheme, PSAHeader, PSAAuthButton, FadeAlert, PSAProfile, PSASkipContent,
 } from 'shared-react-components/src';
+import { useAuth0 } from '@auth0/auth0-react';
 import { deepmerge } from '@mui/utils';
 import ChatBubbleOutlineIcon from '@mui/icons-material/ChatBubbleOutline';
 import AccountBoxOutlinedIcon from '@mui/icons-material/AccountBoxOutlined';
@@ -24,10 +25,10 @@ import 'react-datepicker/dist/react-datepicker.css';
 import { get, set } from './store/Store';
 import FieldDropdown from './components/FieldDropdown';
 import NcalcStepper from './shared/Stepper';
-import Auth0ProviderWithNavigate from './shared/AuthProvider';
 import useFetchHLS from './hooks/useFetchHLS';
 import { useFetchPlantFactors } from './hooks/useFetchApi';
 import ProtectedPage from './shared/ProtectedPage/ProtectedPage';
+import { initAuth } from './utils/apiClient';
 import ActionModal from './shared/Modal';
 
 const screens = {
@@ -41,13 +42,14 @@ screens.location = require('./components/Location').default;
 screens.soil = require('./components/Soil').default;
 screens.covercrop = require('./components/CoverCrop').CoverCropFirst;
 screens.covercrop2 = require('./components/CoverCrop').CoverCropSecond;
-screens.sidedress = require('./components/CashCrop').default;
+screens.cashcrop = require('./components/CashCrop').default;
 screens.output = require('./components/Output').default;
 screens.feedback = require('./components/Feedback').default;
 screens.advanced = require('./components/Advanced').default;
 screens.upload = require('./components/Upload').default;
 screens.field = require('./components/AddField').default;
 screens.editfield = require('./components/AddField').default;
+screens.viewfield = require('./components/AddField').default;
 screens.fileupload = require('./components/FileUpload').default;
 screens.fertilizer = require('./components/NitrogenFertilizer').default;
 
@@ -94,6 +96,7 @@ const App = () => {
   const navigate = useNavigate();
   const dispatch = useDispatch();
   const location = useLocation();
+  const { getAccessTokenSilently, loginWithPopup } = useAuth0();
 
   useFetchHLS();
   useFetchPlantFactors();
@@ -107,7 +110,7 @@ const App = () => {
   const isPM3DMode = useSelector(get.biomassCalcMode) === 'pm3d';
   const actionModal = useSelector(get.actionModal);
 
-  const noStepperPaths = ['/profile', '/field', '/editfield', '/editfield', '/fileupload'];
+  const noStepperPaths = ['/profile', '/field', '/editfield', '/viewfield', '/fileupload'];
   const showStepper = !noStepperPaths.includes(location.pathname.toLowerCase());
 
   const navContent = [
@@ -182,81 +185,83 @@ const App = () => {
     }
   }, [dispatch, showAlert]);
 
+  useEffect(() => {
+    initAuth(getAccessTokenSilently, loginWithPopup);
+  }, [getAccessTokenSilently, loginWithPopup]);
+
   return (
     <ThemeProvider theme={dstTheme}>
-      <Auth0ProviderWithNavigate>
-        <PSASkipContent
-          text="Skip to main content"
-          component="button"
-          onClick={() => {
-            const el = document.getElementById('main-content');
-            if (el) {
-              el.scrollIntoView({ behavior: 'smooth', block: 'start' });
-              el.setAttribute('tabindex', '-1');
-              el.focus();
-            }
+      <PSASkipContent
+        text="Skip to main content"
+        component="button"
+        onClick={() => {
+          const el = document.getElementById('main-content');
+          if (el) {
+            el.scrollIntoView({ behavior: 'smooth', block: 'start' });
+            el.setAttribute('tabindex', '-1');
+            el.focus();
+          }
+        }}
+        sx={{ '&.MuiLink-root.Mui-focusVisible': { outlineOffset: '5px', outlineColor: 'black' } }}
+      />
+
+      <Box sx={{ minHeight: '100vh', display: 'flex', flexDirection: 'column' }}>
+        <AppBar position="static" component="header" sx={{ backgroundColor: 'white' }}>
+          <PSAHeader title="Cover Crop Nitrogen Calculator" onLogoClick={() => navigate('/')} navContent={navContent} />
+        </AppBar>
+
+        {showStepper && (
+        <AppBar
+          position={matchesMd ? 'static' : 'sticky'}
+          component="nav"
+          sx={{ zIndex: 1000, backgroundColor: 'white' }}
+        >
+          <NcalcStepper />
+        </AppBar>
+        )}
+        <Box
+          id="main-content"
+          sx={{
+            flex: 1,
+            minWidth: '100%',
+            backgroundImage: `url(${'/background_0.jpg'})`,
+            backgroundSize: 'cover',
+            backgroundRepeat: 'no-repeat',
           }}
-          sx={{ '&.MuiLink-root.Mui-focusVisible': { outlineOffset: '5px', outlineColor: 'black' } }}
-        />
+        >
+          <Routes>
+            {Object.keys(screens).map((scr) => {
+              const ScreenComponent = screens[scr];
 
-        <Box sx={{ minHeight: '100vh', display: 'flex', flexDirection: 'column' }}>
-          <AppBar position="static" component="header" sx={{ backgroundColor: 'white' }}>
-            <PSAHeader title="Cover Crop Nitrogen Calculator" onLogoClick={() => navigate('/')} navContent={navContent} />
-          </AppBar>
+              const protectedPaths = ['upload', 'field', 'editfield', 'viewfield', 'fileupload'];
+              if (isPM3DMode) {
+                protectedPaths.push('covercrop', 'fertilizer', 'output');
+              }
 
-          {showStepper && (
-            <AppBar
-              position={matchesMd ? 'static' : 'sticky'}
-              component="nav"
-              sx={{ zIndex: 1000, backgroundColor: 'white' }}
-            >
-              <NcalcStepper />
-            </AppBar>
-          )}
-          <Box
-            id="main-content"
-            sx={{
-              flex: 1,
-              minWidth: '100%',
-              backgroundImage: `url(${'/background_0.jpg'})`,
-              backgroundSize: 'cover',
-              backgroundRepeat: 'no-repeat',
-            }}
-          >
-            <Routes>
-              {Object.keys(screens).map((scr) => {
-                const ScreenComponent = screens[scr];
-
-                const protectedPaths = ['upload', 'field', 'fileupload'];
-                if (isPM3DMode) {
-                  protectedPaths.push('covercrop', 'fertilizer', 'output');
-                }
-
-                const element = protectedPaths.includes(scr.toLowerCase()) ? (
-                  <ProtectedPage>
-                    <ScreenComponent />
-                  </ProtectedPage>
-                ) : (
+              const element = protectedPaths.includes(scr.toLowerCase()) ? (
+                <ProtectedPage>
                   <ScreenComponent />
-                );
-                return <Route key={scr} path={scr.toLowerCase()} element={element} />;
-              })}
-              <Route path="" element={<Screen />} />
-            </Routes>
-            <ActionModal {...actionModal} onClose={() => { dispatch(set.actionModal({ ...actionModal, open: false })); }} />
-            <Feedback />
-            <SnackbarMessage />
-            <Box sx={{ position: 'fixed', bottom: matchesMd ? '45px' : 0, zIndex: 1000 }}>
-              <FadeAlert
-                showAlert={showAlert}
-                severity={alertSeverity}
-                message={alertMessage}
-                action={<Button onClick={() => dispatch(set.user.showAlert(false))}>CLOSE</Button>}
-              />
-            </Box>
+                </ProtectedPage>
+              ) : (
+                <ScreenComponent />
+              );
+              return <Route key={scr} path={scr.toLowerCase()} element={element} />;
+            })}
+            <Route path="" element={<Screen />} />
+          </Routes>
+          <ActionModal {...actionModal} onClose={() => { dispatch(set.actionModal({ ...actionModal, open: false })); }} />
+          <Feedback />
+          <SnackbarMessage />
+          <Box sx={{ position: 'fixed', bottom: matchesMd ? '45px' : 0, zIndex: 1000 }}>
+            <FadeAlert
+              showAlert={showAlert}
+              severity={alertSeverity}
+              message={alertMessage}
+              action={<Button onClick={() => dispatch(set.user.showAlert(false))}>CLOSE</Button>}
+            />
           </Box>
         </Box>
-      </Auth0ProviderWithNavigate>
+      </Box>
     </ThemeProvider>
   );
 }; // App
