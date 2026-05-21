@@ -82,6 +82,8 @@ const NitrogenFertilizer = () => {
   const targetN = useSelector(get.targetN);
   const cashCropPlantingDate = useSelector(get.cashCropPlantingDate);
   const coverCropTerminationDate = useSelector(get.coverCropTerminationDate);
+  const sidedressFertilizationDate = useSelector(get.sidedressFertilizationDate);
+  const [showSidedressDateWarning, setShowSidedressDateWarning] = useState(false);
 
   const [isFetching, setIsFetching] = useState(false);
   const fertilizers = useSelector(get.fertilizers);
@@ -122,7 +124,7 @@ const NitrogenFertilizer = () => {
   const matchesMd = useMediaQuery((theme) => theme.breakpoints.down('md'));
 
   const isNextDisabled = (() => {
-    if (!cashCropPlantingDate) return true;
+    if (!isSatelliteMode && !sidedressFertilizationDate) return true;
     if (granularExists || liquidExists) return true;
 
     // Fertilizer specific requirements
@@ -145,12 +147,19 @@ const NitrogenFertilizer = () => {
     return false;
   })();
 
-  // Set default cash crop planting date on mount if not set or invalid
+  // Set default side dress planting date on mount if not set or invalid
   useEffect(() => {
-    if (!cashCropPlantingDate || dayjs(cashCropPlantingDate).isBefore(dayjs(coverCropTerminationDate))) {
-      dispatch(set.cashCropPlantingDate(dayjs(coverCropTerminationDate).add(7, 'day').format('YYYY-MM-DD')));
+    if (isSatelliteMode) return;
+    if (!sidedressFertilizationDate) {
+      dispatch(set.sidedressFertilizationDate(dayjs().format('YYYY-MM-DD')));
     }
   });
+
+  // Show warning if sidedress date is before the cash crop planting date
+  useEffect(() => {
+    if (dayjs(sidedressFertilizationDate).isBefore(dayjs(cashCropPlantingDate))) setShowSidedressDateWarning(true);
+    else setShowSidedressDateWarning(false);
+  }, [sidedressFertilizationDate, cashCropPlantingDate]);
 
   useEffect(() => {
     const fetchFertilizers = async () => {
@@ -286,12 +295,7 @@ const NitrogenFertilizer = () => {
         };
 
       axios.post(`${API_BASE_URL}/fertilizers`, payload);
-    } catch (err) { /* empty */ } finally {
-      dispatch(set.otherGranularFertilizer({ fertilizerName: null, NPercent: null }));
-      dispatch(set.otherLiquidFertilizer({ fertilizerName: null, NPercent: null, density: null }));
-      dispatch(set.granularFertilizer(null));
-      dispatch(set.liquidFertilizer(null));
-    }
+    } catch (err) { /* empty */ }
   };
 
   return (
@@ -538,23 +542,32 @@ const NitrogenFertilizer = () => {
 
           <Box sx={{ borderBottom: '1px solid #eee', mt: 4, mb: 2 }} />
 
-          <Box mt={0} sx={{ mt: 'auto' }}>
-            <CustomInputText>Side Dress Fertilization Date:</CustomInputText>
-            {!cashCropPlantingDate && <Required />}
-            <LocalizationProvider dateAdapter={AdapterDayjs}>
-              <DatePicker
-                minDate={dayjs(coverCropTerminationDate).add(7, 'day')}
-                value={dayjs(cashCropPlantingDate)}
-                onChange={(newValue) => {
-                  dispatch(set.cashCropPlantingDate(newValue.format('YYYY-MM-DD')));
-                  return null;
-                }}
-                shouldDisableDate={(date) => date.isBefore(dayjs(coverCropTerminationDate), 'day')}
-              />
-            </LocalizationProvider>
-          </Box>
-
-          <Box sx={{ borderBottom: '1px solid #eee', mt: 4, mb: 2 }} />
+          {!isSatelliteMode &&
+          (
+            <Box>
+              <Box mt={0} sx={{ mt: 'auto' }}>
+                <CustomInputText>Side Dress Fertilization Date:</CustomInputText>
+                {!sidedressFertilizationDate && <Required />}
+                <LocalizationProvider dateAdapter={AdapterDayjs}>
+                  <DatePicker
+                    // minDate={dayjs(coverCropTerminationDate).add(7, 'day')}
+                    value={dayjs(sidedressFertilizationDate)}
+                    onChange={(newValue) => {
+                      dispatch(set.sidedressFertilizationDate(newValue.format('YYYY-MM-DD')));
+                      return null;
+                    }}
+                    shouldDisableDate={(date) => date.isBefore(dayjs(coverCropTerminationDate), 'day')}
+                  />
+                </LocalizationProvider>
+                {showSidedressDateWarning && (
+                <Alert severity="warning" sx={{ mt: 1 }}>
+                  The selected sidedress fertilization date is before the cash crop planting date.
+                </Alert>
+                )}
+              </Box>
+              <Box sx={{ borderBottom: '1px solid #eee', mt: 4, mb: 2 }} />
+            </Box>
+          )}
 
           {isSatelliteMode && (
           <Box>

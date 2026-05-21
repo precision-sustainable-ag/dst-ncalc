@@ -128,7 +128,7 @@ const CoverCropSecond = () => {
           next="next"
           nextOnClick={() => {
             dispatch(set.activeStep(5));
-            navigate('/sidedress');
+            navigate('/cashcrop');
           }}
           nextDisabled={!N || !carb || !cell || !lign}
           back="back"

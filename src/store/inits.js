@@ -133,6 +133,7 @@ const initialState = {
   coverCropPlantingDate: coverCropPlantingDate.format('YYYY-MM-DD'),
   coverCropTerminationDate: coverCropTerminationDate.format('YYYY-MM-DD'),
   cashCropPlantingDate: null,
+  sidedressFertilizationDate: null,
   biomassTaskResults: null,
   biomassGeojson: null,
   speciesBiomassAverage: {},

@@ -117,9 +117,14 @@ const Upload = () => {
     if (selectedField && selectedField.properties?.coverCrop) {
       dispatch(set.coverCrop(selectedField.properties.coverCrop));
     }
-    if (selectedField && selectedField.properties?.coverCropTerminationDate) {
+    if (selectedField && selectedField.properties?.coverCropPlantingDate) {
       dispatch(set.coverCropPlantingDate(selectedField.properties.coverCropPlantingDate));
+    }
+    if (selectedField && selectedField.properties?.coverCropTerminationDate) {
       dispatch(set.coverCropTerminationDate(selectedField.properties.coverCropTerminationDate));
+    }
+    if (selectedField && selectedField.properties?.cashCropPlantingDate) {
+      dispatch(set.cashCropPlantingDate(selectedField.properties.cashCropPlantingDate));
     }
     if (selectedField && selectedField.geometry) {
       const featuresToSet = { type: 'Feature', geometry: selectedField.geometry };
