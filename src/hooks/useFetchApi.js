@@ -286,13 +286,14 @@ const fetchPrescription = async (
   coverCropTerminationDate,
   nitrogenSprayMapProperty,
   multiplier,
+  inputMode,
   hasFixedNRate,
   targetN,
   isRCPPReportOnly,
   dispatch,
 ) => {
   const url = `${PLANTFACTORS_API_URL}/prescription`;
-  const finalCashCropDate = dayjs(coverCropTerminationDate).add(90, 'day').format('YYYY-MM-DD');
+  const finalCashCropDate = dayjs(coverCropTerminationDate).add(110, 'day').format('YYYY-MM-DD');
   const growthStage = coverCrop.map(
     (item) => coverCropGrowthStage?.[item] || 'Unknown growth stage',
   );
@@ -307,6 +308,7 @@ const fetchPrescription = async (
       start: coverCropTerminationDate,
       end: finalCashCropDate,
       no_prescription: isRCPPReportOnly,
+      input_mode: inputMode,
     };
 
     if (!isRCPPReportOnly) {
@@ -364,7 +366,7 @@ const prepareExportData = (reqnGeojson) => {
     type: 'Feature',
     geometry: feature.geometry,
     properties: {
-      RATE: feature.properties.value ?? 0,
+      RATE: feature.properties.ReqN_product ?? 0,
     },
   }));
 
@@ -429,6 +431,7 @@ const useFetchPlantFactors = () => {
   const activeExample = useSelector(get.activeExample);
   const mapPolygon = useSelector(get.mapPolygon);
   const biomass = useSelector(get.biomass);
+  const inputMode = useSelector(get.inputMode);
 
   useEffect(() => {
     if (activeExample) return;
@@ -571,6 +574,7 @@ const useFetchPlantFactors = () => {
         coverCropTerminationDate,
         nitrogenSprayMapProperty,
         multiplier,
+        inputMode,
         hasFixedNRate,
         targetN,
         isRCPPReportOnly,
@@ -588,6 +592,7 @@ const useFetchPlantFactors = () => {
     multiplier,
     activeStep,
     isRCPPReportOnly,
+    inputMode,
   ]);
 }; // useFetchPlantFactors
 

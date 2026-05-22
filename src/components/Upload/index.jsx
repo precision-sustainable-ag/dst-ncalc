@@ -10,7 +10,6 @@ import {
 import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
 import { PSATextField } from 'shared-react-components/src';
-import dayjs from 'dayjs';
 import centroid from '@turf/centroid';
 import { get, set } from '../../store/Store';
 import NavigateBar from '../../shared/Navigate';
@@ -41,15 +40,15 @@ const Upload = () => {
       throw new Error(`Point at index ${index} is not a valid object`);
     }
 
-    const requiredFields = ['camera_id', 'lon', 'lat', 'species'];
+    const requiredFields = ['lon', 'lat', 'species'];
     const missingField = requiredFields.find((field) => !(field in point));
     if (missingField) {
       throw new Error(`Point at index ${index} is missing required field: ${missingField}`);
     }
 
-    if (typeof point.camera_id !== 'number') {
-      throw new Error(`Point at index ${index}: camera_id must be a number`);
-    }
+    // if (typeof point.camera_id !== 'number') {
+    //   throw new Error(`Point at index ${index}: camera_id must be a number`);
+    // }
 
     if (typeof point.lon !== 'number' || typeof point.lat !== 'number') {
       throw new Error(`Point at index ${index}: lon and lat must be numbers`);
@@ -158,7 +157,7 @@ const Upload = () => {
         const token = await getAccessTokenSilently();
         const { _id: fieldId } = selectedField;
         if (!fieldId) return;
-        const response = await axios.get(`${API_BASE_URL}/biomass/field/${fieldId}`, {
+        const response = await axios.get(`${API_BASE_URL}/biomass-field-map/${fieldId}`, {
           headers: { Authorization: `Bearer ${token}` },
         });
         setBiomassFiles(response.data?.data);
@@ -221,20 +220,21 @@ const Upload = () => {
             onChange={(event, newValue) => {
               dispatch(set.selectedBiomassFile(newValue));
             }}
-            getOptionLabel={(option) => (option?.createdAt
-              ? `${dayjs(option.createdAt).format('MMM D, YYYY')} (${option.points?.length || 0} points)` : '')}
+            getOptionLabel={(option) => (option?.date
+              ? `${option.date} (${option.points?.length || 0} points)` : '')}
             renderOption={(props, option) => (
               <Box component="li" {...props}>
                 <Stack>
                   <Typography variant="subtitle1" sx={{ fontWeight: 'bold' }}>
-                    {dayjs(option.createdAt).format('MMM D, YYYY')}
+                    {/* {dayjs(option.createdAt).format('MMM D, YYYY')} */}
+                    {option.date}
                   </Typography>
                   <Stack direction="row" spacing={2}>
-                    <Typography variant="body2" color="text.secondary">
+                    {/* <Typography variant="body2" color="text.secondary">
                       Time:
                       {' '}
                       <b>{dayjs(option.createdAt).format('h:mm A')}</b>
-                    </Typography>
+                    </Typography> */}
 
                     <Typography variant="body2" color="text.secondary">
                       Points:
