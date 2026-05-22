@@ -209,6 +209,7 @@ const initialState = {
     NPercent: null,
     density: null,
   },
+  inputMode: 'nitrogen',
   hasFixedNRate: 'fixed',
   gridSize: 1,
   summaryData: summaryDataDefaults,

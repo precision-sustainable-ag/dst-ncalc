@@ -1,3 +1,4 @@
+/* eslint-disable no-nested-ternary */
 /* eslint-disable operator-linebreak */
 import React, { useEffect, useRef, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
@@ -94,6 +95,7 @@ const NitrogenFertilizer = () => {
   const liquidFertilizer = useSelector(get.liquidFertilizer);
   const otherLiquidFertilizer = useSelector(get.otherLiquidFertilizer);
 
+  const inputMode = useSelector(get.inputMode);
   const hasFixedNRate = useSelector(get.hasFixedNRate);
 
   const [fileName, setFileName] = useState('');
@@ -227,6 +229,10 @@ const NitrogenFertilizer = () => {
       dispatch(set.otherGranularFertilizer.NPercent(null));
     }
   }, [dispatch, fertilizerType]);
+
+  useEffect(() => {
+    dispatch(set.targetN(0));
+  }, [fertilizerType, inputMode, dispatch]);
 
   const handleFileSelect = (event) => {
     const file = event.target.files[0];
@@ -488,6 +494,17 @@ const NitrogenFertilizer = () => {
           <Box sx={{ borderBottom: '1px solid #eee', my: 3 }} />
 
           <Box sx={{ minHeight: '140px' }}>
+            <Box sx={{ mb: 2 }}>
+              <PSARadioButton
+                options={[
+                  { label: 'Enter lbs N / acre', value: 'nitrogen' },
+                  { label: `Enter ${fertilizerType === 'granular' ? 'lbs/acre' : 'gals/acre'} of fertilizer`, value: 'fertilizer' },
+                ]}
+                selectedValue={inputMode}
+                onChange={(value) => dispatch(set.inputMode(value))}
+                row
+              />
+            </Box>
             <PSARadioButton
               options={[
                 { label: 'Fixed Rate', value: 'fixed' },
@@ -503,17 +520,26 @@ const NitrogenFertilizer = () => {
               <Box mt={1}>
                 <Stack direction="row" alignItems="center">
                   <CustomInputText>
-                    What is your Target Nitrogen Fertilizer Rate?
-                    {' '}
-                    {fertilizerType === 'granular' ? '(lb/ac)' : '(gal/ac)'}
-                    :
+                    {inputMode === 'nitrogen'
+                      ? 'What is your Target N Rate? (lb N/ac):'
+                      : `What is your Target Nitrogen Fertilizer Rate? ${fertilizerType === 'granular' ? '(lb/ac)' : '(gal/ac)'}:`}
                   </CustomInputText>
                   <Help ariaLabel="Specify the target N rate for your region.">Specify the target N rate for your region.</Help>
                   {(!targetN || targetN <= 0) && <Required />}
                 </Stack>
               </Box>
 
-              <Myslider id="targetN" min={0} max={300} />
+              <Myslider
+                id="targetN"
+                min={0}
+                max={
+                  inputMode === 'nitrogen'
+                    ? 250
+                    : fertilizerType === 'liquid'
+                      ? 85
+                      : 500
+                }
+              />
             </>
             )}
 
