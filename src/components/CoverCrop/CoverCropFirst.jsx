@@ -219,6 +219,7 @@ const CoverCropFirst = () => {
               <PSATextField
                 type="date"
                 value={terminationDate}
+                disabled={isPM3DMode}
                 onChange={(e) => {
                   setTerminationDate(e.target.value);
                   dispatch(set.coverCropTerminationDate(e.target.value));
