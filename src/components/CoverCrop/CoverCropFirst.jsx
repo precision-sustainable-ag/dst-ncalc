@@ -102,6 +102,7 @@ const CoverCropFirst = () => {
     }
   }, [isSatelliteMode, isPM3DMode, biomass, coverCrop, coverCropGrowthStage, coverCropTerminationDate, lwc, biomassTotalValue]);
 
+  // eslint-disable-next-line no-unused-vars
   const syncFieldData = async () => {
   if (!isPM3DMode || !selectedField) return;
 
@@ -179,7 +180,7 @@ const CoverCropFirst = () => {
             {/* <CustomInputText>Cover Crop Species:</CustomInputText> */}
             {(!coverCrop || coverCrop.length === 0) && <Required />}
           </Stack>
-          <CoverCropsInput isSatelliteMode={isSatelliteMode} />
+          <CoverCropsInput isSatelliteMode={isSatelliteMode} isPM3DMode={isPM3DMode} />
           {(isSatelliteMode || isPM3DMode) && coverCrop && (
             <Box>
               <Stack direction="row" alignItems="center">
@@ -319,15 +320,13 @@ const CoverCropFirst = () => {
               dispatch(set.activeStep(5));
               navigate('/fertilizer');
             } else if (isPM3DMode) {
-              const isSuccess = await syncFieldData();
-              if (isSuccess) {
-                if (isRCPPReportOnly) {
-                  dispatch(set.activeStep(6));
-                  navigate('/output');
-                } else {
-                  dispatch(set.activeStep(5));
-                  navigate('/fertilizer');
-                }
+              // const isSuccess = await syncFieldData();
+              if (isRCPPReportOnly) {
+                dispatch(set.activeStep(6));
+                navigate('/output');
+              } else {
+                dispatch(set.activeStep(5));
+                navigate('/fertilizer');
               }
             } else navigate('/covercrop2');
           }}

@@ -52,6 +52,7 @@ const NitrogenMapWidget = ({ refVal }) => {
   const nitrogenTaskResults = useSelector(get.nitrogenTaskResults);
   const summaryData = useSelector(get.summaryData);
   const sidedressFertilizationDate = useSelector(get.sidedressFertilizationDate);
+  const coverCropTerminationDate = useSelector(get.coverCropTerminationDate);
   const fertilizers = useSelector(get.fertilizers);
   const fertilizerType = useSelector(get.fertilizerType);
   const granularFertilizer = useSelector(get.granularFertilizer);
@@ -105,6 +106,7 @@ const NitrogenMapWidget = ({ refVal }) => {
         sidedress_fertilization_date: sidedressFertilizationDate,
         fertilizer: fertilizerMeta,
         growth_stage: coverCropGrowthStage,
+        cc_termination_date: coverCropTerminationDate,
       };
 
       axios.post(`${API_BASE_URL}/additional-metadata`, payload, {
