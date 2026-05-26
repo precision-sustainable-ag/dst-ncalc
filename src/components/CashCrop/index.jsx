@@ -40,8 +40,6 @@ const CashCrop = () => {
   const crops = useFetchCropNames();
   const coverCropTerminationDate = useSelector(get.coverCropTerminationDate);
 
-  // const [plantingDate, setPlantingDate] = useState(cashCropPlantingDate);
-
   const matchesMd = useMediaQuery((theme) => theme.breakpoints.down('md'));
 
   // Set default cash crop planting date on mount if not set or invalid
@@ -97,18 +95,10 @@ const CashCrop = () => {
           )}
           <Stack direction="row" alignItems="center">
             <CustomInputText>
-              {isUserSampledMode ? 'Cash Crop Planting Date:' : 'Side Dress Fertilization Date:'}
+              Cash Crop Planting Date:
             </CustomInputText>
             {!cashCropPlantingDate && <Required />}
           </Stack>
-          {/* <PSATextField
-            type="date"
-            value={plantingDate}
-            onChange={(e) => {
-              setPlantingDate(e.target.value);
-              dispatch(set.cashCropPlantingDate(e.target.value));
-            }}
-          /> */}
           <LocalizationProvider dateAdapter={AdapterDayjs}>
             <DatePicker
               minDate={dayjs(coverCropTerminationDate).add(7, 'day')}

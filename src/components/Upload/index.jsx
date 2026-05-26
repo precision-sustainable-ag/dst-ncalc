@@ -10,7 +10,6 @@ import {
 import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
 import { PSATextField } from 'shared-react-components/src';
-import dayjs from 'dayjs';
 import centroid from '@turf/centroid';
 import { get, set } from '../../store/Store';
 import NavigateBar from '../../shared/Navigate';
@@ -41,15 +40,15 @@ const Upload = () => {
       throw new Error(`Point at index ${index} is not a valid object`);
     }
 
-    const requiredFields = ['camera_id', 'lon', 'lat', 'species'];
+    const requiredFields = ['lon', 'lat', 'species'];
     const missingField = requiredFields.find((field) => !(field in point));
     if (missingField) {
       throw new Error(`Point at index ${index} is missing required field: ${missingField}`);
     }
 
-    if (typeof point.camera_id !== 'number') {
-      throw new Error(`Point at index ${index}: camera_id must be a number`);
-    }
+    // if (typeof point.camera_id !== 'number') {
+    //   throw new Error(`Point at index ${index}: camera_id must be a number`);
+    // }
 
     if (typeof point.lon !== 'number' || typeof point.lat !== 'number') {
       throw new Error(`Point at index ${index}: lon and lat must be numbers`);
@@ -117,9 +116,14 @@ const Upload = () => {
     if (selectedField && selectedField.properties?.coverCrop) {
       dispatch(set.coverCrop(selectedField.properties.coverCrop));
     }
-    if (selectedField && selectedField.properties?.coverCropTerminationDate) {
+    if (selectedField && selectedField.properties?.coverCropPlantingDate) {
       dispatch(set.coverCropPlantingDate(selectedField.properties.coverCropPlantingDate));
+    }
+    if (selectedField && selectedField.properties?.coverCropTerminationDate) {
       dispatch(set.coverCropTerminationDate(selectedField.properties.coverCropTerminationDate));
+    }
+    if (selectedField && selectedField.properties?.cashCropPlantingDate) {
+      dispatch(set.cashCropPlantingDate(selectedField.properties.cashCropPlantingDate));
     }
     if (selectedField && selectedField.geometry) {
       const featuresToSet = { type: 'Feature', geometry: selectedField.geometry };
@@ -153,7 +157,7 @@ const Upload = () => {
         const token = await getAccessTokenSilently();
         const { _id: fieldId } = selectedField;
         if (!fieldId) return;
-        const response = await axios.get(`${API_BASE_URL}/biomass/field/${fieldId}`, {
+        const response = await axios.get(`${API_BASE_URL}/biomass-field-map/${fieldId}`, {
           headers: { Authorization: `Bearer ${token}` },
         });
         setBiomassFiles(response.data?.data);
@@ -215,21 +219,23 @@ const Upload = () => {
             value={selectedBiomassFile}
             onChange={(event, newValue) => {
               dispatch(set.selectedBiomassFile(newValue));
+              dispatch(set.coverCropTerminationDate(newValue.date));
             }}
-            getOptionLabel={(option) => (option?.createdAt
-              ? `${dayjs(option.createdAt).format('MMM D, YYYY')} (${option.points?.length || 0} points)` : '')}
+            getOptionLabel={(option) => (option?.date
+              ? `${option.date} (${option.points?.length || 0} points)` : '')}
             renderOption={(props, option) => (
               <Box component="li" {...props}>
                 <Stack>
                   <Typography variant="subtitle1" sx={{ fontWeight: 'bold' }}>
-                    {dayjs(option.createdAt).format('MMM D, YYYY')}
+                    {/* {dayjs(option.createdAt).format('MMM D, YYYY')} */}
+                    {option.date}
                   </Typography>
                   <Stack direction="row" spacing={2}>
-                    <Typography variant="body2" color="text.secondary">
+                    {/* <Typography variant="body2" color="text.secondary">
                       Time:
                       {' '}
                       <b>{dayjs(option.createdAt).format('h:mm A')}</b>
-                    </Typography>
+                    </Typography> */}
 
                     <Typography variant="body2" color="text.secondary">
                       Points:

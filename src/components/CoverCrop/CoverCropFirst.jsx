@@ -1,3 +1,4 @@
+/* eslint-disable no-underscore-dangle */
 /* eslint-disable consistent-return */
 /* eslint-disable operator-linebreak */
 /* eslint-disable indent */
@@ -101,6 +102,7 @@ const CoverCropFirst = () => {
     }
   }, [isSatelliteMode, isPM3DMode, biomass, coverCrop, coverCropGrowthStage, coverCropTerminationDate, lwc, biomassTotalValue]);
 
+  // eslint-disable-next-line no-unused-vars
   const syncFieldData = async () => {
   if (!isPM3DMode || !selectedField) return;
 
@@ -130,7 +132,7 @@ const CoverCropFirst = () => {
         coverCropPlantingDate: selectedField.properties.coverCropPlantingDate,
       };
 
-      await axios.put(`${API_BASE_URL}/fields`, payload, {
+      await axios.put(`${API_BASE_URL}/fields/${selectedField._id}`, payload, {
         headers: { Authorization: `Bearer ${token}` },
       });
 
@@ -178,7 +180,7 @@ const CoverCropFirst = () => {
             {/* <CustomInputText>Cover Crop Species:</CustomInputText> */}
             {(!coverCrop || coverCrop.length === 0) && <Required />}
           </Stack>
-          <CoverCropsInput isSatelliteMode={isSatelliteMode} />
+          <CoverCropsInput isSatelliteMode={isSatelliteMode} isPM3DMode={isPM3DMode} />
           {(isSatelliteMode || isPM3DMode) && coverCrop && (
             <Box>
               <Stack direction="row" alignItems="center">
@@ -218,6 +220,7 @@ const CoverCropFirst = () => {
               <PSATextField
                 type="date"
                 value={terminationDate}
+                disabled={isPM3DMode}
                 onChange={(e) => {
                   setTerminationDate(e.target.value);
                   dispatch(set.coverCropTerminationDate(e.target.value));
@@ -317,15 +320,13 @@ const CoverCropFirst = () => {
               dispatch(set.activeStep(5));
               navigate('/fertilizer');
             } else if (isPM3DMode) {
-              const isSuccess = await syncFieldData();
-              if (isSuccess) {
-                if (isRCPPReportOnly) {
-                  dispatch(set.activeStep(6));
-                  navigate('/output');
-                } else {
-                  dispatch(set.activeStep(5));
-                  navigate('/fertilizer');
-                }
+              // const isSuccess = await syncFieldData();
+              if (isRCPPReportOnly) {
+                dispatch(set.activeStep(6));
+                navigate('/output');
+              } else {
+                dispatch(set.activeStep(5));
+                navigate('/fertilizer');
               }
             } else navigate('/covercrop2');
           }}

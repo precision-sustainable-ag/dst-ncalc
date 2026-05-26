@@ -1,3 +1,4 @@
+/* eslint-disable no-nested-ternary */
 /* eslint-disable operator-linebreak */
 import React, { useEffect, useRef, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
@@ -38,40 +39,40 @@ const MainContentBox = styled(Box)({
   flexDirection: 'column',
 });
 
-const FERTILIZER_DATA = [
-  {
-    type: 'granular',
-    name: 'Urea',
-    n_percent: 46,
-  },
-  {
-    type: 'liquid',
-    name: 'UAN 28%',
-    n_percent: 28,
-    density: 10.67,
-  },
-  {
-    type: 'liquid',
-    name: 'UAN 30%',
-    n_percent: 30,
-    density: 10.86,
-  },
-  {
-    type: 'liquid',
-    name: 'UAN 32%',
-    n_percent: 32,
-    density: 11.08,
-  },
-];
+// const FERTILIZER_DATA = [
+//   {
+//     type: 'granular',
+//     name: 'Urea',
+//     n_percent: 46,
+//   },
+//   {
+//     type: 'liquid',
+//     name: 'UAN 28%',
+//     n_percent: 28,
+//     density: 10.67,
+//   },
+//   {
+//     type: 'liquid',
+//     name: 'UAN 30%',
+//     n_percent: 30,
+//     density: 10.86,
+//   },
+//   {
+//     type: 'liquid',
+//     name: 'UAN 32%',
+//     n_percent: 32,
+//     density: 11.08,
+//   },
+// ];
 
 const CONVERSION_FACTOR = 1.12085; // lb n/acre -> kg n/ha
 
 const API_BASE_URL = ncalcApiUrl;
 
 const NitrogenFertilizer = () => {
-  const isDevelopOrLocal = window.location.hostname === 'localhost'
-    || window.location.hostname === '127.0.0.1'
-    || window.location.href.includes('develop');
+  // const isDevelopOrLocal = window.location.hostname === 'localhost'
+  //   || window.location.hostname === '127.0.0.1'
+  //   || window.location.href.includes('develop');
   const {
     isAuthenticated, getAccessTokenSilently,
   } = useAuth0();
@@ -82,6 +83,8 @@ const NitrogenFertilizer = () => {
   const targetN = useSelector(get.targetN);
   const cashCropPlantingDate = useSelector(get.cashCropPlantingDate);
   const coverCropTerminationDate = useSelector(get.coverCropTerminationDate);
+  const sidedressFertilizationDate = useSelector(get.sidedressFertilizationDate);
+  const [showSidedressDateWarning, setShowSidedressDateWarning] = useState(false);
 
   const [isFetching, setIsFetching] = useState(false);
   const fertilizers = useSelector(get.fertilizers);
@@ -92,6 +95,7 @@ const NitrogenFertilizer = () => {
   const liquidFertilizer = useSelector(get.liquidFertilizer);
   const otherLiquidFertilizer = useSelector(get.otherLiquidFertilizer);
 
+  const inputMode = useSelector(get.inputMode);
   const hasFixedNRate = useSelector(get.hasFixedNRate);
 
   const [fileName, setFileName] = useState('');
@@ -104,11 +108,11 @@ const NitrogenFertilizer = () => {
   const gridSize = useSelector(get.gridSize);
 
   const granularOptions = !isFetching
-    ? [...fertilizers.filter((f) => f.type === 'granular').map((f) => f.name), ...(isDevelopOrLocal ? ['Other'] : [])]
+    ? [...fertilizers.filter((f) => f.type === 'granular').map((f) => f.name), 'Other']
     : [];
 
   const liquidOptions = !isFetching
-    ? [...fertilizers.filter((f) => f.type === 'liquid').map((f) => f.name), ...(isDevelopOrLocal ? ['Other'] : [])]
+    ? [...fertilizers.filter((f) => f.type === 'liquid').map((f) => f.name), 'Other']
     : [];
 
   const granularExists = fertilizerType === 'granular' &&
@@ -122,7 +126,7 @@ const NitrogenFertilizer = () => {
   const matchesMd = useMediaQuery((theme) => theme.breakpoints.down('md'));
 
   const isNextDisabled = (() => {
-    if (!cashCropPlantingDate) return true;
+    if (!isSatelliteMode && !sidedressFertilizationDate) return true;
     if (granularExists || liquidExists) return true;
 
     // Fertilizer specific requirements
@@ -145,12 +149,19 @@ const NitrogenFertilizer = () => {
     return false;
   })();
 
-  // Set default cash crop planting date on mount if not set or invalid
+  // Set default side dress planting date on mount if not set or invalid
   useEffect(() => {
-    if (!cashCropPlantingDate || dayjs(cashCropPlantingDate).isBefore(dayjs(coverCropTerminationDate))) {
-      dispatch(set.cashCropPlantingDate(dayjs(coverCropTerminationDate).add(7, 'day').format('YYYY-MM-DD')));
+    if (isSatelliteMode) return;
+    if (!sidedressFertilizationDate) {
+      dispatch(set.sidedressFertilizationDate(dayjs().format('YYYY-MM-DD')));
     }
   });
+
+  // Show warning if sidedress date is before the cash crop planting date
+  useEffect(() => {
+    if (dayjs(sidedressFertilizationDate).isBefore(dayjs(cashCropPlantingDate))) setShowSidedressDateWarning(true);
+    else setShowSidedressDateWarning(false);
+  }, [sidedressFertilizationDate, cashCropPlantingDate]);
 
   useEffect(() => {
     const fetchFertilizers = async () => {
@@ -165,9 +176,8 @@ const NitrogenFertilizer = () => {
         setIsFetching(false);
       }
     };
-    if (isDevelopOrLocal) fetchFertilizers();
-    else dispatch(set.fertilizers(FERTILIZER_DATA));
-  }, [isAuthenticated, getAccessTokenSilently, dispatch, isDevelopOrLocal]);
+    fetchFertilizers();
+  }, [isAuthenticated, getAccessTokenSilently, dispatch]);
 
   useEffect(() => {
     let newMultiplier = 1;
@@ -218,6 +228,10 @@ const NitrogenFertilizer = () => {
       dispatch(set.otherGranularFertilizer.NPercent(null));
     }
   }, [dispatch, fertilizerType]);
+
+  useEffect(() => {
+    dispatch(set.targetN(0));
+  }, [fertilizerType, inputMode, dispatch]);
 
   const handleFileSelect = (event) => {
     const file = event.target.files[0];
@@ -286,12 +300,7 @@ const NitrogenFertilizer = () => {
         };
 
       axios.post(`${API_BASE_URL}/fertilizers`, payload);
-    } catch (err) { /* empty */ } finally {
-      dispatch(set.otherGranularFertilizer({ fertilizerName: null, NPercent: null }));
-      dispatch(set.otherLiquidFertilizer({ fertilizerName: null, NPercent: null, density: null }));
-      dispatch(set.granularFertilizer(null));
-      dispatch(set.liquidFertilizer(null));
-    }
+    } catch (err) { /* empty */ }
   };
 
   return (
@@ -484,6 +493,17 @@ const NitrogenFertilizer = () => {
           <Box sx={{ borderBottom: '1px solid #eee', my: 3 }} />
 
           <Box sx={{ minHeight: '140px' }}>
+            <Box sx={{ mb: 2 }}>
+              <PSARadioButton
+                options={[
+                  { label: 'Enter lbs N / acre', value: 'nitrogen' },
+                  { label: `Enter ${fertilizerType === 'granular' ? 'lbs/acre' : 'gals/acre'} of fertilizer`, value: 'fertilizer' },
+                ]}
+                selectedValue={inputMode}
+                onChange={(value) => dispatch(set.inputMode(value))}
+                row
+              />
+            </Box>
             <PSARadioButton
               options={[
                 { label: 'Fixed Rate', value: 'fixed' },
@@ -499,17 +519,26 @@ const NitrogenFertilizer = () => {
               <Box mt={1}>
                 <Stack direction="row" alignItems="center">
                   <CustomInputText>
-                    What is your Target Nitrogen Fertilizer Rate?
-                    {' '}
-                    {fertilizerType === 'granular' ? '(lb/ac)' : '(gal/ac)'}
-                    :
+                    {inputMode === 'nitrogen'
+                      ? 'What is your Target N Rate? (lb N/ac):'
+                      : `What is your Target Nitrogen Fertilizer Rate? ${fertilizerType === 'granular' ? '(lb/ac)' : '(gal/ac)'}:`}
                   </CustomInputText>
                   <Help ariaLabel="Specify the target N rate for your region.">Specify the target N rate for your region.</Help>
                   {(!targetN || targetN <= 0) && <Required />}
                 </Stack>
               </Box>
 
-              <Myslider id="targetN" min={0} max={300} />
+              <Myslider
+                id="targetN"
+                min={0}
+                max={
+                  inputMode === 'nitrogen'
+                    ? 250
+                    : fertilizerType === 'liquid'
+                      ? 85
+                      : 500
+                }
+              />
             </>
             )}
 
@@ -538,23 +567,32 @@ const NitrogenFertilizer = () => {
 
           <Box sx={{ borderBottom: '1px solid #eee', mt: 4, mb: 2 }} />
 
-          <Box mt={0} sx={{ mt: 'auto' }}>
-            <CustomInputText>Side Dress Fertilization Date:</CustomInputText>
-            {!cashCropPlantingDate && <Required />}
-            <LocalizationProvider dateAdapter={AdapterDayjs}>
-              <DatePicker
-                minDate={dayjs(coverCropTerminationDate).add(7, 'day')}
-                value={dayjs(cashCropPlantingDate)}
-                onChange={(newValue) => {
-                  dispatch(set.cashCropPlantingDate(newValue.format('YYYY-MM-DD')));
-                  return null;
-                }}
-                shouldDisableDate={(date) => date.isBefore(dayjs(coverCropTerminationDate), 'day')}
-              />
-            </LocalizationProvider>
-          </Box>
-
-          <Box sx={{ borderBottom: '1px solid #eee', mt: 4, mb: 2 }} />
+          {!isSatelliteMode &&
+          (
+            <Box>
+              <Box mt={0} sx={{ mt: 'auto' }}>
+                <CustomInputText>Side Dress Fertilization Date:</CustomInputText>
+                {!sidedressFertilizationDate && <Required />}
+                <LocalizationProvider dateAdapter={AdapterDayjs}>
+                  <DatePicker
+                    // minDate={dayjs(coverCropTerminationDate).add(7, 'day')}
+                    value={dayjs(sidedressFertilizationDate)}
+                    onChange={(newValue) => {
+                      dispatch(set.sidedressFertilizationDate(newValue.format('YYYY-MM-DD')));
+                      return null;
+                    }}
+                    shouldDisableDate={(date) => date.isBefore(dayjs(coverCropTerminationDate), 'day')}
+                  />
+                </LocalizationProvider>
+                {showSidedressDateWarning && (
+                <Alert severity="warning" sx={{ mt: 1 }}>
+                  The selected sidedress fertilization date is before the cash crop planting date.
+                </Alert>
+                )}
+              </Box>
+              <Box sx={{ borderBottom: '1px solid #eee', mt: 4, mb: 2 }} />
+            </Box>
+          )}
 
           {isSatelliteMode && (
           <Box>

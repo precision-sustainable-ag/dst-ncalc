@@ -173,8 +173,8 @@ const NitrogenMapComp = forwardRef(({ layer = 'prescription', setLayer }, ref) =
 
   const unit = useMemo(() => {
     if (layer === 'biomass') return 'lb/ac';
-    if (layer === 'prescription') return fertilizerType === 'liquid' ? 'gal/ac' : 'lb/ac';
-    if (layer === 'credit') return 'lb/ac';
+    if (layer === 'prescription') return fertilizerType === 'liquid' ? 'lb of N/ac' : 'lb of N/ac';
+    if (layer === 'credit') return 'lb of N/ac';
     return '';
   }, [layer, fertilizerType]);
 
