@@ -1,3 +1,4 @@
+/* eslint-disable no-underscore-dangle */
 /* eslint-disable consistent-return */
 /* eslint-disable operator-linebreak */
 /* eslint-disable indent */
@@ -130,7 +131,7 @@ const CoverCropFirst = () => {
         coverCropPlantingDate: selectedField.properties.coverCropPlantingDate,
       };
 
-      await axios.put(`${API_BASE_URL}/fields`, payload, {
+      await axios.put(`${API_BASE_URL}/fields/${selectedField._id}`, payload, {
         headers: { Authorization: `Bearer ${token}` },
       });
 
