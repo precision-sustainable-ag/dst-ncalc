@@ -5,7 +5,7 @@ import Autocomplete from '@mui/material/Autocomplete';
 import { PSATextField } from 'shared-react-components/src';
 import { get, set } from '../../store/Store';
 
-const CoverCropsInput = ({ isSatelliteMode }) => {
+const CoverCropsInput = ({ isSatelliteMode, isPM3DMode }) => {
   const dispatch = useDispatch();
   const species = useSelector(get.species);
   const coverCrop = useSelector(get.coverCrop);
@@ -22,7 +22,7 @@ const CoverCropsInput = ({ isSatelliteMode }) => {
 
     // Clean up growth stages for removed species
     const filteredStages = Object.fromEntries(
-      Object.entries(coverCropGrowthStage || {}).filter(([s]) => speciesList.includes(s))
+      Object.entries(coverCropGrowthStage || {}).filter(([s]) => speciesList.includes(s)),
     );
     dispatch(set.coverCropGrowthStage(filteredStages));
   };
@@ -40,6 +40,7 @@ const CoverCropsInput = ({ isSatelliteMode }) => {
       renderInput={(params) => <PSATextField {...params} label={isSatelliteMode ? 'Select a cover crop' : 'Select one or more cover crops'} />}
       value={value}
       onChange={(e, val) => handleCoverCropChange(val)}
+      readOnly={isPM3DMode}
     />
   );
 }; // CoverCropsInput
