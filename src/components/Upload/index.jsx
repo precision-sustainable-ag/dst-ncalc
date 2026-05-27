@@ -219,6 +219,7 @@ const Upload = () => {
             value={selectedBiomassFile}
             onChange={(event, newValue) => {
               dispatch(set.selectedBiomassFile(newValue));
+              dispatch(set.coverCropTerminationDate(newValue.date));
             }}
             getOptionLabel={(option) => (option?.date
               ? `${option.date} (${option.points?.length || 0} points)` : '')}

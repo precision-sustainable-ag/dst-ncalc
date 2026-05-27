@@ -23,40 +23,40 @@ import NavButton from '../../shared/Navigate/NavButton';
 import { ncalcApiUrl } from '../../utils/keys';
 import { handleError } from '../../utils/apiError';
 
-const FERTILIZER_DATA = [
-  {
-    type: 'granular',
-    name: 'Urea',
-    n_percent: 46,
-  },
-  {
-    type: 'liquid',
-    name: 'UAN 28%',
-    n_percent: 28,
-    density: 10.67,
-  },
-  {
-    type: 'liquid',
-    name: 'UAN 30%',
-    n_percent: 30,
-    density: 10.86,
-  },
-  {
-    type: 'liquid',
-    name: 'UAN 32%',
-    n_percent: 32,
-    density: 11.08,
-  },
-];
+// const FERTILIZER_DATA = [
+//   {
+//     type: 'granular',
+//     name: 'Urea',
+//     n_percent: 46,
+//   },
+//   {
+//     type: 'liquid',
+//     name: 'UAN 28%',
+//     n_percent: 28,
+//     density: 10.67,
+//   },
+//   {
+//     type: 'liquid',
+//     name: 'UAN 30%',
+//     n_percent: 30,
+//     density: 10.86,
+//   },
+//   {
+//     type: 'liquid',
+//     name: 'UAN 32%',
+//     n_percent: 32,
+//     density: 11.08,
+//   },
+// ];
 
 const CONVERSION_FACTOR = 1.12085; // lb n/acre -> kg n/ha
 
 const API_BASE_URL = ncalcApiUrl;
 
 const NitrogenFertilizer = () => {
-  const isDevelopOrLocal = window.location.hostname === 'localhost'
-    || window.location.hostname === '127.0.0.1'
-    || window.location.href.includes('develop');
+  // const isDevelopOrLocal = window.location.hostname === 'localhost'
+  //   || window.location.hostname === '127.0.0.1'
+  //   || window.location.href.includes('develop');
   const {
     isAuthenticated, getAccessTokenSilently,
   } = useAuth0();
@@ -92,11 +92,11 @@ const NitrogenFertilizer = () => {
   const gridSize = useSelector(get.gridSize);
 
   const granularOptions = !isFetching
-    ? [...fertilizers.filter((f) => f.type === 'granular').map((f) => f.name), ...(isDevelopOrLocal ? ['Other'] : [])]
+    ? [...fertilizers.filter((f) => f.type === 'granular').map((f) => f.name), 'Other']
     : [];
 
   const liquidOptions = !isFetching
-    ? [...fertilizers.filter((f) => f.type === 'liquid').map((f) => f.name), ...(isDevelopOrLocal ? ['Other'] : [])]
+    ? [...fertilizers.filter((f) => f.type === 'liquid').map((f) => f.name), 'Other']
     : [];
 
   const granularExists = fertilizerType === 'granular' &&
@@ -160,9 +160,8 @@ const NitrogenFertilizer = () => {
         setIsFetching(false);
       }
     };
-    if (isDevelopOrLocal) fetchFertilizers();
-    else dispatch(set.fertilizers(FERTILIZER_DATA));
-  }, [isAuthenticated, getAccessTokenSilently, dispatch, isDevelopOrLocal]);
+    fetchFertilizers();
+  }, [isAuthenticated, getAccessTokenSilently, dispatch]);
 
   useEffect(() => {
     let newMultiplier = 1;

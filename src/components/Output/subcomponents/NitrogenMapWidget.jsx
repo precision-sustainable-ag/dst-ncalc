@@ -52,12 +52,14 @@ const NitrogenMapWidget = ({ refVal }) => {
   const nitrogenTaskResults = useSelector(get.nitrogenTaskResults);
   const summaryData = useSelector(get.summaryData);
   const sidedressFertilizationDate = useSelector(get.sidedressFertilizationDate);
+  const coverCropTerminationDate = useSelector(get.coverCropTerminationDate);
   const fertilizers = useSelector(get.fertilizers);
   const fertilizerType = useSelector(get.fertilizerType);
   const granularFertilizer = useSelector(get.granularFertilizer);
   const otherGranularFertilizer = useSelector(get.otherGranularFertilizer);
   const liquidFertilizer = useSelector(get.liquidFertilizer);
   const otherLiquidFertilizer = useSelector(get.otherLiquidFertilizer);
+  const coverCropGrowthStage = useSelector(get.coverCropGrowthStage);
 
   const [layer, setLayer] = useState(!isRCPPReportOnly ? 'prescription' : 'credit');
 
@@ -103,16 +105,18 @@ const NitrogenMapWidget = ({ refVal }) => {
         field_id: selectedField._id,
         sidedress_fertilization_date: sidedressFertilizationDate,
         fertilizer: fertilizerMeta,
+        growth_stage: coverCropGrowthStage,
+        cc_termination_date: coverCropTerminationDate,
       };
 
       axios.post(`${API_BASE_URL}/additional-metadata`, payload, {
         headers: { Authorization: `Bearer ${token}` },
       });
     } catch (err) { /* empty */ } finally {
-      dispatch(set.otherGranularFertilizer({ fertilizerName: null, NPercent: null }));
-      dispatch(set.otherLiquidFertilizer({ fertilizerName: null, NPercent: null, density: null }));
-      dispatch(set.granularFertilizer(null));
-      dispatch(set.liquidFertilizer(null));
+      // dispatch(set.otherGranularFertilizer({ fertilizerName: null, NPercent: null }));
+      // dispatch(set.otherLiquidFertilizer({ fertilizerName: null, NPercent: null, density: null }));
+      // dispatch(set.granularFertilizer(null));
+      // dispatch(set.liquidFertilizer(null));
     }
   };
 
