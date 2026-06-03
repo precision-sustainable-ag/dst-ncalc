@@ -1,23 +1,15 @@
 /* eslint-disable no-underscore-dangle */
 /* eslint-disable consistent-return */
-/* eslint-disable operator-linebreak */
-/* eslint-disable indent */
 import React, { useEffect, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { useNavigate } from 'react-router-dom';
 import { PSARadioButton, PSATextField } from 'shared-react-components/src';
 import Typography from '@mui/material/Typography';
-import Box from '@mui/material/Box';
 import Snackbar from '@mui/material/Snackbar';
-import Paper from '@mui/material/Paper';
 import Stack from '@mui/material/Stack';
-// import Button from '@mui/material/Button';
-// import Modal from '@mui/material/Modal';
 import Alert from '@mui/material/Alert';
 import Slide from '@mui/material/Slide';
-import {
- Grid, LinearProgress, styled, useMediaQuery,
-} from '@mui/material';
+import { Grid, LinearProgress, useMediaQuery } from '@mui/material';
 import { useAuth0 } from '@auth0/auth0-react';
 import axios from 'axios';
 import { get, set } from '../../store/Store';
@@ -29,17 +21,8 @@ import BiomassData from '../../shared/BiomassData';
 import Required from '../../shared/Required';
 import NavigateBar from '../../shared/Navigate';
 import { ncalcApiUrl } from '../../utils/keys';
-// import { useFetchPlantFactors } from '../../hooks/useFetchApi';
 
 const UGA_LINK = 'https://extension.uga.edu/publications/detail.html?number=C1077';
-
-const CustomInputText = styled(Typography)({
-  fontSize: '1.2rem',
-  fontWeight: 400,
-  color: '#4f6b14',
-  marginTop: '1.3rem',
-  marginBottom: '0.2rem',
-});
 
 const API_BASE_URL = ncalcApiUrl;
 
@@ -93,8 +76,8 @@ const CoverCropFirst = () => {
   /// Desc: Set the disableNextButton state
   useEffect(() => {
     if (isSatelliteMode || isPM3DMode) {
-      const allStagesSelected = Array.isArray(coverCrop) && coverCrop.length > 0 &&
-        coverCrop.every((species) => coverCropGrowthStage?.[species] && coverCropGrowthStage[species] !== '');
+      const allStagesSelected = Array.isArray(coverCrop) && coverCrop.length > 0
+        && coverCrop.every((species) => coverCropGrowthStage?.[species] && coverCropGrowthStage[species] !== '');
 
       setDisableNextButton((isSatelliteMode && !biomassTotalValue) || !coverCrop || coverCrop.length === 0 || !allStagesSelected);
     } else {
@@ -104,57 +87,57 @@ const CoverCropFirst = () => {
 
   // eslint-disable-next-line no-unused-vars
   const syncFieldData = async () => {
-  if (!isPM3DMode || !selectedField) return;
+    if (!isPM3DMode || !selectedField) return;
 
-  const originalCoverCrops = selectedField.properties?.coverCrop || [];
-  const originalTerminationDate = selectedField.properties?.coverCropTerminationDate;
+    const originalCoverCrops = selectedField.properties?.coverCrop || [];
+    const originalTerminationDate = selectedField.properties?.coverCropTerminationDate;
 
-  const cropsChanged = JSON.stringify(originalCoverCrops) !== JSON.stringify(coverCrop);
-  const dateChanged = originalTerminationDate !== coverCropTerminationDate;
+    const cropsChanged = JSON.stringify(originalCoverCrops) !== JSON.stringify(coverCrop);
+    const dateChanged = originalTerminationDate !== coverCropTerminationDate;
 
-  if (cropsChanged || dateChanged) {
-    setIsLoading(true);
-    try {
-      const token = await getAccessTokenSilently();
+    if (cropsChanged || dateChanged) {
+      setIsLoading(true);
+      try {
+        const token = await getAccessTokenSilently();
 
-      const payload = {
-        programName: selectedField.properties.programName,
-        groupName: selectedField.properties.groupName,
-        growerName: selectedField.properties.growerName,
-        farmName: selectedField.properties.farmName,
-        fieldName: selectedField.properties.fieldName,
-        geometry: selectedField.geometry,
-        coverCrop,
-        coverCropTerminationDate,
-        cashCrop: selectedField.properties.cashCrop,
-        cashCropPlantingDate: selectedField.properties.cashCropPlantingDate,
-        cashCropHarvestingDate: selectedField.properties.cashCropHarvestingDate,
-        coverCropPlantingDate: selectedField.properties.coverCropPlantingDate,
-      };
-
-      await axios.put(`${API_BASE_URL}/fields/${selectedField._id}`, payload, {
-        headers: { Authorization: `Bearer ${token}` },
-      });
-
-      const updatedField = {
-        ...selectedField,
-        properties: {
-          ...selectedField.properties,
+        const payload = {
+          programName: selectedField.properties.programName,
+          groupName: selectedField.properties.groupName,
+          growerName: selectedField.properties.growerName,
+          farmName: selectedField.properties.farmName,
+          fieldName: selectedField.properties.fieldName,
+          geometry: selectedField.geometry,
           coverCrop,
           coverCropTerminationDate,
-        },
-      };
-      dispatch(set.selectedField(updatedField));
-    } catch (err) {
-      dispatch(set.user.showAlert(true));
-      dispatch(set.user.alertMessage('Failed to update field data. Try again.'));
-      return false;
-    } finally {
-      setIsLoading(false);
+          cashCrop: selectedField.properties.cashCrop,
+          cashCropPlantingDate: selectedField.properties.cashCropPlantingDate,
+          cashCropHarvestingDate: selectedField.properties.cashCropHarvestingDate,
+          coverCropPlantingDate: selectedField.properties.coverCropPlantingDate,
+        };
+
+        await axios.put(`${API_BASE_URL}/fields/${selectedField._id}`, payload, {
+          headers: { Authorization: `Bearer ${token}` },
+        });
+
+        const updatedField = {
+          ...selectedField,
+          properties: {
+            ...selectedField.properties,
+            coverCrop,
+            coverCropTerminationDate,
+          },
+        };
+        dispatch(set.selectedField(updatedField));
+      } catch (err) {
+        dispatch(set.user.showAlert(true));
+        dispatch(set.user.alertMessage('Failed to update field data. Try again.'));
+        return false;
+      } finally {
+        setIsLoading(false);
+      }
     }
-  }
-  return true;
-};
+    return true;
+  };
 
   return (
     <Grid container justifyContent="center">
@@ -174,26 +157,32 @@ const CoverCropFirst = () => {
           alignItems: 'center',
         }}
       >
-        <Typography variant="h4">Tell us about your Cover Crop</Typography>
-        <Stack direction="column" spacing={2} m={2} width="100%" maxWidth="600px">
-          <Stack direction="row" alignItems="center">
-            {/* <CustomInputText>Cover Crop Species:</CustomInputText> */}
-            {(!coverCrop || coverCrop.length === 0) && <Required />}
+        <Stack direction="column" spacing="2rem" width="100%" maxWidth="600px">
+
+          <Typography variant="h4" align="center" color="primary">Tell us about your Cover Crop</Typography>
+
+          <Stack gap={1}>
+            <Stack direction="row" alignItems="center">
+              <Typography variant="inputLabel">Cover Crop Species</Typography>
+              {(!coverCrop || coverCrop.length === 0) && <Required />}
+            </Stack>
+            <CoverCropsInput isSatelliteMode={isSatelliteMode} isPM3DMode={isPM3DMode} />
           </Stack>
-          <CoverCropsInput isSatelliteMode={isSatelliteMode} isPM3DMode={isPM3DMode} />
+
           {(isSatelliteMode || isPM3DMode) && coverCrop && (
-            <Box>
+            <Stack gap={1}>
               <Stack direction="row" alignItems="center">
-                <CustomInputText>Cover Crop Growth Stage:</CustomInputText>
+                <Typography variant="inputLabel">Cover Crop Growth Stage</Typography>
                 {(!coverCropGrowthStage || Object.keys(coverCropGrowthStage).length !== coverCrop.length) && <Required />}
               </Stack>
               <GrowthStageInput isSatelliteMode={isSatelliteMode} />
-            </Box>
+            </Stack>
           )}
+
           {isSatelliteMode && (
-            <Paper mt={2}>
-              <Stack m={2} direction="row" alignItems="center">
-                <Typography>Biomass Unit: &nbsp;</Typography>
+            <>
+              <Stack direction="row" alignItems="center" gap={1}>
+                <Typography variant="inputLabel">Biomass Unit</Typography>
                 <PSARadioButton
                   options={[
                     { label: 'lb/ac', value: 'lb/ac' },
@@ -202,19 +191,19 @@ const CoverCropFirst = () => {
                   selectedValue={unit}
                   onChange={(value) => dispatch(set.unit(value))}
                   row
-                  sx={{ marginLeft: '1em', display: 'inline-block' }}
                   aria-label="position"
                   name="position"
                 />
                 <BiomassData minified={false} />
               </Stack>
               {biomassFetchIsLoading && <LinearProgress />}
-            </Paper>
+            </>
           )}
+
           {!isSatelliteMode && (
-            <>
+            <Stack gap={1}>
               <Stack direction="row" alignItems="center">
-                <CustomInputText>Cover Crop Termination Date:</CustomInputText>
+                <Typography variant="inputLabel">Cover Crop Termination Date</Typography>
                 {!coverCropTerminationDate && <Required />}
               </Stack>
               <PSATextField
@@ -224,22 +213,17 @@ const CoverCropFirst = () => {
                 onChange={(e) => {
                   setTerminationDate(e.target.value);
                   dispatch(set.coverCropTerminationDate(e.target.value));
-              }}
+                }}
+                sx={{ mt: 0, width: '100%', '& .MuiInputBase-root': { padding: 1 } }}
               />
-            </>
-            )}
+            </Stack>
+          )}
+
           {!isPM3DMode && !isSatelliteMode && (
             <>
-              <Box
-                mt={1}
-                sx={{
-                  display: 'flex',
-                  flexDirection: 'row',
-                  alignItems: 'center',
-                }}
-              >
+              <Stack gap={1}>
                 <Stack direction="row" alignItems="center">
-                  <CustomInputText>Dry Biomass </CustomInputText>
+                  <Typography variant="inputLabel">Dry Biomass</Typography>
                   <Help ariaLabel="The amount of cover crop biomass on a dry weight basis.">
                     <p>The amount of cover crop biomass on a dry weight basis.</p>
                     <p>
@@ -252,7 +236,7 @@ const CoverCropFirst = () => {
                   </Help>
                   {!biomass && <Required />}
                 </Stack>
-                :
+
                 <PSARadioButton
                   options={[
                     { label: 'lb/ac', value: 'lb/ac' },
@@ -261,43 +245,35 @@ const CoverCropFirst = () => {
                   selectedValue={unit}
                   onChange={(value) => dispatch(set.unit(value))}
                   row
-                  sx={{ marginLeft: '1em', display: 'inline-block' }}
                   aria-label="position"
                   name="position"
                 />
-              </Box>
 
-              <Myslider id="biomass" min={0} max={max} />
+                <Myslider id="biomass" min={0} max={max} />
 
-              {+biomass > +max && (
-                <p className="warning">
-                  This biomass seems too high
-                  {warningText}
-                  .
-                  <br />
-                  Please make sure the biomass entered is on a dry matter basis.
-                </p>
-              )}
-              {+freshBiomass > +freshMax && (
-                <p className="warning">
-                  This biomass seems too high
-                  {warningText}
-                  .
-                  <br />
-                  Please make sure the biomass entered is on a fresh matter basis.
-                </p>
-              )}
+                {+biomass > +max && (
+                  <p className="warning">
+                    This biomass seems too high
+                    {warningText}
+                    .
+                    <br />
+                    Please make sure the biomass entered is on a dry matter basis.
+                  </p>
+                )}
+                {+freshBiomass > +freshMax && (
+                  <p className="warning">
+                    This biomass seems too high
+                    {warningText}
+                    .
+                    <br />
+                    Please make sure the biomass entered is on a fresh matter basis.
+                  </p>
+                )}
+              </Stack>
 
-              <Box
-                mt={2}
-                sx={{
-                  display: 'flex',
-                  flexDirection: 'row',
-                  alignItems: 'center',
-                }}
-              >
+              <Stack gap={1}>
                 <Stack direction="row" alignItems="center">
-                  <CustomInputText>Cover Crop Water Content at Termination (g water/g dry biomass)</CustomInputText>
+                  <Typography variant="inputLabel">Cover Crop Water Content at Termination (g water/g dry biomass)</Typography>
                   <Help ariaLabel="Use the following calculation to adjust default values: Cover Crop Water Content
                    = (Total fresh weight - Total dry weight)/(Total dry weight)"
                   >
@@ -306,9 +282,8 @@ const CoverCropFirst = () => {
                   </Help>
                   {!lwc && <Required />}
                 </Stack>
-                :
-              </Box>
-              <Myslider id="lwc" min={0} max={10} step={0.1} />
+                <Myslider id="lwc" min={0} max={10} step={0.1} />
+              </Stack>
             </>
           )}
         </Stack>
@@ -340,8 +315,8 @@ const CoverCropFirst = () => {
               dispatch(set.activeStep(1));
               navigate('/upload');
             } else {
-                dispatch(set.activeStep(3));
-                navigate('/soil');
+              dispatch(set.activeStep(3));
+              navigate('/soil');
             }
           }}
         />
@@ -351,13 +326,13 @@ const CoverCropFirst = () => {
           TransitionComponent={Slide}
           autoHideDuration={5000}
           onClose={() => {
-                setBiomassNotExist(false);
-              }}
+            setBiomassNotExist(false);
+          }}
         >
           <Alert
             onClose={() => {
-                  setBiomassNotExist(false);
-                }}
+              setBiomassNotExist(false);
+            }}
             severity="warning"
             variant="filled"
             sx={{ width: '100%' }}

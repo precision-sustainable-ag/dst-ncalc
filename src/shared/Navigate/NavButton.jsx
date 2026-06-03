@@ -17,11 +17,9 @@ const NavButton = ({
             textAlign: 'center',
             borderRadius: '2rem',
             fontSize: { fontSize },
-            backgroundColor: '#60802D',
             boxShadow: '0px 2px 2px rgba(160, 160, 160, 0.3)',
             opacity: 1,
             '&:hover': {
-              backgroundColor: '#60802D',
               textDecoration: 'underline',
               boxShadow: '0px 2px 2px rgba(160, 160, 160, 0.3)',
             },

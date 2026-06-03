@@ -207,7 +207,7 @@ const Upload = () => {
         }}
       >
         <Stack spacing={2} direction="column">
-          <Typography variant="h4" align="center">Select your field</Typography>
+          <Typography variant="h4" align="center" color="primary">Select your field</Typography>
 
           <FieldDropdown />
 

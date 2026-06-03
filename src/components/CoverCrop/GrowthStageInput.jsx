@@ -60,7 +60,6 @@ const GrowthStageInput = () => {
             value={value}
             renderInput={(params) => <PSATextField {...params} label={`Select a cover crop growing stage for ${species}`} />}
             onChange={(el, va) => handleGrowthStageChange(species, va)}
-            sx={{ mt: 2 }}
           />
         );
       })

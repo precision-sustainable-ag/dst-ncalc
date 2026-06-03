@@ -1,8 +1,7 @@
 import React from 'react';
 import { useSelector, useDispatch } from 'react-redux';
-import { Paper, Box, Typography } from '@mui/material';
-import { PSAModal, PSAForm, PSAFigmaButton } from 'shared-react-components/src';
-import CancelPresentationIcon from '@mui/icons-material/CancelPresentation';
+import { Box, Typography } from '@mui/material';
+import { PSAForm } from 'shared-react-components/src';
 import { get, set } from '../../store/Store';
 
 const Feedback = () => {
@@ -28,13 +27,6 @@ const Feedback = () => {
   const lwc = useSelector(get.lwc);
   const biomass = useSelector(get.biomass);
   const Yield = useSelector(get.yield);
-
-  const feedback = useSelector(get.feedback);
-  const name = useSelector(get.name);
-  const email = useSelector(get.email);
-
-  const openFeedbackModal = useSelector(get.openFeedbackModal);
-  const handleCloseModal = () => dispatch(set.openFeedbackModal(false));
 
   const fields = [
     {
@@ -112,78 +104,62 @@ const Feedback = () => {
       .then((response) => response.json())
       .then((body) => {
         if (body.data.status === 'success') {
-          alert(`
-            Thank you for the feedback!
-            We will contact you if we have any updates or questions.
-          `);
+          dispatch(set.actionModal({
+            open: true,
+            type: 'info',
+            title: 'Feedback submitted',
+            message: 'Thank you for the feedback! We will contact you if we have any updates or questions.',
+          }));
         } else {
-          alert('Failed to send Feedback to Github.');
+          dispatch(set.actionModal({
+            open: true,
+            type: 'info',
+            title: 'Feedback submission failed',
+            message: 'Failed to send Feedback to Github.',
+          }));
         }
       })
-      .catch(() => alert('Failed to send Feedback to Github.'));
+      .catch(() => dispatch(set.actionModal({
+        open: true,
+        type: 'info',
+        title: 'Feedback submission failed',
+        message: 'Failed to send Feedback to Github.',
+      })));
   };
 
   return (
-    <PSAModal
-      open={openFeedbackModal}
-      onClose={handleCloseModal}
-      aria-labelledby="modal-modal-title"
-      aria-describedby="modal-modal-description"
-      style={{
-        display: 'flex',
-        alignItems: 'center',
-        justifyContent: 'center',
-      }}
-      modalContent={(
-        <Paper style={{ width: '80vw', maxHeight: '90vh', overflow: 'auto' }}>
-          <Box sx={{ padding: '2rem', fontFamily: 'monospace !important' }}>
-            <Box sx={{ display: 'flex', justifyContent: 'flex-end' }}>
-              <PSAFigmaButton
-                sx={{
-                  color: 'red',
-                  padding: '12px 24px',
-                }}
-                variant="color"
-                onClick={handleCloseModal}
-                leftIcon
-                text=""
-                icon={<CancelPresentationIcon />}
-              />
-            </Box>
-            <Typography pb="1rem" sx={{ fontSize: '1.2rem', fontWeight: 700 }}>
-              CC-NCALC Feedback
-            </Typography>
-            <Typography variant="feedback">Please provide any comments or suggestions that will help us improve the tool.</Typography>
-            <Typography variant="feedback" pb="1rem">
-              Include any difficulties you may have encountered while running the program.
-            </Typography>
+    <Box sx={{ padding: '2rem', fontFamily: 'monospace !important' }}>
+      <Typography pb="1rem" sx={{ fontSize: '1.2rem', fontWeight: 700 }}>
+        CC-NCALC Feedback
+      </Typography>
+      <Typography variant="feedback">Please provide any comments or suggestions that will help us improve the tool.</Typography>
+      <Typography variant="feedback" pb="1rem">
+        Include any difficulties you may have encountered while running the program.
+      </Typography>
 
-            <Typography variant="feedback">
-              Note that your inputs will be sent to us along with your feedback, in order to help us troubleshoot. Please delete any personal
-              information that you do not wish to share with us.
-              <span style={{ display: 'none' }}>You can attach a screenshot of your feedback below.</span>
-            </Typography>
-            <PSAForm
-              submitMessage="Thank you for the feedback! We will contact you if we have any updates or questions."
-              repository="dst-feedback"
-              fields={fields}
-              buttons={[
-                {
-                  action: 'submit',
-                  props: {
-                    title: 'Submit',
-                    variant: 'contained',
-                    color: 'primary',
-                    children: 'Submit',
-                  },
-                },
-              ]}
-              handleSubmit={submitFeedback}
-            />
-          </Box>
-        </Paper>
-      )}
-    />
+      <Typography variant="feedback">
+        Note that your inputs will be sent to us along with your feedback, in order to help us troubleshoot. Please delete any personal
+        information that you do not wish to share with us.
+        <span style={{ display: 'none' }}>You can attach a screenshot of your feedback below.</span>
+      </Typography>
+      <PSAForm
+        submitMessage="Thank you for the feedback! We will contact you if we have any updates or questions."
+        repository="dst-feedback"
+        fields={fields}
+        buttons={[
+          {
+            action: 'submit',
+            props: {
+              title: 'Submit',
+              variant: 'contained',
+              color: 'primary',
+              children: 'Submit',
+            },
+          },
+        ]}
+        handleSubmit={submitFeedback}
+      />
+    </Box>
   );
 };
 

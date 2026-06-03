@@ -1,5 +1,4 @@
 /* eslint-disable no-underscore-dangle */
-/* eslint-disable no-alert */
 import React, {
   useCallback, useEffect, useMemo, useState,
 } from 'react';
@@ -390,10 +389,7 @@ const AddField = () => {
   };
 
   const handleDeleteField = async () => {
-    const confirmDelete = window.confirm('Are you sure you want to delete this field? This will deactivate the current seasonal data.');
-
-    if (!confirmDelete) return;
-
+    dispatch(set.actionModal({ open: false }));
     setIsDeleting(true);
 
     try {
@@ -417,6 +413,18 @@ const AddField = () => {
     } finally {
       setIsDeleting(false);
     }
+  };
+
+  const handleConfirmDelete = () => {
+    dispatch(set.actionModal({
+      open: true,
+      type: 'confirm',
+      onConfirm: handleDeleteField,
+      title: 'Delete Field',
+      message: 'Are you sure you want to delete this field? This will deactivate the current seasonal data.',
+      confirmText: 'Delete',
+      cancelText: 'Cancel',
+    }));
   };
 
   const handleFileUpload = (e) => {
@@ -493,11 +501,11 @@ const AddField = () => {
           </Tabs>
         </Box>
 
-        <Stack spacing="1.5rem">
+        <Stack spacing="2rem">
           {(isEdit || isView)
             ? (
               <>
-                <Typography variant="h4" sx={{ fontWeight: 'bold', color: '#60802D' }}>
+                <Typography variant="h4" align="center" color="primary" sx={{ fontWeight: 'bold' }}>
                   {isEdit ? 'Edit Field Details' : 'View Field Details'}
                 </Typography>
 
@@ -555,85 +563,80 @@ const AddField = () => {
             )
             : null}
 
-          <Typography variant="h5" sx={{ fontWeight: 'bold', color: '#60802D' }}>
-            Field Metadata
-          </Typography>
+          {/* FIELD METADATA */}
+          <Stack gap={1}>
+            <Typography variant="h5" sx={{ fontWeight: 'bold' }} color="primary">
+              Field Metadata
+            </Typography>
 
-          <Grid container spacing={2}>
-            <Grid item xs={12} md={6}>
-              <Autocomplete
-                key={group}
-                freeSolo={isEdit}
-                loading={loadingOptions}
-                options={PROGRAM_GROUP_OPTIONS.filter((option) => groupOptions.includes(option.group))}
-                value={programGroupLabel}
-                getOptionLabel={(option) => option?.label || ''}
-                onChange={(e, val) => handleGroupChange(val)}
-                renderInput={(params) => <PSATextField {...params} label="Select a Program name" required />}
-                disabled={inputDisabled}
-              />
-            </Grid>
-            <Grid item xs={12} md={6}>
-              <Autocomplete
-                key={group}
-                freeSolo
-                loading={loadingOptions}
-                options={growerOptions}
-                value={grower}
-                onChange={(e, val) => handleGrowerChange(val)}
-                onInputChange={(e, newInputValue) => handleGrowerChange(newInputValue)}
-                renderInput={(params) => <PSATextField {...params} label="Select or enter a Grower name" required />}
-                disabled={inputDisabled}
-              />
-            </Grid>
-          </Grid>
+            <Stack direction={{ xs: 'column', md: 'row' }} spacing={1}>
+              <Box sx={{ flex: 1 }}>
+                <Autocomplete
+                  key={group}
+                  freeSolo={isEdit}
+                  loading={loadingOptions}
+                  options={PROGRAM_GROUP_OPTIONS.filter((option) => groupOptions.includes(option.group))}
+                  value={programGroupLabel}
+                  getOptionLabel={(option) => option?.label || ''}
+                  onChange={(e, val) => handleGroupChange(val)}
+                  renderInput={(params) => <PSATextField {...params} label="Select a Program name" required />}
+                  disabled={inputDisabled}
+                />
+              </Box>
+              <Box sx={{ flex: 1 }}>
+                <Autocomplete
+                  key={group}
+                  freeSolo
+                  loading={loadingOptions}
+                  options={growerOptions}
+                  value={grower}
+                  onChange={(e, val) => handleGrowerChange(val)}
+                  onInputChange={(e, newInputValue) => handleGrowerChange(newInputValue)}
+                  renderInput={(params) => <PSATextField {...params} label="Select or enter a Grower name" required />}
+                  disabled={inputDisabled}
+                />
+              </Box>
+            </Stack>
 
-          <Grid container spacing={2}>
-            <Grid item xs={12} md={6}>
-              <Autocomplete
-                key={grower}
-                freeSolo
-                loading={loadingOptions}
-                options={farmOptions}
-                value={farm}
-                onChange={(e, val) => handleFarmChange(val)}
-                onInputChange={(e, newInputValue) => handleFarmChange(newInputValue)}
-                renderInput={(params) => <PSATextField {...params} label="Select or enter a Farm name" required />}
-                disabled={inputDisabled}
-              />
-            </Grid>
-            <Grid item xs={12} md={6}>
-              <Autocomplete
-                key={farm}
-                freeSolo
-                loading={loadingOptions}
-                options={fieldOptions}
-                value={field}
-                onChange={(e, val) => setField(val)}
-                onInputChange={(e, newInputValue) => setField(newInputValue)}
-                renderInput={(params) => <PSATextField {...params} label="Select or enter a Field name" required />}
-                disabled={inputDisabled}
-              />
-            </Grid>
-          </Grid>
+            <Stack direction={{ xs: 'column', md: 'row' }} spacing={1}>
+              <Box sx={{ flex: 1 }}>
+                <Autocomplete
+                  key={grower}
+                  freeSolo
+                  loading={loadingOptions}
+                  options={farmOptions}
+                  value={farm}
+                  onChange={(e, val) => handleFarmChange(val)}
+                  onInputChange={(e, newInputValue) => handleFarmChange(newInputValue)}
+                  renderInput={(params) => <PSATextField {...params} label="Select or enter a Farm name" required />}
+                  disabled={inputDisabled}
+                  sx={{ flex: 1 }}
+                />
+              </Box>
+              <Box sx={{ flex: 1 }}>
+                <Autocomplete
+                  key={farm}
+                  freeSolo
+                  loading={loadingOptions}
+                  options={fieldOptions}
+                  value={field}
+                  onChange={(e, val) => setField(val)}
+                  onInputChange={(e, newInputValue) => setField(newInputValue)}
+                  renderInput={(params) => <PSATextField {...params} label="Select or enter a Field name" required />}
+                  disabled={inputDisabled}
+                  sx={{ flex: 1 }}
+                />
+              </Box>
+            </Stack>
+          </Stack>
 
-          <Typography variant="h5" sx={{ fontWeight: 'bold', color: '#60802D', mt: 1 }}>
-            Crop Details
-          </Typography>
+          {/* CROP DETAILS */}
+          <Stack gap={1}>
+            <Typography variant="h5" sx={{ fontWeight: 'bold' }} color="primary">
+              Crop Details
+            </Typography>
 
-          <Grid container spacing={2}>
-            {/* <Grid item xs={12} md={4}>
-              <Autocomplete
-                freeSolo
-                options={SEASONS}
-                value={season}
-                onChange={(e, val) => setSeason(val)}
-                onInputChange={(e, val) => setSeason(val)}
-                renderInput={(params) => <PSATextField {...params} label="Season" />}
-              />
-            </Grid> */}
-
-            <Grid item xs={12} md={6}>
+            <Stack direction={{ xs: 'column', md: 'row' }} spacing={1}>
               <Autocomplete
                 multiple
                 options={COVER_CROP_OPTIONS}
@@ -642,23 +645,23 @@ const AddField = () => {
                 renderInput={(params) => (
                   <PSATextField {...params} label="What cover crop species are planted in this field?" required />
                 )}
-                disabled={inputDisabled}
+                readOnly={inputDisabled}
+                sx={{ flex: 1 }}
               />
-            </Grid>
-
-            <Grid item xs={12} md={6}>
               <Autocomplete
                 options={CASH_CROP_OPTIONS}
                 value={cashCrop}
                 onChange={(e, val) => setCashCrop(val)}
                 renderInput={(params) => <PSATextField {...params} label="What cash crop will be planted next?" required />}
-                disabled={inputDisabled}
+                readOnly={inputDisabled}
+                sx={{ flex: 1 }}
               />
-            </Grid>
-          </Grid>
+            </Stack>
+          </Stack>
 
-          <Grid container spacing={2}>
-            <Grid item xs={12} md={6} xl={3}>
+          {/* CROP DATES */}
+          <Stack direction={{ xs: 'column', xl: 'row' }} columnGap={1} rowGap={2}>
+            <Stack direction={{ xs: 'column', md: 'row' }} columnGap={1} rowGap={2} sx={{ flex: 1 }}>
               <LocalizationProvider dateAdapter={AdapterDayjs}>
                 <DatePicker
                   label="Cover Crop Planting Date"
@@ -671,11 +674,9 @@ const AddField = () => {
                     field: { clearable: true, onClear: () => setCoverCropTerminationDate(null) },
                   }}
                   disabled={inputDisabled}
-                  sx={{ width: '100%' }}
+                  sx={{ flex: 1 }}
                 />
               </LocalizationProvider>
-            </Grid>
-            <Grid item xs={12} md={6} xl={3}>
               <LocalizationProvider dateAdapter={AdapterDayjs}>
                 <DatePicker
                   label="Cover Crop Termination Month"
@@ -690,11 +691,12 @@ const AddField = () => {
                   }}
                   slotProps={{ textField: { required: true } }}
                   disabled={inputDisabled}
-                  sx={{ width: '100%' }}
+                  sx={{ flex: 1 }}
                 />
               </LocalizationProvider>
-            </Grid>
-            <Grid item xs={12} md={6} xl={3}>
+            </Stack>
+
+            <Stack direction={{ xs: 'column', md: 'row' }} columnGap={1} rowGap={2} sx={{ flex: 1 }}>
               <LocalizationProvider dateAdapter={AdapterDayjs}>
                 <DatePicker
                   label="Cash Crop Planting Month"
@@ -709,12 +711,9 @@ const AddField = () => {
                   }}
                   slotProps={{ textField: { required: true } }}
                   disabled={inputDisabled}
-                  sx={{ width: '100%' }}
+                  sx={{ flex: 1 }}
                 />
               </LocalizationProvider>
-            </Grid>
-
-            <Grid item xs={12} md={6} xl={3}>
               <LocalizationProvider dateAdapter={AdapterDayjs}>
                 <DatePicker
                   label="Cash Crop Harvest Month"
@@ -729,126 +728,118 @@ const AddField = () => {
                   }}
                   slotProps={{ textField: { required: true } }}
                   disabled={inputDisabled}
-                  sx={{ width: '100%' }}
+                  sx={{ flex: 1 }}
                 />
               </LocalizationProvider>
-            </Grid>
-          </Grid>
+            </Stack>
+          </Stack>
 
-          <Grid container spacing={2}>
-            <Grid item xs={12} md={6}>
+          <Box sx={{ width: { xs: '100%', md: '50%' } }}>
+            <PSATextField
+              key={comments}
+              label="Additional comments (optional)"
+              value={comments}
+              onChange={(e) => setComments(e.target.value)}
+              fullWidth
+              autoComplete="off"
+              disabled={inputDisabled}
+              sx={{
+                '& .MuiInputBase-root': { padding: 1 },
+              }}
+            />
+          </Box>
+
+          {isSuperAdmin && isEdit && (
+            <Box sx={{ width: { xs: '100%', md: '50%' } }}>
               <PSATextField
-                key={comments}
-                label="Additional comments (optional)"
-                value={comments}
-                onChange={(e) => setComments(e.target.value)}
+                key={email}
+                label="Email"
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
                 fullWidth
                 autoComplete="off"
+                error={!isEmailValid}
                 disabled={inputDisabled}
                 sx={{
                   '& .MuiInputBase-root': { padding: 1 },
                 }}
               />
-            </Grid>
-          </Grid>
+            </Box>
+          )}
 
-          {isSuperAdmin && isEdit && (
-            <Grid container spacing={2}>
-              <Grid item xs={12} md={6}>
-                <PSATextField
-                  key={email}
-                  label="Email"
-                  value={email}
-                  onChange={(e) => setEmail(e.target.value)}
-                  fullWidth
-                  autoComplete="off"
-                  error={!isEmailValid}
-                  disabled={inputDisabled}
+          {/* FIELD LOCATION */}
+          <Stack gap={1}>
+            <Typography variant="h5" align="center" sx={{ fontWeight: 'bold' }} color="primary">
+              Where is your Field located?
+            </Typography>
+            <Typography variant="h6" align="center">
+              Enter your address, zip code, or GPS coordinates into the map search bar. If you
+              know your exact coordinates, you can enter them separated by a comma (ex. 37.7,
+              -80.2). You can also click the
+              {gpsIcon}
+              button to use your device&apos;s current location.
+            </Typography>
+
+            <Typography variant="h6" align="center">
+              You can draw the field boundaries using the polygon tool
+              {polygonIcon}
+              (Click twice or press enter to finish).
+              Alternatively, upload a shape file or GeoJSON of your field boundaries.
+            </Typography>
+
+            {!isEdit && !isView && (
+              <Stack direction="row" justifyContent="flex-end">
+                <input
+                  id="upload-input"
+                  type="file"
+                  hidden
+                  accept=".geojson,.shp,.zip"
+                  onChange={handleFileUpload}
+                />
+                <PSAButton
+                  title="Upload Shapefile / GeoJSON"
+                  variant="contained"
+                  onClick={() => document.getElementById('upload-input').click()}
                   sx={{
-                    '& .MuiInputBase-root': { padding: 1 },
+                    minWidth: '150px',
+                    padding: '0.8rem 1.5rem',
+                    borderRadius: '2rem',
                   }}
                 />
-              </Grid>
-            </Grid>
-          )}
+              </Stack>
+            )}
 
-          <Typography variant="h4" align="center">
-            Where is your Field located?
-          </Typography>
-          <Typography variant="h6" align="center">
-            Enter your address, zip code, or GPS coordinates into the map search bar. If you
-            know your exact coordinates, you can enter them separated by a comma (ex. 37.7,
-            -80.2). You can also click the
-            {gpsIcon}
-            button to use your device&apos;s current location.
-          </Typography>
-
-          <Typography variant="h6" align="center" sx={{ mt: 2 }}>
-            You can draw the field boundaries using the polygon tool
-            {polygonIcon}
-            (Click twice or press enter to finish).
-            Alternatively, upload a shape file or GeoJSON of your field boundaries.
-          </Typography>
-
-          {!isEdit && !isView && (
-            <Stack direction="row" justifyContent="flex-end">
-              <input
-                id="upload-input"
-                type="file"
-                hidden
-                accept=".geojson,.shp,.zip"
-                onChange={handleFileUpload}
+            <Box sx={{ position: 'relative' }}>
+              <PSAReduxMap
+                key={location.pathname}
+                setProperties={updateProperties}
+                initWidth="100%"
+                initHeight="380px"
+                initLat={latLon[0]}
+                initLon={latLon[1]}
+                initStartZoom={zoom}
+                initFeatures={features}
+                initAddress={address?.address}
+                initBounds={bounds}
+                hasSearchBar={!isEdit && !isView}
+                hasClear={!isEdit && !isView}
+                hasMarker
+                hasMarkerPopup
+                hasMarkerMovable
+                hasNavigation
+                hasFullScreen
+                hasGeolocate={!isEdit && !isView}
+                hasDrawing={!isEdit && !isView}
+                scrollZoom
+                dragRotate
+                dragPan
+                keyboard
+                doubleClickZoom={false}
+                touchZoomRotate
+                mapboxToken={mapboxToken}
               />
-              <PSAButton
-                title="Upload Shapefile / GeoJSON"
-                variant="contained"
-                onClick={() => document.getElementById('upload-input').click()}
-                sx={{
-                  minWidth: '150px',
-                  color: 'white',
-                  padding: '0.8rem 1.5rem',
-                  borderRadius: '2rem',
-                  backgroundColor: '#60802D',
-                  '&:hover': {
-                    backgroundColor: '#60802D',
-                    textDecoration: 'underline',
-                    boxShadow: '0px 2px 2px rgba(160, 160, 160, 0.3)',
-                  },
-                }}
-              />
-            </Stack>
-          )}
-
-          <Box sx={{ position: 'relative' }}>
-            <PSAReduxMap
-              key={location.pathname}
-              setProperties={updateProperties}
-              initWidth="100%"
-              initHeight="380px"
-              initLat={latLon[0]}
-              initLon={latLon[1]}
-              initStartZoom={zoom}
-              initFeatures={features}
-              initAddress={address?.address}
-              initBounds={bounds}
-              hasSearchBar={!isEdit && !isView}
-              hasClear={!isEdit && !isView}
-              hasMarker
-              hasMarkerPopup
-              hasMarkerMovable
-              hasNavigation
-              hasFullScreen
-              hasGeolocate={!isEdit && !isView}
-              hasDrawing={!isEdit && !isView}
-              scrollZoom
-              dragRotate
-              dragPan
-              keyboard
-              doubleClickZoom={false}
-              touchZoomRotate
-              mapboxToken={mapboxToken}
-            />
-          </Box>
+            </Box>
+          </Stack>
 
           {!isView && (
             <Stack direction="row" justifyContent="center" spacing={2} sx={{ mt: 2 }}>
@@ -863,15 +854,8 @@ const AddField = () => {
                   || !features || features.length < 1}
                 sx={{
                   minWidth: '150px',
-                  color: 'white',
                   padding: '0.8rem 1.5rem',
                   borderRadius: '2rem',
-                  backgroundColor: '#60802D',
-                  '&:hover': {
-                    backgroundColor: '#60802D',
-                    textDecoration: 'underline',
-                    boxShadow: '0px 2px 2px rgba(160, 160, 160, 0.3)',
-                  },
                 }}
               />
               {isEdit
@@ -879,19 +863,13 @@ const AddField = () => {
               <PSAButton
                 title={isDeleting ? <CircularProgress size={24} color="inherit" /> : 'Delete Field'}
                 variant="contained"
-                onClick={handleDeleteField}
+                onClick={handleConfirmDelete}
                 disabled={isSaving || isDeleting || !selectedField}
+                color="error"
                 sx={{
                   minWidth: '150px',
-                  color: 'white',
                   padding: '0.8rem 1.5rem',
                   borderRadius: '2rem',
-                  backgroundColor: '#D32F2F',
-                  '&:hover': {
-                    backgroundColor: '#B71C1C',
-                    textDecoration: 'underline',
-                    boxShadow: '0px 2px 2px rgba(160, 160, 160, 0.3)',
-                  },
                 }}
               />
               )}

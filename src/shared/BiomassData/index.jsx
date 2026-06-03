@@ -1,27 +1,18 @@
-/* eslint-disable react-hooks/exhaustive-deps */
-/* eslint-disable import/no-extraneous-dependencies */
 import React from 'react';
 import { useSelector } from 'react-redux';
 import Grid from '@mui/material/Grid';
 import Typography from '@mui/material/Typography';
 import Box from '@mui/material/Box';
-import LinearProgress from '@mui/material/LinearProgress';
 import Stack from '@mui/material/Stack';
-import { PSAButton } from 'shared-react-components/src';
 import { get } from '../../store/Store';
 import { AreaErrorModal, TaskFailModal } from './Warnings';
-import Datebox from './Datebox';
-// import useFetchHLS from '../../hooks/useFetchHLS';
 
 const BiomassData = () => {
-  const mapPolygon = useSelector(get.mapPolygon);
   const biomassTotalValue = useSelector(get.biomassTotalValue);
   const biomassFetchIsFailed = useSelector(get.biomassFetchIsFailed);
-  const biomassFetchIsLoading = useSelector(get.biomassFetchIsLoading);
   const biomassFetchFailMessage = useSelector(get.biomassFetchFailMessage);
   const polyDrawTooBig = useSelector(get.polyDrawTooBig);
   const unit = useSelector(get.unit);
-  const isPM3DMode = useSelector(get.biomassCalcMode) === 'pm3d';
 
   // useFetchHLS();
 
@@ -29,7 +20,7 @@ const BiomassData = () => {
     <Box>
       {polyDrawTooBig && <AreaErrorModal />}
       {biomassFetchIsFailed && <TaskFailModal task="biomass" message={biomassFetchFailMessage} />}
-      <Box sx={{ margin: 2 }}>
+      <Box>
         <Grid container spacing={2} alignItems="flex-end" justify="center">
           {/* {!isPM3DMode && (
             <>
@@ -64,7 +55,10 @@ const BiomassData = () => {
           )} */}
           {biomassTotalValue && (
             <Grid item xs={12} display="flex" justifyContent="center">
-              <Box sx={{ border: 1, maxWidth: 200, padding: '0.3rem 1.2rem', textAlign: 'center' }}>
+              <Box sx={{
+                border: 1, maxWidth: 200, padding: '0.3rem 1.2rem', textAlign: 'center',
+              }}
+              >
                 <Stack direction="row" justifyContent="center" alignItems="center">
                   <Typography variant="h8" gutterBottom>
                     Biomass Value
