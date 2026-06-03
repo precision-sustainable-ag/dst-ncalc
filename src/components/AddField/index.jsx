@@ -678,6 +678,9 @@ const AddField = () => {
             } else if (hasCover) cropLabel = 'Cover Crop';
             else if (hasCash) cropLabel = 'Cash Crop';
 
+            const startLabel = cropLabel === 'Cover Crop' ? 'Planting Date' : 'Planting Month';
+            const endLabel = cropLabel === 'Cash Crop' ? 'Harvest Month' : 'Termination Month';
+
             const prevSeasonEndDate = index > 0 ? seasonsData[index - 1]?.endDate : null;
             const minStartDate = (isTwoSeasons && prevSeasonEndDate) ? dayjs(prevSeasonEndDate).startOf('month') : null;
             const minEndDate = seasonItem.startDate ? dayjs(seasonItem.startDate) : null;
@@ -689,7 +692,8 @@ const AddField = () => {
                 <Typography variant="h5" sx={{ fontWeight: 'bold' }} color="primary">
                   {cropLabel}
                   {' '}
-                  Season Details
+                  {hasCash && hasCover ? 'Season ' : ''}
+                  Details
                 </Typography>
 
                 {showSeasonDropdown && (
@@ -733,7 +737,7 @@ const AddField = () => {
                 <Stack direction={{ xs: 'column', md: 'row' }} columnGap={1} rowGap={2}>
                   <LocalizationProvider dateAdapter={AdapterDayjs}>
                     <DatePicker
-                      label={`${cropLabel} Start Date`}
+                      label={`${cropLabel} ${startLabel}`}
                       {...(!isFirstOfTwo ? {
                         views: ['year', 'month'],
                         openTo: 'month',
@@ -757,7 +761,7 @@ const AddField = () => {
                   </LocalizationProvider>
                   <LocalizationProvider dateAdapter={AdapterDayjs}>
                     <DatePicker
-                      label={`${cropLabel} End Date`}
+                      label={`${cropLabel} ${endLabel}`}
                       views={['year', 'month']}
                       openTo="month"
                       format="YYYY-MM"
