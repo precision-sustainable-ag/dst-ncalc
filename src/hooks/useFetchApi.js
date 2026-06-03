@@ -525,6 +525,7 @@ const useFetchPlantFactors = () => {
   }, [dispatch]);
 
   useEffect(() => {
+    if (activeExample) return;
     dispatch(set.biomassGeojson(null));
     dispatch(set.nitrogenTaskResults(null));
   }, [biomassTaskResults, coverCrop, coverCropGrowthStage, coverCropTerminationDate, targetN,

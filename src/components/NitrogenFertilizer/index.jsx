@@ -214,10 +214,6 @@ const NitrogenFertilizer = () => {
     }
   }, [dispatch, fertilizerType]);
 
-  useEffect(() => {
-    dispatch(set.targetN(0));
-  }, [fertilizerType, inputMode, dispatch]);
-
   const handleFileSelect = (event) => {
     const file = event.target.files[0];
     if (!file) return;
