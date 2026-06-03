@@ -22,6 +22,7 @@ import NavigateBar from '../../shared/Navigate';
 import NavButton from '../../shared/Navigate/NavButton';
 import { ncalcApiUrl } from '../../utils/keys';
 import { handleError } from '../../utils/apiError';
+import { mergeFeatureCollections } from '../../utils/geojsonUtils';
 
 // const FERTILIZER_DATA = [
 //   {
@@ -229,7 +230,7 @@ const NitrogenFertilizer = () => {
       try {
         const arrayBuffer = reader.result;
         const geojson = await shpjs(arrayBuffer);
-        const featureCollection = Array.isArray(geojson) ? geojson[0] : geojson;
+        const featureCollection = mergeFeatureCollections(geojson);
 
         let propertyKeys = [];
         if (featureCollection.features && featureCollection.features.length > 0) {
