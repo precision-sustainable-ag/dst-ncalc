@@ -7,7 +7,7 @@ import { get, set } from '../../store/Store';
 
 const CoverCropsInput = ({ isSatelliteMode, isPM3DMode }) => {
   const dispatch = useDispatch();
-  const species = useSelector(get.species);
+  const species = useSelector(get.coverCropList);
   const coverCrop = useSelector(get.coverCrop);
   const coverCropGrowthStage = useSelector(get.coverCropGrowthStage);
 

@@ -12,7 +12,6 @@ import { DatePicker, LocalizationProvider } from '@mui/x-date-pickers';
 import dayjs from 'dayjs';
 import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
 import shpjs from 'shpjs';
-import axios from 'axios';
 import { useAuth0 } from '@auth0/auth0-react';
 import { get, set } from '../../store/Store';
 import Myslider from '../../shared/Slider';
@@ -20,38 +19,11 @@ import Help from '../../shared/Help';
 import Required from '../../shared/Required';
 import NavigateBar from '../../shared/Navigate';
 import NavButton from '../../shared/Navigate/NavButton';
-import { ncalcApiUrl } from '../../utils/keys';
 import { handleError } from '../../utils/apiError';
-
-// const FERTILIZER_DATA = [
-//   {
-//     type: 'granular',
-//     name: 'Urea',
-//     n_percent: 46,
-//   },
-//   {
-//     type: 'liquid',
-//     name: 'UAN 28%',
-//     n_percent: 28,
-//     density: 10.67,
-//   },
-//   {
-//     type: 'liquid',
-//     name: 'UAN 30%',
-//     n_percent: 30,
-//     density: 10.86,
-//   },
-//   {
-//     type: 'liquid',
-//     name: 'UAN 32%',
-//     n_percent: 32,
-//     density: 11.08,
-//   },
-// ];
+import { mergeFeatureCollections } from '../../utils/geojsonUtils';
+import { publicApi } from '../../utils/apiClient';
 
 const CONVERSION_FACTOR = 1.12085; // lb n/acre -> kg n/ha
-
-const API_BASE_URL = ncalcApiUrl;
 
 const NitrogenFertilizer = () => {
   // const isDevelopOrLocal = window.location.hostname === 'localhost'
@@ -151,7 +123,7 @@ const NitrogenFertilizer = () => {
     const fetchFertilizers = async () => {
       try {
         setIsFetching(true);
-        const response = await axios.get(`${API_BASE_URL}/fertilizers`);
+        const response = await publicApi.get('fertilizers');
         dispatch(set.fertilizers(response.data?.data || []));
       } catch (err) {
         dispatch(set.fertilizers([]));
@@ -213,10 +185,6 @@ const NitrogenFertilizer = () => {
     }
   }, [dispatch, fertilizerType]);
 
-  useEffect(() => {
-    dispatch(set.targetN(0));
-  }, [fertilizerType, inputMode, dispatch]);
-
   const handleFileSelect = (event) => {
     const file = event.target.files[0];
     if (!file) return;
@@ -229,7 +197,7 @@ const NitrogenFertilizer = () => {
       try {
         const arrayBuffer = reader.result;
         const geojson = await shpjs(arrayBuffer);
-        const featureCollection = Array.isArray(geojson) ? geojson[0] : geojson;
+        const featureCollection = mergeFeatureCollections(geojson);
 
         let propertyKeys = [];
         if (featureCollection.features && featureCollection.features.length > 0) {
@@ -283,7 +251,7 @@ const NitrogenFertilizer = () => {
           density: parseFloat(otherLiquidFertilizer.density),
         };
 
-      axios.post(`${API_BASE_URL}/fertilizers`, payload);
+      publicApi.post('fertilizers', payload);
     } catch (err) { /* empty */ }
   };
 

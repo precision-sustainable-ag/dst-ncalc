@@ -21,6 +21,13 @@ const Myslider = ({
     setValue(val);
   }, [val]);
 
+  useEffect(() => {
+    if (value > max) {
+      setValue(max);
+      dispatch(set[id](max));
+    }
+  }, [dispatch, id, max, value]);
+
   return (
     <div className="slider">
       {!noTextfield && (

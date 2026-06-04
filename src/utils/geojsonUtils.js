@@ -197,3 +197,19 @@ export const geometriesToFeatures = (geometry, setFeatures, setLatLon, setBounds
     }
   }
 };
+
+/**
+ * Merges an array of FeatureCollections into one FeatureCollection
+ * @param {Object|Array} geojson - A FeatureCollection or array of FeatureCollections
+ * @returns {Object} - A single merged FeatureCollection
+ */
+export const mergeFeatureCollections = (geojson) => {
+  const collections = Array.isArray(geojson) ? geojson : [geojson];
+
+  const mergedFeatures = collections.flatMap((fc) => fc.features ?? []);
+
+  return {
+    type: 'FeatureCollection',
+    features: mergedFeatures,
+  };
+};

@@ -174,7 +174,8 @@ const initialState = {
   dataFetchStatus: 'idle',
   openFeedbackModal: false,
   incorporatedData: [],
-  species: null,
+  coverCropList: [],
+  cashCropList: [],
   plantGrowthStages: null,
   coverCropSpecieGroup: null,
   coverCropGrowthStage: {},
@@ -229,6 +230,7 @@ const initialState = {
     confirmText: 'Confirm',
     onConfirm: null,
   },
+  programGroups: [],
 };
 
 export default initialState;

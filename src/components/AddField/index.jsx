@@ -23,20 +23,6 @@ import { geometriesToFeatures, processGeometries, validateAndProcessGeoJSON } fr
 import { privateApi } from '../../utils/apiClient';
 import { handleError } from '../../utils/apiError';
 
-// Roles are assigned in auth0 and included in the user's ID token. They are the 'groups' that the user has access to.
-const ROLES = ['NIFA-Soy', 'Willard', 'Growmark'];
-
-const PROGRAM_GROUP_OPTIONS = [
-  { label: 'Willard - RCPP', group: 'Willard', program: 'RCPP' },
-  { label: 'Willard - RCPP Report Only', group: 'Willard', program: 'RCPP-Report-Only' },
-  { label: 'Growmark - RCPP', group: 'Growmark', program: 'RCPP' },
-  { label: 'Growmark - RCPP Report Only', group: 'Growmark', program: 'RCPP-Report-Only' },
-  { label: 'NIFA-Soy', group: 'NIFA-Soy', program: 'NIFA-Soy' },
-];
-
-// TODO: Placeholder values - to be updated
-const CASH_CROP_OPTIONS = ['Corn', 'Soybeans', 'Wheat', 'Cotton'];
-
 const polygonIcon = (
   <SvgIcon
     viewBox="0 0 20 20"
@@ -85,7 +71,8 @@ const AddField = () => {
 
   const matchesMd = useMediaQuery((theme) => theme.breakpoints.down('md'));
 
-  const COVER_CROP_OPTIONS = useSelector(get.species) || [];
+  const COVER_CROP_OPTIONS = useSelector(get.coverCropList) || [];
+  const CASH_CROP_OPTIONS = useSelector(get.cashCropList) || [];
 
   // FORM DATA STATE VARIABLES
   const [programGroupLabel, setProgramGroupLabel] = useState(null);
@@ -93,13 +80,7 @@ const AddField = () => {
   const [grower, setGrower] = useState(null);
   const [farm, setFarm] = useState(null);
   const [field, setField] = useState(null);
-  // const [season, setSeason] = useState(null);
-  const [cashCrop, setCashCrop] = useState(null);
-  const [coverCrops, setCoverCrops] = useState([]);
-  const [cashCropPlantingDate, setCashCropPlantingDate] = useState(null);
-  const [cashCropHarvestingDate, setCashCropHarvestingDate] = useState(null);
-  const [coverCropPlantingDate, setCoverCropPlantingDate] = useState(null);
-  const [coverCropTerminationDate, setCoverCropTerminationDate] = useState(null);
+  const [seasonsData, setSeasonsData] = useState([]);
   const [comments, setComments] = useState('');
   const [email, setEmail] = useState('');
   const [isSaving, setIsSaving] = useState(false);
@@ -115,6 +96,7 @@ const AddField = () => {
   const [bounds, setBounds] = useState(null);
 
   // DATA FOR ALL THE FIELDS
+  const programGroups = useSelector(get.programGroups);
   const [allFields, setAllFields] = useState([]);
   const [loadingOptions, setLoadingOptions] = useState(true);
   const [refreshOptions, setRefreshOptions] = useState(false);
@@ -122,13 +104,23 @@ const AddField = () => {
   // SELECTED FIELD (USED FOR EDIT/VIEW FIELD METADATA)
   const [selectedField, setSelectedField] = useState(null);
 
+  // Roles are assigned in auth0 and included in the user's ID token. They are the 'groups' that the user has access to.
   const roles = user?.['https://dst-ncalc.org/claims'] || [];
   const isAdmin = roles.includes('ncalc-admin');
   const isSuperAdmin = roles.includes('ncalc-super-admin');
+  const availableGroups = [...new Set((programGroups || []).map((pg) => pg.groupName))];
   const allowedGroups = (isSuperAdmin || isAdmin)
-    ? ROLES
-    : ROLES.filter((role) => roles.includes(role));
+    ? availableGroups
+    : availableGroups.filter((role) => roles.includes(role));
 
+  const isTwoSeasons = programGroupLabel?.seasonsPerEntry === 2;
+  const isSeasonsValid = seasonsData.length > 0 && seasonsData.every((s) => {
+    // Start date is valid if it has a value (it can be NULL if it is 'winter' AND the program expects 2 seasons)
+    const isStartDateValid = s.startDate || (s.season === 'winter' && isTwoSeasons);
+
+    // End date and crops are always required
+    return isStartDateValid && s.endDate && s.crops.length > 0;
+  });
   const isEmailValid = email && email !== '' && /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
 
   const updateProperties = (properties) => {
@@ -138,21 +130,24 @@ const AddField = () => {
     setLatLon([properties?.lat, properties?.lon]);
   };
 
-  // Reset dates start date > end date
+  const fetchProgamGroups = useCallback(async () => {
+    if (isAuthenticated) {
+      try {
+        setLoadingOptions(true);
+        const url = 'program-config';
+        const response = await privateApi.get(url);
+        dispatch(set.programGroups(response?.data?.data));
+      } catch (error) {
+        handleError(error, dispatch);
+      } finally {
+        setLoadingOptions(false);
+      }
+    }
+  }, [dispatch, isAuthenticated]);
+
   useEffect(() => {
-    if (coverCropPlantingDate && coverCropTerminationDate && dayjs(coverCropPlantingDate) > dayjs(coverCropTerminationDate)) {
-      setCoverCropTerminationDate(null);
-      setCashCropPlantingDate(null);
-      setCashCropHarvestingDate(null);
-    }
-    // if (coverCropTerminationDate && cashCropPlantingDate && dayjs(coverCropTerminationDate) > dayjs(cashCropPlantingDate)) {
-    //   setCashCropPlantingDate(null);
-    //   setCashCropHarvestingDate(null);
-    // }
-    if (cashCropHarvestingDate && cashCropPlantingDate && dayjs(cashCropPlantingDate) > dayjs(cashCropHarvestingDate)) {
-      setCashCropHarvestingDate(null);
-    }
-  }, [cashCropPlantingDate, cashCropHarvestingDate, coverCropPlantingDate, coverCropTerminationDate]);
+    fetchProgamGroups();
+  }, [fetchProgamGroups]);
 
   const fetchOptions = useCallback(async () => {
     if (isAuthenticated) {
@@ -180,6 +175,34 @@ const AddField = () => {
     }
   }, [refreshOptions, fetchOptions]);
 
+  // Initialize dynamic seasons for a new field when a program is selected
+  useEffect(() => {
+    if (!selectedField && programGroupLabel?.seasons) {
+      const seasonOrder = ['winter', 'summer'];
+      const availableSeasons = Object.keys(programGroupLabel.seasons).sort(
+        (a, b) => seasonOrder.indexOf(a) - seasonOrder.indexOf(b),
+      );
+
+      if (programGroupLabel.seasonsPerEntry === 2) {
+        const initialSeasons = availableSeasons.map((seasonName) => ({
+          season: seasonName,
+          startDate: null,
+          endDate: null,
+          crops: [],
+        }));
+        setSeasonsData(initialSeasons);
+      } else if (programGroupLabel.seasonsPerEntry === 1) {
+        const initialSeasons = [{
+          season: availableSeasons[0],
+          startDate: null,
+          endDate: null,
+          crops: [],
+        }];
+        setSeasonsData(initialSeasons);
+      }
+    }
+  }, [programGroupLabel, selectedField]);
+
   // Function to clear all the form values
   const resetForm = () => {
     setSelectedField(null);
@@ -188,12 +211,7 @@ const AddField = () => {
     setGrower(null);
     setFarm(null);
     setField(null);
-    setCoverCrops([]);
-    setCashCrop(null);
-    setCoverCropPlantingDate(null);
-    setCoverCropTerminationDate(null);
-    setCashCropPlantingDate(null);
-    setCashCropHarvestingDate(null);
+    setSeasonsData([]);
     setComments('');
     setEmail('');
     setFeatures([]);
@@ -207,8 +225,8 @@ const AddField = () => {
       return;
     }
 
-    const programGroup = PROGRAM_GROUP_OPTIONS.find(
-      (option) => option.group === selectedField.properties.groupName && option.program === selectedField.properties.programName,
+    const programGroup = programGroups.find(
+      (option) => option.groupName === selectedField.properties.groupName && option.programName === selectedField.properties.programName,
     );
 
     setProgramGroupLabel(programGroup);
@@ -216,16 +234,11 @@ const AddField = () => {
     setGrower(selectedField?.properties.growerName);
     setFarm(selectedField?.properties.farmName);
     setField(selectedField?.properties.fieldName);
-    setCoverCrops(selectedField?.properties.coverCrop);
-    setCashCrop(selectedField?.properties.cashCrop);
-    setCoverCropPlantingDate(selectedField?.properties.coverCropPlantingDate || null);
-    setCoverCropTerminationDate(selectedField?.properties.coverCropTerminationDate || null);
-    setCashCropPlantingDate(selectedField?.properties.cashCropPlantingDate || null);
-    setCashCropHarvestingDate(selectedField?.properties.cashCropHarvestingDate || null);
-    setComments(selectedField?.properties.comments);
-    setEmail(selectedField?.properties.email);
+    setSeasonsData(selectedField?.properties.seasons || []);
+    setComments(selectedField?.properties.comments || '');
+    setEmail(selectedField?.properties.email || '');
     geometriesToFeatures(selectedField?.geometry, setFeatures, setLatLon, setBounds);
-  }, [selectedField]);
+  }, [selectedField, programGroups]);
 
   const {
     groupOptions, growerOptions, farmOptions, fieldOptions,
@@ -257,8 +270,9 @@ const AddField = () => {
   }, [allowedGroups, allFields, group, grower, farm]);
 
   const handleGroupChange = (newVal) => {
+    setSeasonsData([]);
     setProgramGroupLabel(newVal);
-    setGroup(newVal ? newVal.group : null);
+    setGroup(newVal ? newVal.groupName : null);
   };
 
   const handleGrowerChange = (newVal) => {
@@ -269,11 +283,53 @@ const AddField = () => {
     setFarm(newVal);
   };
 
+  const handleSeasonChange = (index, fieldKey, value) => {
+    const updatedSeasons = [...seasonsData];
+    updatedSeasons[index][fieldKey] = value;
+
+    // Date range reset logic
+    if (fieldKey === 'startDate' && updatedSeasons[index].endDate && dayjs(value) > dayjs(updatedSeasons[index].endDate)) {
+      updatedSeasons[index].endDate = null;
+    }
+    if (fieldKey === 'endDate' && updatedSeasons[index].startDate && dayjs(value) < dayjs(updatedSeasons[index].startDate)) {
+      updatedSeasons[index].startDate = null;
+    }
+
+    setSeasonsData(updatedSeasons);
+  };
+
+  const preparePayload = (finalGeometry) => {
+    const formattedSeasons = seasonsData.map((s, idx) => {
+      const seasonPayload = {
+        year: s.startDate ? dayjs(s.startDate).year() : dayjs().year(),
+        season: s.season,
+        startDate: s.startDate,
+        endDate: s.endDate,
+        crops: s.crops,
+      };
+
+      // Inject root comments into the first season array block as required by schema
+      if (idx === 0 && comments) {
+        seasonPayload.comments = comments;
+      }
+      return seasonPayload;
+    });
+
+    return {
+      programName: programGroupLabel?.programName,
+      groupName: group,
+      farmName: farm,
+      growerName: grower,
+      fieldName: field,
+      seasons: formattedSeasons,
+      geometry: finalGeometry,
+    };
+  };
+
   const handleSaveField = async () => {
     // Validate form fields
     // coverCropPlantingDate is temporarily not a required field
-    if (!group || !grower || !farm || !field || !cashCrop || !coverCrops || coverCrops.length < 1
-      || !cashCropPlantingDate || !cashCropHarvestingDate || !coverCropTerminationDate) {
+    if (!group || !grower || !farm || !field || !isSeasonsValid) {
       dispatch(set.actionModal({
         open: true,
         type: 'error',
@@ -292,21 +348,7 @@ const AddField = () => {
     setIsSaving(true);
 
     try {
-      const payload = {
-        programName: programGroupLabel?.program,
-        groupName: group,
-        farmName: farm,
-        growerName: grower,
-        fieldName: field,
-        cashCrop,
-        coverCrop: coverCrops,
-        geometry: finalGeometry,
-        cashCropPlantingDate,
-        cashCropHarvestingDate,
-        coverCropPlantingDate,
-        coverCropTerminationDate,
-        comments,
-      };
+      const payload = preparePayload(finalGeometry);
 
       await privateApi.post('/fields', payload);
 
@@ -329,8 +371,7 @@ const AddField = () => {
 
   const handleUpdateField = async () => {
     // Validate form fields
-    if (!group || !grower || !farm || !field || !cashCrop || !coverCrops || coverCrops.length < 1
-      || !cashCropPlantingDate || !cashCropHarvestingDate || !coverCropTerminationDate) {
+    if (!group || !grower || !farm || !field || !isSeasonsValid) {
       dispatch(set.actionModal({
         open: true,
         type: 'error',
@@ -350,23 +391,7 @@ const AddField = () => {
 
     try {
       const fieldId = selectedField?._id;
-
-      const payload = {
-        programName: programGroupLabel?.program,
-        groupName: group,
-        farmName: farm,
-        growerName: grower,
-        fieldName: field,
-        cashCrop,
-        coverCrop: coverCrops,
-        geometry: finalGeometry,
-        cashCropPlantingDate,
-        cashCropHarvestingDate,
-        coverCropPlantingDate,
-        coverCropTerminationDate,
-        comments,
-      };
-
+      const payload = preparePayload(finalGeometry);
       if (isSuperAdmin && isEdit) payload.email = email;
 
       await privateApi.put(`/fields/${fieldId}`, payload);
@@ -575,12 +600,12 @@ const AddField = () => {
                   key={group}
                   freeSolo={isEdit}
                   loading={loadingOptions}
-                  options={PROGRAM_GROUP_OPTIONS.filter((option) => groupOptions.includes(option.group))}
+                  options={programGroups.filter((option) => groupOptions.includes(option.groupName))}
                   value={programGroupLabel}
-                  getOptionLabel={(option) => option?.label || ''}
+                  getOptionLabel={(option) => option?.displayLabel || ''}
                   onChange={(e, val) => handleGroupChange(val)}
                   renderInput={(params) => <PSATextField {...params} label="Select a Program name" required />}
-                  disabled={inputDisabled}
+                  readOnly={inputDisabled}
                 />
               </Box>
               <Box sx={{ flex: 1 }}>
@@ -593,7 +618,7 @@ const AddField = () => {
                   onChange={(e, val) => handleGrowerChange(val)}
                   onInputChange={(e, newInputValue) => handleGrowerChange(newInputValue)}
                   renderInput={(params) => <PSATextField {...params} label="Select or enter a Grower name" required />}
-                  disabled={inputDisabled}
+                  readOnly={inputDisabled}
                 />
               </Box>
             </Stack>
@@ -609,7 +634,7 @@ const AddField = () => {
                   onChange={(e, val) => handleFarmChange(val)}
                   onInputChange={(e, newInputValue) => handleFarmChange(newInputValue)}
                   renderInput={(params) => <PSATextField {...params} label="Select or enter a Farm name" required />}
-                  disabled={inputDisabled}
+                  readOnly={inputDisabled}
                   sx={{ flex: 1 }}
                 />
               </Box>
@@ -623,120 +648,141 @@ const AddField = () => {
                   onChange={(e, val) => setField(val)}
                   onInputChange={(e, newInputValue) => setField(newInputValue)}
                   renderInput={(params) => <PSATextField {...params} label="Select or enter a Field name" required />}
-                  disabled={inputDisabled}
+                  readOnly={inputDisabled}
                   sx={{ flex: 1 }}
                 />
               </Box>
             </Stack>
           </Stack>
 
-          {/* CROP DETAILS */}
-          <Stack gap={1}>
-            <Typography variant="h5" sx={{ fontWeight: 'bold' }} color="primary">
-              Crop Details
-            </Typography>
+          {/* DYNAMIC SEASONAL DETAILS */}
+          {seasonsData.map((seasonItem, index) => {
+            const availableSeasons = Object.keys(programGroupLabel?.seasons || {});
+            const showSeasonDropdown = programGroupLabel?.seasonsPerEntry === 1 && availableSeasons.length > 1;
 
-            <Stack direction={{ xs: 'column', md: 'row' }} spacing={1}>
-              <Autocomplete
-                multiple
-                options={COVER_CROP_OPTIONS}
-                value={coverCrops}
-                onChange={(e, val) => setCoverCrops(val)}
-                renderInput={(params) => (
-                  <PSATextField {...params} label="What cover crop species are planted in this field?" required />
+            const seasonConfigCrops = programGroupLabel?.seasons?.[seasonItem.season] || [];
+
+            // Build relevant dropdown list based on config requirements
+            let cropOptions = [];
+            const hasCover = seasonConfigCrops.includes('cover');
+            const hasCash = seasonConfigCrops.includes('cash');
+
+            if (hasCover) cropOptions = [...cropOptions, ...COVER_CROP_OPTIONS];
+            if (hasCash) cropOptions = [...cropOptions, ...CASH_CROP_OPTIONS];
+
+            let cropLabel = '';
+            if (hasCover && hasCash) {
+              cropLabel = seasonItem.season
+                ? seasonItem.season.charAt(0).toUpperCase() + seasonItem.season.slice(1)
+                : 'Crop';
+            } else if (hasCover) cropLabel = 'Cover Crop';
+            else if (hasCash) cropLabel = 'Cash Crop';
+
+            const startLabel = cropLabel === 'Cover Crop' ? 'Planting Date' : 'Planting Month';
+            const endLabel = cropLabel === 'Cash Crop' ? 'Harvest Month' : 'Termination Month';
+
+            const prevSeasonEndDate = index > 0 ? seasonsData[index - 1]?.endDate : null;
+            const minStartDate = (isTwoSeasons && prevSeasonEndDate) ? dayjs(prevSeasonEndDate).startOf('month') : null;
+            const minEndDate = seasonItem.startDate ? dayjs(seasonItem.startDate) : null;
+
+            const isFirstOfTwo = isTwoSeasons && index === 0;
+
+            return (
+              <Stack key={seasonItem.season} gap={1}>
+                <Typography variant="h5" sx={{ fontWeight: 'bold' }} color="primary">
+                  {cropLabel}
+                  {' '}
+                  {hasCash && hasCover ? 'Season ' : ''}
+                  Details
+                </Typography>
+
+                {showSeasonDropdown && (
+                  <Autocomplete
+                    options={availableSeasons}
+                    getOptionLabel={(option) => (option ? option.charAt(0).toUpperCase() + option.slice(1) : '')}
+                    value={seasonItem.season || null}
+                    onChange={(e, val) => {
+                      // reset seasons array
+                      const updatedSeasons = [...seasonsData];
+                      updatedSeasons[index] = {
+                        ...updatedSeasons[index],
+                        season: val || '',
+                        crops: [],
+                        startDate: null,
+                        endDate: null,
+                      };
+                      setSeasonsData(updatedSeasons);
+                    }}
+                    renderInput={(params) => (
+                      <PSATextField {...params} label="Select Season" required />
+                    )}
+                    disabled={inputDisabled}
+                    disableClearable
+                    sx={{ width: { xs: '100%', md: '50%' } }}
+                  />
                 )}
-                readOnly={inputDisabled}
-                sx={{ flex: 1 }}
-              />
-              <Autocomplete
-                options={CASH_CROP_OPTIONS}
-                value={cashCrop}
-                onChange={(e, val) => setCashCrop(val)}
-                renderInput={(params) => <PSATextField {...params} label="What cash crop will be planted next?" required />}
-                readOnly={inputDisabled}
-                sx={{ flex: 1 }}
-              />
-            </Stack>
-          </Stack>
 
-          {/* CROP DATES */}
-          <Stack direction={{ xs: 'column', xl: 'row' }} columnGap={1} rowGap={2}>
-            <Stack direction={{ xs: 'column', md: 'row' }} columnGap={1} rowGap={2} sx={{ flex: 1 }}>
-              <LocalizationProvider dateAdapter={AdapterDayjs}>
-                <DatePicker
-                  label="Cover Crop Planting Date"
-                  value={coverCropPlantingDate ? dayjs(coverCropPlantingDate) : null}
-                  onChange={(newValue) => {
-                    setCoverCropPlantingDate(newValue ? newValue.format('YYYY-MM-DD') : null);
-                    return null;
-                  }}
-                  slotProps={{
-                    field: { clearable: true, onClear: () => setCoverCropTerminationDate(null) },
-                  }}
-                  disabled={inputDisabled}
-                  sx={{ flex: 1 }}
+                <Autocomplete
+                  multiple
+                  options={cropOptions}
+                  value={seasonItem.crops || []}
+                  onChange={(e, val) => handleSeasonChange(index, 'crops', val)}
+                  renderInput={(params) => (
+                    <PSATextField {...params} label={`What crops are planted in the ${cropLabel} season?`} required />
+                  )}
+                  readOnly={inputDisabled}
+                  sx={{ mb: 1 }}
                 />
-              </LocalizationProvider>
-              <LocalizationProvider dateAdapter={AdapterDayjs}>
-                <DatePicker
-                  label="Cover Crop Termination Month"
-                  views={['year', 'month']}
-                  openTo="month"
-                  format="YYYY-MM"
-                  minDate={dayjs(coverCropPlantingDate)}
-                  value={coverCropTerminationDate ? dayjs(coverCropTerminationDate) : null}
-                  onChange={(newValue) => {
-                    setCoverCropTerminationDate(newValue ? newValue.endOf('month').format('YYYY-MM-DD') : null);
-                    return null;
-                  }}
-                  slotProps={{ textField: { required: true } }}
-                  disabled={inputDisabled}
-                  sx={{ flex: 1 }}
-                />
-              </LocalizationProvider>
-            </Stack>
 
-            <Stack direction={{ xs: 'column', md: 'row' }} columnGap={1} rowGap={2} sx={{ flex: 1 }}>
-              <LocalizationProvider dateAdapter={AdapterDayjs}>
-                <DatePicker
-                  label="Cash Crop Planting Month"
-                  views={['year', 'month']}
-                  openTo="month"
-                  format="YYYY-MM"
-                  minDate={dayjs(coverCropTerminationDate).startOf('month')}
-                  value={cashCropPlantingDate ? dayjs(cashCropPlantingDate) : null}
-                  onChange={(newValue) => {
-                    setCashCropPlantingDate(newValue ? newValue.startOf('month').format('YYYY-MM-DD') : null);
-                    return null;
-                  }}
-                  slotProps={{ textField: { required: true } }}
-                  disabled={inputDisabled}
-                  sx={{ flex: 1 }}
-                />
-              </LocalizationProvider>
-              <LocalizationProvider dateAdapter={AdapterDayjs}>
-                <DatePicker
-                  label="Cash Crop Harvest Month"
-                  views={['year', 'month']}
-                  openTo="month"
-                  format="YYYY-MM"
-                  minDate={dayjs(cashCropPlantingDate)}
-                  value={cashCropHarvestingDate ? dayjs(cashCropHarvestingDate) : null}
-                  onChange={(newValue) => {
-                    setCashCropHarvestingDate(newValue ? newValue.endOf('month').format('YYYY-MM-DD') : null);
-                    return null;
-                  }}
-                  slotProps={{ textField: { required: true } }}
-                  disabled={inputDisabled}
-                  sx={{ flex: 1 }}
-                />
-              </LocalizationProvider>
-            </Stack>
-          </Stack>
+                <Stack direction={{ xs: 'column', md: 'row' }} columnGap={1} rowGap={2}>
+                  <LocalizationProvider dateAdapter={AdapterDayjs}>
+                    <DatePicker
+                      label={`${cropLabel} ${startLabel}`}
+                      {...(!isFirstOfTwo ? {
+                        views: ['year', 'month'],
+                        openTo: 'month',
+                        format: 'YYYY-MM',
+                      } : {})}
+                      minDate={minStartDate}
+                      value={seasonItem.startDate ? dayjs(seasonItem.startDate) : null}
+                      onChange={(newValue) => {
+                        let formattedDate;
+                        if (isFirstOfTwo) formattedDate = newValue ? newValue.format('YYYY-MM-DD') : null;
+                        else formattedDate = newValue ? newValue.startOf('month').format('YYYY-MM-DD') : null;
+                        handleSeasonChange(index, 'startDate', formattedDate);
+                      }}
+                      slotProps={{
+                        textField: { required: !isFirstOfTwo },
+                        field: { clearable: isFirstOfTwo },
+                      }}
+                      readOnly={inputDisabled}
+                      sx={{ flex: 1 }}
+                    />
+                  </LocalizationProvider>
+                  <LocalizationProvider dateAdapter={AdapterDayjs}>
+                    <DatePicker
+                      label={`${cropLabel} ${endLabel}`}
+                      views={['year', 'month']}
+                      openTo="month"
+                      format="YYYY-MM"
+                      minDate={minEndDate}
+                      value={seasonItem.endDate ? dayjs(seasonItem.endDate) : null}
+                      onChange={(newValue) => {
+                        const formattedDate = newValue ? newValue.endOf('month').format('YYYY-MM-DD') : null;
+                        handleSeasonChange(index, 'endDate', formattedDate);
+                      }}
+                      slotProps={{ textField: { required: true } }}
+                      readOnly={inputDisabled}
+                      sx={{ flex: 1 }}
+                    />
+                  </LocalizationProvider>
+                </Stack>
+              </Stack>
+            );
+          })}
 
           <Box sx={{ width: { xs: '100%', md: '50%' } }}>
             <PSATextField
-              key={comments}
               label="Additional comments (optional)"
               value={comments}
               onChange={(e) => setComments(e.target.value)}
@@ -752,7 +798,6 @@ const AddField = () => {
           {isSuperAdmin && isEdit && (
             <Box sx={{ width: { xs: '100%', md: '50%' } }}>
               <PSATextField
-                key={email}
                 label="Email"
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
@@ -848,8 +893,7 @@ const AddField = () => {
                 title={isSaving ? <CircularProgress size={24} color="inherit" /> : isEdit ? 'Update Field' : 'Save Field'}
                 variant="contained"
                 onClick={isEdit ? handleUpdateField : handleSaveField}
-                disabled={isSaving || isDeleting || !group || !grower || !farm || !field || !cashCrop || !coverCrops || coverCrops.length < 1
-                  || !cashCropPlantingDate || !cashCropHarvestingDate || !coverCropTerminationDate
+                disabled={isSaving || isDeleting || !group || !grower || !farm || !field || !isSeasonsValid
                   || (isEdit && isSuperAdmin && !isEmailValid)
                   || !features || features.length < 1}
                 sx={{

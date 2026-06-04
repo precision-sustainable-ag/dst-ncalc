@@ -44,7 +44,6 @@ const useFetchSampleBiomass = () => {
           .then((response) => response.json())
           .then((jsonObj) => {
             dispatch(set.biomassTaskResults({ data_array: jsonObj.data_array, bbox: jsonObj.bbox }));
-            dispatch(set.biomassGeojson(jsonObj.biomass_geojson));
             setBiomass(jsonObj);
             return null;
           });
@@ -74,26 +73,9 @@ const useFetchSampleNitrogen = () => {
         .then((response) => response.json())
         .then((jsonObj) => {
           delete jsonObj.properties;
-          const reqnGeojson = JSON.parse(JSON.stringify(jsonObj));
-          jsonObj.features.forEach((feature) => {
-            if (
-              feature.properties
-              && feature.properties.MinNfromFOM !== undefined
-            ) {
-              feature.properties.value = feature.properties.MinNfromFOM;
-            }
-          });
-
-          reqnGeojson.features.forEach((feature) => {
-            if (
-              feature.properties
-              && feature.properties.ReqN !== undefined
-            ) {
-              feature.properties.value = feature.properties.ReqN;
-            }
-          });
-
-          dispatch(set.nitrogenTaskResults({ minN: jsonObj, reqN: reqnGeojson }));
+          const parsedGeojson = JSON.parse(JSON.stringify(jsonObj));
+          dispatch(set.biomassGeojson(parsedGeojson));
+          dispatch(set.nitrogenTaskResults({ reqN: parsedGeojson }));
         });
     }
   }, [activeExample]);

@@ -61,7 +61,7 @@ const FieldDropdown = () => {
       dispatch(set.InorganicN(10));
       // dispatch(set.plantGrowthStages({ 'Cereal rye': ['2. Stem elongation'] }));
       dispatch(set.coverCrop(['Cereal rye']));
-      dispatch(set.coverCropGrowthStage({ 'Cereal rye': '2. Stem elongation' }));
+      dispatch(set.coverCropGrowthStage({ 'Cereal rye': 'Jointed' }));
       dispatch(set.coverCropPlantingDate('2024-11-01'));
       dispatch(set.coverCropTerminationDate('2025-05-01'));
       dispatch(set.cashCropPlantingDate('2025-06-01'));
@@ -74,6 +74,10 @@ const FieldDropdown = () => {
       // dispatch(set.cashCrop('Corn'));
       dispatch(set.yield(150));
       dispatch(set.targetN(150));
+      dispatch(set.gridSize(1));
+      dispatch(set.multiplier(3.34865146));
+      dispatch(set.fertilizerType('liquid'));
+      dispatch(set.liquidFertilizer('UAN 28%'));
       dispatch(set.user.historyState(historyStates.imported));
     } else if (fieldStr === 'Example: Legume') {
       // navigate('location');
