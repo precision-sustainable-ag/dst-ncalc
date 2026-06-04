@@ -235,8 +235,8 @@ const AddField = () => {
     setFarm(selectedField?.properties.farmName);
     setField(selectedField?.properties.fieldName);
     setSeasonsData(selectedField?.properties.seasons || []);
-    setComments(selectedField?.properties.comments);
-    setEmail(selectedField?.properties.email);
+    setComments(selectedField?.properties.comments || '');
+    setEmail(selectedField?.properties.email || '');
     geometriesToFeatures(selectedField?.geometry, setFeatures, setLatLon, setBounds);
   }, [selectedField, programGroups]);
 
@@ -783,7 +783,6 @@ const AddField = () => {
 
           <Box sx={{ width: { xs: '100%', md: '50%' } }}>
             <PSATextField
-              key={comments}
               label="Additional comments (optional)"
               value={comments}
               onChange={(e) => setComments(e.target.value)}
@@ -799,7 +798,6 @@ const AddField = () => {
           {isSuperAdmin && isEdit && (
             <Box sx={{ width: { xs: '100%', md: '50%' } }}>
               <PSATextField
-                key={email}
                 label="Email"
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
