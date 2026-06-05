@@ -1,9 +1,7 @@
 .slider {
   .MuiSlider-root {
     vertical-align: bottom;
-    color: #4F6B14;
-    position: relative;  
-    top: 12px;  /* align with Input */
+    position: relative;
   }
   
   .MuiSlider-thumbColorPrimary {
@@ -14,8 +12,6 @@
   .tiny {
     font-size: 70%;
     position: relative;
-    top: 1.5em;
-    color: #4f6b14;
-    vertical-align: bottom;
+    align-content: center;
   }
 }

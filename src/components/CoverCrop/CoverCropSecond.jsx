@@ -1,24 +1,15 @@
 import React, { useEffect } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { useNavigate } from 'react-router-dom';
-import Box from '@mui/material/Box';
 import Typography from '@mui/material/Typography';
 import {
-  Stack, styled, Grid, useMediaQuery,
+  Stack, Grid, useMediaQuery,
 } from '@mui/material';
 import { get, set } from '../../store/Store';
 import Myslider from '../../shared/Slider';
 import Help from '../../shared/Help';
 import Required from '../../shared/Required';
 import NavigateBar from '../../shared/Navigate';
-
-const CustomInputText = styled(Typography)({
-  fontSize: '1.2rem',
-  fontWeight: 400,
-  color: '#4f6b14',
-  marginTop: '1.3rem',
-  marginBottom: '0.2rem',
-});
 
 const CoverCropSecond = () => {
   const navigate = useNavigate();
@@ -54,28 +45,31 @@ const CoverCropSecond = () => {
           alignItems: 'center',
         }}
       >
-        <Typography variant="h4">Tell us about your Cover Crop Quality</Typography>
-        {isSatelliteMode && (
-        <Typography variant="subtitle1" fontWeight={900}>
-          These values are estimated based on plant species and growth stage
-        </Typography>
-        )}
-        <Box sx={{ width: '50%', marginBottom: '1rem' }}>
-          <Box mt={2} sx={{ display: 'flex', flexDirection: 'row', alignItems: 'center' }}>
+        <Stack direction="column" spacing="2rem" width="100%" maxWidth="600px">
+
+          <Typography variant="h4" align="center" color="primary">Tell us about your Cover Crop Quality</Typography>
+
+          {isSatelliteMode && (
+          <Typography variant="subtitle1" fontWeight={900}>
+            These values are estimated based on plant species and growth stage
+          </Typography>
+          )}
+
+          <Stack gap={1}>
             <Stack direction="row" alignItems="center">
-              <CustomInputText>Nitrogen (%)</CustomInputText>
+              <Typography variant="inputLabel">Nitrogen (%)</Typography>
               <Help ariaLabel="Cover crop nitrogen concentration based on lab results.">
                 Cover crop nitrogen concentration based on lab results.
               </Help>
               {!N && <Required />}
             </Stack>
-            :
-          </Box>
-          <Myslider id="N" min={0} max={6} step={0.1} disabled={isSatelliteMode} />
-          {!isSatelliteMode && N ? <p className="note">Adjust default values below based on lab results.</p> : ''}
-          <Box mt={2} sx={{ display: 'flex', flexDirection: 'row', alignItems: 'center' }}>
+            <Myslider id="N" min={0} max={6} step={0.1} disabled={isSatelliteMode} />
+            {!isSatelliteMode && N ? <p className="note">Adjust default values below based on lab results.</p> : ''}
+          </Stack>
+
+          <Stack gap={1}>
             <Stack direction="row" alignItems="center">
-              <CustomInputText>Carbohydrates (%)</CustomInputText>
+              <Typography variant="inputLabel">Carbohydrates (%)</Typography>
               <Help ariaLabel="Non-structural labile carbohydrate concentration based on lab results. Click for more details.">
                 <p>
                   Non-structural labile carbohydrate concentration based on lab results.
@@ -87,12 +81,12 @@ const CoverCropSecond = () => {
               </Help>
               {!carb && <Required />}
             </Stack>
-            :
-          </Box>
-          <Myslider id="carb" min={20} max={70} step={0.1} disabled={isSatelliteMode} />
-          <Box mt={2} sx={{ display: 'flex', flexDirection: 'row', alignItems: 'center' }}>
+            <Myslider id="carb" min={20} max={70} step={0.1} disabled={isSatelliteMode} />
+          </Stack>
+
+          <Stack gap={1}>
             <Stack direction="row" alignItems="center">
-              <CustomInputText>Holo-cellulose (%)</CustomInputText>
+              <Typography variant="inputLabel">Holo-cellulose (%)</Typography>
               <Help ariaLabel="Structural holo-cellulose concentration based on lab results. Click for more details.">
                 <p>
                   Structural holo-cellulose (i.e., both cellulose and hemi-cellulose) concentration based on lab results. This represents the
@@ -100,16 +94,16 @@ const CoverCropSecond = () => {
                 </p>
                 <p>The default value is based on the nitrogen concentration.</p>
                 <p>If you have the raw data from near infra-red reflectance spectroscopy (NIRS) analysis, use the following equation:</p>
-                <p>holo-cellulose (%) = % neutral detergent fiber (NDF) – (% lignin + % ash)</p>
+                <p>holo-cellulose (%) = % neutral detergent fiber (NDF) - (% lignin + % ash)</p>
               </Help>
               {!cell && <Required />}
             </Stack>
-            :
-          </Box>
-          <Myslider id="cell" min={20} max={70} step={0.1} disabled={isSatelliteMode} />
-          <Box mt={2} sx={{ display: 'flex', flexDirection: 'row', alignItems: 'center' }}>
+            <Myslider id="cell" min={20} max={70} step={0.1} disabled={isSatelliteMode} />
+          </Stack>
+
+          <Stack gap={1}>
             <Stack direction="row" alignItems="center">
-              <CustomInputText>Lignin (%)</CustomInputText>
+              <Typography variant="inputLabel">Lignin (%)</Typography>
               <Help ariaLabel="Structural lignin concentration based on lab results.  Click for more details.">
                 <p>
                   Structural lignin concentration based on lab results.
@@ -119,10 +113,9 @@ const CoverCropSecond = () => {
               </Help>
               {!lign && <Required />}
             </Stack>
-            :
-          </Box>
-          <Myslider id="lign" min={1} max={10} step={0.1} disabled={isSatelliteMode} />
-        </Box>
+            <Myslider id="lign" min={1} max={10} step={0.1} disabled={isSatelliteMode} />
+          </Stack>
+        </Stack>
 
         <NavigateBar
           next="next"

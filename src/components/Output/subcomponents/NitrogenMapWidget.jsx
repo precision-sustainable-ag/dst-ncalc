@@ -59,6 +59,7 @@ const NitrogenMapWidget = ({ refVal }) => {
   const otherGranularFertilizer = useSelector(get.otherGranularFertilizer);
   const liquidFertilizer = useSelector(get.liquidFertilizer);
   const otherLiquidFertilizer = useSelector(get.otherLiquidFertilizer);
+  const hasFixedNRate = useSelector(get.hasFixedNRate);
   const coverCropGrowthStage = useSelector(get.coverCropGrowthStage);
 
   const [layer, setLayer] = useState(!isRCPPReportOnly ? 'prescription' : 'credit');
@@ -221,7 +222,7 @@ const NitrogenMapWidget = ({ refVal }) => {
   return (
     <Card sx={CardStyles} elevation={8} ref={refVal}>
       <CardContent sx={cardContentStyles}>
-        <Typography sx={{ fontSize: 22 }} color="text.secondary" gutterBottom textAlign="center">
+        <Typography variant="h5" color="primary" gutterBottom textAlign="center">
           Field Map
         </Typography>
         {nitrogenFetchIsLoading && (
@@ -268,6 +269,7 @@ const NitrogenMapWidget = ({ refVal }) => {
               { label: 'Nitrogen Credit', value: 'credit' },
               { label: 'Biomass', value: 'biomass' },
               ...(isPM3DMode && !isRCPPReportOnly ? [{ label: 'Treatment', value: 'treatment' }] : []),
+              ...(isPM3DMode && !isRCPPReportOnly && hasFixedNRate === 'variable' ? [{ label: 'Target Rate', value: 'spray' }] : []),
             ]}
             selectedValue={layer}
             onChange={(value) => setLayer(value)}

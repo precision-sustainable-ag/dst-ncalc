@@ -153,12 +153,7 @@ const ResidueCard = ({ refVal }) => {
     <Card sx={CardStyles} elevation={8} ref={refVal}>
       <CardContent sx={cardContentStyles}>
         <Stack gap={2}>
-          <Typography
-            sx={{ fontSize: 22 }}
-            color="text.secondary"
-            gutterBottom
-            textAlign="center"
-          >
+          <Typography variant="h5" color="primary" gutterBottom textAlign="center">
             Remaining Residue
           </Typography>
         </Stack>

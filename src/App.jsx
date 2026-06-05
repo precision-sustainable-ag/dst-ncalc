@@ -12,12 +12,8 @@ import {
   PSATheme, PSAHeader, PSAAuthButton, FadeAlert, PSAProfile, PSASkipContent,
 } from 'shared-react-components/src';
 import { useAuth0 } from '@auth0/auth0-react';
-import { deepmerge } from '@mui/utils';
-import ChatBubbleOutlineIcon from '@mui/icons-material/ChatBubbleOutline';
 import AccountBoxOutlinedIcon from '@mui/icons-material/AccountBoxOutlined';
-// import GrassOutlinedIcon from '@mui/icons-material/GrassOutlined';
 import CloudUploadOutlinedIcon from '@mui/icons-material/CloudUploadOutlined';
-// import ResponsiveNavBar from './components/ResponsiveNavBar';
 import Feedback from './components/Feedback';
 import SnackbarMessage from './shared/SnackbarMessage';
 import './App.scss';
@@ -74,8 +70,10 @@ console.warn = (msg, ...subst) => {
 
 // const Init = screens.init;
 
-const theme = createTheme({
+const localTheme = {
+  ...PSATheme,
   typography: {
+    ...PSATheme.typography,
     feedback: {
       fontFamily: 'IBM Plex Sans',
       textTransform: 'none',
@@ -86,10 +84,15 @@ const theme = createTheme({
       textTransform: 'none',
       fontSize: '1rem',
     },
+    inputLabel: {
+      fontSize: '1.2rem',
+      fontWeight: 400,
+      color: '#598445',
+    },
   },
-});
+};
 
-const dstTheme = createTheme(deepmerge(PSATheme, theme));
+const dstTheme = createTheme(localTheme);
 
 const App = () => {
   useSelector(get.screen); // force render
@@ -101,7 +104,7 @@ const App = () => {
   useFetchHLS();
   useFetchPlantFactors();
 
-  const matchesMd = useMediaQuery(theme.breakpoints.down('md'));
+  const matchesMd = useMediaQuery(dstTheme.breakpoints.down('md'));
 
   const path = window.location.toString().split('/').pop().toLowerCase() || 'home';
   const Screen = screens[path] || screens.home;
@@ -124,32 +127,9 @@ const App = () => {
       textSx: { fontSize: '1rem' },
     },
     {
-      type: 'button',
-      variant: 'text',
       text: 'Feedback',
-      icon: <ChatBubbleOutlineIcon />,
-      rightIcon: true,
-      style: { fontSize: '1rem' },
-      textSx: { fontSize: '1rem' },
-      onClick: () => {
-        dispatch(set.openFeedbackModal(true));
-      },
+      dialog: <Feedback />,
     },
-    // ...(isPM3DMode
-    //   ? [
-    //     {
-    //       type: 'button',
-    //       variant: 'text',
-    //       text: 'Enroll Field',
-    //       icon: <GrassOutlinedIcon />,
-    //       rightIcon: true,
-    //       onClick: () => {
-    //         dispatch(set.activeStep(0));
-    //         navigate('/field');
-    //       },
-    //     },
-    //   ]
-    //   : []),
     ...(isPM3DMode
       ? [
         {
@@ -250,7 +230,6 @@ const App = () => {
             <Route path="" element={<Screen />} />
           </Routes>
           <ActionModal {...actionModal} onClose={() => { dispatch(set.actionModal({ ...actionModal, open: false })); }} />
-          <Feedback />
           <SnackbarMessage />
           <Box sx={{ position: 'fixed', bottom: matchesMd ? '45px' : 0, zIndex: 1000 }}>
             <FadeAlert

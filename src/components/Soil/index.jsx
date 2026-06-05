@@ -34,7 +34,7 @@ const Soil = () => {
       dispatch(set.activeStep(4));
       navigate('/covercrop');
     }
-  }, []);
+  }, [dispatch, isPM3DMode, isSatelliteMode, navigate]);
 
   /// /// /// RETURN JSX /// ///
   return (
@@ -52,8 +52,8 @@ const Soil = () => {
           backgroundColor: 'white',
         }}
       >
-        <Stack spacing="1rem" sx={{ marginBottom: '1rem' }}>
-          <Typography variant="h4" align="center">Tell us about your Soil</Typography>
+        <Stack direction="column" spacing="1rem" alignItems="center">
+          <Typography variant="h4" align="center" color="primary">Tell us about your Soil</Typography>
           {SSURGOisFailed && (
           <Alert severity="warning">
             Note that the NRCS Soil Survey Geographic database (SSURGO) does not have information for your location,
@@ -112,33 +112,32 @@ const Soil = () => {
                   The data below was pulled from NRCS&apos;s Soil Survey Geographic database (SSURGO) based on your field&apos;s latitude/longitude
                   coordinates. You can adjust them if you have lab results.
                 </Typography>
-                <Box sx={{ display: 'flex', justifyContent: 'center' }}>
-                  <Stack spacing="1rem" sx={{ color: '#4f6b14', minWidth: '50%' }}>
-                    <Box>
-                      Organic Matter (%):
-                      <Help ariaLabel="Soil organic matter in the surface (0-10cm) soil">
-                        Soil organic matter in the surface (0-10cm) soil
-                      </Help>
-                      <Myslider id="OM" min={0.1} max={5} step={0.1} />
-                    </Box>
-                    <Box>
-                      Bulk Density (g/cm
-                      <sup>3</sup>
-                      ):
-                      <Help ariaLabel="Soil bulk density in the surface (0-10cm) soil">
-                        Soil bulk density in the surface (0-10cm) soil
-                      </Help>
-                      <Myslider id="BD" min={0.8} max={1.8} step={0.1} />
-                    </Box>
-                    <Box>
-                      Soil Inorganic N (ppm or mg/kg):
-                      <Help ariaLabel="Soil inorganic nitrogen in the surface (0-10cm) soil">
-                        Soil inorganic nitrogen in the surface (0-10cm) soil
-                      </Help>
-                      <Myslider id="InorganicN" min={0} max={25} />
-                    </Box>
-                  </Stack>
-                </Box>
+
+                <Stack spacing="2rem" width="100%" maxWidth="600px" sx={{ color: 'primary.main' }}>
+                  <Box>
+                    Organic Matter (%)
+                    <Help ariaLabel="Soil organic matter in the surface (0-10cm) soil">
+                      Soil organic matter in the surface (0-10cm) soil
+                    </Help>
+                    <Myslider id="OM" min={0.1} max={5} step={0.1} />
+                  </Box>
+                  <Box>
+                    Bulk Density (g/cm
+                    <sup>3</sup>
+                    )
+                    <Help ariaLabel="Soil bulk density in the surface (0-10cm) soil">
+                      Soil bulk density in the surface (0-10cm) soil
+                    </Help>
+                    <Myslider id="BD" min={0.8} max={1.8} step={0.1} />
+                  </Box>
+                  <Box>
+                    Soil Inorganic N (ppm or mg/kg)
+                    <Help ariaLabel="Soil inorganic nitrogen in the surface (0-10cm) soil">
+                      Soil inorganic nitrogen in the surface (0-10cm) soil
+                    </Help>
+                    <Myslider id="InorganicN" min={0} max={25} />
+                  </Box>
+                </Stack>
               </>
             )
           ) : (

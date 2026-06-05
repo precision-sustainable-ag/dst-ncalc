@@ -165,12 +165,7 @@ const NitrogenCard = ({ refVal }) => {
     <Card sx={CardStyles} elevation={8} ref={refVal}>
       <CardContent sx={cardContentStyles}>
         <Stack gap={2}>
-          <Typography
-            sx={{ fontSize: 22 }}
-            color="text.secondary"
-            textAlign="center"
-            gutterBottom
-          >
+          <Typography variant="h5" color="primary" gutterBottom textAlign="center">
             Released Nitrogen
           </Typography>
         </Stack>

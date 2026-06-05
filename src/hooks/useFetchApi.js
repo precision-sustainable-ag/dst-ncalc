@@ -9,6 +9,7 @@ import { get, set } from '../store/Store';
 import { weightedAverage } from './helpers';
 import { historyStates } from '../store/inits';
 import { handleError } from '../utils/apiError';
+import { publicApi } from '../utils/apiClient';
 
 const NCAL_API_URL = 'https://api.covercrop-ncalc.org/surface';
 const SSURGO_API_URL = 'https://ssurgo.covercrop-data.org';
@@ -405,7 +406,7 @@ const downloadPrescriptionShapefile = async (reqnGeojson, dispatch) => {
 
 const useFetchPlantFactors = () => {
   const dispatch = useDispatch();
-  const species = useSelector(get.species);
+  const species = useSelector(get.coverCropList);
   const plantGrowthStages = useSelector(get.plantGrowthStages);
   const coverCrop = useSelector(get.coverCrop);
   const coverCropGrowthStage = useSelector(get.coverCropGrowthStage);
@@ -463,18 +464,48 @@ const useFetchPlantFactors = () => {
 
   useEffect(() => {
     const satelliteSpecies = 'winter_cereals';
-    const url = isSatelliteMode ? `${PLANTFACTORS_API_URL}/species/${satelliteSpecies}` : `${PLANTFACTORS_API_URL}/species`;
-    axios
-      .get(url)
-      .then((data) => {
-        if (data.data) {
-          dispatch(set.species(data.data));
+    if (biomassCalcMode === 'satellite') {
+      const url = `${PLANTFACTORS_API_URL}/species/${satelliteSpecies}`;
+      axios
+        .get(url)
+        .then((data) => {
+          if (data.data) {
+            dispatch(set.coverCropList(data.data));
+          }
+        })
+        .catch((error) => {
+          dispatch(set.coverCropList([]));
+          console.log(error);
+        });
+    } else {
+      const fetchCrops = async () => {
+        try {
+          const url = 'crops';
+          const response = await publicApi.get(url);
+
+          if (response?.data?.data) {
+            const sortedCrops = response.data.data.sort((a, b) => (a).cropName.localeCompare(b.cropName));
+
+            const coverCropList = sortedCrops
+              .filter((crop) => crop.cropType === 'cover')
+              .map((crop) => crop.cropName);
+
+            const cashCropList = sortedCrops
+              .filter((crop) => crop.cropType === 'cash')
+              .map((crop) => crop.cropName);
+
+            dispatch(set.coverCropList(coverCropList));
+            dispatch(set.cashCropList(cashCropList));
+          }
+        } catch (error) {
+          console.error('Failed to fetch crops:', error);
+          dispatch(set.coverCropList([]));
+          dispatch(set.cashCropList([]));
         }
-      })
-      .catch((error) => {
-        dispatch(set.species([]));
-        console.log(error);
-      });
+      };
+
+      fetchCrops();
+    }
   }, [dispatch, biomassCalcMode]);
 
   useEffect(() => {
@@ -494,6 +525,7 @@ const useFetchPlantFactors = () => {
   }, [dispatch]);
 
   useEffect(() => {
+    if (activeExample) return;
     dispatch(set.biomassGeojson(null));
     dispatch(set.nitrogenTaskResults(null));
   }, [biomassTaskResults, coverCrop, coverCropGrowthStage, coverCropTerminationDate, targetN,
