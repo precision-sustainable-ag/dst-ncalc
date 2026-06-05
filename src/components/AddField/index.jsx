@@ -358,7 +358,7 @@ const AddField = () => {
 
       dispatch(set.actionModal({
         open: true,
-        type: 'info',
+        type: 'success',
         title: 'Field Saved',
         message: 'Field saved successfully!',
       }));
@@ -402,7 +402,7 @@ const AddField = () => {
 
       dispatch(set.actionModal({
         open: true,
-        type: 'info',
+        type: 'success',
         title: 'Field Updated',
         message: 'Field updated successfully!',
       }));
@@ -428,7 +428,7 @@ const AddField = () => {
 
         dispatch(set.actionModal({
           open: true,
-          type: 'info',
+          type: 'success',
           title: 'Field Deleted',
           message: 'Field deleted successfully!',
         }));

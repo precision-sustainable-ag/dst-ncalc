@@ -106,14 +106,14 @@ const Feedback = () => {
         if (body.data.status === 'success') {
           dispatch(set.actionModal({
             open: true,
-            type: 'info',
+            type: 'success',
             title: 'Feedback submitted',
             message: 'Thank you for the feedback! We will contact you if we have any updates or questions.',
           }));
         } else {
           dispatch(set.actionModal({
             open: true,
-            type: 'info',
+            type: 'error',
             title: 'Feedback submission failed',
             message: 'Failed to send Feedback to Github.',
           }));
@@ -121,7 +121,7 @@ const Feedback = () => {
       })
       .catch(() => dispatch(set.actionModal({
         open: true,
-        type: 'info',
+        type: 'error',
         title: 'Feedback submission failed',
         message: 'Failed to send Feedback to Github.',
       })));

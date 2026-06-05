@@ -182,7 +182,12 @@ const UploadMap = () => {
         blobHTTPHeaders: { blobContentType: selectedFile.type },
       });
 
-      handleError(null, dispatch, `File uploaded successfully to folder: ${folderName}`);
+      dispatch(set.actionModal({
+        open: true,
+        type: 'success',
+        title: 'File Uploaded',
+        message: `File uploaded successfully to folder: ${folderName}`,
+      }));
 
       // Reset file input
       setSelectedFile(null);
@@ -254,18 +259,18 @@ const UploadMap = () => {
           borderRadius: 5,
           opacity: 0.9,
           backgroundColor: 'white',
+          display: 'flex',
+          flexDirection: 'column',
+          alignItems: 'center',
         }}
       >
-        <Stack spacing="1.5em">
-          <Typography variant="h4" align="center" gutterBottom>
-            Upload Field Maps
-          </Typography>
+        <Stack direction="column" spacing="2rem" width="100%">
+          <Typography variant="h4" align="center" color="primary" gutterBottom>Upload Field Maps</Typography>
 
-          <Typography variant="body1" color="textSecondary">
-            Use the filters below to find your field.
-          </Typography>
-
-          <FieldDropdown />
+          <Stack gap={1}>
+            <Typography variant="body1" color="textSecondary">Use the filters below to find your field.</Typography>
+            <FieldDropdown />
+          </Stack>
 
           {selectedField && (
           <Autocomplete
@@ -332,14 +337,7 @@ const UploadMap = () => {
             variant="contained"
             title={isUploading ? 'Uploading...' : 'Upload File'}
             onClick={handleUpload}
-            disabled={isUploading || !selectedFile || !mapType || !selectedField}
-            sx={{
-              backgroundColor: '#60802D',
-              '&:hover': {
-                backgroundColor: '#60802D',
-                textDecoration: 'underline',
-              },
-            }}
+            disabled={isUploading || !selectedField || !selectedSeason || !mapType || !selectedFile}
           />
 
         </Stack>
