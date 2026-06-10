@@ -130,25 +130,6 @@ const AddField = () => {
     setLatLon([properties?.lat, properties?.lon]);
   };
 
-  const fetchProgamGroups = useCallback(async () => {
-    if (isAuthenticated) {
-      try {
-        setLoadingOptions(true);
-        const url = 'program-config';
-        const response = await privateApi.get(url);
-        dispatch(set.programGroups(response?.data?.data));
-      } catch (error) {
-        handleError(error, dispatch);
-      } finally {
-        setLoadingOptions(false);
-      }
-    }
-  }, [dispatch, isAuthenticated]);
-
-  useEffect(() => {
-    fetchProgamGroups();
-  }, [fetchProgamGroups]);
-
   const fetchOptions = useCallback(async () => {
     if (isAuthenticated) {
       try {

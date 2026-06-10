@@ -1,7 +1,7 @@
 /* eslint-disable no-underscore-dangle */
 /* eslint-disable no-console */
 /* eslint-disable react-hooks/exhaustive-deps */
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import { useAuth0 } from '@auth0/auth0-react';
 import { useDispatch, useSelector } from 'react-redux';
 import {
@@ -9,13 +9,15 @@ import {
 } from '@mui/material';
 import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
-import { PSATextField } from 'shared-react-components/src';
+import { PSAButton, PSARadioButton, PSATextField } from 'shared-react-components/src';
 import centroid from '@turf/centroid';
+import shpjs from 'shpjs';
 import { get, set } from '../../store/Store';
 import NavigateBar from '../../shared/Navigate';
 import { ncalcApiUrl } from '../../utils/keys';
 import FieldDropdown from '../../shared/FieldDropdown/FieldDropdown';
 import { handleError } from '../../utils/apiError';
+import { processGeometries, validateAndProcessGeoJSON } from '../../utils/geojsonUtils';
 
 const API_BASE_URL = ncalcApiUrl;
 
@@ -28,6 +30,9 @@ const Upload = () => {
   const selectedField = useSelector(get.selectedField);
   const [biomassFiles, setBiomassFiles] = useState([]);
   const selectedBiomassFile = useSelector(get.selectedBiomassFile);
+  const [useCustomBoundary, setUseCustomBoundary] = useState(false);
+  const [fileName, setFileName] = useState('');
+  const originalGeometryRef = useRef(null);
 
   const biomassPoints = useSelector(get.biomassPoints);
   const [error, setError] = useState('');
@@ -191,6 +196,78 @@ const Upload = () => {
     dispatch(set.coverCropGrowthStage(selectedBiomassFile?.growthStages));
   }, [selectedBiomassFile]);
 
+  // Capture the original geometry and reset boundary UI whenever a new field is chosen
+  useEffect(() => {
+    if (selectedField?.geometry) {
+      originalGeometryRef.current = selectedField.geometry;
+    }
+    setUseCustomBoundary(false);
+  }, [selectedField?._id]);
+
+  const handleBoundaryToggle = (newValue) => {
+    if (newValue === null) return;
+    setUseCustomBoundary(newValue);
+    setFileName('');
+
+    // Restore original geometry when switching back to no
+    if (newValue === false && originalGeometryRef.current && selectedField) {
+      dispatch(set.selectedField({ ...selectedField, geometry: originalGeometryRef.current }));
+    }
+  };
+
+  const handleFileUpload = (e) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    setFileName(file.name);
+
+    const setGeometry = (processedGeojson) => {
+      const newGeometry = processGeometries(processedGeojson);
+      if (newGeometry) dispatch(set.selectedField({ ...selectedField, geometry: newGeometry }));
+    };
+
+    const ext = file.name.split('.').pop()?.toLowerCase();
+
+    if (['geojson', 'json'].includes(ext)) {
+      const reader = new FileReader();
+      reader.onload = () => {
+        try {
+          const geojson = JSON.parse(reader.result);
+          validateAndProcessGeoJSON(
+            geojson,
+            setGeometry,
+            () => {},
+            () => {},
+          );
+        } catch (err) {
+          setFileName('');
+          handleError(err, dispatch, 'Error parsing GeoJSON file');
+        }
+      };
+      reader.readAsText(file);
+    } else if (['shp', 'zip'].includes(ext)) {
+      const reader = new FileReader();
+      reader.onload = async () => {
+        try {
+          const arrayBuffer = reader.result;
+          const geojson = await shpjs(arrayBuffer);
+          validateAndProcessGeoJSON(
+            geojson,
+            setGeometry,
+            () => {},
+            () => {},
+          );
+        } catch (err) {
+          setFileName('');
+          handleError(err, dispatch, 'Error parsing Shapefile. Please ensure it is a valid .zip containing .shp, .shx, and .dbf files.');
+        }
+      };
+      reader.readAsArrayBuffer(file);
+    } else {
+      setFileName('');
+      handleError(null, dispatch, 'Unsupported file type. Please upload .geojson or .shp');
+    }
+  };
+
   return (
     <Grid container justifyContent="center">
       <Grid
@@ -257,6 +334,54 @@ const Upload = () => {
           />
           )}
 
+          {selectedField && (
+          <Stack spacing={1}>
+            <Typography variant="body1">
+              Would you like to use different field boundaries?
+            </Typography>
+
+            <PSARadioButton
+              options={[
+                { label: 'No', value: false },
+                { label: 'Yes', value: true },
+              ]}
+              selectedValue={useCustomBoundary}
+              onChange={handleBoundaryToggle}
+              row
+            />
+            {useCustomBoundary && (
+              <Stack spacing={1} sx={{ pt: 1 }}>
+
+                <Stack direction={{ sm: 'column', md: 'row' }} gap={1} justifyContent="space-between">
+                  <Typography variant="body1" color="text.secondary" alignContent="center">
+                    {' '}
+                    {fileName ? `Selected file: ${fileName}` : 'No file selected'}
+                    {' '}
+                  </Typography>
+
+                  <input
+                    id="upload-input"
+                    type="file"
+                    hidden
+                    accept=".geojson,.shp,.zip"
+                    onChange={handleFileUpload}
+                  />
+                  <PSAButton
+                    title="Upload Shapefile / GeoJSON"
+                    variant="contained"
+                    onClick={() => document.getElementById('upload-input').click()}
+                    sx={{
+                      minWidth: '150px',
+                      padding: '0.8rem 1.5rem',
+                      borderRadius: '2rem',
+                    }}
+                  />
+                </Stack>
+              </Stack>
+            )}
+          </Stack>
+          )}
+
           {error && (
           <Box sx={{ marginBottom: '1rem' }}>
             <Alert severity="error">{error}</Alert>
@@ -283,7 +408,7 @@ const Upload = () => {
             navigate('/covercrop');
             dispatch(set.activeStep(4));
           }}
-          nextDisabled={!biomassPoints}
+          nextDisabled={!biomassPoints || (useCustomBoundary && !fileName)}
           nextTooltip={!biomassPoints ? 'Upload a file' : ''}
           back="Back"
           backOnClick={() => {

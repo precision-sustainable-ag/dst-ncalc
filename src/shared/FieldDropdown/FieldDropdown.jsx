@@ -1,4 +1,3 @@
-/* eslint-disable react-hooks/exhaustive-deps */
 import React, {
   useEffect, useMemo, useState,
 } from 'react';
@@ -12,12 +11,6 @@ import { PSATextField } from 'shared-react-components/src';
 import { get, set } from '../../store/Store';
 import { privateApi } from '../../utils/apiClient';
 import { handleError } from '../../utils/apiError';
-
-const PROGRAM_GROUPS = {
-  'NIFA-Soy': 'NIFA-Soy',
-  Willard: 'RCPP',
-  Growmark: 'RCPP',
-};
 
 const FieldDropdown = () => {
   const { isAuthenticated } = useAuth0();
@@ -93,7 +86,7 @@ const FieldDropdown = () => {
     if (isAuthenticated) {
       fetchFields();
     }
-  }, [isAuthenticated]);
+  }, [dispatch, isAuthenticated]);
 
   return (
     <>
@@ -103,7 +96,7 @@ const FieldDropdown = () => {
             options={uniqueGroups}
             value={filterGroup}
             getOptionLabel={(option) => {
-              const p = PROGRAM_GROUPS[option] || option;
+              const p = option;
               return p !== option ? `${p} - ${option}` : `${p}`;
             }}
             onChange={(e, val) => handleGroupFilterChange(val)}

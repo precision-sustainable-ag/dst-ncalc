@@ -1,15 +1,16 @@
 /* eslint-disable react-hooks/exhaustive-deps */
 /* eslint-disable no-console */
-import { useEffect, useState } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 import axios from 'axios';
 import moment from 'moment';
 import dayjs from 'dayjs';
 import { useDispatch, useSelector } from 'react-redux';
+import { useAuth0 } from '@auth0/auth0-react';
 import { get, set } from '../store/Store';
 import { weightedAverage } from './helpers';
 import { historyStates } from '../store/inits';
 import { handleError } from '../utils/apiError';
-import { publicApi } from '../utils/apiClient';
+import { privateApi, publicApi } from '../utils/apiClient';
 
 const NCAL_API_URL = 'https://api.covercrop-ncalc.org/surface';
 const SSURGO_API_URL = 'https://ssurgo.covercrop-data.org';
@@ -405,6 +406,7 @@ const downloadPrescriptionShapefile = async (reqnGeojson, dispatch) => {
 //
 
 const useFetchPlantFactors = () => {
+  const { isAuthenticated } = useAuth0();
   const dispatch = useDispatch();
   const species = useSelector(get.coverCropList);
   const plantGrowthStages = useSelector(get.plantGrowthStages);
@@ -523,6 +525,23 @@ const useFetchPlantFactors = () => {
         });
     }
   }, [dispatch]);
+
+  // fetch program configs for pm3d mode
+  const fetchProgamGroups = useCallback(async () => {
+    if (isAuthenticated && biomassCalcMode === 'pm3d') {
+      try {
+        const url = 'program-config';
+        const response = await privateApi.get(url);
+        dispatch(set.programGroups(response?.data?.data));
+      } catch (error) {
+        handleError(error, dispatch);
+      }
+    }
+  }, [dispatch, isAuthenticated, biomassCalcMode]);
+
+  useEffect(() => {
+    fetchProgamGroups();
+  }, [fetchProgamGroups]);
 
   useEffect(() => {
     if (activeExample) return;

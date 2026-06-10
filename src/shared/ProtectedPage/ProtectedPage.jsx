@@ -4,20 +4,21 @@ import {
   Box, CircularProgress, Grid, Stack, Typography,
 } from '@mui/material';
 import { useNavigate } from 'react-router-dom';
-import { useDispatch } from 'react-redux';
-import { set } from '../../store/redux-autosetters';
+import { useDispatch, useSelector } from 'react-redux';
+import { get, set } from '../../store/redux-autosetters';
 import NavButton from '../Navigate/NavButton';
-
-const ROLES = ['NIFA-Soy', 'Willard', 'Growmark'];
 
 const ProtectedPage = ({ children }) => {
   const { user, isAuthenticated, isLoading } = useAuth0();
   const dispatch = useDispatch();
   const navigate = useNavigate();
 
+  const programGroups = useSelector(get.programGroups);
+
   const roles = user?.['https://dst-ncalc.org/claims'] || [];
+  const availableGroups = [...new Set((programGroups || []).map((pg) => pg.groupName))];
   const isAllowed = isAuthenticated && (
-    roles.includes('ncalc-super-admin') || roles.includes('ncalc-admin') || roles.some((r) => ROLES.includes(r))
+    roles.includes('ncalc-super-admin') || roles.includes('ncalc-admin') || roles.some((r) => availableGroups.includes(r))
   );
 
   if (isLoading) {
