@@ -12,7 +12,7 @@ import { get, set } from '../../store/Store';
  *  */
 const ALL_STEPS = [
   { id: 'home', title: 'Home', step: 0 },
-  { id: 'upload', title: 'Upload', step: 1 },
+  { id: 'upload', title: 'Location', step: 1 },
   { id: 'location', title: 'Location', step: 2 },
   { id: 'soil', title: 'Soil', step: 3 },
   { id: 'covercrop', title: 'Cover Crop', step: 4 },
