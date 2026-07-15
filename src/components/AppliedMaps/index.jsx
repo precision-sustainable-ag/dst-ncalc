@@ -109,7 +109,7 @@ const AppliedMaps = () => {
     return nPercent;
   }, [additionalMetadata]);
 
-  // Applied map with the selected rate column scaled by the fertilizer multiplier
+  // Applied map with an 'applied_N_rate column' added: the selected rate column scaled by the fertilizer multiplier.
   const displayedMap = useMemo(() => {
     if (!appliedMap?.features?.length || !appliedRateColumn) {
       return appliedMap;
@@ -121,7 +121,7 @@ const AppliedMaps = () => {
         ...feature,
         properties: {
           ...feature.properties,
-          [appliedRateColumn]:
+          applied_N_rate:
             (parseFloat(feature.properties?.[appliedRateColumn]) || 0) * rateMultiplier,
         },
       })),
@@ -134,7 +134,7 @@ const AppliedMaps = () => {
     return appliedRateColumn ? displayedMap : null;
   }, [mapLayer, prescriptionGeojson, appliedRateColumn, displayedMap]);
 
-  const valueKey = mapLayer === 'prescription' ? 'ReqN' : appliedRateColumn;
+  const valueKey = mapLayer === 'prescription' ? 'ReqN' : 'applied_N_rate';
 
   const unit = useMemo(() => {
     if (mapLayer === 'prescription') return 'lb of N/ac';
@@ -298,9 +298,9 @@ const AppliedMaps = () => {
       const fieldName = selectedField?.properties?.fieldName ?? 'Field';
       const fertilizer = additionalMetadata?.fertilizer;
 
-      // Min/max/average of the uploaded file's rate column after the fertilizer conversion
+      // Min/max/average of the converted applied_N_rate column
       const rateValues = (displayedMap?.features ?? [])
-        .map((feature) => feature.properties?.[appliedRateColumn])
+        .map((feature) => feature.properties?.applied_N_rate)
         .filter((value) => Number.isFinite(value) && value > 0);
       const rateUnit = rateMultiplier !== 1 ? ' lb N/ac' : '';
       const rateStats = rateValues.length
