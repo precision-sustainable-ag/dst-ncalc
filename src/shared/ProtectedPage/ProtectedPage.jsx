@@ -10,14 +10,15 @@ import NavButton from '../Navigate/NavButton';
 
 const ROLES = ['NIFA-Soy', 'Willard', 'Growmark'];
 
-const ProtectedPage = ({ children }) => {
+const ProtectedPage = ({ children, adminOnly = false }) => {
   const { user, isAuthenticated, isLoading } = useAuth0();
   const dispatch = useDispatch();
   const navigate = useNavigate();
 
   const roles = user?.['https://dst-ncalc.org/claims'] || [];
+  const isAdmin = roles.includes('ncalc-super-admin') || roles.includes('ncalc-admin');
   const isAllowed = isAuthenticated && (
-    roles.includes('ncalc-super-admin') || roles.includes('ncalc-admin') || roles.some((r) => ROLES.includes(r))
+    adminOnly ? isAdmin : (isAdmin || roles.some((r) => ROLES.includes(r)))
   );
 
   if (isLoading) {

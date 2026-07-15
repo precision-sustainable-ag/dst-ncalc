@@ -213,3 +213,15 @@ export const mergeFeatureCollections = (geojson) => {
     features: mergedFeatures,
   };
 };
+
+/**
+ * Normalizes any valid GeoJSON (Feature / FeatureCollection / array of FCs) into one FeatureCollection
+ * @param {Object|Array} geojson - GeoJSON data to normalize
+ * @returns {Object} - A single FeatureCollection
+ */
+export const toFeatureCollection = (geojson) => {
+  const normalized = geojson?.type === 'Feature'
+    ? { type: 'FeatureCollection', features: [geojson] }
+    : geojson;
+  return mergeFeatureCollections(normalized);
+};

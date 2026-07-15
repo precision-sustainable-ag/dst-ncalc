@@ -56,6 +56,7 @@ const PATH_TO_TAB = {
   '/field': 0,
   '/editfield': 1,
   '/viewfield': 2,
+  '/appliedmaps': 3,
 };
 
 const AddField = () => {
@@ -523,6 +524,7 @@ const AddField = () => {
             <Tab label="Create Field" />
             <Tab label="Edit Field" />
             <Tab label="View Field" />
+            {(isSuperAdmin || isAdmin) ? <Tab label="View Applied Maps" /> : null}
           </Tabs>
         </Box>
 
