@@ -291,8 +291,8 @@ const AppliedMaps = () => {
     if (!mapInstance || isPdfLoading) return;
 
     const layers = [
-      ...(appliedRateColumn && displayedMap?.features?.length
-        ? [{ value: 'applied', label: 'Applied Fertilizer', geojson: displayedMap }]
+      ...(appliedRateColumn && trimmedMap?.features?.length
+        ? [{ value: 'applied', label: 'Applied Fertilizer', geojson: trimmedMap }]
         : []),
       ...(prescriptionGeojson?.features?.length
         ? [{ value: 'prescription', label: 'Prescription', geojson: prescriptionGeojson }]
@@ -328,8 +328,8 @@ const AppliedMaps = () => {
       const fieldName = selectedField?.properties?.fieldName ?? 'Field';
       const fertilizer = additionalMetadata?.fertilizer;
 
-      // Min/max/average of the converted applied_N_rate column
-      const rateValues = (displayedMap?.features ?? [])
+      // Min/max/average of the converted applied_N_rate column, matching the trimmed map view
+      const rateValues = (trimmedMap?.features ?? [])
         .map((feature) => feature.properties?.applied_N_rate)
         .filter((value) => Number.isFinite(value) && value > 0);
       const rateUnit = rateMultiplier !== 1 ? ' lb N/ac' : '';
