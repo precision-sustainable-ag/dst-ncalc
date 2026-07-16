@@ -12,7 +12,7 @@ import shpjs from 'shpjs';
 import axios from 'axios';
 import { bbox } from '@turf/turf';
 import {
-  PSATextField, PSAButton, PSARadioButton, PSAReduxMap,
+  PSATextField, PSAButton, PSARadioButton, PSAReduxMap, PSASlider,
 } from 'shared-react-components/src';
 import { useDispatch, useSelector } from 'react-redux';
 import { useLocation, useNavigate } from 'react-router-dom';
@@ -69,6 +69,9 @@ const AppliedMaps = () => {
   const [appliedMap, setAppliedMap] = useState(null);
   const [appliedMapFileName, setAppliedMapFileName] = useState('');
   const [appliedRateColumn, setAppliedRateColumn] = useState(null);
+
+  // Percent of data trimmed from each end of applied_N_rate for map display
+  const [trimPercent, setTrimPercent] = useState(5);
 
   const mapInstanceRef = useRef(null);
   const [mapLayer, setMapLayer] = useState('applied');
@@ -128,11 +131,38 @@ const AppliedMaps = () => {
     };
   }, [appliedMap, appliedRateColumn, rateMultiplier]);
 
+  // Drop features outside the trimPercent-th percentile of applied_N_rate from each end
+  // Only for visualization and pdf. Export (GeoJSON zip) preserves the full dataset.
+  const trimmedMap = useMemo(() => {
+    const features = displayedMap?.features;
+    if (!features?.length || !appliedRateColumn) return displayedMap;
+
+    const trimFraction = Math.min(Math.max(Number(trimPercent) || 0, 0), 49) / 100;
+    if (trimFraction === 0) return displayedMap;
+
+    const values = features
+      .map((feature) => feature.properties?.applied_N_rate)
+      .filter((value) => Number.isFinite(value))
+      .sort((a, b) => a - b);
+    if (!values.length) return displayedMap;
+
+    const lower = values[Math.floor(values.length * trimFraction)];
+    const upper = values[Math.ceil(values.length * (1 - trimFraction)) - 1];
+
+    return {
+      type: 'FeatureCollection',
+      features: features.filter((feature) => {
+        const value = feature.properties?.applied_N_rate;
+        return Number.isFinite(value) && value >= lower && value <= upper;
+      }),
+    };
+  }, [displayedMap, appliedRateColumn, trimPercent]);
+
   // Raster props for the displayed layer - initRasterObject, valueKey, unit
   const initRasterObject = useMemo(() => {
     if (mapLayer === 'prescription') return prescriptionGeojson;
-    return appliedRateColumn ? displayedMap : null;
-  }, [mapLayer, prescriptionGeojson, appliedRateColumn, displayedMap]);
+    return appliedRateColumn ? trimmedMap : null;
+  }, [mapLayer, prescriptionGeojson, appliedRateColumn, trimmedMap]);
 
   const valueKey = mapLayer === 'prescription' ? 'ReqN' : 'applied_N_rate';
 
@@ -447,16 +477,32 @@ const AppliedMaps = () => {
             </Stack>
 
             {appliedMap && (
-              <Box sx={{ width: { xs: '100%', md: '50%' } }}>
-                <Autocomplete
-                  options={appliedRateColumns}
-                  value={appliedRateColumn}
-                  onChange={(e, val) => setAppliedRateColumn(val)}
-                  renderInput={(params) => (
-                    <PSATextField {...params} label="Select the Applied Rate column" required />
-                  )}
-                />
-              </Box>
+              <>
+                <Box sx={{ width: { xs: '100%', md: '50%' } }}>
+                  <Autocomplete
+                    options={appliedRateColumns}
+                    value={appliedRateColumn}
+                    onChange={(e, val) => setAppliedRateColumn(val)}
+                    renderInput={(params) => (
+                      <PSATextField {...params} label="Select the Applied Rate column" required />
+                    )}
+                  />
+                </Box>
+                <Box sx={{ width: { xs: '100%', md: '25%' } }}>
+                  <Typography variant="inputLabel">
+                    {`Outlier trim: ${trimPercent}%`}
+                  </Typography>
+                  <PSASlider
+                    value={trimPercent}
+                    onChange={(_, value) => setTrimPercent(value)}
+                    min={0}
+                    max={49}
+                    step={1}
+                    valueLabelDisplay="auto"
+                    disabled={!appliedRateColumn}
+                  />
+                </Box>
+              </>
             )}
           </Stack>
 
