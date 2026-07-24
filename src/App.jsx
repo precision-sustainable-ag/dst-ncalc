@@ -24,6 +24,7 @@ import NcalcStepper from './shared/Stepper';
 import useFetchHLS from './hooks/useFetchHLS';
 import { useFetchPlantFactors } from './hooks/useFetchApi';
 import ProtectedPage from './shared/ProtectedPage/ProtectedPage';
+import { APPLIED_MAPS_ROLES } from './utils/roles';
 import { initAuth } from './utils/apiClient';
 import ActionModal from './shared/Modal';
 
@@ -220,14 +221,16 @@ const App = () => {
                 protectedPaths.push('covercrop', 'fertilizer', 'output');
               }
 
-              // Pages restricted to the ncalc-admin / ncalc-super-admin roles
-              const adminOnlyPaths = ['appliedmaps'];
+              // Pages restricted to specific roles. (ncalc-admin / ncalc-super-admin) have access by default.
+              const restrictedPaths = {
+                appliedmaps: APPLIED_MAPS_ROLES,
+              };
 
               const routePath = scr.toLowerCase();
               let element;
-              if (adminOnlyPaths.includes(routePath)) {
+              if (restrictedPaths[routePath]) {
                 element = (
-                  <ProtectedPage adminOnly>
+                  <ProtectedPage allowedRoles={restrictedPaths[routePath]}>
                     <ScreenComponent />
                   </ProtectedPage>
                 );

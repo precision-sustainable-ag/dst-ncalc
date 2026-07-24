@@ -7,18 +7,24 @@ import { useNavigate } from 'react-router-dom';
 import { useDispatch } from 'react-redux';
 import { set } from '../../store/redux-autosetters';
 import NavButton from '../Navigate/NavButton';
+import { getRoles, isUserAdmin } from '../../utils/roles';
 
-const ROLES = ['NIFA-Soy', 'Willard', 'Growmark'];
+const ROLES = ['NIFA-Soy', 'Willard', 'Growmark', 'GA', 'ND'];
 
-const ProtectedPage = ({ children, adminOnly = false }) => {
+/**
+ * Page is restricted to `allowedRoles`.
+ * Admins (ncalc-admin / ncalc-super-admin) have access by default.
+ * If `allowedRoles` is null, the page is accessible to all roles.
+ */
+const ProtectedPage = ({ children, allowedRoles = null }) => {
   const { user, isAuthenticated, isLoading } = useAuth0();
   const dispatch = useDispatch();
   const navigate = useNavigate();
 
-  const roles = user?.['https://dst-ncalc.org/claims'] || [];
-  const isAdmin = roles.includes('ncalc-super-admin') || roles.includes('ncalc-admin');
+  const roles = getRoles(user);
+  const grantingRoles = allowedRoles || ROLES;
   const isAllowed = isAuthenticated && (
-    adminOnly ? isAdmin : (isAdmin || roles.some((r) => ROLES.includes(r)))
+    isUserAdmin(roles) || roles.some((r) => grantingRoles.includes(r))
   );
 
   if (isLoading) {

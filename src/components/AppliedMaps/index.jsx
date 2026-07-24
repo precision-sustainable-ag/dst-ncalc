@@ -25,6 +25,7 @@ import { isValidGeoJSON, toFeatureCollection } from '../../utils/geojsonUtils';
 import { fitAndWaitForIdle, extractLegend } from '../../utils/mapCaptureUtils';
 import { downloadGeojsonZip } from '../../utils/downloadUtils';
 import buildPdfReportHtml from '../../utils/pdfUtils';
+import { APPLIED_MAPS_ROLES, getRoles, hasAccess } from '../../utils/roles';
 import FieldDropdown from '../../shared/FieldDropdown/FieldDropdown';
 
 // Maps each route to a tab index so the Tabs component stays in sync with the URL
@@ -50,10 +51,8 @@ const AppliedMaps = () => {
 
   const matchesMd = useMediaQuery((theme) => theme.breakpoints.down('md'));
 
-  // Roles are assigned in auth0 and included in the user's ID token. They are the 'groups' that the user has access to.
-  const roles = user?.['https://dst-ncalc.org/claims'] || [];
-  const isAdmin = roles.includes('ncalc-admin');
-  const isSuperAdmin = roles.includes('ncalc-super-admin');
+  const roles = getRoles(user);
+  const showAppliedMaps = hasAccess(roles, APPLIED_MAPS_ROLES);
 
   const selectedField = useSelector(get.selectedField);
 
@@ -425,7 +424,7 @@ const AppliedMaps = () => {
             <Tab label="Create Field" />
             <Tab label="Edit Field" />
             <Tab label="View Field" />
-            {(isSuperAdmin || isAdmin) ? <Tab label="View Applied Maps" /> : null}
+            {showAppliedMaps ? <Tab label="View Applied Maps" /> : null}
           </Tabs>
         </Box>
 
