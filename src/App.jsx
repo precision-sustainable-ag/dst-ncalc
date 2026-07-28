@@ -24,6 +24,7 @@ import NcalcStepper from './shared/Stepper';
 import useFetchHLS from './hooks/useFetchHLS';
 import { useFetchPlantFactors } from './hooks/useFetchApi';
 import ProtectedPage from './shared/ProtectedPage/ProtectedPage';
+import { APPLIED_MAPS_ROLES } from './utils/roles';
 import { initAuth } from './utils/apiClient';
 import ActionModal from './shared/Modal';
 
@@ -48,6 +49,7 @@ screens.editfield = require('./components/AddField').default;
 screens.viewfield = require('./components/AddField').default;
 screens.fileupload = require('./components/FileUpload').default;
 screens.fertilizer = require('./components/NitrogenFertilizer').default;
+screens.appliedmaps = require('./components/AppliedMaps').default;
 
 screens.profile = () => <PSAProfile styles={{ backgroundColor: 'white' }} />;
 
@@ -113,7 +115,7 @@ const App = () => {
   const isPM3DMode = useSelector(get.biomassCalcMode) === 'pm3d';
   const actionModal = useSelector(get.actionModal);
 
-  const noStepperPaths = ['/profile', '/field', '/editfield', '/viewfield', '/fileupload'];
+  const noStepperPaths = ['/profile', '/field', '/editfield', '/viewfield', '/fileupload', '/appliedmaps'];
   const showStepper = !noStepperPaths.includes(location.pathname.toLowerCase());
 
   const navContent = [
@@ -213,19 +215,35 @@ const App = () => {
             {Object.keys(screens).map((scr) => {
               const ScreenComponent = screens[scr];
 
-              const protectedPaths = ['upload', 'field', 'editfield', 'viewfield', 'fileupload'];
+              // Pages that require user log in
+              const protectedPaths = ['upload', 'field', 'editfield', 'viewfield', 'fileupload', 'appliedmaps'];
               if (isPM3DMode) {
                 protectedPaths.push('covercrop', 'fertilizer', 'output');
               }
 
-              const element = protectedPaths.includes(scr.toLowerCase()) ? (
-                <ProtectedPage>
-                  <ScreenComponent />
-                </ProtectedPage>
-              ) : (
-                <ScreenComponent />
-              );
-              return <Route key={scr} path={scr.toLowerCase()} element={element} />;
+              // Pages restricted to specific roles. (ncalc-admin / ncalc-super-admin) have access by default.
+              const restrictedPaths = {
+                appliedmaps: APPLIED_MAPS_ROLES,
+              };
+
+              const routePath = scr.toLowerCase();
+              let element;
+              if (restrictedPaths[routePath]) {
+                element = (
+                  <ProtectedPage allowedRoles={restrictedPaths[routePath]}>
+                    <ScreenComponent />
+                  </ProtectedPage>
+                );
+              } else if (protectedPaths.includes(routePath)) {
+                element = (
+                  <ProtectedPage>
+                    <ScreenComponent />
+                  </ProtectedPage>
+                );
+              } else {
+                element = <ScreenComponent />;
+              }
+              return <Route key={scr} path={routePath} element={element} />;
             })}
             <Route path="" element={<Screen />} />
           </Routes>
