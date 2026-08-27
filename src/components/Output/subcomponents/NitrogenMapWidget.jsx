@@ -72,8 +72,11 @@ const NitrogenMapWidget = ({ refVal }) => {
         return;
       }
 
+      const pdfTitle = 'Nitrogen Prescription Maps';
       const fieldName = selectedField?.properties?.fieldName ?? 'Field';
-      const html = buildPdfReportHtml({ fieldName, mapCaptures, summaryData });
+      const html = buildPdfReportHtml({
+        pdfTitle, fieldName, mapCaptures, summaryData,
+      });
 
       const { data } = await axios.post(`${PDF_BASE_URL}/generate-pdf`, { html, filename: `prescription-${fieldName}.pdf` });
       window.open(data.fileUrl, '_blank');

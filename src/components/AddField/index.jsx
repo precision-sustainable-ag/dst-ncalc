@@ -22,6 +22,9 @@ import { mapboxToken } from '../../utils/keys';
 import { geometriesToFeatures, processGeometries, validateAndProcessGeoJSON } from '../../utils/geojsonUtils';
 import { privateApi } from '../../utils/apiClient';
 import { handleError } from '../../utils/apiError';
+import {
+  APPLIED_MAPS_ROLES, getRoles, hasAccess, isUserAdmin, isUserSuperAdmin,
+} from '../../utils/roles';
 
 const polygonIcon = (
   <SvgIcon
@@ -56,6 +59,7 @@ const PATH_TO_TAB = {
   '/field': 0,
   '/editfield': 1,
   '/viewfield': 2,
+  '/appliedmaps': 3,
 };
 
 const AddField = () => {
@@ -104,10 +108,10 @@ const AddField = () => {
   // SELECTED FIELD (USED FOR EDIT/VIEW FIELD METADATA)
   const [selectedField, setSelectedField] = useState(null);
 
-  // Roles are assigned in auth0 and included in the user's ID token. They are the 'groups' that the user has access to.
-  const roles = user?.['https://dst-ncalc.org/claims'] || [];
-  const isAdmin = roles.includes('ncalc-admin');
-  const isSuperAdmin = roles.includes('ncalc-super-admin');
+  const roles = getRoles(user);
+  const isAdmin = isUserAdmin(roles);
+  const isSuperAdmin = isUserSuperAdmin(roles);
+  const showAppliedMaps = hasAccess(roles, APPLIED_MAPS_ROLES);
   const availableGroups = [...new Set((programGroups || []).map((pg) => pg.groupName))];
   const allowedGroups = (isSuperAdmin || isAdmin)
     ? availableGroups
@@ -523,6 +527,7 @@ const AddField = () => {
             <Tab label="Create Field" />
             <Tab label="Edit Field" />
             <Tab label="View Field" />
+            {showAppliedMaps ? <Tab label="View Applied Maps" /> : null}
           </Tabs>
         </Box>
 

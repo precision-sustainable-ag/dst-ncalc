@@ -1,10 +1,13 @@
 /**
  * Turns an array of captured map snapshots into an HTML string suitable for PDF generation.
+ * @param {string} pdfTitle - title of the pdf file
  * @param {string} fieldName - field name for the heading
  * @param {Array} mapCaptures - array of { label, mapImage, legendItems, legendTitle }
  * @param {Object} summaryData - key-value pairs of summary data to include in the report
  */
-const buildPdfReportHtml = ({ fieldName, mapCaptures, summaryData }) => {
+const buildPdfReportHtml = ({
+  pdfTitle = 'Cover Crop Nitrogen Calculator', fieldName, mapCaptures, summaryData,
+}) => {
   const summaryRows = Object.entries(summaryData)
     .map(
       ([key, item]) => `
@@ -204,7 +207,7 @@ const buildPdfReportHtml = ({ fieldName, mapCaptures, summaryData }) => {
         </head>
         <body>
             <header>
-                <h1>Nitrogen Prescription Maps - ${fieldName}</h1>
+                <h1>${pdfTitle} - ${fieldName}</h1>
                 <p>Generated: ${new Date().toLocaleString()}</p>
             </header>
 

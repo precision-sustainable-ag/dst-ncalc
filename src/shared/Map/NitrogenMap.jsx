@@ -9,65 +9,13 @@ import { Paper } from '@mui/material';
 import { bbox } from '@turf/turf';
 import { get, set } from '../../store/Store';
 import { mapboxToken } from '../../utils/keys';
+import { fitAndWaitForIdle, extractLegend } from '../../utils/mapCaptureUtils';
 import { geometryToFeatureCollection } from '../../utils/geojsonUtils';
 
 const biomassRasterColors = ['#d73027', '#f46d43', '#fdae61', '#fee08b', '#a6d96a', '#1a9850'];
 const prescriptionRasterColors = ['#762a83', '#af8dc3', '#e7d4e8', '#d9f0d3', '#7fbf7b', '#1b7837'];
 // const creditRasterColors = ['#ffffcc', '#c7e9b4', '#7fcdbb', '#41b6c4', '#1d91c0', '#225ea8'];
 // const sprayMapRasterColors = ['#8B4513', '#D2691E', '#F4A460', '#90EE90', '#228B22', '#006400'];
-
-/**
- * Fit a Mapbox map to `bounds` and resolve only once the camera animation
- * and the subsequent tile/render cycle are both complete.
- */
-function fitAndWaitForIdle(mapInstance, bounds) {
-  return new Promise((resolve) => {
-    const waitForIdle = () => {
-      mapInstance.once('idle', resolve);
-      mapInstance.triggerRepaint();
-    };
-    if (!bounds) {
-      waitForIdle();
-      return;
-    }
-    let settled = false;
-    const finish = () => {
-      if (settled) return;
-      settled = true;
-      waitForIdle();
-    };
-
-    mapInstance.once('moveend', finish);
-
-    mapInstance.fitBounds(
-      [[bounds[0], bounds[1]], [bounds[2], bounds[3]]],
-      { padding: 40, animate: false },
-    );
-    setTimeout(finish, 100);
-  });
-}
-
-/**
- * Extract legend items from the DOM node that wraps the map.
- */
-function extractLegend(containerEl) {
-  const legendEl = containerEl?.querySelector('[class*="rasterlegend"]');
-  if (!legendEl) return { legendTitle: [], legendItems: [] };
-
-  const headerEl = legendEl.querySelector('[class*="rasterlegendheader"]');
-  const legendTitle = headerEl
-    ? [...headerEl.querySelectorAll('[class*="rasterlegendvalue"]')].map((v) => v.textContent.trim())
-    : [];
-
-  const legendItems = [];
-  legendEl.querySelectorAll('[class*="rasterlegenditem"]').forEach((item) => {
-    const color = item.querySelector('[class*="rasterlegendcolor"]')?.style?.backgroundColor;
-    const values = [...item.querySelectorAll('[class*="rasterlegendvalue"]')].map((v) => v.textContent.trim());
-    if (color && values.length) legendItems.push({ color, values });
-  });
-
-  return { legendTitle, legendItems };
-}
 
 const NitrogenMapComp = forwardRef(({ layer = 'prescription', setLayer }, ref) => {
   const [address, setAddress] = useState({});
