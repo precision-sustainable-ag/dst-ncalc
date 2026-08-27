@@ -183,6 +183,9 @@ const NitrogenFertilizer = () => {
           <Typography variant="h4" align="center" color="primary" gutterBottom>Tell us about your Fertilizer</Typography>
 
           <Stack gap={2}>
+            <Typography variant="inputLabel">
+              What fertilizer will you be using at sidedress?
+            </Typography>
             <PSARadioButton
               options={[
                 { label: 'Liquid Fertilizer', value: 'liquid' },
@@ -347,6 +350,9 @@ const NitrogenFertilizer = () => {
           <Box sx={{ borderBottom: '1px solid #eee' }} />
 
           <Stack gap={2}>
+            <Typography variant="inputLabel">
+              What units do you want to enter your target rate in?
+            </Typography>
             <PSARadioButton
               options={[
                 { label: 'Enter lbs N / acre', value: 'nitrogen' },

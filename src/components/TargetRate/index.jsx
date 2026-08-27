@@ -144,7 +144,10 @@ const TargetRate = () => {
           <Alert severity="error" sx={{ width: '100%', mb: 2 }}>{error}</Alert>
           )}
 
-          <Stack gap={2} sx={{ minHeight: '140px' }}>
+          <Stack gap={2}>
+            <Typography variant="inputLabel">
+              Will you be using fixed target rate or variable target rate?
+            </Typography>
             <PSARadioButton
               options={[
                 { label: 'Fixed Rate', value: 'fixed' },
@@ -154,55 +157,62 @@ const TargetRate = () => {
               onChange={(value) => dispatch(set.hasFixedNRate(value))}
               row
             />
+          </Stack>
 
-            {hasFixedNRate === 'fixed' && (
-            <Stack gap={1}>
-              <Stack direction="row" alignItems="center">
-                <Typography variant="inputLabel">
-                  {inputMode === 'nitrogen'
-                    ? 'What is your Target N Rate? (lb N/ac):'
-                    : `What is your Target Nitrogen Fertilizer Rate? ${fertilizerType === 'granular' ? '(lb/ac)' : '(gal/ac)'}:`}
-                </Typography>
-                <Help ariaLabel="Specify the target N rate for your region.">Specify the target N rate for your region.</Help>
-                {(!targetN || targetN <= 0) && <Required />}
-              </Stack>
+          <Box sx={{ borderBottom: '1px solid #eee' }} />
 
-              <Myslider
-                id="targetN"
-                min={0}
-                max={
-                  inputMode === 'nitrogen'
-                    ? 250
-                    : fertilizerType === 'liquid'
-                      ? 85
-                      : 500
-                }
-              />
+          {hasFixedNRate === 'fixed' && (
+          <Stack gap={2}>
+            <Stack direction="row" alignItems="center">
+              <Typography variant="inputLabel">
+                {inputMode === 'nitrogen'
+                  ? 'What is your Target Nitrogen Rate? (lb N/ac):'
+                  : `What is your Target Nitrogen Fertilizer Rate? ${fertilizerType === 'granular' ? '(lb/ac)' : '(gal/ac)'}:`}
+              </Typography>
+              <Help ariaLabel="Specify the target N rate for your region.">Specify the target N rate for your region.</Help>
+              {(!targetN || targetN <= 0) && <Required />}
             </Stack>
-            )}
 
-            {hasFixedNRate === 'variable' && (
-            <Stack gap={2}>
-              <Stack direction={{ sm: 'column', md: 'row' }} gap={1} justifyContent="space-between">
-                <Typography variant="body1" color="text.secondary" alignContent="center">
-                  {' '}
-                  {fileName ? `Selected file: ${fileName}` : 'No file selected'}
-                  {' '}
-                </Typography>
-                <NavButton onClick={handleUploadClick}>Upload Map</NavButton>
-                <input ref={fileInputRef} type="file" accept=".geojson,.shp,.zip" hidden onChange={handleFileSelect} />
-              </Stack>
-              {properties.length > 0 && (
-              <Autocomplete
-                options={properties}
-                value={nitrogenSprayMapProperty}
-                onChange={(e, val) => dispatch(set.nitrogenSprayMapProperty(val))}
-                renderInput={(params) => <PSATextField {...params} label="Select the N rate column name" />}
-              />
-              )}
+            <Myslider
+              id="targetN"
+              min={0}
+              max={
+                inputMode === 'nitrogen'
+                  ? 250
+                  : fertilizerType === 'liquid'
+                    ? 85
+                    : 500
+              }
+            />
+          </Stack>
+          )}
+
+          {hasFixedNRate === 'variable' && (
+          <Stack gap={2}>
+            <Typography variant="inputLabel">
+              {inputMode === 'nitrogen'
+                ? 'Upload your Variable Target Nitrogen Rate (lb N/ac):'
+                : `Upload your Variable Target Nitrogen Fertilizer Rate ${fertilizerType === 'granular' ? '(lb/ac)' : '(gal/ac)'}:`}
+            </Typography>
+            <Stack direction={{ sm: 'column', md: 'row' }} gap={1} justifyContent="space-between">
+              <Typography variant="body1" color="text.secondary" alignContent="center">
+                {' '}
+                {fileName ? `Selected file: ${fileName}` : 'No file selected'}
+                {' '}
+              </Typography>
+              <NavButton onClick={handleUploadClick} sx={{ minWidth: '145px' }}>Upload Map</NavButton>
+              <input ref={fileInputRef} type="file" accept=".geojson,.shp,.zip" hidden onChange={handleFileSelect} />
             </Stack>
+            {properties.length > 0 && (
+            <Autocomplete
+              options={properties}
+              value={nitrogenSprayMapProperty}
+              onChange={(e, val) => dispatch(set.nitrogenSprayMapProperty(val))}
+              renderInput={(params) => <PSATextField {...params} label="Select the N rate column name" />}
+            />
             )}
           </Stack>
+          )}
 
           <Box sx={{ borderBottom: '1px solid #eee' }} />
 
