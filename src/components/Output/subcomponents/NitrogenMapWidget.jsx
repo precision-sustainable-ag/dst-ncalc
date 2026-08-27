@@ -1,3 +1,4 @@
+/* eslint-disable no-nested-ternary */
 /* eslint-disable no-underscore-dangle */
 import { React, useState, useRef } from 'react';
 import {
@@ -55,6 +56,7 @@ const NitrogenMapWidget = ({ refVal }) => {
   const coverCropTerminationDate = useSelector(get.coverCropTerminationDate);
   const fertilizers = useSelector(get.fertilizers);
   const fertilizerType = useSelector(get.fertilizerType);
+  const inputMode = useSelector(get.inputMode);
   const granularFertilizer = useSelector(get.granularFertilizer);
   const otherGranularFertilizer = useSelector(get.otherGranularFertilizer);
   const liquidFertilizer = useSelector(get.liquidFertilizer);
@@ -188,6 +190,23 @@ const NitrogenMapWidget = ({ refVal }) => {
     }
   };
 
+  // Notify the user of the units the prescription will be downloaded in before proceeding.
+  const handleDownloadPrescription = () => {
+    const unit = inputMode === 'nitrogen' ? 'lb of N/ac' : fertilizerType === 'granular' ? 'lb of product/ac' : 'gal of product/ac';
+    dispatch(set.actionModal({
+      open: true,
+      type: 'confirm',
+      title: 'Download Prescription',
+      message: `Note: The downloaded prescription rates will be in ${unit}.`,
+      confirmText: 'Download',
+      cancelText: 'Cancel',
+      onConfirm: () => {
+        dispatch(set.actionModal({ open: false }));
+        handleSaveAndDownload();
+      },
+    }));
+  };
+
   /**
    * Captures all map layers as images, builds an HTML report and POSTs it to the PDF-generation endpoint.
    */
@@ -279,7 +298,7 @@ const NitrogenMapWidget = ({ refVal }) => {
             <Stack direction="row" spacing={3}>
               {(isSatelliteMode || (isPM3DMode && !isRCPPReportOnly)) && (
                 <NavButton
-                  onClick={handleSaveAndDownload}
+                  onClick={handleDownloadPrescription}
                   disabled={!nitrogenTaskResults?.reqN || nitrogenFetchIsLoading || isSaving}
                   sx={{ mt: 2 }}
                 >

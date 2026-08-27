@@ -51,16 +51,19 @@ function fitAndWaitForIdle(mapInstance, bounds) {
  */
 function extractLegend(containerEl) {
   const legendEl = containerEl?.querySelector('[class*="rasterlegend"]');
-  const legendTitle = legendEl?.querySelector('span')?.textContent?.trim() ?? '';
-  const legendItems = [];
+  if (!legendEl) return { legendTitle: [], legendItems: [] };
 
-  if (legendEl) {
-    legendEl.querySelectorAll('[class*="rasterlegenditem"]').forEach((item) => {
-      const color = item.querySelector('[class*="rasterlegendcolor"]')?.style?.backgroundColor;
-      const label = item.querySelector('[class*="rasterlegendvalue"]')?.textContent?.trim();
-      if (color && label) legendItems.push({ color, label });
-    });
-  }
+  const headerEl = legendEl.querySelector('[class*="rasterlegendheader"]');
+  const legendTitle = headerEl
+    ? [...headerEl.querySelectorAll('[class*="rasterlegendvalue"]')].map((v) => v.textContent.trim())
+    : [];
+
+  const legendItems = [];
+  legendEl.querySelectorAll('[class*="rasterlegenditem"]').forEach((item) => {
+    const color = item.querySelector('[class*="rasterlegendcolor"]')?.style?.backgroundColor;
+    const values = [...item.querySelectorAll('[class*="rasterlegendvalue"]')].map((v) => v.textContent.trim());
+    if (color && values.length) legendItems.push({ color, values });
+  });
 
   return { legendTitle, legendItems };
 }
@@ -82,6 +85,7 @@ const NitrogenMapComp = forwardRef(({ layer = 'prescription', setLayer }, ref) =
   const fertilizerType = useSelector(get.fertilizerType);
   const nitrogenSprayMapProperty = useSelector(get.nitrogenSprayMapProperty);
   const hasFixedNRate = useSelector(get.hasFixedNRate);
+  const multiplier = useSelector(get.multiplier);
   const [features, setFeatures] = useState(mapPolygon);
   const [zoom, setZoom] = useState(null);
   const [latLon, setLatLon] = useState([lat, lon]);
@@ -162,9 +166,9 @@ const NitrogenMapComp = forwardRef(({ layer = 'prescription', setLayer }, ref) =
     if (layer === 'biomass') return 'biomass_average';
     if (layer === 'prescription') return 'ReqN';
     if (layer === 'credit') return 'MinNfromFOM';
-    if (layer === 'spray') return nitrogenSprayMapProperty;
+    if (layer === 'spray') return hasFixedNRate === 'fixed' ? 'targetN' : nitrogenSprayMapProperty;
     return 'category'; // treatment
-  }, [layer, nitrogenSprayMapProperty]);
+  }, [layer, hasFixedNRate, nitrogenSprayMapProperty]);
 
   const rasterColors = useMemo(() => {
     if (layer === 'prescription') return prescriptionRasterColors;
@@ -177,6 +181,20 @@ const NitrogenMapComp = forwardRef(({ layer = 'prescription', setLayer }, ref) =
     if (layer === 'prescription') return fertilizerType === 'liquid' ? 'lb of N/ac' : 'lb of N/ac';
     if (layer === 'credit') return 'lb of N/ac';
     if (layer === 'spray') return inputMode === 'nitrogen' ? 'lb of N/ac' : fertilizerType === 'liquid' ? 'gal of product/ac' : 'lb of product/ac';
+    return '';
+  }, [layer, fertilizerType, inputMode]);
+
+  const secondaryUnit = useMemo(() => {
+    if (layer === 'prescription' || layer === 'credit') {
+      return fertilizerType === 'liquid' ? 'gal of product/ac' : 'lb of product/ac';
+    }
+    if (layer === 'spray') return inputMode === 'nitrogen' ? fertilizerType === 'liquid' ? 'gal of product/ac' : 'lb of product/ac' : 'lb of N/ac';
+    return '';
+  }, [layer, fertilizerType, inputMode]);
+
+  const secondaryUnitMultiplier = useMemo(() => {
+    if (layer === 'prescription' || layer === 'credit') return 1 / multiplier;
+    if (layer === 'spray') return inputMode === 'nitrogen' ? 1 / multiplier : multiplier;
     return '';
   }, [layer, fertilizerType, inputMode]);
 
@@ -229,8 +247,10 @@ const NitrogenMapComp = forwardRef(({ layer = 'prescription', setLayer }, ref) =
         rasterColors={rasterColors}
         color_steps={7}
         unit={unit}
-        material={layer}
+        material={layer.charAt(0).toUpperCase() + layer.slice(1)}
         discreteLabels={discreteLabels}
+        secondaryUnit={secondaryUnit}
+        secondaryUnitMultiplier={secondaryUnitMultiplier}
         mapboxToken={mapboxToken}
       />
     </Paper>
