@@ -360,14 +360,14 @@ const fetchPrescription = async (
   }
 };
 
-const prepareExportData = (reqnGeojson) => {
+const prepareExportData = (reqnGeojson, rateKey) => {
   if (!reqnGeojson || !reqnGeojson.features) return null;
 
   const exportedFeatures = reqnGeojson.features.map((feature) => ({
     type: 'Feature',
     geometry: feature.geometry,
     properties: {
-      RATE: feature.properties.ReqN_product ?? 0,
+      RATE: feature.properties[rateKey] ?? 0,
     },
   }));
 
@@ -377,8 +377,8 @@ const prepareExportData = (reqnGeojson) => {
   };
 };
 
-const downloadPrescriptionShapefile = async (reqnGeojson, dispatch) => {
-  const filteredData = prepareExportData(reqnGeojson);
+const downloadPrescriptionShapefile = async (reqnGeojson, dispatch, rateKey = 'ReqN_product') => {
+  const filteredData = prepareExportData(reqnGeojson, rateKey);
   if (!filteredData) {
     dispatch(set.user.alertMessage('No prescription data available for download.'));
     dispatch(set.user.showAlert(true));
@@ -542,7 +542,7 @@ const useFetchPlantFactors = () => {
       && coverCropTerminationDate
       && ((hasFixedNRate === 'variable' && nitrogenSprayMap && nitrogenSprayMapProperty) || (hasFixedNRate === 'fixed' && targetN > 0))
       && gridSize > 0
-      && activeStep > 5
+      && activeStep > 6
     ) {
       fetchNitrogenData(
         biomassTaskResults,
@@ -595,7 +595,7 @@ const useFetchPlantFactors = () => {
         && ((hasFixedNRate === 'variable' && multiplier && nitrogenSprayMap && nitrogenSprayMapProperty)
           || (hasFixedNRate === 'fixed' && multiplier && targetN > 0)))
         || isRCPPReportOnly)
-      && activeStep > 5
+      && activeStep > 6
     ) {
       fetchPrescription(
         selectedBiomassFile.points,
