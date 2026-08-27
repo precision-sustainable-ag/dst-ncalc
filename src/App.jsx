@@ -48,6 +48,7 @@ screens.editfield = require('./components/AddField').default;
 screens.viewfield = require('./components/AddField').default;
 screens.fileupload = require('./components/FileUpload').default;
 screens.fertilizer = require('./components/NitrogenFertilizer').default;
+screens.targetrate = require('./components/TargetRate').default;
 
 screens.profile = () => <PSAProfile styles={{ backgroundColor: 'white' }} />;
 
@@ -213,7 +214,7 @@ const App = () => {
             {Object.keys(screens).map((scr) => {
               const ScreenComponent = screens[scr];
 
-              const protectedPaths = ['upload', 'field', 'editfield', 'viewfield', 'fileupload'];
+              const protectedPaths = ['upload', 'field', 'editfield', 'viewfield', 'fileupload', 'targetrate'];
               if (isPM3DMode) {
                 protectedPaths.push('covercrop', 'fertilizer', 'output');
               }
