@@ -9,6 +9,7 @@ import { Paper } from '@mui/material';
 import { bbox } from '@turf/turf';
 import { get, set } from '../../store/Store';
 import { mapboxToken } from '../../utils/keys';
+import { geometryToFeatureCollection } from '../../utils/geojsonUtils';
 
 const biomassRasterColors = ['#d73027', '#f46d43', '#fdae61', '#fee08b', '#a6d96a', '#1a9850'];
 const prescriptionRasterColors = ['#762a83', '#af8dc3', '#e7d4e8', '#d9f0d3', '#7fbf7b', '#1b7837'];
@@ -86,6 +87,8 @@ const NitrogenMapComp = forwardRef(({ layer = 'prescription', setLayer }, ref) =
   const nitrogenSprayMapProperty = useSelector(get.nitrogenSprayMapProperty);
   const hasFixedNRate = useSelector(get.hasFixedNRate);
   const multiplier = useSelector(get.multiplier);
+  const targetN = useSelector(get.targetN);
+  const selectedField = useSelector(get.selectedField);
   const [features, setFeatures] = useState(mapPolygon);
   const [zoom, setZoom] = useState(null);
   const [latLon, setLatLon] = useState([lat, lon]);
@@ -107,7 +110,7 @@ const NitrogenMapComp = forwardRef(({ layer = 'prescription', setLayer }, ref) =
         { value: 'credit', label: 'Nitrogen Credit' },
         { value: 'biomass', label: 'Biomass' },
         ...(isPM3DMode && !isRCPPReportOnly ? [{ value: 'treatment', label: 'Treatment' }] : []),
-        ...(isPM3DMode && !isRCPPReportOnly && hasFixedNRate === 'variable' ? [{ value: 'spray', label: 'Target Rate' }] : []),
+        ...(isPM3DMode && !isRCPPReportOnly ? [{ value: 'spray', label: 'Target Rate' }] : []),
       ];
 
       return layers.reduce(async (prevPromise, { value, label }) => {
@@ -213,9 +216,15 @@ const NitrogenMapComp = forwardRef(({ layer = 'prescription', setLayer }, ref) =
 
   const initRasterObject = useMemo(() => {
     if (layer === 'biomass') return biomassGeojson;
-    if (layer === 'spray') return nitrogenSprayMap;
+    if (layer === 'spray') {
+      // Build a map for fixed rate from the field geometry with a constant target rate.
+      if (hasFixedNRate === 'fixed') {
+        return geometryToFeatureCollection(selectedField?.geometry, { targetN: Number(targetN) });
+      }
+      return nitrogenSprayMap;
+    }
     return nitrogenTaskResults?.reqN;
-  }, [layer, biomassGeojson, nitrogenTaskResults?.reqN, nitrogenSprayMap]);
+  }, [layer, hasFixedNRate, selectedField, targetN, biomassGeojson, nitrogenTaskResults?.reqN, nitrogenSprayMap]);
 
   return (
     <Paper>
