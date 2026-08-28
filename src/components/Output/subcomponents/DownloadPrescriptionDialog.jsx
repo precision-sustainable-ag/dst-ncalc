@@ -68,7 +68,8 @@ const DownloadPrescriptionDialog = ({ open, onClose }) => {
   }, [open, inputMode]);
 
   const downloadShapefile = () => {
-    downloadPrescriptionShapefile(nitrogenTaskResults?.reqN, dispatch, rateKey);
+    const fieldName = selectedField?.properties?.fieldName ?? '';
+    downloadPrescriptionShapefile(nitrogenTaskResults?.reqN, dispatch, fieldName, rateKey);
   };
 
   const saveAdditionalMetadata = async () => {

@@ -377,7 +377,7 @@ const prepareExportData = (reqnGeojson, rateKey) => {
   };
 };
 
-const downloadPrescriptionShapefile = async (reqnGeojson, dispatch, rateKey = 'ReqN_product') => {
+const downloadPrescriptionShapefile = async (reqnGeojson, dispatch, fieldName, rateKey = 'ReqN_product') => {
   const filteredData = prepareExportData(reqnGeojson, rateKey);
   if (!filteredData) {
     dispatch(set.user.alertMessage('No prescription data available for download.'));
@@ -391,7 +391,14 @@ const downloadPrescriptionShapefile = async (reqnGeojson, dispatch, rateKey = 'R
     const url = window.URL.createObjectURL(blob);
     const link = document.createElement('a');
     link.href = url;
-    link.setAttribute('download', 'prescription_rate.zip');
+
+    // Generate filename: prescription_<fieldName>_<YYYY-MM-DD>.zip
+    const today = dayjs().format('YYYY-MM-DD');
+    const sanitizedFieldName = fieldName.replace(/[^a-z0-9-]/gi, '_').toLowerCase();
+    const filename = sanitizedFieldName
+      ? `prescription_${sanitizedFieldName}_${today}.zip`
+      : `prescription_${today}.zip`;
+    link.setAttribute('download', filename);
     document.body.appendChild(link);
     link.click();
     link.remove();
