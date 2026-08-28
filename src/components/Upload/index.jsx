@@ -16,6 +16,7 @@ import NavigateBar from '../../shared/Navigate';
 import { ncalcApiUrl } from '../../utils/keys';
 import FieldDropdown from '../../shared/FieldDropdown/FieldDropdown';
 import { handleError } from '../../utils/apiError';
+import { privateApi, publicApi } from '../../utils/apiClient';
 
 const API_BASE_URL = ncalcApiUrl;
 
@@ -30,7 +31,10 @@ const Upload = () => {
   const selectedBiomassFile = useSelector(get.selectedBiomassFile);
 
   const biomassPoints = useSelector(get.biomassPoints);
+  const fertilizers = useSelector(get.fertilizers);
   const [error, setError] = useState('');
+  const [metadataGrowthStage, setMetadataGrowthStage] = useState(null); // saved in additional metadata table
+  const [biomassFileGrowthStage, setBiomassFileGrowthStage] = useState(null); // saved in boundaries table
 
   const navigate = useNavigate();
 
@@ -174,22 +178,95 @@ const Upload = () => {
     }
   }, [isAuthenticated, getAccessTokenSilently, selectedField]);
 
+  // Pre-populate latest saved additional metadata for the field.
+  useEffect(() => {
+    const fieldId = selectedField?._id;
+    setMetadataGrowthStage(null);
+    if (!isAuthenticated || !fieldId) return;
+
+    // Map the saved fertilizer back onto the dropdown selection.
+    const applyFertilizerMetadata = (fertilizer, fertilizerList) => {
+      if (!fertilizer?.type) return;
+      dispatch(set.fertilizerType(fertilizer.type));
+
+      const name = fertilizer.name ?? null;
+      const nPercent = fertilizer.n_percent ?? null;
+
+      if (fertilizer.type === 'granular') {
+        const known = fertilizerList.some((f) => f.type === 'granular' && f.name === name);
+        if (known) {
+          dispatch(set.granularFertilizer(name));
+        } else {
+          dispatch(set.granularFertilizer('Other'));
+          dispatch(set.otherGranularFertilizer({ fertilizerName: name, NPercent: nPercent }));
+        }
+      } else {
+        const known = fertilizerList.some((f) => f.type === 'liquid' && f.name === name);
+        if (known) {
+          dispatch(set.liquidFertilizer(name));
+        } else {
+          dispatch(set.liquidFertilizer('Other'));
+          dispatch(set.otherLiquidFertilizer({ fertilizerName: name, NPercent: nPercent, density: fertilizer.density ?? null }));
+        }
+      }
+    };
+
+    const fetchAdditionalMetadata = async () => {
+      try {
+        const response = await privateApi.get(`/additional-metadata/${fieldId}`);
+        const metadata = response?.data?.data;
+        if (!metadata) return;
+
+        // Ensure the fertilizer list is loaded so we can distinguish known fertilizers from custom ones.
+        let fertilizerList = fertilizers;
+        if (!fertilizerList?.length) {
+          try {
+            const res = await publicApi.get('fertilizers');
+            fertilizerList = res.data?.data || [];
+            dispatch(set.fertilizers(fertilizerList));
+          } catch {
+            fertilizerList = [];
+          }
+        }
+
+        if (metadata.sidedress_fertilization_date) dispatch(set.sidedressFertilizationDate(metadata.sidedress_fertilization_date));
+        if (metadata.growth_stage) setMetadataGrowthStage(metadata.growth_stage);
+        if (metadata.cc_termination_date) dispatch(set.coverCropTerminationDate(metadata.cc_termination_date));
+        applyFertilizerMetadata(metadata.fertilizer, fertilizerList);
+      } catch { /* empty */ }
+    };
+
+    fetchAdditionalMetadata();
+  }, [isAuthenticated, selectedField]);
+
   useEffect(() => {
     setError('');
     if (!selectedBiomassFile) {
       dispatch(set.biomassPoints(null));
-      dispatch(set.coverCropGrowthStage(null));
+      setBiomassFileGrowthStage(null);
       return;
     }
     const isValidated = validateData(selectedBiomassFile?.points);
     if (!isValidated) {
       dispatch(set.biomassPoints(null));
-      dispatch(set.coverCropGrowthStage(null));
+      setBiomassFileGrowthStage(null);
       return;
     }
     dispatch(set.biomassPoints(selectedBiomassFile?.points));
-    dispatch(set.coverCropGrowthStage(selectedBiomassFile?.growthStages));
+    setBiomassFileGrowthStage(selectedBiomassFile?.growthStages);
   }, [selectedBiomassFile]);
+
+  // Priority: additional-metadata growth stage first, then the biomass file growth stage, then empty.
+  useEffect(() => {
+    const isEmptyGrowthStage = (gs) => !gs || (typeof gs === 'object' && Object.keys(gs).length === 0);
+    if (!isEmptyGrowthStage(metadataGrowthStage)) {
+      dispatch(set.coverCropGrowthStage(metadataGrowthStage));
+    } else if (!isEmptyGrowthStage(biomassFileGrowthStage)) {
+      dispatch(set.coverCropGrowthStage(biomassFileGrowthStage));
+    } else {
+      dispatch(set.coverCropGrowthStage(null));
+    }
+  }, [metadataGrowthStage, biomassFileGrowthStage, dispatch]);
 
   return (
     <Grid container justifyContent="center">
