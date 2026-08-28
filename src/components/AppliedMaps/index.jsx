@@ -530,7 +530,6 @@ const AppliedMaps = () => {
               initLat={mapCenter[0]}
               initLon={mapCenter[1]}
               initBounds={mapBounds}
-              hasSearchBar
               hasNavigation
               hasFullScreen
               scrollZoom

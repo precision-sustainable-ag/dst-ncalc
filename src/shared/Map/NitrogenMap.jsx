@@ -187,12 +187,9 @@ const NitrogenMapComp = forwardRef(({ layer = 'prescription', setLayer }, ref) =
         initFeatures={mapPolygon}
         initAddress={mapAddress}
         initBounds={bounds}
-        hasSearchBar
         hasMarkerMovable
         hasNavigation
         hasFullScreen
-        hasGeolocate
-        hasDrawing
         scrollZoom
         dragRotate
         dragPan
@@ -208,6 +205,7 @@ const NitrogenMapComp = forwardRef(({ layer = 'prescription', setLayer }, ref) =
         discreteLabels={discreteLabels}
         secondaryUnit={secondaryUnit}
         secondaryUnitMultiplier={secondaryUnitMultiplier}
+        roundTo={1}
         mapboxToken={mapboxToken}
       />
     </Paper>
