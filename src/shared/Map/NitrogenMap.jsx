@@ -10,6 +10,7 @@ import { bbox } from '@turf/turf';
 import { get, set } from '../../store/Store';
 import { mapboxToken } from '../../utils/keys';
 import { fitAndWaitForIdle, extractLegend } from '../../utils/mapCaptureUtils';
+import { geometryToFeatureCollection } from '../../utils/geojsonUtils';
 
 const biomassRasterColors = ['#d73027', '#f46d43', '#fdae61', '#fee08b', '#a6d96a', '#1a9850'];
 const prescriptionRasterColors = ['#762a83', '#af8dc3', '#e7d4e8', '#d9f0d3', '#7fbf7b', '#1b7837'];
@@ -33,6 +34,9 @@ const NitrogenMapComp = forwardRef(({ layer = 'prescription', setLayer }, ref) =
   const fertilizerType = useSelector(get.fertilizerType);
   const nitrogenSprayMapProperty = useSelector(get.nitrogenSprayMapProperty);
   const hasFixedNRate = useSelector(get.hasFixedNRate);
+  const multiplier = useSelector(get.multiplier);
+  const targetN = useSelector(get.targetN);
+  const selectedField = useSelector(get.selectedField);
   const [features, setFeatures] = useState(mapPolygon);
   const [zoom, setZoom] = useState(null);
   const [latLon, setLatLon] = useState([lat, lon]);
@@ -54,7 +58,7 @@ const NitrogenMapComp = forwardRef(({ layer = 'prescription', setLayer }, ref) =
         { value: 'credit', label: 'Nitrogen Credit' },
         { value: 'biomass', label: 'Biomass' },
         ...(isPM3DMode && !isRCPPReportOnly ? [{ value: 'treatment', label: 'Treatment' }] : []),
-        ...(isPM3DMode && !isRCPPReportOnly && hasFixedNRate === 'variable' ? [{ value: 'spray', label: 'Target Rate' }] : []),
+        ...(isPM3DMode && !isRCPPReportOnly ? [{ value: 'spray', label: 'Target Rate' }] : []),
       ];
 
       return layers.reduce(async (prevPromise, { value, label }) => {
@@ -113,9 +117,9 @@ const NitrogenMapComp = forwardRef(({ layer = 'prescription', setLayer }, ref) =
     if (layer === 'biomass') return 'biomass_average';
     if (layer === 'prescription') return 'ReqN';
     if (layer === 'credit') return 'MinNfromFOM';
-    if (layer === 'spray') return nitrogenSprayMapProperty;
+    if (layer === 'spray') return hasFixedNRate === 'fixed' ? 'targetN' : nitrogenSprayMapProperty;
     return 'category'; // treatment
-  }, [layer, nitrogenSprayMapProperty]);
+  }, [layer, hasFixedNRate, nitrogenSprayMapProperty]);
 
   const rasterColors = useMemo(() => {
     if (layer === 'prescription') return prescriptionRasterColors;
@@ -128,6 +132,20 @@ const NitrogenMapComp = forwardRef(({ layer = 'prescription', setLayer }, ref) =
     if (layer === 'prescription') return fertilizerType === 'liquid' ? 'lb of N/ac' : 'lb of N/ac';
     if (layer === 'credit') return 'lb of N/ac';
     if (layer === 'spray') return inputMode === 'nitrogen' ? 'lb of N/ac' : fertilizerType === 'liquid' ? 'gal of product/ac' : 'lb of product/ac';
+    return '';
+  }, [layer, fertilizerType, inputMode]);
+
+  const secondaryUnit = useMemo(() => {
+    if (layer === 'prescription' || layer === 'credit') {
+      return fertilizerType === 'liquid' ? 'gal of product/ac' : 'lb of product/ac';
+    }
+    if (layer === 'spray') return inputMode === 'nitrogen' ? fertilizerType === 'liquid' ? 'gal of product/ac' : 'lb of product/ac' : 'lb of N/ac';
+    return '';
+  }, [layer, fertilizerType, inputMode]);
+
+  const secondaryUnitMultiplier = useMemo(() => {
+    if (layer === 'prescription' || layer === 'credit') return 1 / multiplier;
+    if (layer === 'spray') return inputMode === 'nitrogen' ? 1 / multiplier : multiplier;
     return '';
   }, [layer, fertilizerType, inputMode]);
 
@@ -146,9 +164,16 @@ const NitrogenMapComp = forwardRef(({ layer = 'prescription', setLayer }, ref) =
 
   const initRasterObject = useMemo(() => {
     if (layer === 'biomass') return biomassGeojson;
-    if (layer === 'spray') return nitrogenSprayMap;
+    if (layer === 'spray') {
+      // Build a map for fixed rate from the field geometry with a constant target rate.
+      if (hasFixedNRate === 'fixed') {
+        if (isPM3DMode) return geometryToFeatureCollection(selectedField?.geometry, { targetN: Number(targetN) });
+        return geometryToFeatureCollection(mapPolygon[0]?.geometry, { targetN: Number(targetN) });
+      }
+      return nitrogenSprayMap;
+    }
     return nitrogenTaskResults?.reqN;
-  }, [layer, biomassGeojson, nitrogenTaskResults?.reqN, nitrogenSprayMap]);
+  }, [layer, hasFixedNRate, selectedField, targetN, biomassGeojson, nitrogenTaskResults?.reqN, nitrogenSprayMap]);
 
   return (
     <Paper>
@@ -163,12 +188,9 @@ const NitrogenMapComp = forwardRef(({ layer = 'prescription', setLayer }, ref) =
         initFeatures={mapPolygon}
         initAddress={mapAddress}
         initBounds={bounds}
-        hasSearchBar
         hasMarkerMovable
         hasNavigation
         hasFullScreen
-        hasGeolocate
-        hasDrawing
         scrollZoom
         dragRotate
         dragPan
@@ -180,8 +202,11 @@ const NitrogenMapComp = forwardRef(({ layer = 'prescription', setLayer }, ref) =
         rasterColors={rasterColors}
         color_steps={7}
         unit={unit}
-        material={layer}
+        material={layer.charAt(0).toUpperCase() + layer.slice(1)}
         discreteLabels={discreteLabels}
+        secondaryUnit={secondaryUnit}
+        secondaryUnitMultiplier={secondaryUnitMultiplier}
+        roundTo={isPM3DMode ? 1 : 0.1}
         mapboxToken={mapboxToken}
       />
     </Paper>

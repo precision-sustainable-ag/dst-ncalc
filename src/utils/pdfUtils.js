@@ -21,15 +21,19 @@ const buildPdfReportHtml = ({
 
   const mapCards = mapCaptures
     .map(({
-      label, mapImage, legendItems, legendTitle,
+      label, mapImage, legendItems, legendTitle = [],
     }) => {
+      const headerCells = legendTitle
+        .map((u) => `<th class="legend-unit">${u}</th>`)
+        .join('');
+
       const legendRows = legendItems
         .map(
-          ({ color, label: itemLabel }) => `
-          <div class="legend-row">
-            <span class="legend-swatch" style="background:${color};"></span>
-            <span class="legend-label">${itemLabel}</span>
-          </div>`,
+          ({ color, values }) => `
+          <tr class="legend-row">
+            <td class="legend-swatch-cell"><span class="legend-swatch" style="background:${color};"></span></td>
+            ${(values ?? []).map((v) => `<td class="legend-label">${v}</td>`).join('')}
+          </tr>`,
         )
         .join('');
 
@@ -39,8 +43,17 @@ const buildPdfReportHtml = ({
         <div class="map-body">
           <img class="map-img" src="${mapImage}" alt="${label} map" />
           <div class="legend">
-            ${legendTitle ? `<span class="legend-title">${legendTitle}</span>` : ''}
-            ${legendRows}
+            <table class="legend-table">
+              <thead>
+                <tr>
+                  <th class="legend-swatch-cell"></th>
+                  ${headerCells}
+                </tr>
+              </thead>
+              <tbody>
+                ${legendRows}
+              </tbody>
+            </table>
           </div>
         </div>
       </div>`;
@@ -134,49 +147,52 @@ const buildPdfReportHtml = ({
             }
         
             .map-img {
-                width: calc(100% - 90px);
+                width: calc(100% - 150px);
                 height: 220px;
                 object-fit: cover;
                 display: block;
             }
-        
+
             .legend {
-                width: 90px;
+                width: 150px;
                 padding: 8px 6px;
                 background: #fafafa;
                 border-left: 1px solid #eee;
-                display: flex;
-                flex-direction: column;
-                gap: 4px;
                 flex-shrink: 0;
             }
-        
-            .legend-title {
-                font-size: 10px;
+
+            .legend-table {
+                width: 100%;
+                border-collapse: collapse;
+                table-layout: fixed;
+            }
+
+            .legend-unit {
+                font-size: 9px;
                 font-weight: 700;
                 color: #555;
                 text-align: center;
-                margin-bottom: 4px;
-                display: block;
+                vertical-align: bottom;
+                padding-bottom: 4px;
             }
-        
-            .legend-row {
-                display: flex;
-                align-items: center;
-                gap: 5px;
+
+            .legend-swatch-cell {
+                width: 18px;
             }
-        
+
             .legend-swatch {
+                display: inline-block;
                 width: 14px;
                 height: 14px;
                 border-radius: 2px;
-                flex-shrink: 0;
             }
-        
+
             .legend-label {
                 font-size: 9px;
                 color: #333;
                 line-height: 1.2;
+                text-align: center;
+                padding: 1px 0;
             }
         
             footer {

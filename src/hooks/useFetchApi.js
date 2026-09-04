@@ -360,14 +360,14 @@ const fetchPrescription = async (
   }
 };
 
-const prepareExportData = (reqnGeojson) => {
+const prepareExportData = (reqnGeojson, rateKey) => {
   if (!reqnGeojson || !reqnGeojson.features) return null;
 
   const exportedFeatures = reqnGeojson.features.map((feature) => ({
     type: 'Feature',
     geometry: feature.geometry,
     properties: {
-      RATE: feature.properties.ReqN_product ?? 0,
+      RATE: feature.properties[rateKey] ?? 0,
     },
   }));
 
@@ -377,8 +377,8 @@ const prepareExportData = (reqnGeojson) => {
   };
 };
 
-const downloadPrescriptionShapefile = async (reqnGeojson, dispatch) => {
-  const filteredData = prepareExportData(reqnGeojson);
+const downloadPrescriptionShapefile = async (reqnGeojson, dispatch, fieldName, rateKey = 'ReqN_product') => {
+  const filteredData = prepareExportData(reqnGeojson, rateKey);
   if (!filteredData) {
     dispatch(set.user.alertMessage('No prescription data available for download.'));
     dispatch(set.user.showAlert(true));
@@ -391,7 +391,14 @@ const downloadPrescriptionShapefile = async (reqnGeojson, dispatch) => {
     const url = window.URL.createObjectURL(blob);
     const link = document.createElement('a');
     link.href = url;
-    link.setAttribute('download', 'prescription_rate.zip');
+
+    // Generate filename: prescription_<fieldName>_<YYYY-MM-DD>.zip
+    const today = dayjs().format('YYYY-MM-DD');
+    const sanitizedFieldName = fieldName.replace(/[^a-z0-9-]/gi, '_').toLowerCase();
+    const filename = sanitizedFieldName
+      ? `prescription_${sanitizedFieldName}_${today}.zip`
+      : `prescription_${today}.zip`;
+    link.setAttribute('download', filename);
     document.body.appendChild(link);
     link.click();
     link.remove();
@@ -542,7 +549,7 @@ const useFetchPlantFactors = () => {
       && coverCropTerminationDate
       && ((hasFixedNRate === 'variable' && nitrogenSprayMap && nitrogenSprayMapProperty) || (hasFixedNRate === 'fixed' && targetN > 0))
       && gridSize > 0
-      && activeStep > 5
+      && activeStep > 6
     ) {
       fetchNitrogenData(
         biomassTaskResults,
@@ -595,7 +602,7 @@ const useFetchPlantFactors = () => {
         && ((hasFixedNRate === 'variable' && multiplier && nitrogenSprayMap && nitrogenSprayMapProperty)
           || (hasFixedNRate === 'fixed' && multiplier && targetN > 0)))
         || isRCPPReportOnly)
-      && activeStep > 5
+      && activeStep > 6
     ) {
       fetchPrescription(
         selectedBiomassFile.points,
@@ -627,6 +634,25 @@ const useFetchPlantFactors = () => {
     inputMode,
   ]);
 }; // useFetchPlantFactors
+
+/// Fetch fertilizers once and cache in Redux
+const useFetchFertilizers = () => {
+  const dispatch = useDispatch();
+
+  useEffect(() => {
+    const fetchFertilizers = async () => {
+      try {
+        const response = await publicApi.get('fertilizers');
+        dispatch(set.fertilizers(response.data?.data || []));
+      } catch (err) {
+        console.error('Failed to fetch fertilizers:', err);
+        dispatch(set.fertilizers([]));
+      }
+    };
+
+    fetchFertilizers();
+  }, []);
+};
 
 /// Desc: useFetchNitrogenArray
 /// ..............................................................................
@@ -668,5 +694,5 @@ const useFetchPlantFactors = () => {
 // }; // useFetchNitrogenArray
 
 export {
-  useFetchModel, useFetchSSURGO, useFetchCornN, useFetchPlantFactors, fetchNitrogenData, downloadPrescriptionShapefile,
+  useFetchModel, useFetchSSURGO, useFetchCornN, useFetchPlantFactors, fetchNitrogenData, downloadPrescriptionShapefile, useFetchFertilizers,
 };

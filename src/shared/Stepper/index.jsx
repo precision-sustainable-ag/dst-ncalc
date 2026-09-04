@@ -18,7 +18,8 @@ const ALL_STEPS = [
   { id: 'covercrop', title: 'Cover Crop', step: 4 },
   { id: 'cashcrop', title: 'Cash Crop', step: 5 },
   { id: 'fertilizer', title: 'Nitrogen Fertilizer', step: 5 },
-  { id: 'output', title: 'Output', step: 6 },
+  { id: 'targetrate', title: 'Target N Rate', step: 6 },
+  { id: 'output', title: 'Output', step: 7 },
 ];
 
 const NcalcStepper = () => {
@@ -40,11 +41,12 @@ const NcalcStepper = () => {
       if (!isRCPPReportOnly) {
         return updatedSteps.filter((s) => s.id !== 'location' && s.id !== 'soil' && s.id !== 'cashcrop');
       }
-      return updatedSteps.filter((s) => s.id !== 'location' && s.id !== 'soil' && s.id !== 'cashcrop' && s.id !== 'fertilizer');
+      return updatedSteps.filter((s) => s.id !== 'location' && s.id !== 'soil'
+      && s.id !== 'cashcrop' && s.id !== 'fertilizer' && s.id !== 'targetrate');
     } if (biomassCalcMode === 'satellite') {
       return updatedSteps.filter((s) => s.id !== 'upload' && s.id !== 'soil' && s.id !== 'cashcrop');
     } if (biomassCalcMode === 'sampled') {
-      return updatedSteps.filter((s) => s.id !== 'upload' && s.id !== 'fertilizer');
+      return updatedSteps.filter((s) => s.id !== 'upload' && s.id !== 'fertilizer' && s.id !== 'targetrate');
     }
     return updatedSteps;
   }, [biomassCalcMode, isRCPPReportOnly]);
