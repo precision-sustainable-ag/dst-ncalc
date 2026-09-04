@@ -16,7 +16,7 @@ import NavigateBar from '../../shared/Navigate';
 import { ncalcApiUrl } from '../../utils/keys';
 import FieldDropdown from '../../shared/FieldDropdown/FieldDropdown';
 import { handleError } from '../../utils/apiError';
-import { privateApi, publicApi } from '../../utils/apiClient';
+import { privateApi } from '../../utils/apiClient';
 
 const API_BASE_URL = ncalcApiUrl;
 
@@ -217,22 +217,10 @@ const Upload = () => {
         const metadata = response?.data?.data;
         if (!metadata) return;
 
-        // Ensure the fertilizer list is loaded so we can distinguish known fertilizers from custom ones.
-        let fertilizerList = fertilizers;
-        if (!fertilizerList?.length) {
-          try {
-            const res = await publicApi.get('fertilizers');
-            fertilizerList = res.data?.data || [];
-            dispatch(set.fertilizers(fertilizerList));
-          } catch {
-            fertilizerList = [];
-          }
-        }
-
         if (metadata.sidedress_fertilization_date) dispatch(set.sidedressFertilizationDate(metadata.sidedress_fertilization_date));
         if (metadata.growth_stage) setMetadataGrowthStage(metadata.growth_stage);
         if (metadata.cc_termination_date) dispatch(set.coverCropTerminationDate(metadata.cc_termination_date));
-        applyFertilizerMetadata(metadata.fertilizer, fertilizerList);
+        applyFertilizerMetadata(metadata.fertilizer, fertilizers);
       } catch { /* empty */ }
     };
 

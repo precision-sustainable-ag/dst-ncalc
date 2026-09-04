@@ -635,6 +635,25 @@ const useFetchPlantFactors = () => {
   ]);
 }; // useFetchPlantFactors
 
+/// Fetch fertilizers once and cache in Redux
+const useFetchFertilizers = () => {
+  const dispatch = useDispatch();
+
+  useEffect(() => {
+    const fetchFertilizers = async () => {
+      try {
+        const response = await publicApi.get('fertilizers');
+        dispatch(set.fertilizers(response.data?.data || []));
+      } catch (err) {
+        console.error('Failed to fetch fertilizers:', err);
+        dispatch(set.fertilizers([]));
+      }
+    };
+
+    fetchFertilizers();
+  }, []);
+};
+
 /// Desc: useFetchNitrogenArray
 /// ..............................................................................
 /// ..............................................................................
@@ -675,5 +694,5 @@ const useFetchPlantFactors = () => {
 // }; // useFetchNitrogenArray
 
 export {
-  useFetchModel, useFetchSSURGO, useFetchCornN, useFetchPlantFactors, fetchNitrogenData, downloadPrescriptionShapefile,
+  useFetchModel, useFetchSSURGO, useFetchCornN, useFetchPlantFactors, fetchNitrogenData, downloadPrescriptionShapefile, useFetchFertilizers,
 };

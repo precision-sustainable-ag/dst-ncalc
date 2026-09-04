@@ -1,15 +1,13 @@
 /* eslint-disable operator-linebreak */
-import React, { useEffect, useState } from 'react';
+import React, { useEffect } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { useNavigate } from 'react-router-dom';
 import {
   Box, Stack, Typography, Grid, useMediaQuery, Autocomplete, InputAdornment,
 } from '@mui/material';
 import { PSARadioButton, PSATextField } from 'shared-react-components/src';
-import { useAuth0 } from '@auth0/auth0-react';
 import { get, set } from '../../store/Store';
 import NavigateBar from '../../shared/Navigate';
-import { handleError } from '../../utils/apiError';
 import { publicApi } from '../../utils/apiClient';
 
 const CONVERSION_FACTOR = 1.12085; // lb n/acre -> kg n/ha
@@ -18,13 +16,9 @@ const NitrogenFertilizer = () => {
   // const isDevelopOrLocal = window.location.hostname === 'localhost'
   //   || window.location.hostname === '127.0.0.1'
   //   || window.location.href.includes('develop');
-  const {
-    isAuthenticated, getAccessTokenSilently,
-  } = useAuth0();
   const navigate = useNavigate();
   const dispatch = useDispatch();
 
-  const [isFetching, setIsFetching] = useState(false);
   const fertilizers = useSelector(get.fertilizers);
 
   const fertilizerType = useSelector(get.fertilizerType);
@@ -35,11 +29,11 @@ const NitrogenFertilizer = () => {
 
   const inputMode = useSelector(get.inputMode);
 
-  const granularOptions = !isFetching
+  const granularOptions = fertilizers.length > 0
     ? [...fertilizers.filter((f) => f.type === 'granular').map((f) => f.name), 'Other']
     : [];
 
-  const liquidOptions = !isFetching
+  const liquidOptions = fertilizers.length > 0
     ? [...fertilizers.filter((f) => f.type === 'liquid').map((f) => f.name), 'Other']
     : [];
 
@@ -68,22 +62,6 @@ const NitrogenFertilizer = () => {
 
     return false;
   })();
-
-  useEffect(() => {
-    const fetchFertilizers = async () => {
-      try {
-        setIsFetching(true);
-        const response = await publicApi.get('fertilizers');
-        dispatch(set.fertilizers(response.data?.data || []));
-      } catch (err) {
-        dispatch(set.fertilizers([]));
-        handleError(err, dispatch, 'Failed to load list of fertilizers.');
-      } finally {
-        setIsFetching(false);
-      }
-    };
-    fetchFertilizers();
-  }, [isAuthenticated, getAccessTokenSilently, dispatch]);
 
   useEffect(() => {
     let newMultiplier = 1;
@@ -156,7 +134,20 @@ const NitrogenFertilizer = () => {
           density: parseFloat(otherLiquidFertilizer.density),
         };
 
-      publicApi.post('fertilizers', payload);
+      await publicApi.post('fertilizers', payload);
+
+      // Refetch fertilizers after successful save
+      try {
+        const response = await publicApi.get('fertilizers');
+        dispatch(set.fertilizers(response.data?.data || []));
+        if (isOtherGranular) {
+          dispatch(set.granularFertilizer(otherGranularFertilizer.fertilizerName));
+          dispatch(set.otherGranularFertilizer({ fertilizerName: null, NPercent: null }));
+        } else if (isOtherLiquid) {
+          dispatch(set.liquidFertilizer(otherLiquidFertilizer.fertilizerName));
+          dispatch(set.otherLiquidFertilizer({ fertilizerName: null, NPercent: null, density: null }));
+        }
+      } catch (err) { /* empty */ }
     } catch (err) { /* empty */ }
   };
 
@@ -201,7 +192,7 @@ const NitrogenFertilizer = () => {
               {/* <CustomInputText>Select a granular fertilizer:</CustomInputText> */}
               <Autocomplete
                 fullWidth
-                loading={isFetching}
+                loading={fertilizers.length === 0}
                 options={granularOptions}
                 value={granularFertilizer}
                 onChange={(e, val) => {
@@ -269,7 +260,7 @@ const NitrogenFertilizer = () => {
               {/* <CustomInputText>Select a liquid fertilizer:</CustomInputText> */}
               <Autocomplete
                 fullWidth
-                loading={isFetching}
+                loading={fertilizers.length === 0}
                 options={liquidOptions}
                 value={liquidFertilizer}
                 onChange={(e, val) => {
