@@ -167,7 +167,8 @@ const NitrogenMapComp = forwardRef(({ layer = 'prescription', setLayer }, ref) =
     if (layer === 'spray') {
       // Build a map for fixed rate from the field geometry with a constant target rate.
       if (hasFixedNRate === 'fixed') {
-        return geometryToFeatureCollection(selectedField?.geometry, { targetN: Number(targetN) });
+        if (isPM3DMode) return geometryToFeatureCollection(selectedField?.geometry, { targetN: Number(targetN) });
+        return geometryToFeatureCollection(mapPolygon[0]?.geometry, { targetN: Number(targetN) });
       }
       return nitrogenSprayMap;
     }
@@ -205,7 +206,7 @@ const NitrogenMapComp = forwardRef(({ layer = 'prescription', setLayer }, ref) =
         discreteLabels={discreteLabels}
         secondaryUnit={secondaryUnit}
         secondaryUnitMultiplier={secondaryUnitMultiplier}
-        roundTo={1}
+        roundTo={isPM3DMode ? 1 : 0.1}
         mapboxToken={mapboxToken}
       />
     </Paper>

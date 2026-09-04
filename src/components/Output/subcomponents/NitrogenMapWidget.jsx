@@ -137,7 +137,7 @@ const NitrogenMapWidget = ({ refVal }) => {
               { label: 'Nitrogen Credit', value: 'credit' },
               { label: 'Biomass', value: 'biomass' },
               ...(isPM3DMode && !isRCPPReportOnly ? [{ label: 'Treatment', value: 'treatment' }] : []),
-              ...(isPM3DMode && !isRCPPReportOnly ? [{ label: 'Target Rate', value: 'spray' }] : []),
+              ...(isSatelliteMode || (isPM3DMode && !isRCPPReportOnly) ? [{ label: 'Target Rate', value: 'spray' }] : []),
             ]}
             selectedValue={layer}
             onChange={(value) => setLayer(value)}
