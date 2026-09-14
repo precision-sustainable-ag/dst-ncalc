@@ -115,7 +115,7 @@ const NitrogenMapComp = forwardRef(({ layer = 'prescription', setLayer }, ref) =
 
   const valueKey = useMemo(() => {
     if (layer === 'biomass') return 'biomass_average';
-    if (layer === 'prescription') return 'ReqN';
+    if (layer === 'prescription') return inputMode === 'nitrogen' ? 'ReqN' : 'ReqN_product';
     if (layer === 'credit') return 'MinNfromFOM';
     if (layer === 'spray') return hasFixedNRate === 'fixed' ? 'targetN' : nitrogenSprayMapProperty;
     return 'category'; // treatment
@@ -129,14 +129,19 @@ const NitrogenMapComp = forwardRef(({ layer = 'prescription', setLayer }, ref) =
 
   const unit = useMemo(() => {
     if (layer === 'biomass') return 'lb/ac';
-    if (layer === 'prescription') return fertilizerType === 'liquid' ? 'lb of N/ac' : 'lb of N/ac';
+    if (layer === 'prescription') {
+      return inputMode === 'nitrogen' ? 'lb of N/ac' : fertilizerType === 'liquid' ? 'gal of product/ac' : 'lb of product/ac';
+    }
     if (layer === 'credit') return 'lb of N/ac';
     if (layer === 'spray') return inputMode === 'nitrogen' ? 'lb of N/ac' : fertilizerType === 'liquid' ? 'gal of product/ac' : 'lb of product/ac';
     return '';
   }, [layer, fertilizerType, inputMode]);
 
   const secondaryUnit = useMemo(() => {
-    if (layer === 'prescription' || layer === 'credit') {
+    if (layer === 'prescription') {
+      return inputMode === 'fertilizer' ? 'lb of N/ac' : fertilizerType === 'liquid' ? 'gal of product/ac' : 'lb of product/ac';
+    }
+    if (layer === 'credit') {
       return fertilizerType === 'liquid' ? 'gal of product/ac' : 'lb of product/ac';
     }
     if (layer === 'spray') return inputMode === 'nitrogen' ? fertilizerType === 'liquid' ? 'gal of product/ac' : 'lb of product/ac' : 'lb of N/ac';
@@ -144,8 +149,8 @@ const NitrogenMapComp = forwardRef(({ layer = 'prescription', setLayer }, ref) =
   }, [layer, fertilizerType, inputMode]);
 
   const secondaryUnitMultiplier = useMemo(() => {
-    if (layer === 'prescription' || layer === 'credit') return 1 / multiplier;
-    if (layer === 'spray') return inputMode === 'nitrogen' ? 1 / multiplier : multiplier;
+    if (layer === 'credit') return 1 / multiplier;
+    if (layer === 'prescription' || layer === 'spray') return inputMode === 'nitrogen' ? 1 / multiplier : multiplier;
     return '';
   }, [layer, fertilizerType, inputMode]);
 
