@@ -22,7 +22,7 @@ import { get, set } from './store/Store';
 import FieldDropdown from './components/FieldDropdown';
 import NcalcStepper from './shared/Stepper';
 import useFetchHLS from './hooks/useFetchHLS';
-import { useFetchPlantFactors } from './hooks/useFetchApi';
+import { useFetchPlantFactors, useFetchFertilizers } from './hooks/useFetchApi';
 import ProtectedPage from './shared/ProtectedPage/ProtectedPage';
 import { APPLIED_MAPS_ROLES } from './utils/roles';
 import { initAuth } from './utils/apiClient';
@@ -50,6 +50,7 @@ screens.viewfield = require('./components/AddField').default;
 screens.fileupload = require('./components/FileUpload').default;
 screens.fertilizer = require('./components/NitrogenFertilizer').default;
 screens.appliedmaps = require('./components/AppliedMaps').default;
+screens.targetrate = require('./components/TargetRate').default;
 
 screens.profile = () => <PSAProfile styles={{ backgroundColor: 'white' }} />;
 
@@ -105,6 +106,7 @@ const App = () => {
 
   useFetchHLS();
   useFetchPlantFactors();
+  useFetchFertilizers();
 
   const matchesMd = useMediaQuery(dstTheme.breakpoints.down('md'));
 
@@ -216,7 +218,7 @@ const App = () => {
               const ScreenComponent = screens[scr];
 
               // Pages that require user log in
-              const protectedPaths = ['upload', 'field', 'editfield', 'viewfield', 'fileupload', 'appliedmaps'];
+              const protectedPaths = ['upload', 'field', 'editfield', 'viewfield', 'fileupload', 'appliedmaps', 'targetrate'];
               if (isPM3DMode) {
                 protectedPaths.push('covercrop', 'fertilizer', 'output');
               }

@@ -2,7 +2,7 @@ import React from 'react';
 import { PSAButton, PSATooltip } from 'shared-react-components/src';
 
 const NavButton = ({
-  children, onClick, disabled = false, fontSize = '1rem', tooltip = '',
+  children, onClick, disabled = false, fontSize = '1rem', tooltip = '', sx = {},
 }) => (
   <PSATooltip
     title={tooltip}
@@ -23,6 +23,7 @@ const NavButton = ({
               textDecoration: 'underline',
               boxShadow: '0px 2px 2px rgba(160, 160, 160, 0.3)',
             },
+            ...sx,
           }}
           variant="contained"
           onClick={onClick}

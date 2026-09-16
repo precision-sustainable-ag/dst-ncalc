@@ -34,16 +34,19 @@ export function fitAndWaitForIdle(mapInstance, bounds) {
  */
 export function extractLegend(containerEl) {
   const legendEl = containerEl?.querySelector('[class*="rasterlegend"]');
-  const legendTitle = legendEl?.querySelector('span')?.textContent?.trim() ?? '';
-  const legendItems = [];
+  if (!legendEl) return { legendTitle: [], legendItems: [] };
 
-  if (legendEl) {
-    legendEl.querySelectorAll('[class*="rasterlegenditem"]').forEach((item) => {
-      const color = item.querySelector('[class*="rasterlegendcolor"]')?.style?.backgroundColor;
-      const label = item.querySelector('[class*="rasterlegendvalue"]')?.textContent?.trim();
-      if (color && label) legendItems.push({ color, label });
-    });
-  }
+  const headerEl = legendEl.querySelector('[class*="rasterlegendheader"]');
+  const legendTitle = headerEl
+    ? [...headerEl.querySelectorAll('[class*="rasterlegendvalue"]')].map((v) => v.textContent.trim())
+    : [];
+
+  const legendItems = [];
+  legendEl.querySelectorAll('[class*="rasterlegenditem"]').forEach((item) => {
+    const color = item.querySelector('[class*="rasterlegendcolor"]')?.style?.backgroundColor;
+    const values = [...item.querySelectorAll('[class*="rasterlegendvalue"]')].map((v) => v.textContent.trim());
+    if (color && values.length) legendItems.push({ color, values });
+  });
 
   return { legendTitle, legendItems };
 }

@@ -73,8 +73,8 @@ const RightSideBar = ({ summaryData, refs }) => {
                   dispatch(set.activeStep(4));
                   navigate('/covercrop');
                 } else {
-                  dispatch(set.activeStep(5));
-                  navigate('/fertilizer');
+                  dispatch(set.activeStep(6));
+                  navigate('/targetrate');
                 }
               } else {
                 dispatch(set.activeStep(5));

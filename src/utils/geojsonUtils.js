@@ -199,6 +199,27 @@ export const geometriesToFeatures = (geometry, setFeatures, setLatLon, setBounds
 };
 
 /**
+ * Wraps a single geometry into a FeatureCollection with the given properties.
+ * @param {Object} geometry - Polygon or MultiPolygon geometry
+ * @param {Object} [properties={}] - Properties to attach to the feature (e.g. { ReqN: targetN })
+ * @returns {Object|null} - A FeatureCollection, or null if the geometry is invali
+ */
+export const geometryToFeatureCollection = (geometry, properties = {}) => {
+  if (!geometry || !geometry.type || !geometry.coordinates) return null;
+
+  return {
+    type: 'FeatureCollection',
+    features: [
+      {
+        type: 'Feature',
+        properties,
+        geometry, // works for BOTH Polygon & MultiPolygon
+      },
+    ],
+  };
+};
+
+/**
  * Merges an array of FeatureCollections into one FeatureCollection
  * @param {Object|Array} geojson - A FeatureCollection or array of FeatureCollections
  * @returns {Object} - A single merged FeatureCollection
