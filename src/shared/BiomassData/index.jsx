@@ -21,7 +21,7 @@ const BiomassData = () => {
       {polyDrawTooBig && <AreaErrorModal />}
       {biomassFetchIsFailed && <TaskFailModal task="biomass" message={biomassFetchFailMessage} />}
       <Box>
-        <Grid container spacing={2} alignItems="flex-end" justify="center">
+        <Grid container spacing={2} sx={{ alignItems: 'flex-end', justifyContent: 'center' }}>
           {/* {!isPM3DMode && (
             <>
               <Grid item xs={12}>
@@ -54,12 +54,12 @@ const BiomassData = () => {
             </>
           )} */}
           {biomassTotalValue && (
-            <Grid item xs={12} display="flex" justifyContent="center">
+            <Grid size={{ xs: 12 }} sx={{ display: 'flex', justifyContent: 'center' }}>
               <Box sx={{
                 border: 1, maxWidth: 200, padding: '0.3rem 1.2rem', textAlign: 'center',
               }}
               >
-                <Stack direction="row" justifyContent="center" alignItems="center">
+                <Stack direction="row" sx={{ justifyContent: 'center', alignItems: 'center' }}>
                   <Typography variant="h8" gutterBottom>
                     Biomass Value
                   </Typography>

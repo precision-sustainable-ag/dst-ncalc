@@ -65,11 +65,8 @@ const Home = () => {
   // const className = privacy ? 'home background' : 'home';
 
   return (
-    <Grid container justifyContent="center">
+    <Grid container sx={{ justifyContent: 'center' }}>
       <Grid
-        item
-        xs={12}
-        md={10}
         sx={{
           marginTop: '1rem',
           padding: `2rem ${matchesMd ? '1rem' : '4rem'}`,
@@ -78,8 +75,12 @@ const Home = () => {
           opacity: 0.9,
           backgroundColor: 'white',
         }}
+        size={{
+          xs: 12,
+          md: 10,
+        }}
       >
-        <Stack spacing={2} direction="column">
+        <Stack spacing={2}>
           <Box>
             <Typography variant="h4" align="center">Welcome to the Cover Crop Nitrogen Calculator (CC-NCALC)</Typography>
           </Box>
@@ -94,8 +95,8 @@ const Home = () => {
         <HistorySelect />
         )}
         <Box sx={{ height: '2rem' }} />
-        <Stack spacing={2} direction="column">
-          <Stack justifyContent="space-around" alignItems="center" sx={{ flexDirection: { sm: 'column', md: 'row' } }}>
+        <Stack spacing={2}>
+          <Stack sx={{ flexDirection: { sm: 'column', md: 'row' }, alignItems: 'center', justifyContent: 'space-around' }}>
             <Typography variant="h6"> Select biomass calculation method </Typography>
             <ToggleButtonGroup color="primary" value={biomassCalcMode} exclusive onChange={handleChange} aria-label="biomassCalcMode">
               <BiomassMethodButton value="sampled">User Sampled</BiomassMethodButton>
@@ -133,7 +134,6 @@ const Home = () => {
         <About open={aboutOpen} setOpen={setAboutOpen} />
       </Grid>
     </Grid>
-
   );
 }; // Home
 

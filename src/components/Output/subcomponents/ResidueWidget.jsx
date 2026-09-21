@@ -152,7 +152,7 @@ const ResidueCard = ({ refVal }) => {
   return (
     <Card sx={CardStyles} elevation={8} ref={refVal}>
       <CardContent sx={cardContentStyles}>
-        <Stack gap={2}>
+        <Stack spacing={2}>
           <Typography variant="h5" color="primary" gutterBottom textAlign="center">
             Remaining Residue
           </Typography>
@@ -160,26 +160,24 @@ const ResidueCard = ({ refVal }) => {
       </CardContent>
       <CardActions>
         <Stack
-          direction="column"
-          gap={2}
-          justifyContent="center"
-          width="100%"
+          spacing={2}
+          sx={{ justifyContent: 'space-around', width: '100%' }}
         >
           {surfaceData.length > 0
             && (
               <Container sx={{ fontSize: 9, paddingBottom: '10px' }}>
                 <Typography variant="subtitle2">
                   By
-                  <Typography variant="subtitle2" component="span" fontWeight="bold" m={1}>
+                  <Typography variant="subtitle2" component="span" sx={{ fontWeight: 'bold', m: 0.5 }}>
                     4 weeks
                   </Typography>
                   after cover crop termination, undecomposed residue mass remaining is:
                 </Typography>
                 <Typography variant="subtitle2">
-                  <Typography variant="subtitle2" component="span" fontWeight="bold" m={0}>
+                  <Typography variant="subtitle2" component="span" sx={{ fontWeight: 'bold' }}>
                     {Math.round(surfaceData[Math.min(nweeks * 7, surfaceData.length - 1)].y)}
                   </Typography>
-                  <Typography variant="subtitle2" component="span" fontWeight="bold" m={1}>
+                  <Typography variant="subtitle2" component="span" sx={{ fontWeight: 'bold', m: 0.5 }}>
                     {unit}
                   </Typography>
                   for incorporated residues.

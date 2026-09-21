@@ -27,22 +27,21 @@ const TransitionsSnackbar = () => {
     });
   }, [dataFetchStatus]);
 
-  return (
-    dataFetchStatus !== 'idle'
-    && (
-      <div>
-        <Snackbar
-          open={state.open}
-          anchorOrigin={{ vertical: 'bottom', horizontal: 'right' }}
-          onClose={handleClose}
-          TransitionComponent={state.Transition}
-          message={dataFetchStatus}
-          key="up snackbar"
-          autoHideDuration={5000}
-        />
-      </div>
-    )
-  );
+  return (dataFetchStatus !== 'idle' && (
+  <div>
+    <Snackbar
+      open={state.open}
+      anchorOrigin={{ vertical: 'bottom', horizontal: 'right' }}
+      onClose={handleClose}
+      message={dataFetchStatus}
+      key="up snackbar"
+      autoHideDuration={5000}
+      slots={{
+        transition: state.Transition,
+      }}
+    />
+  </div>
+  ));
 };
 
 export default TransitionsSnackbar;

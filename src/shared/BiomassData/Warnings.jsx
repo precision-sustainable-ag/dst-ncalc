@@ -1,5 +1,7 @@
 import React from 'react';
-import { Dialog, DialogActions, DialogContent, DialogContentText, DialogTitle } from '@mui/material';
+import {
+  Dialog, DialogActions, DialogContent, DialogContentText, DialogTitle,
+} from '@mui/material';
 import { useSelector, useDispatch } from 'react-redux';
 import { PSAButton } from 'shared-react-components/src';
 import { get, set } from '../../store/Store';

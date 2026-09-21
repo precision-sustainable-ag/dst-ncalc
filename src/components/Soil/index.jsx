@@ -38,11 +38,8 @@ const Soil = () => {
 
   /// /// /// RETURN JSX /// ///
   return (
-    <Grid container justifyContent="center">
+    <Grid container sx={{ justifyContent: 'center' }}>
       <Grid
-        item
-        xs={12}
-        md={10}
         sx={{
           marginTop: '1rem',
           padding: `2rem ${matchesMd ? '1rem' : '4rem'}`,
@@ -51,8 +48,12 @@ const Soil = () => {
           opacity: 0.9,
           backgroundColor: 'white',
         }}
+        size={{
+          xs: 12,
+          md: 10,
+        }}
       >
-        <Stack direction="column" spacing="1rem" alignItems="center">
+        <Stack spacing="1rem" sx={{ alignItems: 'center' }}>
           <Typography variant="h4" align="center" color="primary">Tell us about your Soil</Typography>
           {SSURGOisFailed && (
           <Alert severity="warning">
@@ -113,7 +114,7 @@ const Soil = () => {
                   coordinates. You can adjust them if you have lab results.
                 </Typography>
 
-                <Stack spacing="2rem" width="100%" maxWidth="600px" sx={{ color: 'primary.main' }}>
+                <Stack spacing="2rem" sx={{ color: 'primary.main', width: '100%', maxWidth: '600px' }}>
                   <Box>
                     Organic Matter (%)
                     <Help ariaLabel="Soil organic matter in the surface (0-10cm) soil">
@@ -167,7 +168,6 @@ const Soil = () => {
         />
       </Grid>
     </Grid>
-
   );
 }; // Soil
 

@@ -28,11 +28,8 @@ const CoverCropSecond = () => {
   }, [N, biomass, dispatch]);
 
   return (
-    <Grid container justifyContent="center">
+    <Grid container sx={{ justifyContent: 'center' }}>
       <Grid
-        item
-        xs={12}
-        md={10}
         sx={{
           marginTop: '1rem',
           padding: `2rem ${matchesMd ? '1rem' : '4rem'}`,
@@ -44,8 +41,12 @@ const CoverCropSecond = () => {
           flexDirection: 'column',
           alignItems: 'center',
         }}
+        size={{
+          xs: 12,
+          md: 10,
+        }}
       >
-        <Stack direction="column" spacing="2rem" width="100%" maxWidth="600px">
+        <Stack spacing="2rem" sx={{ width: '100%', maxWidth: '600px' }}>
 
           <Typography variant="h4" align="center" color="primary">Tell us about your Cover Crop Quality</Typography>
 
@@ -55,8 +56,8 @@ const CoverCropSecond = () => {
           </Typography>
           )}
 
-          <Stack gap={1}>
-            <Stack direction="row" alignItems="center">
+          <Stack spacing={1}>
+            <Stack direction="row" sx={{ alignItems: 'center' }}>
               <Typography variant="inputLabel">Nitrogen (%)</Typography>
               <Help ariaLabel="Cover crop nitrogen concentration based on lab results.">
                 Cover crop nitrogen concentration based on lab results.
@@ -67,8 +68,8 @@ const CoverCropSecond = () => {
             {!isSatelliteMode && N ? <p className="note">Adjust default values below based on lab results.</p> : ''}
           </Stack>
 
-          <Stack gap={1}>
-            <Stack direction="row" alignItems="center">
+          <Stack spacing={1}>
+            <Stack direction="row" sx={{ alignItems: 'center' }}>
               <Typography variant="inputLabel">Carbohydrates (%)</Typography>
               <Help ariaLabel="Non-structural labile carbohydrate concentration based on lab results. Click for more details.">
                 <p>
@@ -84,8 +85,8 @@ const CoverCropSecond = () => {
             <Myslider id="carb" min={20} max={70} step={0.1} disabled={isSatelliteMode} />
           </Stack>
 
-          <Stack gap={1}>
-            <Stack direction="row" alignItems="center">
+          <Stack spacing={1}>
+            <Stack direction="row" sx={{ alignItems: 'center' }}>
               <Typography variant="inputLabel">Holo-cellulose (%)</Typography>
               <Help ariaLabel="Structural holo-cellulose concentration based on lab results. Click for more details.">
                 <p>
@@ -101,8 +102,8 @@ const CoverCropSecond = () => {
             <Myslider id="cell" min={20} max={70} step={0.1} disabled={isSatelliteMode} />
           </Stack>
 
-          <Stack gap={1}>
-            <Stack direction="row" alignItems="center">
+          <Stack spacing={1}>
+            <Stack direction="row" sx={{ alignItems: 'center' }}>
               <Typography variant="inputLabel">Lignin (%)</Typography>
               <Help ariaLabel="Structural lignin concentration based on lab results.  Click for more details.">
                 <p>
@@ -129,7 +130,6 @@ const CoverCropSecond = () => {
         />
       </Grid>
     </Grid>
-
   );
 }; // CoverCropSecond
 CoverCropSecond.showInMenu = false;

@@ -35,9 +35,14 @@ const Datebox = () => {
 
   return (
     <Grid container spacing={2}>
-      <Grid item xs={12} md={6}>
-        <Stack direction="column" spacing={1} justifyContent="center" alignItems="center">
-          <Typography variant="body1" color="text.secondary">Planting Date</Typography>
+      <Grid
+        size={{
+          xs: 12,
+          md: 6,
+        }}
+      >
+        <Stack spacing={1} sx={{ justifyContent: 'center', alignItems: 'center' }}>
+          <Typography variant="body1" sx={{ color: 'text.secondary' }}>Planting Date</Typography>
           <LocalizationProvider dateAdapter={AdapterDayjs}>
             <DatePicker
               label="Date Selector"
@@ -49,14 +54,19 @@ const Datebox = () => {
                 dispatch(set.coverCropPlantingDate(newValue.format('YYYY-MM-DD')));
                 return null;
               }}
-              sx={{ '.MuiOutlinedInput-notchedOutline': { borderColor: 'rgba(0, 0, 0, .45)' } }}
+              sx={{ '.MuiPickersOutlinedInput-notchedOutline': { borderColor: 'rgba(0, 0, 0, .45)' } }}
             />
           </LocalizationProvider>
         </Stack>
       </Grid>
-      <Grid item xs={12} md={6}>
-        <Stack direction="column" spacing={1} justifyContent="center" alignItems="center">
-          <Typography variant="body1" color="text.secondary">Termination Date</Typography>
+      <Grid
+        size={{
+          xs: 12,
+          md: 6,
+        }}
+      >
+        <Stack spacing={1} sx={{ justifyContent: 'center', alignItems: 'center' }}>
+          <Typography variant="body1" sx={{ color: 'text.secondary' }}>Termination Date</Typography>
           <LocalizationProvider dateAdapter={AdapterDayjs}>
             <DatePicker
               label="Date Selector"
@@ -68,7 +78,7 @@ const Datebox = () => {
                 dispatch(set.coverCropTerminationDate(newValue.format('YYYY-MM-DD')));
                 return null;
               }}
-              sx={{ '.MuiOutlinedInput-notchedOutline': { borderColor: 'rgba(0, 0, 0, .45)' } }}
+              sx={{ '.MuiPickersOutlinedInput-notchedOutline': { borderColor: 'rgba(0, 0, 0, .45)' } }}
             />
           </LocalizationProvider>
         </Stack>

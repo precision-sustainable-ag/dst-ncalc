@@ -6,7 +6,7 @@ import { useAuth0 } from '@auth0/auth0-react';
 import { useDispatch, useSelector } from 'react-redux';
 import {
   Autocomplete,
-  Box, CircularProgress, Grid, Stack, Typography,
+  Box, CircularProgress, Stack, Typography,
 } from '@mui/material';
 import { PSATextField } from 'shared-react-components/src';
 import { get, set } from '../../store/Store';
@@ -96,30 +96,28 @@ const FieldDropdown = () => {
   }, [isAuthenticated]);
 
   return (
-    <>
-      <Grid container>
-        <Grid item xs={12} md={6} sx={{ pr: { md: 1 }, pb: { xs: 2 } }}>
-          <Autocomplete
-            options={uniqueGroups}
-            value={filterGroup}
-            getOptionLabel={(option) => {
-              const p = PROGRAM_GROUPS[option] || option;
-              return p !== option ? `${p} - ${option}` : `${p}`;
-            }}
-            onChange={(e, val) => handleGroupFilterChange(val)}
-            renderInput={(params) => <PSATextField {...params} label="Filter by Program" />}
-          />
-        </Grid>
-        <Grid item xs={12} md={6} sx={{ pl: { md: 1 } }}>
-          <Autocomplete
-            options={uniqueGrowers}
-            value={filterGrower}
-            onChange={(e, val) => handleGrowerFilterChange(val)}
-            disabled={!filterGroup && uniqueGrowers.length > 50}
-            renderInput={(params) => <PSATextField {...params} label="Filter by Grower" />}
-          />
-        </Grid>
-      </Grid>
+    <Stack spacing={2}>
+      <Stack direction={{ xs: 'column', md: 'row' }} spacing={{ xs: 3, md: 2 }}>
+        <Autocomplete
+          options={uniqueGroups}
+          value={filterGroup}
+          getOptionLabel={(option) => {
+            const p = PROGRAM_GROUPS[option] || option;
+            return p !== option ? `${p} - ${option}` : `${p}`;
+          }}
+          onChange={(e, val) => handleGroupFilterChange(val)}
+          renderInput={(params) => <PSATextField {...params} label="Filter by Program" />}
+          sx={{ width: { xs: '100%', md: '50%' } }}
+        />
+        <Autocomplete
+          options={uniqueGrowers}
+          value={filterGrower}
+          onChange={(e, val) => handleGrowerFilterChange(val)}
+          disabled={!filterGroup && uniqueGrowers.length > 50}
+          renderInput={(params) => <PSATextField {...params} label="Filter by Grower" />}
+          sx={{ width: { xs: '100%', md: '50%' } }}
+        />
+      </Stack>
 
       <Autocomplete
         loading={isFetching}
@@ -157,19 +155,23 @@ const FieldDropdown = () => {
             {...params}
             label="Select Field (Program / Group / Grower / Farm / Field)"
             placeholder="Type to search..."
-            InputProps={{
-              ...params.InputProps,
-              endAdornment: (
-                <>
-                  {isFetching ? <CircularProgress color="inherit" size={20} /> : null}
-                  {params.InputProps.endAdornment}
-                </>
-              ),
+            slotProps={{
+              ...params.slotProps,
+              input: {
+                ...params.slotProps.input,
+                endAdornment: (
+                  <>
+                    {isFetching ? <CircularProgress color="inherit" size={20} /> : null}
+                    {params.slotProps.input.endAdornment}
+                  </>
+                ),
+              },
             }}
           />
         )}
+        sx={{ pt: 2 }}
       />
-    </>
+    </Stack>
   );
 };
 

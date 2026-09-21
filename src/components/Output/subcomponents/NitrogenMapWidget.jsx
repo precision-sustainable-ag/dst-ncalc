@@ -96,11 +96,8 @@ const NitrogenMapWidget = ({ refVal }) => {
         {nitrogenFetchIsLoading && (
           <Box>
             <Grid
-              item
               container
               spacing={1}
-              justifyContent="center"
-              alignItems="center"
               sx={{
                 display: 'flex',
                 justifyContent: 'center',

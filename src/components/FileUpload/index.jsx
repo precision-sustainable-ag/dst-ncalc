@@ -242,11 +242,8 @@ const UploadMap = () => {
   };
 
   return (
-    <Grid container justifyContent="center">
+    <Grid container sx={{ justifyContent: 'center' }}>
       <Grid
-        item
-        xs={12}
-        md={10}
         sx={{
           marginTop: '1rem',
           padding: `2rem ${matchesMd ? '1rem' : '4rem'}`,
@@ -255,9 +252,13 @@ const UploadMap = () => {
           opacity: 0.9,
           backgroundColor: 'white',
         }}
+        size={{
+          xs: 12,
+          md: 10,
+        }}
       >
         <Stack spacing="1.5em">
-          <Typography variant="h4" align="center" gutterBottom>
+          <Typography variant="h4" align="center" color="primary">
             Upload Field Maps
           </Typography>
 
@@ -310,7 +311,13 @@ const UploadMap = () => {
             })}
           </TextField>
 
-          <Stack direction="row" alignItems="center" spacing={2} sx={{ border: '1px dashed grey', p: 3, borderRadius: 2 }}>
+          <Stack
+            direction="row"
+            spacing={2}
+            sx={{
+              border: '1px dashed grey', p: 3, borderRadius: 2, alignItems: 'center',
+            }}
+          >
             <input id="file-input" type="file" hidden accept=".geojson,.json,.shp,.zip" onChange={handleFileChange} />
             <PSAButton buttonType="Back" title="Choose File" variant="contained" onClick={() => document.getElementById('file-input').click()} />
             <Typography variant="body1">
@@ -319,7 +326,7 @@ const UploadMap = () => {
           </Stack>
 
           {isUploading && (
-          <Stack direction="row" alignItems="center" spacing={2}>
+          <Stack direction="row" spacing={2} sx={{ alignItems: 'center' }}>
             <CircularProgress variant="determinate" value={uploadProgress} />
             <Typography>
               {uploadProgress}

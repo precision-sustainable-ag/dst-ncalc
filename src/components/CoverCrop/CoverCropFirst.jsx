@@ -140,11 +140,8 @@ const CoverCropFirst = () => {
   };
 
   return (
-    <Grid container justifyContent="center">
+    <Grid container sx={{ justifyContent: 'center' }}>
       <Grid
-        item
-        xs={12}
-        md={10}
         sx={{
           marginTop: '1rem',
           padding: `2rem ${matchesMd ? '1rem' : '4rem'}`,
@@ -156,13 +153,17 @@ const CoverCropFirst = () => {
           flexDirection: 'column',
           alignItems: 'center',
         }}
+        size={{
+          xs: 12,
+          md: 10,
+        }}
       >
-        <Stack direction="column" spacing="2rem" width="100%" maxWidth="600px">
+        <Stack spacing="2rem" sx={{ width: '100%', maxWidth: '600px' }}>
 
           <Typography variant="h4" align="center" color="primary">Tell us about your Cover Crop</Typography>
 
-          <Stack gap={1}>
-            <Stack direction="row" alignItems="center">
+          <Stack spacing={3}>
+            <Stack direction="row" sx={{ alignItems: 'center' }}>
               <Typography variant="inputLabel">Cover Crop Species</Typography>
               {(!coverCrop || coverCrop.length === 0) && <Required />}
             </Stack>
@@ -170,8 +171,8 @@ const CoverCropFirst = () => {
           </Stack>
 
           {(isSatelliteMode || isPM3DMode) && coverCrop && (
-            <Stack gap={1}>
-              <Stack direction="row" alignItems="center">
+            <Stack spacing={3}>
+              <Stack direction="row" sx={{ alignItems: 'center' }}>
                 <Typography variant="inputLabel">Cover Crop Growth Stage</Typography>
                 {(!coverCropGrowthStage || Object.keys(coverCropGrowthStage).length !== coverCrop.length) && <Required />}
               </Stack>
@@ -181,7 +182,7 @@ const CoverCropFirst = () => {
 
           {isSatelliteMode && (
             <>
-              <Stack direction="row" alignItems="center" gap={1}>
+              <Stack direction="row" sx={{ alignItems: 'center' }} spacing={1}>
                 <Typography variant="inputLabel">Biomass Unit</Typography>
                 <PSARadioButton
                   options={[
@@ -201,8 +202,8 @@ const CoverCropFirst = () => {
           )}
 
           {!isSatelliteMode && (
-            <Stack gap={1}>
-              <Stack direction="row" alignItems="center">
+            <Stack spacing={1}>
+              <Stack direction="row" sx={{ alignItems: 'center' }}>
                 <Typography variant="inputLabel">Cover Crop Termination Date</Typography>
                 {!coverCropTerminationDate && <Required />}
               </Stack>
@@ -221,8 +222,8 @@ const CoverCropFirst = () => {
 
           {!isPM3DMode && !isSatelliteMode && (
             <>
-              <Stack gap={1}>
-                <Stack direction="row" alignItems="center">
+              <Stack spacing={1}>
+                <Stack direction="row" sx={{ alignItems: 'center' }}>
                   <Typography variant="inputLabel">Dry Biomass</Typography>
                   <Help ariaLabel="The amount of cover crop biomass on a dry weight basis.">
                     <p>The amount of cover crop biomass on a dry weight basis.</p>
@@ -271,8 +272,8 @@ const CoverCropFirst = () => {
                 )}
               </Stack>
 
-              <Stack gap={1}>
-                <Stack direction="row" alignItems="center">
+              <Stack spacing={1}>
+                <Stack direction="row" sx={{ alignItems: 'center' }}>
                   <Typography variant="inputLabel">Cover Crop Water Content at Termination (g water/g dry biomass)</Typography>
                   <Help ariaLabel="Use the following calculation to adjust default values: Cover Crop Water Content
                    = (Total fresh weight - Total dry weight)/(Total dry weight)"
@@ -323,10 +324,12 @@ const CoverCropFirst = () => {
 
         <Snackbar
           open={biomassNotExist}
-          TransitionComponent={Slide}
           autoHideDuration={5000}
           onClose={() => {
             setBiomassNotExist(false);
+          }}
+          slots={{
+            transition: Slide,
           }}
         >
           <Alert
@@ -342,7 +345,6 @@ const CoverCropFirst = () => {
         </Snackbar>
       </Grid>
     </Grid>
-
   );
 }; // CoverCropFirst
 CoverCropFirst.desc = 'Cover Crop';

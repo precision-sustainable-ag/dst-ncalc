@@ -2,8 +2,8 @@ import React from 'react';
 import {
   Dialog, DialogTitle, DialogContent, DialogContentText, DialogActions, Button, CircularProgress, Stack, Typography,
 } from '@mui/material';
-import ErrorOutlineIcon from '@mui/icons-material/ErrorOutline';
-import CheckCircleOutlineIcon from '@mui/icons-material/CheckCircleOutline';
+import ErrorOutlineIcon from '@mui/icons-material/ErrorOutlineOutlined';
+import CheckCircleOutlineIcon from '@mui/icons-material/CheckCircleOutlineOutlined';
 
 const ActionModal = ({
   open,
@@ -25,7 +25,7 @@ const ActionModal = ({
     <Dialog open={open} onClose={isLoading ? undefined : onClose} maxWidth="xs" fullWidth>
       {title && (
         <DialogTitle>
-          <Stack direction="row" alignItems="center" spacing={1.5}>
+          <Stack direction="row" spacing={1.5} sx={{ alignItems: 'center' }}>
             {type === 'error' && <ErrorOutlineIcon color="error" />}
             {type === 'success' && <CheckCircleOutlineIcon color="success" />}
             <Typography variant="inherit" component="span">
@@ -37,12 +37,12 @@ const ActionModal = ({
 
       <DialogContent>
         {isLoading ? (
-          <Stack direction="row" spacing={2} alignItems="center" sx={{ py: 2 }}>
+          <Stack direction="row" spacing={2} sx={{ py: 2, alignItems: 'center' }}>
             <CircularProgress size={24} />
             <Typography>{message || 'Processing...'}</Typography>
           </Stack>
         ) : (
-          <Stack spacing={2} alignItems={icon ? 'center' : 'flex-start'} sx={{ py: icon ? 2 : 0, mt: title ? 0 : 2 }}>
+          <Stack spacing={2} sx={{ py: icon ? 2 : 0, mt: title ? 0 : 2, alignItems: icon ? 'center' : 'stretch' }}>
             {icon}
             {customContent || <DialogContentText textAlign={icon ? 'center' : 'left'}>{message}</DialogContentText>}
           </Stack>

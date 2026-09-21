@@ -109,12 +109,18 @@ const HistorySelect = () => {
         textAlign: 'center',
       }}
     >
-      <Typography mb={2}>
+      <Typography>
         Would you like to save your selection history? Simply give it a name, and your selections will be stored after you&apos;ve made all your
         selections.
       </Typography>
-      <Grid container spacing="1rem">
-        <Grid item xs={12} sm={6} display="flex" justifyContent={matchesMd ? 'center' : 'flex-end'} alignItems="center">
+      <Grid container spacing={2} sx={{ mt: 4 }}>
+        <Grid
+          sx={{ display: 'flex', justifyContent: matchesMd ? 'center' : 'flex-end', alignItems: 'center' }}
+          size={{
+            xs: 12,
+            sm: 6,
+          }}
+        >
           <Typography>
             Name your field:
             <Help ariaLabel="This input is optional. Click for more details.">
@@ -158,7 +164,13 @@ const HistorySelect = () => {
             </Help>
           </Typography>
         </Grid>
-        <Grid item xs={12} sm={6} display="flex" justifyContent="flex-start" alignItems="center">
+        <Grid
+          sx={{ display: 'flex', justifyContent: 'flex-start', alignItems: 'center' }}
+          size={{
+            xs: 12,
+            sm: 6,
+          }}
+        >
           <PSATextField
             label="Name your Field (optional)"
             value={fieldName}
@@ -173,10 +185,22 @@ const HistorySelect = () => {
             }}
           />
         </Grid>
-        <Grid item xs={12} sm={6} display="flex" justifyContent={matchesMd ? 'center' : 'flex-end'} alignItems="center">
+        <Grid
+          sx={{ display: 'flex', justifyContent: matchesMd ? 'center' : 'flex-end', alignItems: 'center' }}
+          size={{
+            xs: 12,
+            sm: 6,
+          }}
+        >
           <Typography mb={2}>Retrieve your previous selections here:</Typography>
         </Grid>
-        <Grid item xs={12} sm={6} display="flex" justifyContent="flex-start" alignItems="center">
+        <Grid
+          sx={{ display: 'flex', justifyContent: 'flex-start', alignItems: 'center' }}
+          size={{
+            xs: 12,
+            sm: 6,
+          }}
+        >
           <PSADropdown
             label="Histories"
             items={[
