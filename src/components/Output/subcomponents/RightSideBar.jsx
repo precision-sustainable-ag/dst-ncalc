@@ -36,18 +36,35 @@ const RightSideBar = ({ summaryData, refs }) => {
 
   /// /// RETURN JSX /// ///
   return (
-    <Box sx={wrapperStyles} flex={4} justifyContent="center">
+    <Box sx={{ ...wrapperStyles, justifyContent: 'center' }} flex={4}>
       <Grid container spacing={3}>
-        <Grid item sm={12} width="100%" mt="1rem">
+        <Grid
+          sx={{ width: '100%', mt: '1rem' }}
+          size={{
+            sm: 12,
+          }}
+        >
           <SummaryCard refVal={refs[0]} data={summaryData} />
         </Grid>
         {!isPM3DMode && (
-        <Grid item sm={12} lg={6} width="100%">
+        <Grid
+          sx={{ width: '100%' }}
+          size={{
+            sm: 12,
+            lg: 6,
+          }}
+        >
           <NitrogenCard refVal={refs[1]} />
         </Grid>
         )}
         {!isPM3DMode && (
-        <Grid item sm={12} lg={6} width="100%">
+        <Grid
+          sx={{ width: '100%' }}
+          size={{
+            sm: 12,
+            lg: 6,
+          }}
+        >
           <ResidueCard refVal={refs[2]} />
         </Grid>
         )}
@@ -57,11 +74,23 @@ const RightSideBar = ({ summaryData, refs }) => {
           </Grid>
         )} */}
         {(isSatelliteMode || isPM3DMode) && (
-          <Grid item sm={12} lg={12} width="100%">
+          <Grid
+            sx={{ width: '100%' }}
+            size={{
+              sm: 12,
+              lg: 12,
+            }}
+          >
             <NitrogenMapWidget refVal={refs[4]} />
           </Grid>
         )}
-        <Grid item sm={12} lg={12} width="100%">
+        <Grid
+          sx={{ width: '100%' }}
+          size={{
+            sm: 12,
+            lg: 12,
+          }}
+        >
           <NavigateBar
             next="ADVANCED"
             nextOnClick={() => { navigate('/advanced'); }}

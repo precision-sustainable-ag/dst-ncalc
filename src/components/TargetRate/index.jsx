@@ -119,11 +119,8 @@ const TargetRate = () => {
   };
 
   return (
-    <Grid container justifyContent="center">
+    <Grid container sx={{ justifyContent: 'center' }}>
       <Grid
-        item
-        xs={12}
-        md={10}
         sx={{
           marginTop: '1rem',
           padding: `2rem ${matchesMd ? '1rem' : '4rem'}`,
@@ -135,8 +132,12 @@ const TargetRate = () => {
           flexDirection: 'column',
           alignItems: 'center',
         }}
+        size={{
+          xs: 12,
+          md: 10,
+        }}
       >
-        <Stack direction="column" spacing="2rem" width="100%" maxWidth="600px">
+        <Stack spacing="2rem" sx={{ width: '100%', maxWidth: '600px' }}>
 
           <Typography variant="h4" align="center" color="primary" gutterBottom>Tell us about your Target N Rate</Typography>
 
@@ -144,7 +145,7 @@ const TargetRate = () => {
           <Alert severity="error" sx={{ width: '100%', mb: 2 }}>{error}</Alert>
           )}
 
-          <Stack gap={2}>
+          <Stack spacing={2}>
             <Typography variant="inputLabel">
               Will you be using fixed target rate or variable target rate?
             </Typography>
@@ -162,8 +163,8 @@ const TargetRate = () => {
           <Box sx={{ borderBottom: '1px solid #eee' }} />
 
           {hasFixedNRate === 'fixed' && (
-          <Stack gap={2}>
-            <Stack direction="row" alignItems="center">
+          <Stack spacing={2}>
+            <Stack direction="row" sx={{ alignItems: 'center' }}>
               <Typography variant="inputLabel">
                 {inputMode === 'nitrogen'
                   ? 'What is your Target Nitrogen Rate? (lb N/ac):'
@@ -188,14 +189,14 @@ const TargetRate = () => {
           )}
 
           {hasFixedNRate === 'variable' && (
-          <Stack gap={2}>
+          <Stack spacing={2}>
             <Typography variant="inputLabel">
               {inputMode === 'nitrogen'
                 ? 'Upload your Variable Target Nitrogen Rate (lb N/ac):'
                 : `Upload your Variable Target Nitrogen Fertilizer Rate ${fertilizerType === 'granular' ? '(lb/ac)' : '(gal/ac)'}:`}
             </Typography>
-            <Stack direction={{ sm: 'column', md: 'row' }} gap={1} justifyContent="space-between">
-              <Typography variant="body1" color="text.secondary" alignContent="center">
+            <Stack direction={{ sm: 'column', md: 'row' }} spacing={1} sx={{ justifyContent: 'space-between' }}>
+              <Typography variant="body1" color="textSecondary" alignContent="center">
                 {' '}
                 {fileName ? `Selected file: ${fileName}` : 'No file selected'}
                 {' '}
@@ -209,6 +210,7 @@ const TargetRate = () => {
               value={nitrogenSprayMapProperty}
               onChange={(e, val) => dispatch(set.nitrogenSprayMapProperty(val))}
               renderInput={(params) => <PSATextField {...params} label="Select the N rate column name" />}
+              sx={{ pt: 2 }}
             />
             )}
           </Stack>
@@ -218,7 +220,7 @@ const TargetRate = () => {
 
           {!isSatelliteMode &&
           (
-            <Stack gap={1}>
+            <Stack spacing={1}>
               <Typography variant="inputLabel">Side Dress Fertilization Date</Typography>
               {!sidedressFertilizationDate && <Required />}
               <LocalizationProvider dateAdapter={AdapterDayjs}>
@@ -237,14 +239,14 @@ const TargetRate = () => {
                   The selected sidedress fertilization date is before the cash crop planting date.
                 </Alert>
                 )}
-              <Box sx={{ borderBottom: '1px solid #eee', mt: 4, mb: 2 }} />
+              <Box sx={{ borderBottom: '1px solid #eee', pt: 4 }} />
             </Stack>
           )}
 
           {isSatelliteMode && (
           <>
-            <Stack gap={1}>
-              <Stack direction="row" alignItems="center">
+            <Stack spacing={1}>
+              <Stack direction="row" sx={{ alignItems: 'center' }}>
                 <Typography variant="inputLabel">Grid Size</Typography>
                 {(!gridSize || gridSize < 0.5) && <Required />}
               </Stack>
@@ -252,8 +254,10 @@ const TargetRate = () => {
                 variant="standard"
                 value={gridSize}
                 disabled
-                InputProps={{
-                  endAdornment: <InputAdornment position="end">acre</InputAdornment>,
+                slotProps={{
+                  input: {
+                    endAdornment: <InputAdornment position="end">acre</InputAdornment>,
+                  },
                 }}
                 sx={{ mt: 0, width: '25%' }}
               />

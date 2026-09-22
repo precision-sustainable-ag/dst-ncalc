@@ -152,11 +152,8 @@ const NitrogenFertilizer = () => {
   };
 
   return (
-    <Grid container justifyContent="center">
+    <Grid container sx={{ justifyContent: 'center' }}>
       <Grid
-        item
-        xs={12}
-        md={10}
         sx={{
           marginTop: '1rem',
           padding: `2rem ${matchesMd ? '1rem' : '4rem'}`,
@@ -168,12 +165,16 @@ const NitrogenFertilizer = () => {
           flexDirection: 'column',
           alignItems: 'center',
         }}
+        size={{
+          xs: 12,
+          md: 10,
+        }}
       >
-        <Stack direction="column" spacing="2rem" width="100%" maxWidth="600px">
+        <Stack spacing="2rem" sx={{ width: '100%', maxWidth: '600px' }}>
 
           <Typography variant="h4" align="center" color="primary" gutterBottom>Tell us about your Fertilizer</Typography>
 
-          <Stack gap={2}>
+          <Stack spacing={2}>
             <Typography variant="inputLabel">
               What fertilizer will you be using at sidedress?
             </Typography>
@@ -188,7 +189,7 @@ const NitrogenFertilizer = () => {
             />
 
             {fertilizerType === 'granular' && (
-            <>
+            <Stack spacing={4} sx={{ pt: 2 }}>
               {/* <CustomInputText>Select a granular fertilizer:</CustomInputText> */}
               <Autocomplete
                 fullWidth
@@ -246,17 +247,19 @@ const NitrogenFertilizer = () => {
                       dispatch(set.otherGranularFertilizer.NPercent(val));
                     }
                   }}
-                  InputProps={{
-                    endAdornment: <InputAdornment position="end">%</InputAdornment>,
+                  slotProps={{
+                    input: {
+                      endAdornment: <InputAdornment position="end">%</InputAdornment>,
+                    },
                   }}
                 />
               </Stack>
               )}
-            </>
+            </Stack>
             )}
 
             {fertilizerType === 'liquid' && (
-            <>
+            <Stack spacing={4} sx={{ pt: 2 }}>
               {/* <CustomInputText>Select a liquid fertilizer:</CustomInputText> */}
               <Autocomplete
                 fullWidth
@@ -328,19 +331,21 @@ const NitrogenFertilizer = () => {
                       dispatch(set.otherLiquidFertilizer.NPercent(val));
                     }
                   }}
-                  InputProps={{
-                    endAdornment: <InputAdornment position="end">%</InputAdornment>,
+                  slotProps={{
+                    input: {
+                      endAdornment: <InputAdornment position="end">%</InputAdornment>,
+                    },
                   }}
                 />
               </Stack>
               )}
-            </>
+            </Stack>
             )}
           </Stack>
 
           <Box sx={{ borderBottom: '1px solid #eee' }} />
 
-          <Stack gap={2}>
+          <Stack spacing={2}>
             <Typography variant="inputLabel">
               What units do you want to enter your target rate in?
             </Typography>

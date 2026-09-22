@@ -59,7 +59,7 @@ const Output = () => {
   }, [field, biomass]);
 
   return (
-    <Stack direction="row" justifyContent="center">
+    <Stack direction="row" sx={{ justifyContent: 'center' }}>
       {/* <LeftSideBar sidebarListData={sidebarListData} refs={refs} /> */}
       <RightSideBar sidebarListData={sidebarListData} summaryData={summaryData} refs={refs} />
     </Stack>

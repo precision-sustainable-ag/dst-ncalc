@@ -29,11 +29,8 @@ const Location = () => {
   // useFetchHLS();
 
   return (
-    <Grid container justifyContent="center">
+    <Grid container sx={{ justifyContent: 'center' }}>
       <Grid
-        item
-        xs={12}
-        md={10}
         sx={{
           marginTop: '1rem',
           padding: `2rem ${matchesMd ? '1rem' : '4rem'}`,
@@ -41,6 +38,10 @@ const Location = () => {
           borderRadius: 5,
           opacity: 0.9,
           backgroundColor: 'white',
+        }}
+        size={{
+          xs: 12,
+          md: 10,
         }}
       >
         <Stack spacing="1rem">
@@ -116,7 +117,6 @@ const Location = () => {
         />
       </Grid>
     </Grid>
-
   );
 }; // Location
 

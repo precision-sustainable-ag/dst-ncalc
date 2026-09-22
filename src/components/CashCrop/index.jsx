@@ -42,11 +42,8 @@ const CashCrop = () => {
   });
 
   return (
-    <Grid container justifyContent="center">
+    <Grid container sx={{ justifyContent: 'center' }}>
       <Grid
-        item
-        xs={12}
-        md={10}
         sx={{
           marginTop: '1rem',
           padding: `2rem ${matchesMd ? '1rem' : '4rem'}`,
@@ -58,14 +55,18 @@ const CashCrop = () => {
           flexDirection: 'column',
           alignItems: 'center',
         }}
+        size={{
+          xs: 12,
+          md: 10,
+        }}
       >
-        <Stack spacing="2rem" width="100%" maxWidth="600px">
+        <Stack spacing="2rem" sx={{ width: '100%', maxWidth: '600px' }}>
 
           <Typography variant="h4" align="center" color="primary">Tell us about your Target Rate</Typography>
 
           {isUserSampledMode && (
-            <Stack gap={0}>
-              <Stack direction="row" alignItems="center">
+            <Stack spacing={0}>
+              <Stack direction="row" sx={{ alignItems: 'center' }}>
                 <Typography variant="inputLabel">Cash Crop</Typography>
                 {!cashCrop && <Required />}
               </Stack>
@@ -76,7 +77,7 @@ const CashCrop = () => {
                   id="combo-box-demo"
                   autoFocus
                   options={[...crops]}
-                  sx={{ mt: 0 }}
+                  sx={{ mt: 1 }}
                   value={cashCrop}
                   renderInput={(params) => <PSATextField {...params} placeholder="Select a cash crop" />}
                   onChange={(el, va) => {
@@ -87,8 +88,8 @@ const CashCrop = () => {
             </Stack>
           )}
 
-          <Stack gap={1}>
-            <Stack direction="row" alignItems="center">
+          <Stack spacing={1}>
+            <Stack direction="row" sx={{ alignItems: 'center' }}>
               <Typography variant="inputLabel">Cash Crop Planting Date</Typography>
               {!cashCropPlantingDate && <Required />}
             </Stack>
@@ -107,8 +108,8 @@ const CashCrop = () => {
           </Stack>
 
           {isUserSampledMode && cashCrop === 'Corn' && (
-            <Stack gap={1}>
-              <Stack direction="row" alignItems="center">
+            <Stack spacing={1}>
+              <Stack direction="row" sx={{ alignItems: 'center' }}>
                 <Typography variant="inputLabel">Yield Goal (bu/ac)</Typography>
                 {(!Yield || Yield <= 0) && <Required />}
               </Stack>
@@ -116,8 +117,8 @@ const CashCrop = () => {
             </Stack>
           )}
 
-          <Stack gap={1}>
-            <Stack direction="row" alignItems="center">
+          <Stack spacing={1}>
+            <Stack direction="row" sx={{ alignItems: 'center' }}>
               <Typography variant="inputLabel">
                 What is your Target Nitrogen Fertilizer Rate? (
                 {unit}
@@ -130,7 +131,6 @@ const CashCrop = () => {
             </Stack>
             <Myslider id="targetN" min={0} max={300} />
           </Stack>
-
         </Stack>
 
         <NavigateBar
@@ -153,7 +153,6 @@ const CashCrop = () => {
         />
       </Grid>
     </Grid>
-
   );
 }; // CashCrop
 

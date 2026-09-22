@@ -257,11 +257,8 @@ const Upload = () => {
   }, [metadataGrowthStage, biomassFileGrowthStage, dispatch]);
 
   return (
-    <Grid container justifyContent="center">
+    <Grid container sx={{ justifyContent: 'center' }}>
       <Grid
-        item
-        xs={12}
-        md={10}
         sx={{
           marginTop: '1rem',
           padding: `2rem ${matchesMd ? '1rem' : '4rem'}`,
@@ -270,9 +267,13 @@ const Upload = () => {
           opacity: 0.9,
           backgroundColor: 'white',
         }}
+        size={{
+          xs: 12,
+          md: 10,
+        }}
       >
         <Stack spacing={2} direction="column">
-          <Typography variant="h4" align="center" color="primary">Select your field</Typography>
+          <Typography variant="h4" align="center" color="primary" sx={{ pb: 2 }}>Select your field</Typography>
 
           <FieldDropdown />
 
@@ -296,13 +297,13 @@ const Upload = () => {
                     {option.date}
                   </Typography>
                   <Stack direction="row" spacing={2}>
-                    {/* <Typography variant="body2" color="text.secondary">
+                    {/* <Typography variant="body2" color="textSecondary">
                       Time:
                       {' '}
                       <b>{dayjs(option.createdAt).format('h:mm A')}</b>
                     </Typography> */}
 
-                    <Typography variant="body2" color="text.secondary">
+                    <Typography variant="body2" color="textSecondary">
                       Points:
                       {' '}
                       <b>{option.points?.length || 0}</b>
@@ -318,7 +319,7 @@ const Upload = () => {
                 placeholder="Select a date..."
               />
             )}
-            sx={{ mt: 2 }}
+            sx={{ pt: 2 }}
           />
           )}
 
@@ -341,7 +342,6 @@ const Upload = () => {
           )}
         </Stack>
 
-        <Box sx={{ height: '1rem' }} />
         <NavigateBar
           next="Next"
           nextOnClick={() => {
@@ -358,7 +358,6 @@ const Upload = () => {
         />
       </Grid>
     </Grid>
-
   );
 }; // Upload
 

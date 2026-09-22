@@ -494,11 +494,8 @@ const AddField = () => {
   const inputDisabled = isView || (isEdit && !selectedField);
 
   return (
-    <Grid container justifyContent="center">
+    <Grid container sx={{ justifyContent: 'center' }}>
       <Grid
-        item
-        xs={12}
-        md={10}
         sx={{
           position: 'relative',
           marginTop: '1rem',
@@ -508,6 +505,10 @@ const AddField = () => {
           borderRadius: 5,
           opacity: 0.9,
           backgroundColor: 'white',
+        }}
+        size={{
+          xs: 12,
+          md: 10,
         }}
       >
         <Box sx={{ borderBottom: 1, borderColor: 'divider', mb: 3 }}>
@@ -577,14 +578,17 @@ const AddField = () => {
                       {...params}
                       label="Select Field (Program / Group / Grower / Farm / Field)"
                       placeholder="Type to search..."
-                      InputProps={{
-                        ...params.InputProps,
-                        endAdornment: (
-                          <>
-                            {loadingOptions ? <CircularProgress color="inherit" size={20} /> : null}
-                            {params.InputProps.endAdornment}
-                          </>
-                        ),
+                      slotProps={{
+                        ...params.slotProps,
+                        input: {
+                          ...params.slotProps.input,
+                          endAdornment: (
+                            <>
+                              {loadingOptions ? <CircularProgress color="inherit" size={20} /> : null}
+                              {params.slotProps.input.endAdornment}
+                            </>
+                          ),
+                        },
                       }}
                     />
                   )}
@@ -594,7 +598,7 @@ const AddField = () => {
             : null}
 
           {/* FIELD METADATA */}
-          <Stack gap={1}>
+          <Stack spacing={2}>
             <Typography variant="h5" sx={{ fontWeight: 'bold' }} color="primary">
               Field Metadata
             </Typography>
@@ -611,6 +615,7 @@ const AddField = () => {
                   onChange={(e, val) => handleGroupChange(val)}
                   renderInput={(params) => <PSATextField {...params} label="Select a Program name" required />}
                   readOnly={inputDisabled}
+                  sx={{ mt: 2 }}
                 />
               </Box>
               <Box sx={{ flex: 1 }}>
@@ -624,6 +629,7 @@ const AddField = () => {
                   onInputChange={(e, newInputValue) => handleGrowerChange(newInputValue)}
                   renderInput={(params) => <PSATextField {...params} label="Select or enter a Grower name" required />}
                   readOnly={inputDisabled}
+                  sx={{ mt: 2 }}
                 />
               </Box>
             </Stack>
@@ -640,7 +646,7 @@ const AddField = () => {
                   onInputChange={(e, newInputValue) => handleFarmChange(newInputValue)}
                   renderInput={(params) => <PSATextField {...params} label="Select or enter a Farm name" required />}
                   readOnly={inputDisabled}
-                  sx={{ flex: 1 }}
+                  sx={{ mt: 2 }}
                 />
               </Box>
               <Box sx={{ flex: 1 }}>
@@ -654,7 +660,7 @@ const AddField = () => {
                   onInputChange={(e, newInputValue) => setField(newInputValue)}
                   renderInput={(params) => <PSATextField {...params} label="Select or enter a Field name" required />}
                   readOnly={inputDisabled}
-                  sx={{ flex: 1 }}
+                  sx={{ mt: 2 }}
                 />
               </Box>
             </Stack>
@@ -693,7 +699,7 @@ const AddField = () => {
             const isFirstOfTwo = isTwoSeasons && index === 0;
 
             return (
-              <Stack key={seasonItem.season} gap={1}>
+              <Stack key={seasonItem.season} spacing={2} useFlexGap>
                 <Typography variant="h5" sx={{ fontWeight: 'bold' }} color="primary">
                   {cropLabel}
                   {' '}
@@ -736,10 +742,10 @@ const AddField = () => {
                     <PSATextField {...params} label={`What crops are planted in the ${cropLabel} season?`} required />
                   )}
                   readOnly={inputDisabled}
-                  sx={{ mb: 1 }}
+                  sx={{ mt: 2 }}
                 />
 
-                <Stack direction={{ xs: 'column', md: 'row' }} columnGap={1} rowGap={2}>
+                <Stack direction={{ xs: 'column', md: 'row' }} spacing={{ xs: 2, md: 1 }}>
                   <LocalizationProvider dateAdapter={AdapterDayjs}>
                     <DatePicker
                       label={`${cropLabel} ${startLabel}`}
@@ -818,7 +824,7 @@ const AddField = () => {
           )}
 
           {/* FIELD LOCATION */}
-          <Stack gap={1}>
+          <Stack spacing={1}>
             <Typography variant="h5" align="center" sx={{ fontWeight: 'bold' }} color="primary">
               Where is your Field located?
             </Typography>
@@ -838,7 +844,7 @@ const AddField = () => {
             </Typography>
 
             {!isEdit && !isView && (
-              <Stack direction="row" justifyContent="flex-end">
+              <Stack direction="row" sx={{ justifyContent: 'flex-end' }}>
                 <input
                   id="upload-input"
                   type="file"
@@ -892,7 +898,7 @@ const AddField = () => {
           </Stack>
 
           {!isView && (
-            <Stack direction="row" justifyContent="center" spacing={2} sx={{ mt: 2 }}>
+            <Stack direction="row" spacing={2} sx={{ mt: 2, justifyContent: 'center' }}>
               <PSAButton
                 // eslint-disable-next-line no-nested-ternary
                 title={isSaving ? <CircularProgress size={24} color="inherit" /> : isEdit ? 'Update Field' : 'Save Field'}

@@ -391,11 +391,8 @@ const AppliedMaps = () => {
   };
 
   return (
-    <Grid container justifyContent="center">
+    <Grid container sx={{ justifyContent: 'center' }}>
       <Grid
-        item
-        xs={12}
-        md={10}
         sx={{
           position: 'relative',
           marginTop: '1rem',
@@ -405,6 +402,10 @@ const AppliedMaps = () => {
           borderRadius: 5,
           opacity: 0.9,
           backgroundColor: 'white',
+        }}
+        size={{
+          xs: 12,
+          md: 10,
         }}
       >
         <Box sx={{ borderBottom: 1, borderColor: 'divider', mb: 3 }}>
@@ -428,13 +429,12 @@ const AppliedMaps = () => {
           </Tabs>
         </Box>
 
-        <Typography variant="h4" align="center" color="primary" sx={{ fontWeight: 'bold', mb: 2 }}>
-          View Applied Maps
-        </Typography>
+        <Stack spacing="2rem">
+          <Typography variant="h4" align="center" color="primary" sx={{ fontWeight: 'bold', mb: 2 }}>
+            View Applied Maps
+          </Typography>
 
-        <FieldDropdown />
-
-        <Stack spacing="2rem" sx={{ mt: 2 }}>
+          <FieldDropdown />
           {selectedField && loadingMetadata && (
             <Box display="flex" justifyContent="center">
               <CircularProgress size={24} />
@@ -450,8 +450,8 @@ const AppliedMaps = () => {
           <Stack spacing={2}>
             <Typography variant="inputLabel" sx={{ fontWeight: 'bold' }}>Upload Applied Rate Map</Typography>
 
-            <Stack direction={{ xs: 'column', md: 'row' }} gap={1} justifyContent="space-between">
-              <Typography variant="body1" color="text.secondary" alignContent="center">
+            <Stack direction={{ xs: 'column', md: 'row' }} spacing={1} sx={{ justifyContent: 'space-between' }}>
+              <Typography variant="body1" color="textSecondary" alignContent="center">
                 {' '}
                 {appliedMapFileName ? `Selected file: ${appliedMapFileName}` : 'No file selected'}
                 {' '}
@@ -468,7 +468,8 @@ const AppliedMaps = () => {
                 variant="contained"
                 onClick={() => document.getElementById('applied-map-input').click()}
                 sx={{
-                  minWidth: '150px',
+                  minWidth: { xs: '100%', sm: '50%', md: '150px' },
+                  maxWidth: { sm: '50%' },
                   padding: '0.8rem 1.5rem',
                   borderRadius: '2rem',
                 }}
@@ -477,7 +478,7 @@ const AppliedMaps = () => {
 
             {appliedMap && (
               <>
-                <Box sx={{ width: { xs: '100%', md: '50%' } }}>
+                <Box sx={{ width: { xs: '100%', sm: '50%' } }}>
                   <Autocomplete
                     options={appliedRateColumns}
                     value={appliedRateColumn}
@@ -485,9 +486,10 @@ const AppliedMaps = () => {
                     renderInput={(params) => (
                       <PSATextField {...params} label="Select the Applied Rate column" required />
                     )}
+                    sx={{ mt: { xs: 2, md: 0 } }}
                   />
                 </Box>
-                <Box sx={{ width: { xs: '100%', md: '25%' } }}>
+                <Box sx={{ width: { xs: '100%', sm: '25%' } }}>
                   <Typography variant="inputLabel">
                     {`Outlier trim: ${trimPercent}%`}
                   </Typography>
@@ -505,7 +507,7 @@ const AppliedMaps = () => {
             )}
           </Stack>
 
-          <Stack gap={2} alignItems="center">
+          <Stack spacing={2} sx={{ alignItems: 'center' }}>
             <PSARadioButton
               options={[
                 { label: 'Applied Map', value: 'applied' },
@@ -548,7 +550,7 @@ const AppliedMaps = () => {
             />
           </Stack>
 
-          <Stack direction="row" justifyContent="center" spacing={2} sx={{ mt: 2 }}>
+          <Stack direction="row" spacing={2} sx={{ mt: 2, justifyContent: 'center' }}>
             <PSAButton
               title={isPdfLoading ? 'Generating PDF...' : 'Export as PDF'}
               variant="contained"

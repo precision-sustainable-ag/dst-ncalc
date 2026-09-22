@@ -29,7 +29,7 @@ const ProtectedPage = ({ children, allowedRoles = null }) => {
 
   if (isLoading) {
     return (
-      <Box display="flex" justifyContent="center" alignItems="center" minHeight="100vh">
+      <Box display="flex" justifyContent="center" sx={{ alignItems: 'center' }} minHeight="100vh">
         <CircularProgress />
       </Box>
     );
@@ -37,9 +37,9 @@ const ProtectedPage = ({ children, allowedRoles = null }) => {
 
   if (!isAuthenticated) {
     return (
-      <Grid container justifyContent="center" sx={{ mt: '2rem' }}>
-        <Grid item xs={10} sx={{ p: '2rem', backgroundColor: 'white', borderRadius: 5 }}>
-          <Stack spacing={2} alignItems="center">
+      <Grid container sx={{ justifyContent: 'center', mt: '2rem' }}>
+        <Grid sx={{ p: '2rem', backgroundColor: 'white', borderRadius: 5 }} size={{ xs: 10 }}>
+          <Stack spacing={2} sx={{ alignItems: 'center' }}>
             <Typography variant="h6" align="center">Please log in to view this page</Typography>
 
             <NavButton onClick={() => { navigate('/home'); dispatch(set.activeStep(0)); }}>Home</NavButton>
@@ -51,9 +51,9 @@ const ProtectedPage = ({ children, allowedRoles = null }) => {
 
   if (!isAllowed) {
     return (
-      <Grid container justifyContent="center" sx={{ mt: '2rem' }}>
-        <Grid item xs={10} sx={{ p: '2rem', backgroundColor: 'white', borderRadius: 5 }}>
-          <Stack spacing={2} alignItems="center">
+      <Grid container sx={{ justifyContent: 'center', mt: '2rem' }}>
+        <Grid sx={{ p: '2rem', backgroundColor: 'white', borderRadius: 5 }} size={{ xs: 10 }}>
+          <Stack spacing={2} sx={{ alignItems: 'center' }}>
             <Typography variant="h6" align="center">Access denied: You do not have the required permissions.</Typography>
 
             <NavButton onClick={() => { navigate('/home'); dispatch(set.activeStep(0)); }}>Home</NavButton>
