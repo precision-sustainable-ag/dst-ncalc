@@ -25,7 +25,9 @@ import { isValidGeoJSON, toFeatureCollection } from '../../utils/geojsonUtils';
 import { fitAndWaitForIdle, extractLegend } from '../../utils/mapCaptureUtils';
 import { downloadGeojsonZip } from '../../utils/downloadUtils';
 import buildPdfReportHtml from '../../utils/pdfUtils';
-import { APPLIED_MAPS_ROLES, getRoles, hasAccess } from '../../utils/roles';
+import {
+  APPLIED_MAPS_ROLES, SWATH_ANALYSIS_ROLES, getRoles, hasAccess, isUserSuperAdmin,
+} from '../../utils/roles';
 import FieldDropdown from '../../shared/FieldDropdown/FieldDropdown';
 
 // Maps each route to a tab index so the Tabs component stays in sync with the URL
@@ -55,6 +57,9 @@ const AppliedMaps = () => {
 
   const roles = getRoles(user);
   const showAppliedMaps = hasAccess(roles, APPLIED_MAPS_ROLES);
+  // Swath sections are only for data analysts and super-admins.
+  const canViewSwaths = isUserSuperAdmin(roles)
+    || SWATH_ANALYSIS_ROLES.some((r) => roles.includes(r));
 
   const selectedField = useSelector(get.selectedField);
 
@@ -336,15 +341,15 @@ const AppliedMaps = () => {
     }
   }, []);
 
-  // Regenerate swath polygons whenever a new applied map is uploaded
+  // Regenerate swath polygons whenever a new applied map is uploaded.
   useEffect(() => {
-    if (appliedMap?.features?.length) {
+    if (canViewSwaths && appliedMap?.features?.length) {
       fetchSwathPolygons(appliedMap);
     } else {
       setSwathMap(null);
       setSwathError('');
     }
-  }, [appliedMap, fetchSwathPolygons]);
+  }, [canViewSwaths, appliedMap, fetchSwathPolygons]);
 
   // Aggregate the swath polygons into prescription cells via /swaths-to-cells
   const fetchCellSummary = useCallback(async () => {
@@ -636,7 +641,7 @@ const AppliedMaps = () => {
               </>
             )}
 
-            {appliedMap && appliedRateColumn && swathMap && (
+            {canViewSwaths && appliedMap && appliedRateColumn && swathMap && (
               <>
                 <Typography variant="inputLabel">
                   Use only swaths from each grid cell?
@@ -702,8 +707,10 @@ const AppliedMaps = () => {
               options={[
                 { label: 'Applied Map', value: 'applied' },
                 { label: 'Prescription', value: 'prescription' },
-                { label: 'Swaths', value: 'swath' },
-                { label: 'Aggregated swaths', value: 'aggrSwaths' },
+                ...(canViewSwaths ? [
+                  { label: 'Swaths', value: 'swath' },
+                  { label: 'Aggregated swaths', value: 'aggrSwaths' },
+                ] : []),
               ]}
               selectedValue={mapLayer}
               onChange={(value) => setMapLayer(value)}
