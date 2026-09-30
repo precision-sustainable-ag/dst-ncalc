@@ -25,7 +25,9 @@ import { isValidGeoJSON, toFeatureCollection } from '../../utils/geojsonUtils';
 import { fitAndWaitForIdle, extractLegend } from '../../utils/mapCaptureUtils';
 import { downloadGeojsonZip } from '../../utils/downloadUtils';
 import buildPdfReportHtml from '../../utils/pdfUtils';
-import { APPLIED_MAPS_ROLES, getRoles, hasAccess } from '../../utils/roles';
+import {
+  APPLIED_MAPS_ROLES, SWATH_ANALYSIS_ROLES, getRoles, hasAccess, isUserSuperAdmin,
+} from '../../utils/roles';
 import FieldDropdown from '../../shared/FieldDropdown/FieldDropdown';
 
 // Maps each route to a tab index so the Tabs component stays in sync with the URL
@@ -40,6 +42,8 @@ const APPLIED_RATE_COLORS = ['#762a83', '#af8dc3', '#e7d4e8', '#d9f0d3', '#7fbf7
 
 const PDF_BASE_URL = 'https://pdf.covercrop-data.org/api';
 
+const IMAGERY_API_URL = 'https://developapi.covercrop-imagery.org';
+
 const AppliedMaps = () => {
   const { user } = useAuth0();
 
@@ -53,6 +57,9 @@ const AppliedMaps = () => {
 
   const roles = getRoles(user);
   const showAppliedMaps = hasAccess(roles, APPLIED_MAPS_ROLES);
+  // Swath sections are only for data analysts and super-admins.
+  const canViewSwaths = isUserSuperAdmin(roles)
+    || SWATH_ANALYSIS_ROLES.some((r) => roles.includes(r));
 
   const selectedField = useSelector(get.selectedField);
 
@@ -69,8 +76,22 @@ const AppliedMaps = () => {
   const [appliedMapFileName, setAppliedMapFileName] = useState('');
   const [appliedRateColumn, setAppliedRateColumn] = useState(null);
 
+  // SWATH POLYGONS (returned by /swaths-to-cells alongside the aggregated cells)
+  const [swathMap, setSwathMap] = useState(null);
+  const [loadingSwath, setLoadingSwath] = useState(false);
+  const [swathError, setSwathError] = useState('');
+
+  // AGGREGATE SWATH (swaths aggregated into prescription cells via /swaths-to-cells)
+  const [aggregateSwathMap, setAggregateSwathMap] = useState(null);
+  const [loadingAggregateSwath, setLoadingAggregateSwath] = useState(false);
+  const [aggregateSwathError, setAggregateSwathError] = useState('');
+
   // Percent of data trimmed from each end of applied_N_rate for map display
   const [trimPercent, setTrimPercent] = useState(5);
+
+  const [useOnlyCenteredSwaths, setUseOnlyCenteredSwaths] = useState(false);
+  const [removeSwathIntersection, setRemoveSwathIntersection] = useState(false);
+  const [boundThreshold, setBoundThreshold] = useState('');
 
   const mapInstanceRef = useRef(null);
   const [mapLayer, setMapLayer] = useState('applied');
@@ -79,19 +100,18 @@ const AppliedMaps = () => {
 
   const prescriptionGeojson = latestPrescription?.geojson ?? null;
 
-  // Prefer the displayed layer's extent; fall back to the selected field's geometry
+  // Prefer the field geometry (stable across layers); fall back to whatever data we have.
   const mapBounds = useMemo(() => {
     try {
-      if (mapLayer === 'prescription' && prescriptionGeojson?.features?.length) {
-        return bbox(prescriptionGeojson);
-      }
-      if (mapLayer === 'applied' && appliedMap?.features?.length) return bbox(appliedMap);
       if (selectedField?.geometry) return bbox(selectedField.geometry);
+      if (appliedMap?.features?.length) return bbox(appliedMap);
+      if (prescriptionGeojson?.features?.length) return bbox(prescriptionGeojson);
+      if (swathMap?.features?.length) return bbox(swathMap);
     } catch (e) {
       return null;
     }
     return null;
-  }, [mapLayer, prescriptionGeojson, appliedMap, selectedField]);
+  }, [prescriptionGeojson, swathMap, appliedMap, selectedField]);
 
   // Center the map on the current bounds (fallback to the continental US)
   const mapCenter = useMemo(() => {
@@ -111,15 +131,15 @@ const AppliedMaps = () => {
     return nPercent;
   }, [additionalMetadata]);
 
-  // Applied map with an 'applied_N_rate column' added: the selected rate column scaled by the fertilizer multiplier.
-  const displayedMap = useMemo(() => {
-    if (!appliedMap?.features?.length || !appliedRateColumn) {
-      return appliedMap;
+  // Add an 'applied_N_rate' column: the selected rate column scaled by the fertilizer multiplier.
+  const applyAppliedRate = useCallback((featureCollection) => {
+    if (!featureCollection?.features?.length || !appliedRateColumn) {
+      return featureCollection;
     }
 
     return {
       type: 'FeatureCollection',
-      features: appliedMap.features.map((feature) => ({
+      features: featureCollection.features.map((feature) => ({
         ...feature,
         properties: {
           ...feature.properties,
@@ -128,22 +148,22 @@ const AppliedMaps = () => {
         },
       })),
     };
-  }, [appliedMap, appliedRateColumn, rateMultiplier]);
+  }, [appliedRateColumn, rateMultiplier]);
 
   // Drop features outside the trimPercent-th percentile of applied_N_rate from each end
   // Only for visualization and pdf. Export (GeoJSON zip) preserves the full dataset.
-  const trimmedMap = useMemo(() => {
-    const features = displayedMap?.features;
-    if (!features?.length || !appliedRateColumn) return displayedMap;
+  const trimByAppliedRate = useCallback((featureCollection) => {
+    const features = featureCollection?.features;
+    if (!features?.length || !appliedRateColumn) return featureCollection;
 
     const trimFraction = Math.min(Math.max(Number(trimPercent) || 0, 0), 49) / 100;
-    if (trimFraction === 0) return displayedMap;
+    if (trimFraction === 0) return featureCollection;
 
     const values = features
       .map((feature) => feature.properties?.applied_N_rate)
       .filter((value) => Number.isFinite(value))
       .sort((a, b) => a - b);
-    if (!values.length) return displayedMap;
+    if (!values.length) return featureCollection;
 
     const lower = values[Math.floor(values.length * trimFraction)];
     const upper = values[Math.ceil(values.length * (1 - trimFraction)) - 1];
@@ -155,19 +175,58 @@ const AppliedMaps = () => {
         return Number.isFinite(value) && value >= lower && value <= upper;
       }),
     };
-  }, [displayedMap, appliedRateColumn, trimPercent]);
+  }, [appliedRateColumn, trimPercent]);
+
+  // Applied map, converted to lb N/ac and outlier-trimmed for display
+  const displayedMap = useMemo(
+    () => applyAppliedRate(appliedMap),
+    [applyAppliedRate, appliedMap],
+  );
+  const trimmedMap = useMemo(
+    () => trimByAppliedRate(displayedMap),
+    [trimByAppliedRate, displayedMap],
+  );
+
+  // Swath polygons (from /swaths-to-cells), converted and trimmed.
+  const swathDisplayedMap = useMemo(
+    () => applyAppliedRate(swathMap),
+    [applyAppliedRate, swathMap],
+  );
+  const swathTrimmedMap = useMemo(
+    () => trimByAppliedRate(swathDisplayedMap),
+    [trimByAppliedRate, swathDisplayedMap],
+  );
 
   // Raster props for the displayed layer - initRasterObject, valueKey, unit
   const initRasterObject = useMemo(() => {
     if (mapLayer === 'prescription') return prescriptionGeojson;
+    if (mapLayer === 'aggrSwaths') return aggregateSwathMap;
+    if (mapLayer === 'swath') return appliedRateColumn ? swathTrimmedMap : null;
     return appliedRateColumn ? trimmedMap : null;
-  }, [mapLayer, prescriptionGeojson, appliedRateColumn, trimmedMap]);
+  }, [mapLayer, prescriptionGeojson, aggregateSwathMap, appliedRateColumn, trimmedMap, swathTrimmedMap]);
 
-  const valueKey = mapLayer === 'prescription' ? 'ReqN' : 'applied_N_rate';
+  const valueKey = useMemo(() => {
+    if (mapLayer === 'prescription') return 'ReqN';
+    if (mapLayer === 'aggrSwaths') return 'weighted_rate';
+    return 'applied_N_rate';
+  }, [mapLayer]);
 
   const unit = useMemo(() => {
     if (mapLayer === 'prescription') return 'lb of N/ac';
+    if (mapLayer === 'aggrSwaths') return 'Weighted Rate';
     return rateMultiplier !== 1 ? 'lb N/ac' : 'Applied Rate';
+  }, [mapLayer, rateMultiplier]);
+
+  const secondaryUnit = useMemo(() => {
+    if (mapLayer === 'prescription' || mapLayer === 'swath' || mapLayer === 'applied') {
+      return additionalMetadata?.fertilizer?.type === 'liquid' ? 'gal of product/ac' : 'lb of product/ac';
+    }
+    return '';
+  }, [mapLayer, additionalMetadata]);
+
+  const secondaryUnitMultiplier = useMemo(() => {
+    if (mapLayer === 'prescription' || mapLayer === 'swath' || mapLayer === 'applied') return 1 / rateMultiplier;
+    return '';
   }, [mapLayer, rateMultiplier]);
 
   // Numeric-friendly columns in the uploaded features' properties to display in the dropdown
@@ -264,6 +323,57 @@ const AppliedMaps = () => {
     }
   }, [dispatch]);
 
+  // Make the /swaths-to-cells API call. The backend returns the aggregated
+  // cell summary (geojson_data) and the swath polygons (swaths_geojson).
+  const fetchCellSummary = useCallback(async () => {
+    if (!appliedMap?.features?.length || !prescriptionGeojson?.features?.length) {
+      setAggregateSwathError('An applied rate map and a saved prescription are required.');
+      setSwathMap(null);
+      setAggregateSwathMap(null);
+      return;
+    }
+    try {
+      setLoadingSwath(true);
+      setLoadingAggregateSwath(true);
+      setSwathError('');
+      setAggregateSwathError('');
+      const response = await axios.post(`${IMAGERY_API_URL}/swaths-to-cells`, {
+        geojson: appliedMap,
+        prescription: prescriptionGeojson,
+        centered_swaths_only: useOnlyCenteredSwaths,
+        remove_intersection: removeSwathIntersection,
+        threshold: boundThreshold === '' ? undefined : Number(boundThreshold),
+        include_swaths: true,
+      });
+      setSwathMap(response?.data?.swaths_geojson ?? null);
+      setAggregateSwathMap(response?.data?.geojson_data ?? null);
+    } catch (error) {
+      const message = error?.response?.data?.message || 'Could not generate the cell summary.';
+      setSwathMap(null);
+      setAggregateSwathMap(null);
+      setSwathError(message);
+      setAggregateSwathError(message);
+    } finally {
+      setLoadingSwath(false);
+      setLoadingAggregateSwath(false);
+    }
+  }, [
+    appliedMap,
+    prescriptionGeojson,
+    useOnlyCenteredSwaths,
+    removeSwathIntersection,
+    boundThreshold,
+  ]);
+
+  // Clear any stale swath / cell-summary results when the inputs change.
+  // They are only (re)generated when the "Generate" button is clicked.
+  useEffect(() => {
+    setSwathMap(null);
+    setSwathError('');
+    setAggregateSwathMap(null);
+    setAggregateSwathError('');
+  }, [appliedMap, appliedRateColumn, prescriptionGeojson]);
+
   useEffect(() => {
     setAppliedMap(null);
     setAppliedMapFileName('');
@@ -281,7 +391,7 @@ const AppliedMaps = () => {
 
   // Exports need both maps: an uploaded applied map and a saved prescription for the field
   const exportReady = Boolean(
-    appliedMap?.features?.length && appliedRateColumn && prescriptionGeojson?.features?.length,
+    (appliedMap?.features?.length && appliedRateColumn) || prescriptionGeojson?.features?.length,
   );
 
   // Capture each available map layer as an image and export them as a PDF report
@@ -372,8 +482,14 @@ const AppliedMaps = () => {
       ...(displayedMap?.features?.length
         ? [{ name: 'applied_map.geojson', geojson: displayedMap }]
         : []),
-      ...(latestPrescription?.geojson?.features?.length
-        ? [{ name: 'prescription.geojson', geojson: latestPrescription.geojson }]
+      ...(prescriptionGeojson?.features?.length
+        ? [{ name: 'prescription.geojson', geojson: prescriptionGeojson }]
+        : []),
+      ...(swathDisplayedMap?.features?.length
+        ? [{ name: 'swaths.geojson', geojson: swathDisplayedMap }]
+        : []),
+      ...(aggregateSwathMap?.features?.length
+        ? [{ name: 'aggregated_swaths.geojson', geojson: aggregateSwathMap }]
         : []),
     ];
 
@@ -505,6 +621,66 @@ const AppliedMaps = () => {
                 </Box>
               </>
             )}
+
+            {canViewSwaths && appliedMap && appliedRateColumn && (
+              <>
+                <Typography variant="inputLabel">
+                  Use only swaths from each grid cell?
+                </Typography>
+                <PSARadioButton
+                  options={[
+                    { label: 'Yes', value: true },
+                    { label: 'No', value: false },
+                  ]}
+                  selectedValue={useOnlyCenteredSwaths}
+                  onChange={(value) => setUseOnlyCenteredSwaths(value)}
+                  row
+                />
+                <Typography variant="inputLabel">
+                  Threshold for lower and upper bounds
+                </Typography>
+                <Box sx={{ width: { xs: '100%', md: '25%' } }}>
+                  <PSATextField
+                    type="number"
+                    value={boundThreshold}
+                    onChange={(e) => setBoundThreshold(e.target.value)}
+                    fullWidth
+                    sx={{ mt: 0 }}
+                  />
+                </Box>
+                <Typography variant="inputLabel">
+                  Remove intersection of swaths?
+                </Typography>
+                <PSARadioButton
+                  options={[
+                    { label: 'Yes', value: true },
+                    { label: 'No', value: false },
+                  ]}
+                  selectedValue={removeSwathIntersection}
+                  onChange={(value) => setRemoveSwathIntersection(value)}
+                  row
+                />
+                <PSAButton
+                  title={loadingAggregateSwath ? 'Generating...' : 'Generate'}
+                  variant="contained"
+                  onClick={fetchCellSummary}
+                  disabled={
+                    loadingAggregateSwath
+                    || !appliedMap?.features?.length
+                    || !prescriptionGeojson?.features?.length
+                  }
+                  sx={{
+                    maxWidth: '250px',
+                    padding: '0.8rem 1.5rem',
+                    borderRadius: '2rem',
+                  }}
+                />
+                {aggregateSwathError && (
+                  <Typography color="error">{aggregateSwathError}</Typography>
+                )}
+              </>
+            )}
+
           </Stack>
 
           <Stack spacing={2} sx={{ alignItems: 'center' }}>
@@ -512,16 +688,42 @@ const AppliedMaps = () => {
               options={[
                 { label: 'Applied Map', value: 'applied' },
                 { label: 'Prescription', value: 'prescription' },
+                ...(canViewSwaths ? [
+                  { label: 'Swaths', value: 'swath' },
+                  { label: 'Aggregated swaths', value: 'aggrSwaths' },
+                ] : []),
               ]}
               selectedValue={mapLayer}
               onChange={(value) => setMapLayer(value)}
               row
             />
 
+            {mapLayer === 'applied' && !displayedMap && (
+              <Typography color="textSecondary">
+                Upload an applied rate map.
+              </Typography>
+            )}
+
             {mapLayer === 'prescription' && !loadingPrescription && !prescriptionGeojson && (
               <Typography color="textSecondary">
-                No saved prescription found for this field.
+                {!selectedField ? 'Select a field to view the latest prescription.' : 'No saved prescription found for this field.'}
               </Typography>
+            )}
+
+            {(mapLayer === 'swath' || mapLayer === 'aggrSwaths') && !loadingSwath && !swathError && !swathMap && (
+              <Typography color="textSecondary">
+                {prescriptionGeojson
+                  ? 'Click Generate to build the swath polygons.'
+                  : 'A saved prescription is required to generate swaths.'}
+              </Typography>
+            )}
+
+            {mapLayer === 'prescription' && loadingPrescription && <CircularProgress size={24} />}
+            {mapLayer === 'swath' && loadingSwath && <CircularProgress size={24} />}
+            {mapLayer === 'aggrSwaths' && loadingAggregateSwath && <CircularProgress size={24} />}
+
+            {mapLayer === 'swath' && !loadingSwath && swathError && (
+              <Typography color="textSecondary">{swathError}</Typography>
             )}
 
             <PSAReduxMap
@@ -537,6 +739,7 @@ const AppliedMaps = () => {
               scrollZoom
               dragPan
               keyboard
+              hasSearchBar
               doubleClickZoom={false}
               touchZoomRotate
               initRasterObject={initRasterObject}
@@ -545,7 +748,9 @@ const AppliedMaps = () => {
               color_steps={7}
               unit={unit}
               material={mapLayer === 'prescription' ? 'prescription' : 'appliedRate'}
-              scaleType={mapLayer === 'applied' ? 'quantile' : 'linear'}
+              scaleType={mapLayer === 'prescription' ? 'linear' : 'quantile'}
+              secondaryUnit={secondaryUnit}
+              secondaryUnitMultiplier={secondaryUnitMultiplier}
               mapboxToken={mapboxToken}
             />
           </Stack>
