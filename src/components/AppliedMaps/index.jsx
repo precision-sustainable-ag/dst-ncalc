@@ -76,7 +76,7 @@ const AppliedMaps = () => {
   const [appliedMapFileName, setAppliedMapFileName] = useState('');
   const [appliedRateColumn, setAppliedRateColumn] = useState(null);
 
-  // SWATH POLYGONS (derived from the uploaded applied map via /points-to-polygon)
+  // SWATH POLYGONS (returned by /swaths-to-cells alongside the aggregated cells)
   const [swathMap, setSwathMap] = useState(null);
   const [loadingSwath, setLoadingSwath] = useState(false);
   const [swathError, setSwathError] = useState('');
@@ -187,7 +187,7 @@ const AppliedMaps = () => {
     [trimByAppliedRate, displayedMap],
   );
 
-  // Swath polygons (from /points-to-polygon), converted and trimmed.
+  // Swath polygons (from /swaths-to-cells), converted and trimmed.
   const swathDisplayedMap = useMemo(
     () => applyAppliedRate(swathMap),
     [applyAppliedRate, swathMap],
@@ -323,75 +323,56 @@ const AppliedMaps = () => {
     }
   }, [dispatch]);
 
-  // Convert the uploaded applied-rate points into swath coverage polygons
-  const fetchSwathPolygons = useCallback(async (geojson) => {
-    try {
-      setLoadingSwath(true);
-      setSwathError('');
-      const response = await axios.post(`${IMAGERY_API_URL}/points-to-polygon`, { geojson });
-      setSwathMap(response?.data?.geojson_data ?? null);
-    } catch (error) {
-      setSwathMap(null);
-      setSwathError(
-        error?.response?.data?.message
-          || 'Could not generate swath polygons from this file.',
-      );
-    } finally {
-      setLoadingSwath(false);
-    }
-  }, []);
-
-  // Regenerate swath polygons whenever a new applied map is uploaded.
-  useEffect(() => {
-    if (canViewSwaths && appliedMap?.features?.length) {
-      fetchSwathPolygons(appliedMap);
-    } else {
-      setSwathMap(null);
-      setSwathError('');
-    }
-  }, [canViewSwaths, appliedMap, fetchSwathPolygons]);
-
-  // Aggregate the swath polygons into prescription cells via /swaths-to-cells
+  // Make the /swaths-to-cells API call. The backend returns the aggregated
+  // cell summary (geojson_data) and the swath polygons (swaths_geojson).
   const fetchCellSummary = useCallback(async () => {
-    if (!swathMap?.features?.length || !prescriptionGeojson?.features?.length) {
-      setAggregateSwathError('A swath map and a saved prescription are required.');
+    if (!appliedMap?.features?.length || !prescriptionGeojson?.features?.length) {
+      setAggregateSwathError('An applied rate map and a saved prescription are required.');
+      setSwathMap(null);
       setAggregateSwathMap(null);
       return;
     }
     try {
+      setLoadingSwath(true);
       setLoadingAggregateSwath(true);
+      setSwathError('');
       setAggregateSwathError('');
       const response = await axios.post(`${IMAGERY_API_URL}/swaths-to-cells`, {
-        swaths: swathMap,
+        geojson: appliedMap,
         prescription: prescriptionGeojson,
         centered_swaths_only: useOnlyCenteredSwaths,
         remove_intersection: removeSwathIntersection,
         threshold: boundThreshold === '' ? undefined : Number(boundThreshold),
+        include_swaths: true,
       });
+      setSwathMap(response?.data?.swaths_geojson ?? null);
       setAggregateSwathMap(response?.data?.geojson_data ?? null);
     } catch (error) {
+      const message = error?.response?.data?.message || 'Could not generate the cell summary.';
+      setSwathMap(null);
       setAggregateSwathMap(null);
-      setAggregateSwathError(
-        error?.response?.data?.message
-          || 'Could not generate the cell summary.',
-      );
+      setSwathError(message);
+      setAggregateSwathError(message);
     } finally {
+      setLoadingSwath(false);
       setLoadingAggregateSwath(false);
     }
   }, [
-    swathMap,
+    appliedMap,
     prescriptionGeojson,
     useOnlyCenteredSwaths,
     removeSwathIntersection,
     boundThreshold,
   ]);
 
-  // Clear any stale cell summary when the swaths/prescription change.
-  // The summary is only (re)generated when the "Generate cell summary" button is clicked.
+  // Clear any stale swath / cell-summary results when the inputs change.
+  // They are only (re)generated when the "Generate" button is clicked.
   useEffect(() => {
+    setSwathMap(null);
+    setSwathError('');
     setAggregateSwathMap(null);
     setAggregateSwathError('');
-  }, [swathMap, prescriptionGeojson]);
+  }, [appliedMap, appliedRateColumn, prescriptionGeojson]);
 
   useEffect(() => {
     setAppliedMap(null);
@@ -641,7 +622,7 @@ const AppliedMaps = () => {
               </>
             )}
 
-            {canViewSwaths && appliedMap && appliedRateColumn && swathMap && (
+            {canViewSwaths && appliedMap && appliedRateColumn && (
               <>
                 <Typography variant="inputLabel">
                   Use only swaths from each grid cell?
@@ -685,7 +666,7 @@ const AppliedMaps = () => {
                   onClick={fetchCellSummary}
                   disabled={
                     loadingAggregateSwath
-                    || !swathMap?.features?.length
+                    || !appliedMap?.features?.length
                     || !prescriptionGeojson?.features?.length
                   }
                   sx={{
@@ -729,9 +710,11 @@ const AppliedMaps = () => {
               </Typography>
             )}
 
-            {mapLayer === 'swath' && !loadingSwath && !swathError && !swathMap && (
+            {(mapLayer === 'swath' || mapLayer === 'aggrSwaths') && !loadingSwath && !swathError && !swathMap && (
               <Typography color="textSecondary">
-                Upload an applied rate map to generate swath polygons.
+                {prescriptionGeojson
+                  ? 'Click Generate to build the swath polygons.'
+                  : 'A saved prescription is required to generate swaths.'}
               </Typography>
             )}
 
