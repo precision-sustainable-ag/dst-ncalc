@@ -5,11 +5,17 @@ import {
 import AdminPortal from 'shared-react-components/src/AdminPortal';
 import { useAuth0 } from '@auth0/auth0-react';
 import { auth0ApiUrl } from '../../utils/keys';
+import { getRoles, isUserSuperAdmin, ROLE_MANAGER_RESTRICTED_ROLES } from '../../utils/roles';
 import CreateRole from './CreateRole';
 
 const ManageUsers = () => {
-  const { getAccessTokenSilently } = useAuth0();
+  const { getAccessTokenSilently, user } = useAuth0();
   const [activeTab, setActiveTab] = useState(0);
+
+  // Super-admins can assign any role; role-managers can't assign the restricted ones.
+  const nonAssignableRoles = isUserSuperAdmin(getRoles(user))
+    ? []
+    : ROLE_MANAGER_RESTRICTED_ROLES;
   // Used for remounting the AdminPortal component.
   // Only remounted when a new role is created to prevent repeated calls to the auth0 api
   const [adminPortalKey, setAdminPortalKey] = useState(0);
@@ -57,6 +63,7 @@ const ManageUsers = () => {
               getAccessToken={getAccessTokenSilently}
               appName="NCALC"
               showRequests={false}
+              nonAssignableRoles={nonAssignableRoles}
               title=""
             />
           </Box>
