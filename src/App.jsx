@@ -14,6 +14,7 @@ import {
 import { useAuth0 } from '@auth0/auth0-react';
 import AccountBoxOutlinedIcon from '@mui/icons-material/AccountBoxOutlined';
 import CloudUploadOutlinedIcon from '@mui/icons-material/CloudUploadOutlined';
+import PeopleAltOutlinedIcon from '@mui/icons-material/PeopleAltOutlined';
 import Feedback from './components/Feedback';
 import SnackbarMessage from './shared/SnackbarMessage';
 import './App.scss';
@@ -24,7 +25,9 @@ import NcalcStepper from './shared/Stepper';
 import useFetchHLS from './hooks/useFetchHLS';
 import { useFetchPlantFactors, useFetchFertilizers } from './hooks/useFetchApi';
 import ProtectedPage from './shared/ProtectedPage/ProtectedPage';
-import { APPLIED_MAPS_ROLES } from './utils/roles';
+import {
+  APPLIED_MAPS_ROLES, MANAGE_USERS_ROLES, getRoles, hasAccess,
+} from './utils/roles';
 import { initAuth } from './utils/apiClient';
 import ActionModal from './shared/Modal';
 
@@ -51,6 +54,7 @@ screens.fileupload = require('./components/FileUpload').default;
 screens.fertilizer = require('./components/NitrogenFertilizer').default;
 screens.appliedmaps = require('./components/AppliedMaps').default;
 screens.targetrate = require('./components/TargetRate').default;
+screens.manageusers = require('./components/Users').default;
 
 screens.profile = () => <PSAProfile styles={{ backgroundColor: 'white' }} />;
 
@@ -102,7 +106,9 @@ const App = () => {
   const navigate = useNavigate();
   const dispatch = useDispatch();
   const location = useLocation();
-  const { getAccessTokenSilently, loginWithPopup } = useAuth0();
+  const { getAccessTokenSilently, loginWithPopup, user } = useAuth0();
+
+  const canManageUsers = hasAccess(getRoles(user), MANAGE_USERS_ROLES);
 
   useFetchHLS();
   useFetchPlantFactors();
@@ -117,7 +123,7 @@ const App = () => {
   const isPM3DMode = useSelector(get.biomassCalcMode) === 'pm3d';
   const actionModal = useSelector(get.actionModal);
 
-  const noStepperPaths = ['/profile', '/field', '/editfield', '/viewfield', '/fileupload', '/appliedmaps'];
+  const noStepperPaths = ['/profile', '/field', '/editfield', '/viewfield', '/fileupload', '/appliedmaps', '/manageusers'];
   const showStepper = !noStepperPaths.includes(location.pathname.toLowerCase());
 
   const navContent = [
@@ -145,6 +151,21 @@ const App = () => {
           onClick: () => {
             dispatch(set.activeStep(0));
             navigate('/fileupload');
+          },
+        },
+      ]
+      : []),
+    ...(canManageUsers
+      ? [
+        {
+          type: 'button',
+          variant: 'text',
+          text: 'Manage Users',
+          icon: <PeopleAltOutlinedIcon />,
+          rightIcon: true,
+          onClick: () => {
+            dispatch(set.activeStep(0));
+            navigate('/manageusers');
           },
         },
       ]
@@ -218,14 +239,15 @@ const App = () => {
               const ScreenComponent = screens[scr];
 
               // Pages that require user log in
-              const protectedPaths = ['upload', 'field', 'editfield', 'viewfield', 'fileupload', 'appliedmaps', 'targetrate'];
+              const protectedPaths = ['upload', 'field', 'editfield', 'viewfield', 'fileupload', 'appliedmaps', 'targetrate', 'manageusers'];
               if (isPM3DMode) {
                 protectedPaths.push('covercrop', 'fertilizer', 'output');
               }
 
-              // Pages restricted to specific roles. (ncalc-admin / ncalc-super-admin) have access by default.
+              // Pages restricted to specific roles. ncalc-super-admin has access by default.
               const restrictedPaths = {
                 appliedmaps: APPLIED_MAPS_ROLES,
+                manageusers: MANAGE_USERS_ROLES,
               };
 
               const routePath = scr.toLowerCase();

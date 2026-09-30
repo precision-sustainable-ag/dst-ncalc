@@ -5,8 +5,18 @@ export const getRoles = (user) => user?.[ROLES_CLAIM] || [];
 // Admin roles that have access to everything by default.
 export const ADMIN_ROLES = ['ncalc-admin', 'ncalc-super-admin'];
 
-// Pages restricted to specific roles. (ncalc-admin / ncalc-super-admin) have access by default.
-export const APPLIED_MAPS_ROLES = ['TNC'];
+// Pages restricted to specific roles. ncalc-super-admin has access by default.
+export const APPLIED_MAPS_ROLES = ['ncalc-data-analyst', 'TNC'];
+export const MANAGE_USERS_ROLES = ['ncalc-role-manager'];
+
+// Roles a role-manager is not allowed to assign to other users.
+// Only super-admins can assign these.
+export const ROLE_MANAGER_RESTRICTED_ROLES = [
+  'ncalc-super-admin',
+  'ncalc-admin',
+  'ncalc-role-manager',
+  'admin',
+];
 
 export const isUserAdmin = (roles) => roles.some((r) => ADMIN_ROLES.includes(r));
 export const isUserSuperAdmin = (roles) => roles.includes('ncalc-super-admin');

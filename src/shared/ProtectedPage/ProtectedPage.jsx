@@ -7,13 +7,13 @@ import { useNavigate } from 'react-router-dom';
 import { useDispatch } from 'react-redux';
 import { set } from '../../store/redux-autosetters';
 import NavButton from '../Navigate/NavButton';
-import { getRoles, isUserAdmin } from '../../utils/roles';
+import { getRoles, isUserSuperAdmin } from '../../utils/roles';
 
 const ROLES = ['NIFA-Soy', 'Willard', 'Growmark', 'GA', 'ND'];
 
 /**
  * Page is restricted to `allowedRoles`.
- * Admins (ncalc-admin / ncalc-super-admin) have access by default.
+ * ncalc-super-admin has access by default.
  * If `allowedRoles` is null, the page is accessible to all roles.
  */
 const ProtectedPage = ({ children, allowedRoles = null }) => {
@@ -24,7 +24,7 @@ const ProtectedPage = ({ children, allowedRoles = null }) => {
   const roles = getRoles(user);
   const grantingRoles = allowedRoles || ROLES;
   const isAllowed = isAuthenticated && (
-    isUserAdmin(roles) || roles.some((r) => grantingRoles.includes(r))
+    isUserSuperAdmin(roles) || roles.some((r) => grantingRoles.includes(r))
   );
 
   if (isLoading) {
