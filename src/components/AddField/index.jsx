@@ -528,7 +528,7 @@ const AddField = () => {
             <Tab label="Create Field" />
             <Tab label="Edit Field" />
             <Tab label="View Field" />
-            {showAppliedMaps ? <Tab label="View Applied Maps" /> : null}
+            {showAppliedMaps ? <Tab label="Field Maps" /> : null}
           </Tabs>
         </Box>
 

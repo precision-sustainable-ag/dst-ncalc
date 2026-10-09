@@ -747,7 +747,6 @@ const AppliedMaps = () => {
       };
       const payload = {
         field_id: selectedField._id,
-        parameters,
       };
       // Store each map's raw GeoJSON plus its config (as a GeoJSON foreign member) so
       // it can be restored and re-rendered exactly on reload.
@@ -759,6 +758,7 @@ const AppliedMaps = () => {
         };
       }
       if (aggregateSwathMap?.features?.length) {
+        payload.parameters = parameters;
         payload.aggregated_map = { ...aggregateSwathMap, parameters };
       }
       if (canSaveYieldMap) {

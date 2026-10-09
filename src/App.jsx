@@ -13,7 +13,6 @@ import {
 } from 'shared-react-components/src';
 import { useAuth0 } from '@auth0/auth0-react';
 import AccountBoxOutlinedIcon from '@mui/icons-material/AccountBoxOutlined';
-import CloudUploadOutlinedIcon from '@mui/icons-material/CloudUploadOutlined';
 import PeopleAltOutlinedIcon from '@mui/icons-material/PeopleAltOutlined';
 import Feedback from './components/Feedback';
 import SnackbarMessage from './shared/SnackbarMessage';
@@ -140,21 +139,6 @@ const App = () => {
       text: 'Feedback',
       dialog: <Feedback />,
     },
-    ...(isPM3DMode
-      ? [
-        {
-          type: 'button',
-          variant: 'text',
-          text: 'Upload Files',
-          icon: <CloudUploadOutlinedIcon />,
-          rightIcon: true,
-          onClick: () => {
-            dispatch(set.activeStep(0));
-            navigate('/fileupload');
-          },
-        },
-      ]
-      : []),
     ...(canManageUsers
       ? [
         {
@@ -164,7 +148,6 @@ const App = () => {
           icon: <PeopleAltOutlinedIcon />,
           rightIcon: true,
           onClick: () => {
-            dispatch(set.activeStep(0));
             navigate('/manageusers');
           },
         },
