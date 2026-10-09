@@ -48,7 +48,7 @@ const IMAGERY_API_URL = 'https://developapi.covercrop-imagery.org';
 // Returns null if the map is absent or the request fails.
 const fetchStoredMapGeojson = async (fieldId, mapType) => {
   try {
-    const res = await privateApi.get(`/application-maps/${fieldId}/${mapType}`);
+    const res = await privateApi.get(`/field-maps/${fieldId}/${mapType}`);
     return res?.data ?? null;
   } catch (error) {
     return null;
@@ -121,8 +121,8 @@ const AppliedMaps = () => {
 
   // Yield points filtered to those inside the aggregated swath cells (via /yield-in-cells).
   const [intersectedYieldMap, setIntersectedYieldMap] = useState(null);
-  const [loadingYieldInCells, setLoadingYieldInCells] = useState(false);
-  const [yieldInCellsError, setYieldInCellsError] = useState('');
+  const [loadingIntersectedYield, setLoadingIntersectedYield] = useState(false);
+  const [intersectedYieldError, setIntersectedYieldError] = useState('');
 
   // SWATH POLYGONS (returned by /swaths-to-cells alongside the aggregated cells)
   const [swathMap, setSwathMap] = useState(null);
@@ -134,10 +134,10 @@ const AppliedMaps = () => {
   const [loadingAggregateSwath, setLoadingAggregateSwath] = useState(false);
   const [aggregateSwathError, setAggregateSwathError] = useState('');
 
-  // Previously saved application-map document for the selected field.
-  const [existingApplicationMap, setExistingApplicationMap] = useState(null);
-  const [loadingApplicationMap, setLoadingApplicationMap] = useState(false);
-  const [isSavingApplicationMap, setIsSavingApplicationMap] = useState(false);
+  // Previously saved field-map document for the selected field.
+  const [existingFieldMap, setExistingFieldMap] = useState(null);
+  const [loadingFieldMap, setLoadingFieldMap] = useState(false);
+  const [isSavingFieldMap, setIsSavingFieldMap] = useState(false);
 
   // Percent of data trimmed from each end of 'applied_N_rate' for as applied map display
   const [asAppliedTrimPercent, setAsAppliedTrimPercent] = useState(5);
@@ -320,7 +320,7 @@ const AppliedMaps = () => {
     setAggregateSwathMap(null);
     setAggregateSwathError('');
     setIntersectedYieldMap(null);
-    setYieldInCellsError('');
+    setIntersectedYieldError('');
 
     if (['geojson', 'json'].includes(ext)) {
       const reader = new FileReader();
@@ -375,7 +375,7 @@ const AppliedMaps = () => {
     setYieldMapFileName('');
     setYieldColumn(null);
     setIntersectedYieldMap(null);
-    setYieldInCellsError('');
+    setIntersectedYieldError('');
 
     if (['geojson', 'json'].includes(ext)) {
       const reader = new FileReader();
@@ -436,15 +436,15 @@ const AppliedMaps = () => {
     }
   }, [dispatch]);
 
-  // Fetch any previously saved application maps and other metadata for the field and prepopulate the UI.
+  // Fetch any previously saved field maps and other metadata for the field and prepopulate the UI.
   // The document returned here only holds a blob link,
-  // so the GeoJSON for each map is streamed from /application-maps/:field_id/:mapType.
-  const fetchApplicationMap = useCallback(async (fieldId) => {
+  // so the GeoJSON for each map is streamed from /field-maps/:field_id/:mapType.
+  const fetchFieldMap = useCallback(async (fieldId) => {
     try {
-      setLoadingApplicationMap(true);
-      const response = await privateApi.get(`/application-maps/${fieldId}`);
+      setLoadingFieldMap(true);
+      const response = await privateApi.get(`/field-maps/${fieldId}`);
       const data = response?.data?.data ?? null;
-      setExistingApplicationMap(data);
+      setExistingFieldMap(data);
       if (!data) return;
 
       // Parameters are stored inline on the document.
@@ -494,9 +494,9 @@ const AppliedMaps = () => {
       }
     } catch (error) {
       handleError(error, dispatch);
-      setExistingApplicationMap(null);
+      setExistingFieldMap(null);
     } finally {
-      setLoadingApplicationMap(false);
+      setLoadingFieldMap(false);
     }
   }, [dispatch]);
 
@@ -515,7 +515,7 @@ const AppliedMaps = () => {
       setSwathError('');
       setAggregateSwathError('');
       setIntersectedYieldMap(null);
-      setYieldInCellsError('');
+      setIntersectedYieldError('');
       const response = await axios.post(`${IMAGERY_API_URL}/swaths-to-cells`, {
         geojson: appliedMap,
         prescription: prescriptionGeojson,
@@ -547,12 +547,12 @@ const AppliedMaps = () => {
   // Intersect the uploaded yield points with the aggregated swath cells (/yield-in-cells).
   const fetchYieldInCells = useCallback(async () => {
     if (!yieldMap?.features?.length || !aggregateSwathMap?.features?.length) {
-      setYieldInCellsError('A yield map and generated aggregated swaths are required.');
+      setIntersectedYieldError('A yield map and generated aggregated swaths are required.');
       return;
     }
     try {
-      setLoadingYieldInCells(true);
-      setYieldInCellsError('');
+      setLoadingIntersectedYield(true);
+      setIntersectedYieldError('');
       // Send the outlier-trimmed raw yield points and not the intersected yield map.
       const trimmedYieldMap = trimFeaturesByColumn(yieldMap, yieldColumn, yieldTrimPercent);
       const response = await axios.post(`${IMAGERY_API_URL}/yield-in-cells`, {
@@ -564,9 +564,9 @@ const AppliedMaps = () => {
     } catch (error) {
       const message = error?.response?.data?.message || 'Could not intersect the yield map with the cells.';
       setIntersectedYieldMap(null);
-      setYieldInCellsError(message);
+      setIntersectedYieldError(message);
     } finally {
-      setLoadingYieldInCells(false);
+      setLoadingIntersectedYield(false);
     }
   }, [yieldMap, aggregateSwathMap, yieldColumn, yieldTrimPercent]);
 
@@ -579,12 +579,12 @@ const AppliedMaps = () => {
     setYieldMapFileName('');
     setYieldColumn(null);
     setIntersectedYieldMap(null);
-    setYieldInCellsError('');
+    setIntersectedYieldError('');
     setSwathMap(null);
     setSwathError('');
     setAggregateSwathMap(null);
     setAggregateSwathError('');
-    setExistingApplicationMap(null);
+    setExistingFieldMap(null);
     setUseOnlyCenteredSwaths(false);
     setRemoveSwathIntersection(false);
     setBoundThreshold('');
@@ -595,12 +595,12 @@ const AppliedMaps = () => {
     if (fieldId) {
       fetchAdditionalMetadata(fieldId);
       fetchLatestPrescription(fieldId);
-      fetchApplicationMap(fieldId);
+      fetchFieldMap(fieldId);
     } else {
       setAdditionalMetadata(null);
       setLatestPrescription(null);
     }
-  }, [selectedField, fetchAdditionalMetadata, fetchLatestPrescription, fetchApplicationMap]);
+  }, [selectedField, fetchAdditionalMetadata, fetchLatestPrescription, fetchFieldMap]);
 
   // Exports need at least one map: an uploaded applied/yield map or a saved prescription
   const exportReady = Boolean(
@@ -735,10 +735,10 @@ const AppliedMaps = () => {
   const canSaveYieldMap = Boolean(yieldMap?.features?.length && yieldColumn);
   const canSaveMaps = canSaveAppliedMap || canSaveYieldMap;
 
-  // Save the current maps (and swath parameters) to /application-maps.
-  const saveApplicationMap = async () => {
-    dispatch(set.actionModal({ open: true, type: 'loading', message: 'Saving application maps...' }));
-    setIsSavingApplicationMap(true);
+  // Save the current maps (and swath parameters) to /field-maps.
+  const saveFieldMap = async () => {
+    dispatch(set.actionModal({ open: true, type: 'loading', message: 'Saving field maps...' }));
+    setIsSavingFieldMap(true);
     try {
       const parameters = {
         centered_swaths_only: useOnlyCenteredSwaths,
@@ -772,18 +772,18 @@ const AppliedMaps = () => {
         payload.intersected_yield_map = { ...intersectedYieldMap, yield_column: yieldColumn };
       }
 
-      const response = await privateApi.post('/application-maps', payload);
-      setExistingApplicationMap(response?.data?.data ?? null);
+      const response = await privateApi.post('/field-maps', payload);
+      setExistingFieldMap(response?.data?.data ?? null);
       dispatch(set.actionModal({
         open: true,
         type: 'success',
         title: 'Saved Successfully',
-        message: 'Your application maps have been saved for this field.',
+        message: 'Your field maps have been saved for this field.',
       }));
     } catch (error) {
-      handleError(error, dispatch, '', 'There was an error saving the application maps.');
+      handleError(error, dispatch, '', 'There was an error saving the field maps.');
     } finally {
-      setIsSavingApplicationMap(false);
+      setIsSavingFieldMap(false);
     }
   };
 
@@ -792,18 +792,18 @@ const AppliedMaps = () => {
       handleError(null, dispatch, 'Select a field before saving.');
       return;
     }
-    if (existingApplicationMap) {
+    if (existingFieldMap) {
       dispatch(set.actionModal({
         open: true,
         type: 'confirm',
         title: 'Overwrite Saved Maps?',
-        message: 'Saved application maps already exist for this field. Do you want to overwrite them with the current maps?',
+        message: 'Saved field maps already exist for this field. Do you want to overwrite them with the current maps?',
         confirmText: 'Overwrite',
         cancelText: 'Cancel',
-        onConfirm: () => saveApplicationMap(),
+        onConfirm: () => saveFieldMap(),
       }));
     } else {
-      saveApplicationMap();
+      saveFieldMap();
     }
   };
 
@@ -863,7 +863,7 @@ const AppliedMaps = () => {
           </Typography>
 
           <FieldDropdown />
-          {selectedField && (loadingMetadata || loadingApplicationMap) && (
+          {selectedField && (loadingMetadata || loadingFieldMap) && (
             <Box display="flex" justifyContent="center">
               <CircularProgress size={24} />
             </Box>
@@ -919,7 +919,7 @@ const AppliedMaps = () => {
                     setAggregateSwathMap(null);
                     setAggregateSwathError('');
                     setIntersectedYieldMap(null);
-                    setYieldInCellsError('');
+                    setIntersectedYieldError('');
                   }}
                   renderInput={(params) => (
                     <PSATextField {...params} label="Select the Applied Rate column" required />
@@ -1041,7 +1041,7 @@ const AppliedMaps = () => {
                     onChange={(e, val) => {
                       setYieldColumn(val);
                       setIntersectedYieldMap(null);
-                      setYieldInCellsError('');
+                      setIntersectedYieldError('');
                     }}
                     renderInput={(params) => (
                       <PSATextField {...params} label="Select the Yield column" required />
@@ -1075,11 +1075,11 @@ const AppliedMaps = () => {
                         always set the trim first, then intersect.
                       </Typography>
                       <PSAButton
-                        title={loadingYieldInCells ? 'Intersecting...' : 'Intersect with Cells'}
+                        title={loadingIntersectedYield ? 'Intersecting...' : 'Intersect with Cells'}
                         variant="contained"
                         onClick={fetchYieldInCells}
                         disabled={
-                          loadingYieldInCells
+                          loadingIntersectedYield
                           || !yieldColumn
                           || !aggregateSwathMap?.features?.length
                         }
@@ -1099,8 +1099,8 @@ const AppliedMaps = () => {
                           {`Showing ${intersectedYieldMap.features?.length ?? 0} yield map points inside the cells.`}
                         </Typography>
                       )}
-                      {yieldInCellsError && (
-                        <Typography color="error">{yieldInCellsError}</Typography>
+                      {intersectedYieldError && (
+                        <Typography color="error">{intersectedYieldError}</Typography>
                       )}
                     </>
                   )}
@@ -1175,7 +1175,7 @@ const AppliedMaps = () => {
             {mapLayer === 'prescription' && loadingPrescription && <CircularProgress size={24} />}
             {mapLayer === 'swath' && loadingSwath && <CircularProgress size={24} />}
             {mapLayer === 'aggrSwaths' && loadingAggregateSwath && <CircularProgress size={24} />}
-            {mapLayer === 'yield' && loadingYieldInCells && <CircularProgress size={24} />}
+            {mapLayer === 'yield' && loadingIntersectedYield && <CircularProgress size={24} />}
 
             {mapLayer === 'swath' && !loadingSwath && swathError && (
               <Typography color="textSecondary">{swathError}</Typography>
@@ -1236,10 +1236,10 @@ const AppliedMaps = () => {
             {canViewSwaths
             && (
             <PSAButton
-              title={isSavingApplicationMap ? 'Saving...' : 'Save Maps'}
+              title={isSavingFieldMap ? 'Saving...' : 'Save Maps'}
               variant="contained"
               onClick={handleSaveMaps}
-              disabled={!canSaveMaps || isSavingApplicationMap}
+              disabled={!canSaveMaps || isSavingFieldMap}
               sx={{
                 minWidth: '150px',
                 padding: '0.8rem 1.5rem',
