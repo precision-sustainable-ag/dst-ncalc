@@ -55,6 +55,33 @@ const fetchStoredMapGeojson = async (fieldId, mapType) => {
   }
 };
 
+// Drop features outside the trimPercent-th percentile of `column` from each end.
+// Returns the collection unchanged when there is nothing to trim.
+const trimFeaturesByColumn = (featureCollection, column, trimPercent) => {
+  const features = featureCollection?.features;
+  if (!features?.length || !column) return featureCollection;
+
+  const trimFraction = Math.min(Math.max(Number(trimPercent) || 0, 0), 49) / 100;
+  if (trimFraction === 0) return featureCollection;
+
+  const values = features
+    .map((feature) => parseFloat(feature.properties?.[column]))
+    .filter((value) => Number.isFinite(value))
+    .sort((a, b) => a - b);
+  if (!values.length) return featureCollection;
+
+  const lower = values[Math.floor(values.length * trimFraction)];
+  const upper = values[Math.ceil(values.length * (1 - trimFraction)) - 1];
+
+  return {
+    type: 'FeatureCollection',
+    features: features.filter((feature) => {
+      const value = parseFloat(feature.properties?.[column]);
+      return Number.isFinite(value) && value >= lower && value <= upper;
+    }),
+  };
+};
+
 const AppliedMaps = () => {
   const { user } = useAuth0();
 
@@ -91,6 +118,11 @@ const AppliedMaps = () => {
   const [yieldMap, setYieldMap] = useState(null);
   const [yieldMapFileName, setYieldMapFileName] = useState('');
   const [yieldColumn, setYieldColumn] = useState(null);
+
+  // Yield points filtered to those inside the aggregated swath cells (via /yield-in-cells).
+  const [intersectedYieldMap, setIntersectedYieldMap] = useState(null);
+  const [loadingYieldInCells, setLoadingYieldInCells] = useState(false);
+  const [yieldInCellsError, setYieldInCellsError] = useState('');
 
   // SWATH POLYGONS (returned by /swaths-to-cells alongside the aggregated cells)
   const [swathMap, setSwathMap] = useState(null);
@@ -174,41 +206,14 @@ const AppliedMaps = () => {
     };
   }, [appliedRateColumn, rateMultiplier]);
 
-  // Drop features outside the trimPercent-th percentile of applied_N_rate from each end
-  // Only for visualization and pdf. Export (GeoJSON zip) preserves the full dataset.
-  const trimByAppliedRate = useCallback((featureCollection) => {
-    const features = featureCollection?.features;
-    if (!features?.length || !appliedRateColumn) return featureCollection;
-
-    const trimFraction = Math.min(Math.max(Number(asAppliedTrimPercent) || 0, 0), 49) / 100;
-    if (trimFraction === 0) return featureCollection;
-
-    const values = features
-      .map((feature) => feature.properties?.applied_N_rate)
-      .filter((value) => Number.isFinite(value))
-      .sort((a, b) => a - b);
-    if (!values.length) return featureCollection;
-
-    const lower = values[Math.floor(values.length * trimFraction)];
-    const upper = values[Math.ceil(values.length * (1 - trimFraction)) - 1];
-
-    return {
-      type: 'FeatureCollection',
-      features: features.filter((feature) => {
-        const value = feature.properties?.applied_N_rate;
-        return Number.isFinite(value) && value >= lower && value <= upper;
-      }),
-    };
-  }, [appliedRateColumn, asAppliedTrimPercent]);
-
-  // Applied map, converted to lb N/ac and outlier-trimmed for display
+  // Applied map, converted to lb N/ac and outlier-trimmed for display.
   const displayedMap = useMemo(
     () => applyAppliedRate(appliedMap),
     [applyAppliedRate, appliedMap],
   );
   const trimmedMap = useMemo(
-    () => trimByAppliedRate(displayedMap),
-    [trimByAppliedRate, displayedMap],
+    () => trimFeaturesByColumn(displayedMap, 'applied_N_rate', asAppliedTrimPercent),
+    [displayedMap, asAppliedTrimPercent],
   );
 
   // Swath polygons (from /swaths-to-cells), converted and trimmed.
@@ -217,34 +222,17 @@ const AppliedMaps = () => {
     [applyAppliedRate, swathMap],
   );
   const swathTrimmedMap = useMemo(
-    () => trimByAppliedRate(swathDisplayedMap),
-    [trimByAppliedRate, swathDisplayedMap],
+    () => trimFeaturesByColumn(swathDisplayedMap, 'applied_N_rate', asAppliedTrimPercent),
+    [swathDisplayedMap, asAppliedTrimPercent],
   );
 
-  const yieldTrimmedMap = useMemo(() => {
-    const features = yieldMap?.features;
-    if (!features?.length || !yieldColumn) return yieldMap;
+  // Yield layer shows that intersectedYieldMap is present; otherwise it shows the raw uploaded yield map.
+  const effectiveYieldMap = intersectedYieldMap ?? yieldMap;
 
-    const trimFraction = Math.min(Math.max(Number(yieldTrimPercent) || 0, 0), 49) / 100;
-    if (trimFraction === 0) return yieldMap;
-
-    const values = features
-      .map((feature) => parseFloat(feature.properties?.[yieldColumn]))
-      .filter((value) => Number.isFinite(value))
-      .sort((a, b) => a - b);
-    if (!values.length) return yieldMap;
-
-    const lower = values[Math.floor(values.length * trimFraction)];
-    const upper = values[Math.ceil(values.length * (1 - trimFraction)) - 1];
-
-    return {
-      type: 'FeatureCollection',
-      features: features.filter((feature) => {
-        const value = parseFloat(feature.properties?.[yieldColumn]);
-        return Number.isFinite(value) && value >= lower && value <= upper;
-      }),
-    };
-  }, [yieldMap, yieldColumn, yieldTrimPercent]);
+  const yieldTrimmedMap = useMemo(
+    () => trimFeaturesByColumn(effectiveYieldMap, yieldColumn, yieldTrimPercent),
+    [effectiveYieldMap, yieldColumn, yieldTrimPercent],
+  );
 
   // Raster props for the displayed layer - initRasterObject, valueKey, unit
   const initRasterObject = useMemo(() => {
@@ -331,6 +319,8 @@ const AppliedMaps = () => {
     setSwathError('');
     setAggregateSwathMap(null);
     setAggregateSwathError('');
+    setIntersectedYieldMap(null);
+    setYieldInCellsError('');
 
     if (['geojson', 'json'].includes(ext)) {
       const reader = new FileReader();
@@ -384,6 +374,8 @@ const AppliedMaps = () => {
     setYieldMap(null);
     setYieldMapFileName('');
     setYieldColumn(null);
+    setIntersectedYieldMap(null);
+    setYieldInCellsError('');
 
     if (['geojson', 'json'].includes(ext)) {
       const reader = new FileReader();
@@ -468,16 +460,20 @@ const AppliedMaps = () => {
       }
 
       // Fetch the GeoJSON for each map type whose link is present.
-      const [appliedGeojson, aggregatedGeojson, yieldGeojson] = await Promise.all([
+      const [appliedGeojson, aggregatedGeojson, yieldGeojson, intersectedYieldGeojson] = await Promise.all([
         data.as_applied_map ? fetchStoredMapGeojson(fieldId, 'as_applied_map') : null,
         data.aggregated_map ? fetchStoredMapGeojson(fieldId, 'aggregated_map') : null,
         data.yield_map ? fetchStoredMapGeojson(fieldId, 'yield_map') : null,
+        data.intersected_yield_map ? fetchStoredMapGeojson(fieldId, 'intersected_yield_map') : null,
       ]);
 
       if (appliedGeojson?.features?.length) {
         setAppliedMap(appliedGeojson);
         setAppliedMapFileName('Saved applied map');
         setAppliedRateColumn(appliedGeojson.applied_rate_column ?? null);
+        if (Number.isFinite(appliedGeojson.trim_percent)) {
+          setAsAppliedTrimPercent(appliedGeojson.trim_percent);
+        }
       }
 
       if (aggregatedGeojson?.features?.length) {
@@ -488,6 +484,13 @@ const AppliedMaps = () => {
         setYieldMap(yieldGeojson);
         setYieldMapFileName('Saved yield map');
         setYieldColumn(yieldGeojson.yield_column ?? null);
+        if (Number.isFinite(yieldGeojson.trim_percent)) {
+          setYieldTrimPercent(yieldGeojson.trim_percent);
+        }
+      }
+
+      if (intersectedYieldGeojson?.features?.length) {
+        setIntersectedYieldMap(intersectedYieldGeojson);
       }
     } catch (error) {
       handleError(error, dispatch);
@@ -511,6 +514,8 @@ const AppliedMaps = () => {
       setLoadingAggregateSwath(true);
       setSwathError('');
       setAggregateSwathError('');
+      setIntersectedYieldMap(null);
+      setYieldInCellsError('');
       const response = await axios.post(`${IMAGERY_API_URL}/swaths-to-cells`, {
         geojson: appliedMap,
         prescription: prescriptionGeojson,
@@ -539,6 +544,32 @@ const AppliedMaps = () => {
     boundThreshold,
   ]);
 
+  // Intersect the uploaded yield points with the aggregated swath cells (/yield-in-cells).
+  const fetchYieldInCells = useCallback(async () => {
+    if (!yieldMap?.features?.length || !aggregateSwathMap?.features?.length) {
+      setYieldInCellsError('A yield map and generated aggregated swaths are required.');
+      return;
+    }
+    try {
+      setLoadingYieldInCells(true);
+      setYieldInCellsError('');
+      // Send the outlier-trimmed raw yield points and not the intersected yield map.
+      const trimmedYieldMap = trimFeaturesByColumn(yieldMap, yieldColumn, yieldTrimPercent);
+      const response = await axios.post(`${IMAGERY_API_URL}/yield-in-cells`, {
+        yield_geojson: trimmedYieldMap,
+        cells_geojson: aggregateSwathMap,
+      });
+      setIntersectedYieldMap(response?.data?.geojson_data ?? null);
+      setYieldTrimPercent(0); // no need to trim data for intersected yield map
+    } catch (error) {
+      const message = error?.response?.data?.message || 'Could not intersect the yield map with the cells.';
+      setIntersectedYieldMap(null);
+      setYieldInCellsError(message);
+    } finally {
+      setLoadingYieldInCells(false);
+    }
+  }, [yieldMap, aggregateSwathMap, yieldColumn, yieldTrimPercent]);
+
   useEffect(() => {
     // Reset everything if the selected field changes. Existing maps for the new field are fetched after the reset.
     setAppliedMap(null);
@@ -547,6 +578,8 @@ const AppliedMaps = () => {
     setYieldMap(null);
     setYieldMapFileName('');
     setYieldColumn(null);
+    setIntersectedYieldMap(null);
+    setYieldInCellsError('');
     setSwathMap(null);
     setSwathError('');
     setAggregateSwathMap(null);
@@ -555,6 +588,8 @@ const AppliedMaps = () => {
     setUseOnlyCenteredSwaths(false);
     setRemoveSwathIntersection(false);
     setBoundThreshold('');
+    setAsAppliedTrimPercent(5);
+    setYieldTrimPercent(5);
 
     const fieldId = selectedField?._id;
     if (fieldId) {
@@ -658,21 +693,27 @@ const AppliedMaps = () => {
 
   // Save the applied map with converted units and the saved prescription into a zip
   const handleDownloadZip = async () => {
+    // trimmed raw yield independent of the separate intersected file below
+    const trimmedYieldMap = trimFeaturesByColumn(yieldMap, yieldColumn, yieldTrimPercent);
+
     const files = [
-      ...(displayedMap?.features?.length
-        ? [{ name: 'applied_map.geojson', geojson: displayedMap }]
-        : []),
+      // ...(trimmedMap?.features?.length
+      //   ? [{ name: 'applied_map.geojson', geojson: trimmedMap }]
+      //   : []),
       ...(prescriptionGeojson?.features?.length
         ? [{ name: 'prescription.geojson', geojson: prescriptionGeojson }]
         : []),
-      ...(swathDisplayedMap?.features?.length
-        ? [{ name: 'swaths.geojson', geojson: swathDisplayedMap }]
-        : []),
+      // ...(swathDisplayedMap?.features?.length
+      //   ? [{ name: 'swaths.geojson', geojson: swathDisplayedMap }]
+      //   : []),
       ...(aggregateSwathMap?.features?.length
         ? [{ name: 'aggregated_swaths.geojson', geojson: aggregateSwathMap }]
         : []),
-      ...(yieldMap?.features?.length
-        ? [{ name: 'yield_map.geojson', geojson: yieldMap }]
+      ...(trimmedYieldMap?.features?.length
+        ? [{ name: 'yield_map.geojson', geojson: trimmedYieldMap }]
+        : []),
+      ...(intersectedYieldMap?.features?.length
+        ? [{ name: 'intersected_yield_map.geojson', geojson: intersectedYieldMap }]
         : []),
     ];
 
@@ -711,13 +752,24 @@ const AppliedMaps = () => {
       // Store each map's raw GeoJSON plus its config (as a GeoJSON foreign member) so
       // it can be restored and re-rendered exactly on reload.
       if (canSaveAppliedMap) {
-        payload.as_applied_map = { ...appliedMap, applied_rate_column: appliedRateColumn };
+        payload.as_applied_map = {
+          ...appliedMap,
+          applied_rate_column: appliedRateColumn,
+          trim_percent: asAppliedTrimPercent,
+        };
       }
       if (aggregateSwathMap?.features?.length) {
         payload.aggregated_map = { ...aggregateSwathMap, parameters };
       }
       if (canSaveYieldMap) {
-        payload.yield_map = { ...yieldMap, yield_column: yieldColumn };
+        payload.yield_map = {
+          ...yieldMap,
+          yield_column: yieldColumn,
+          trim_percent: yieldTrimPercent,
+        };
+      }
+      if (intersectedYieldMap?.features?.length && yieldColumn) {
+        payload.intersected_yield_map = { ...intersectedYieldMap, yield_column: yieldColumn };
       }
 
       const response = await privateApi.post('/application-maps', payload);
@@ -755,6 +807,17 @@ const AppliedMaps = () => {
     }
   };
 
+  // Remount the map when the field, uploaded files, selected columns, or the yield
+  // intersection state change, so the raster re-initialises cleanly.
+  const mapKey = [
+    selectedField?._id,
+    appliedMapFileName,
+    appliedRateColumn,
+    yieldMapFileName,
+    yieldColumn,
+    intersectedYieldMap ? 'intersected' : 'raw',
+  ].join('-');
+
   return (
     <Grid container sx={{ justifyContent: 'center' }}>
       <Grid
@@ -790,13 +853,13 @@ const AppliedMaps = () => {
             <Tab label="Create Field" />
             <Tab label="Edit Field" />
             <Tab label="View Field" />
-            {showAppliedMaps ? <Tab label="View Applied Maps" /> : null}
+            {showAppliedMaps ? <Tab label="Field Maps" /> : null}
           </Tabs>
         </Box>
 
         <Stack spacing="2rem">
           <Typography variant="h4" align="center" color="primary" sx={{ fontWeight: 'bold', mb: 2 }}>
-            View Applied Maps
+            Field Maps
           </Typography>
 
           <FieldDropdown />
@@ -855,6 +918,8 @@ const AppliedMaps = () => {
                     setSwathError('');
                     setAggregateSwathMap(null);
                     setAggregateSwathError('');
+                    setIntersectedYieldMap(null);
+                    setYieldInCellsError('');
                   }}
                   renderInput={(params) => (
                     <PSATextField {...params} label="Select the Applied Rate column" required />
@@ -973,7 +1038,11 @@ const AppliedMaps = () => {
                   <Autocomplete
                     options={yieldColumns}
                     value={yieldColumn}
-                    onChange={(e, val) => setYieldColumn(val)}
+                    onChange={(e, val) => {
+                      setYieldColumn(val);
+                      setIntersectedYieldMap(null);
+                      setYieldInCellsError('');
+                    }}
                     renderInput={(params) => (
                       <PSATextField {...params} label="Select the Yield column" required />
                     )}
@@ -993,6 +1062,48 @@ const AppliedMaps = () => {
                       disabled={!yieldColumn}
                     />
                   </Box>
+
+                  {canViewSwaths && (
+                    <>
+                      <Typography variant="body2" color="textSecondary">
+                        Note:
+                        <br />
+                        1. &quot;Intersect with Cells&quot; runs on the original yield map using
+                        the trim you have selected.
+                        <br />
+                        2. Changing the trim after intersecting is not saved or downloaded, so
+                        always set the trim first, then intersect.
+                      </Typography>
+                      <PSAButton
+                        title={loadingYieldInCells ? 'Intersecting...' : 'Intersect with Cells'}
+                        variant="contained"
+                        onClick={fetchYieldInCells}
+                        disabled={
+                          loadingYieldInCells
+                          || !yieldColumn
+                          || !aggregateSwathMap?.features?.length
+                        }
+                        sx={{
+                          maxWidth: '250px',
+                          padding: '0.8rem 1.5rem',
+                          borderRadius: '2rem',
+                        }}
+                      />
+                      {!aggregateSwathMap?.features?.length && (
+                        <Typography variant="body2" color="textSecondary">
+                          Generate the aggregated swaths first to intersect the yield map points.
+                        </Typography>
+                      )}
+                      {intersectedYieldMap && (
+                        <Typography variant="body2" color="textSecondary">
+                          {`Showing ${intersectedYieldMap.features?.length ?? 0} yield map points inside the cells.`}
+                        </Typography>
+                      )}
+                      {yieldInCellsError && (
+                        <Typography color="error">{yieldInCellsError}</Typography>
+                      )}
+                    </>
+                  )}
                 </>
               )}
             </Stack>
@@ -1064,13 +1175,14 @@ const AppliedMaps = () => {
             {mapLayer === 'prescription' && loadingPrescription && <CircularProgress size={24} />}
             {mapLayer === 'swath' && loadingSwath && <CircularProgress size={24} />}
             {mapLayer === 'aggrSwaths' && loadingAggregateSwath && <CircularProgress size={24} />}
+            {mapLayer === 'yield' && loadingYieldInCells && <CircularProgress size={24} />}
 
             {mapLayer === 'swath' && !loadingSwath && swathError && (
               <Typography color="textSecondary">{swathError}</Typography>
             )}
 
             <PSAReduxMap
-              key={`${selectedField?._id}-${appliedMapFileName}-${appliedRateColumn}-${yieldMapFileName}-${yieldColumn}`}
+              key={mapKey}
               setMap={(mapInstance) => { mapInstanceRef.current = mapInstance; }}
               initWidth="100%"
               initHeight="380px"
