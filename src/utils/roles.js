@@ -6,7 +6,7 @@ export const getRoles = (user) => user?.[ROLES_CLAIM] || [];
 export const ADMIN_ROLES = ['ncalc-admin', 'ncalc-super-admin'];
 
 // Pages/sections restricted to specific roles. ncalc-super-admin has access by default.
-export const APPLIED_MAPS_ROLES = ['ncalc-data-analyst', 'TNC'];
+export const APPLIED_MAPS_ROLES = ['ncalc-admin', 'ncalc-data-analyst', 'TNC'];
 export const MANAGE_USERS_ROLES = ['ncalc-role-manager'];
 export const SWATH_ANALYSIS_ROLES = ['ncalc-data-analyst'];
 
@@ -17,5 +17,5 @@ export const isUserSuperAdmin = (roles) => roles.includes('ncalc-super-admin');
  * True if the given roles grant access to a page restricted to `allowedRoles`.
  * Admins always have access.
  */
-export const hasAccess = (roles, allowedRoles) => isUserAdmin(roles)
+export const hasAccess = (roles, allowedRoles) => isUserSuperAdmin(roles)
   || roles.some((r) => allowedRoles.includes(r));
