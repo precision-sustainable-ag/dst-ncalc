@@ -61,22 +61,64 @@ const NitrogenMapComp = forwardRef(({ layer = 'prescription', setLayer }, ref) =
         ...(isPM3DMode && !isRCPPReportOnly ? [{ value: 'spray', label: 'Target Rate' }] : []),
       ];
 
-      return layers.reduce(async (prevPromise, { value, label }) => {
-        const mapCaptures = await prevPromise;
+      // Current map layer and map settings so they can be restored after capture.
+      const originalLayer = layer;
+      const originalMap = {
+        center: mapInstance.getCenter(),
+        zoom: mapInstance.getZoom(),
+        bearing: mapInstance.getBearing(),
+        pitch: mapInstance.getPitch(),
+      };
 
-        setLayer(value);
-        await new Promise((resolve) => { setTimeout(resolve, 200); });
-        mapInstance.triggerRepaint();
-        await fitAndWaitForIdle(mapInstance, bounds);
+      // Capture at a fixed 3:2 size so exported maps are large, and consistent.
+      const container = mapInstance.getContainer();
+      const prevStyle = {
+        width: container.style.width,
+        height: container.style.height,
+        position: container.style.position,
+        left: container.style.left,
+        top: container.style.top,
+        zIndex: container.style.zIndex,
+      };
 
-        const mapImage = mapInstance.getCanvas().toDataURL('image/png');
-        // RasterLegend component is rendered outside the map div, hence `parentElement` to access it
-        const { legendTitle, legendItems } = extractLegend(mapInstanceRef.current.getContainer().parentElement);
+      container.style.position = 'absolute';
+      container.style.left = '-10000px';
+      container.style.top = '0';
+      container.style.width = '1500px';
+      container.style.height = '1000px';
+      container.style.zIndex = '-1';
+      mapInstance.resize();
 
-        return [...mapCaptures, {
-          label, mapImage, legendItems, legendTitle,
-        }];
-      }, Promise.resolve([]));
+      try {
+        return await layers.reduce(async (prevPromise, { value, label }) => {
+          const mapCaptures = await prevPromise;
+
+          setLayer(value);
+          await new Promise((resolve) => { setTimeout(resolve, 200); });
+          mapInstance.triggerRepaint();
+          await fitAndWaitForIdle(mapInstance, bounds);
+
+          const mapImage = mapInstance.getCanvas().toDataURL('image/png');
+          // RasterLegend component is rendered outside the map div, hence `parentElement` to access it
+          const { legendTitle, legendItems } = extractLegend(mapInstanceRef.current.getContainer().parentElement);
+
+          return [...mapCaptures, {
+            label, mapImage, legendItems, legendTitle,
+          }];
+        }, Promise.resolve([]));
+      } finally {
+        container.style.width = prevStyle.width;
+        container.style.height = prevStyle.height;
+        container.style.position = prevStyle.position;
+        container.style.left = prevStyle.left;
+        container.style.top = prevStyle.top;
+        container.style.zIndex = prevStyle.zIndex;
+        mapInstance.resize();
+
+        // Restore the user's original layer and map settings.
+        setLayer(originalLayer);
+        mapInstance.jumpTo(originalMap);
+      }
     },
   }));
 
