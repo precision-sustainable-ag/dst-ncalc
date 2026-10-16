@@ -630,6 +630,34 @@ const AppliedMaps = () => {
 
     setIsPdfLoading(true);
     const previousLayer = mapLayer;
+
+    // Remember the current camera so the map can be restored after capture.
+    const originalCamera = {
+      center: mapInstance.getCenter(),
+      zoom: mapInstance.getZoom(),
+      bearing: mapInstance.getBearing(),
+      pitch: mapInstance.getPitch(),
+    };
+
+    // Capture at a fixed 3:2 size so exported maps are large, and consistent.
+    const container = mapInstance.getContainer();
+    const prevStyle = {
+      width: container.style.width,
+      height: container.style.height,
+      position: container.style.position,
+      left: container.style.left,
+      top: container.style.top,
+      zIndex: container.style.zIndex,
+    };
+
+    container.style.position = 'absolute';
+    container.style.left = '-10000px';
+    container.style.top = '0';
+    container.style.width = '1500px';
+    container.style.height = '1000px';
+    container.style.zIndex = '-1';
+    mapInstance.resize();
+
     try {
       // TODO: make this is util func - also used in NitrogenMapWidget
       const mapCaptures = await layers.reduce(async (prevPromise, { value, label, geojson }) => {
@@ -686,7 +714,17 @@ const AppliedMaps = () => {
     } catch (error) {
       handleError(error, dispatch, '', 'There was an error while generating the PDF.');
     } finally {
+      // Restore the on-screen map size, layer, and camera (zoom/center/bearing/pitch).
+      container.style.width = prevStyle.width;
+      container.style.height = prevStyle.height;
+      container.style.position = prevStyle.position;
+      container.style.left = prevStyle.left;
+      container.style.top = prevStyle.top;
+      container.style.zIndex = prevStyle.zIndex;
+      mapInstance.resize();
+
       setMapLayer(previousLayer);
+      mapInstance.jumpTo(originalCamera);
       setIsPdfLoading(false);
     }
   };

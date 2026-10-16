@@ -257,7 +257,10 @@ const App = () => {
           </Routes>
           <ActionModal {...actionModal} onClose={() => { dispatch(set.actionModal({ ...actionModal, open: false })); }} />
           <SnackbarMessage />
-          <Box sx={{ position: 'fixed', bottom: matchesMd ? '45px' : 0, zIndex: 1000 }}>
+          <Box sx={{
+            position: 'fixed', bottom: matchesMd ? '45px' : 0, zIndex: 1000, pointerEvents: showAlert ? 'auto' : 'none',
+          }}
+          >
             <FadeAlert
               showAlert={showAlert}
               severity={alertSeverity}

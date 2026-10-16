@@ -493,6 +493,9 @@ const AddField = () => {
   // Shared disabled logic: inputs lock when a field hasn't been selected yet in edit/view mode
   const inputDisabled = isView || (isEdit && !selectedField);
 
+  // No hover/focus outline, cursor, or text selection for disbaled input.
+  const readOnlySx = inputDisabled ? { pointerEvents: 'none', userSelect: 'none' } : {};
+
   return (
     <Grid container sx={{ justifyContent: 'center' }}>
       <Grid
@@ -615,7 +618,7 @@ const AddField = () => {
                   onChange={(e, val) => handleGroupChange(val)}
                   renderInput={(params) => <PSATextField {...params} label="Select a Program name" required />}
                   readOnly={inputDisabled}
-                  sx={{ mt: 2 }}
+                  sx={{ mt: 2, ...readOnlySx }}
                 />
               </Box>
               <Box sx={{ flex: 1 }}>
@@ -629,7 +632,7 @@ const AddField = () => {
                   onInputChange={(e, newInputValue) => handleGrowerChange(newInputValue)}
                   renderInput={(params) => <PSATextField {...params} label="Select or enter a Grower name" required />}
                   readOnly={inputDisabled}
-                  sx={{ mt: 2 }}
+                  sx={{ mt: 2, ...readOnlySx }}
                 />
               </Box>
             </Stack>
@@ -646,7 +649,7 @@ const AddField = () => {
                   onInputChange={(e, newInputValue) => handleFarmChange(newInputValue)}
                   renderInput={(params) => <PSATextField {...params} label="Select or enter a Farm name" required />}
                   readOnly={inputDisabled}
-                  sx={{ mt: 2 }}
+                  sx={{ mt: 2, ...readOnlySx }}
                 />
               </Box>
               <Box sx={{ flex: 1 }}>
@@ -660,7 +663,7 @@ const AddField = () => {
                   onInputChange={(e, newInputValue) => setField(newInputValue)}
                   renderInput={(params) => <PSATextField {...params} label="Select or enter a Field name" required />}
                   readOnly={inputDisabled}
-                  sx={{ mt: 2 }}
+                  sx={{ mt: 2, ...readOnlySx }}
                 />
               </Box>
             </Stack>
@@ -742,7 +745,7 @@ const AddField = () => {
                     <PSATextField {...params} label={`What crops are planted in the ${cropLabel} season?`} required />
                   )}
                   readOnly={inputDisabled}
-                  sx={{ mt: 2 }}
+                  sx={{ mt: 2, ...readOnlySx }}
                 />
 
                 <Stack direction={{ xs: 'column', md: 'row' }} spacing={{ xs: 2, md: 1 }}>
@@ -767,7 +770,7 @@ const AddField = () => {
                         field: { clearable: isFirstOfTwo },
                       }}
                       readOnly={inputDisabled}
-                      sx={{ flex: 1 }}
+                      sx={{ flex: 1, ...readOnlySx }}
                     />
                   </LocalizationProvider>
                   <LocalizationProvider dateAdapter={AdapterDayjs}>
@@ -784,7 +787,7 @@ const AddField = () => {
                       }}
                       slotProps={{ textField: { required: true } }}
                       readOnly={inputDisabled}
-                      sx={{ flex: 1 }}
+                      sx={{ flex: 1, ...readOnlySx }}
                     />
                   </LocalizationProvider>
                 </Stack>
@@ -799,14 +802,15 @@ const AddField = () => {
               onChange={(e) => setComments(e.target.value)}
               fullWidth
               autoComplete="off"
-              disabled={inputDisabled}
+              slotProps={{ input: { readOnly: inputDisabled } }}
               sx={{
                 '& .MuiInputBase-root': { padding: 1 },
+                ...readOnlySx,
               }}
             />
           </Box>
 
-          {isSuperAdmin && isEdit && (
+          {isSuperAdmin && (isEdit || isView) && (
             <Box sx={{ width: { xs: '100%', md: '50%' } }}>
               <PSATextField
                 label="Email"
@@ -814,10 +818,11 @@ const AddField = () => {
                 onChange={(e) => setEmail(e.target.value)}
                 fullWidth
                 autoComplete="off"
-                error={!isEmailValid}
-                disabled={inputDisabled}
+                error={selectedField && !isEmailValid}
+                slotProps={{ input: { readOnly: inputDisabled } }}
                 sx={{
                   '& .MuiInputBase-root': { padding: 1 },
+                  ...readOnlySx,
                 }}
               />
             </Box>
