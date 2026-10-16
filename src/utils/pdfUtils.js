@@ -148,8 +148,10 @@ const buildPdfReportHtml = ({
         
             .map-img {
                 width: calc(100% - 150px);
-                height: 220px;
+                aspect-ratio: 3 / 2;
+                height: auto;
                 object-fit: cover;
+                background: #f4f4f4;
                 display: block;
             }
 

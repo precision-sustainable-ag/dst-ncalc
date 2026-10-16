@@ -13,7 +13,6 @@ import {
 } from 'shared-react-components/src';
 import { useAuth0 } from '@auth0/auth0-react';
 import AccountBoxOutlinedIcon from '@mui/icons-material/AccountBoxOutlined';
-import CloudUploadOutlinedIcon from '@mui/icons-material/CloudUploadOutlined';
 import PeopleAltOutlinedIcon from '@mui/icons-material/PeopleAltOutlined';
 import Feedback from './components/Feedback';
 import SnackbarMessage from './shared/SnackbarMessage';
@@ -23,7 +22,7 @@ import { get, set } from './store/Store';
 import FieldDropdown from './components/FieldDropdown';
 import NcalcStepper from './shared/Stepper';
 import useFetchHLS from './hooks/useFetchHLS';
-import { useFetchPlantFactors, useFetchFertilizers } from './hooks/useFetchApi';
+import { useFetchPlantFactors, useFetchFertilizers, useFetchProgramGroups } from './hooks/useFetchApi';
 import ProtectedPage from './shared/ProtectedPage/ProtectedPage';
 import {
   APPLIED_MAPS_ROLES, MANAGE_USERS_ROLES, getRoles, hasAccess,
@@ -113,6 +112,7 @@ const App = () => {
   useFetchHLS();
   useFetchPlantFactors();
   useFetchFertilizers();
+  useFetchProgramGroups();
 
   const matchesMd = useMediaQuery(dstTheme.breakpoints.down('md'));
 
@@ -140,21 +140,6 @@ const App = () => {
       text: 'Feedback',
       dialog: <Feedback />,
     },
-    ...(isPM3DMode
-      ? [
-        {
-          type: 'button',
-          variant: 'text',
-          text: 'Upload Files',
-          icon: <CloudUploadOutlinedIcon />,
-          rightIcon: true,
-          onClick: () => {
-            dispatch(set.activeStep(0));
-            navigate('/fileupload');
-          },
-        },
-      ]
-      : []),
     ...(canManageUsers
       ? [
         {
@@ -164,7 +149,6 @@ const App = () => {
           icon: <PeopleAltOutlinedIcon />,
           rightIcon: true,
           onClick: () => {
-            dispatch(set.activeStep(0));
             navigate('/manageusers');
           },
         },
@@ -273,7 +257,10 @@ const App = () => {
           </Routes>
           <ActionModal {...actionModal} onClose={() => { dispatch(set.actionModal({ ...actionModal, open: false })); }} />
           <SnackbarMessage />
-          <Box sx={{ position: 'fixed', bottom: matchesMd ? '45px' : 0, zIndex: 1000 }}>
+          <Box sx={{
+            position: 'fixed', bottom: matchesMd ? '45px' : 0, zIndex: 1000, pointerEvents: showAlert ? 'auto' : 'none',
+          }}
+          >
             <FadeAlert
               showAlert={showAlert}
               severity={alertSeverity}

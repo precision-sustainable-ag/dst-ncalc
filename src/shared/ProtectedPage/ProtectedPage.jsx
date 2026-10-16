@@ -4,27 +4,34 @@ import {
   Box, CircularProgress, Grid, Stack, Typography,
 } from '@mui/material';
 import { useNavigate } from 'react-router-dom';
-import { useDispatch } from 'react-redux';
-import { set } from '../../store/redux-autosetters';
+import { useDispatch, useSelector } from 'react-redux';
+import { get, set } from '../../store/redux-autosetters';
 import NavButton from '../Navigate/NavButton';
-import { getRoles, isUserSuperAdmin } from '../../utils/roles';
-
-const ROLES = ['NIFA-Soy', 'Willard', 'Growmark', 'GA', 'ND'];
+import { getRoles, isUserAdmin, isUserSuperAdmin } from '../../utils/roles';
 
 /**
  * Page is restricted to `allowedRoles`.
  * ncalc-super-admin has access by default.
- * If `allowedRoles` is null, the page is accessible to all roles.
+ * If `allowedRoles` is null:
+ *  - admins (ncalc-admin / ncalc-super-admin) have access, and
+ *  - access is granted to the program group roles fetched from the API.
  */
 const ProtectedPage = ({ children, allowedRoles = null }) => {
   const { user, isAuthenticated, isLoading } = useAuth0();
   const dispatch = useDispatch();
   const navigate = useNavigate();
+  const programGroups = useSelector(get.programGroups);
 
   const roles = getRoles(user);
-  const grantingRoles = allowedRoles || ROLES;
+  const programGroupRoles = [
+    ...new Set((programGroups || []).map((pg) => pg.groupName).filter(Boolean)),
+  ];
+  const grantingRoles = allowedRoles || programGroupRoles;
   const isAllowed = isAuthenticated && (
-    isUserSuperAdmin(roles) || roles.some((r) => grantingRoles.includes(r))
+    isUserSuperAdmin(roles)
+    // Admins can access any page that isn't explicitly role-restricted.
+    || (!allowedRoles && isUserAdmin(roles))
+    || roles.some((r) => grantingRoles.includes(r))
   );
 
   if (isLoading) {
