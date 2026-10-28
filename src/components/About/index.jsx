@@ -4,11 +4,10 @@ import { Box } from '@mui/material';
 import List from '@mui/material/List';
 import ListItem from '@mui/material/ListItem';
 import ListItemIcon from '@mui/material/ListItemIcon';
-import { PSAFigmaButton, PSAModal } from 'shared-react-components/src';
+import { PSAModal } from 'shared-react-components/src';
 import Paper from '@mui/material/Paper';
 import Typography from '@mui/material/Typography';
 import LensIcon from '@mui/icons-material/Lens';
-import CancelPresentationIcon from '@mui/icons-material/CancelPresentation';
 import NavButton from '../../shared/Navigate/NavButton';
 
 const BullettedText = ({ children }) => (
@@ -37,50 +36,24 @@ const About = ({ open, setOpen }) => {
       onClose={handleCloseModal}
       aria-labelledby="modal-modal-title"
       aria-describedby="modal-modal-description"
-      style={{
-        display: 'flex',
-        top: '0%',
-        left: '10%',
-        width: '80vw',
-        alignItems: 'center',
-        justifyContent: 'center',
+      paperProps={{
+        sx: {
+          position: 'relative',
+          p: 3,
+          width: { xs: '95vw', md: '80vw' },
+          maxHeight: '90vh',
+          overflow: 'auto',
+        },
       }}
       modalContent={(
         <Paper>
           <Box
             sx={{
-              padding: '2rem 2rem',
-              maxHeight: '90vh',
-              overflow: 'auto',
+              padding: '1rem',
+              marginTop: 3,
               fontFamily: 'monospace !important',
             }}
           >
-            <Box
-              sx={{
-                position: 'absolute',
-                top: '5%',
-                right: 0,
-                display: 'flex',
-                flexDirection: 'row',
-                minWidth: '100%',
-                justifyContent: 'flex-end',
-                maxHeight: 'auto',
-                p: 0,
-                m: 0,
-              }}
-            >
-              <PSAFigmaButton
-                sx={{
-                  color: 'red',
-                  padding: '12px 24px',
-                }}
-                variant="color"
-                onClick={handleCloseModal}
-                leftIcon
-                text=""
-                icon={<CancelPresentationIcon />}
-              />
-            </Box>
             <Typography sx={{ paddingBottom: '1rem', fontSize: '1.2rem', fontWeight: 700 }} id="modal-modal-title" variant="h5" component="h2">
               CC-NCALC estimates:
             </Typography>

@@ -5,11 +5,12 @@ import axios from 'axios';
 import moment from 'moment';
 import dayjs from 'dayjs';
 import { useDispatch, useSelector } from 'react-redux';
+import { useAuth0 } from '@auth0/auth0-react';
 import { get, set } from '../store/Store';
 import { weightedAverage } from './helpers';
 import { historyStates } from '../store/inits';
 import { handleError } from '../utils/apiError';
-import { publicApi } from '../utils/apiClient';
+import { publicApi, privateApi } from '../utils/apiClient';
 
 const NCAL_API_URL = 'https://api.covercrop-ncalc.org/surface';
 const SSURGO_API_URL = 'https://ssurgo.covercrop-data.org';
@@ -654,6 +655,27 @@ const useFetchFertilizers = () => {
   }, []);
 };
 
+/// Fetch program groups once and cache in Redux.
+const useFetchProgramGroups = () => {
+  const dispatch = useDispatch();
+  const { isAuthenticated } = useAuth0();
+
+  useEffect(() => {
+    if (!isAuthenticated) return;
+
+    const fetchProgramGroups = async () => {
+      try {
+        const response = await privateApi.get('program-config');
+        dispatch(set.programGroups(response?.data?.data || []));
+      } catch (err) {
+        handleError(err, dispatch);
+      }
+    };
+
+    fetchProgramGroups();
+  }, [dispatch, isAuthenticated]);
+};
+
 /// Desc: useFetchNitrogenArray
 /// ..............................................................................
 /// ..............................................................................
@@ -694,5 +716,12 @@ const useFetchFertilizers = () => {
 // }; // useFetchNitrogenArray
 
 export {
-  useFetchModel, useFetchSSURGO, useFetchCornN, useFetchPlantFactors, fetchNitrogenData, downloadPrescriptionShapefile, useFetchFertilizers,
+  useFetchModel,
+  useFetchSSURGO,
+  useFetchCornN,
+  useFetchPlantFactors,
+  fetchNitrogenData,
+  downloadPrescriptionShapefile,
+  useFetchFertilizers,
+  useFetchProgramGroups,
 };
