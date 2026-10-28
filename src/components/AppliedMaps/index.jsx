@@ -40,6 +40,14 @@ const PATH_TO_TAB = {
 
 const APPLIED_RATE_COLORS = ['#762a83', '#af8dc3', '#e7d4e8', '#d9f0d3', '#7fbf7b', '#1b7837'];
 
+// Display unit per known yield column. Falls back to 'Yield' for any other column.
+const YIELD_COLUMN_UNITS = {
+  Yld_Mass_W: 'lb/ac', // wet yield mass
+  Yld_Mass_D: 'lb/ac', // dry yield mass
+  Yld_Vol_We: 'bu/ac', // wet yield volume
+  Yld_Vol_Dr: 'bu/ac', // dry yield volume
+};
+
 const PDF_BASE_URL = 'https://pdf.covercrop-data.org/api';
 
 const IMAGERY_API_URL = 'https://developapi.covercrop-imagery.org';
@@ -226,12 +234,10 @@ const AppliedMaps = () => {
     [swathDisplayedMap, asAppliedTrimPercent],
   );
 
-  // Yield layer shows that intersectedYieldMap is present; otherwise it shows the raw uploaded yield map.
-  const effectiveYieldMap = intersectedYieldMap ?? yieldMap;
-
+  // Yield map layer shows the raw uploaded yield map, outlier-trimmed via the slider.
   const yieldTrimmedMap = useMemo(
-    () => trimFeaturesByColumn(effectiveYieldMap, yieldColumn, yieldTrimPercent),
-    [effectiveYieldMap, yieldColumn, yieldTrimPercent],
+    () => trimFeaturesByColumn(yieldMap, yieldColumn, yieldTrimPercent),
+    [yieldMap, yieldColumn, yieldTrimPercent],
   );
 
   // Raster props for the displayed layer - initRasterObject, valueKey, unit
@@ -240,25 +246,28 @@ const AppliedMaps = () => {
     if (mapLayer === 'aggrSwaths') return aggregateSwathMap;
     if (mapLayer === 'swath') return appliedRateColumn ? swathTrimmedMap : null;
     if (mapLayer === 'yield') return yieldColumn ? yieldTrimmedMap : null;
+    if (mapLayer === 'intersectedYield') return yieldColumn ? intersectedYieldMap : null;
     return appliedRateColumn ? trimmedMap : null;
   }, [
     mapLayer, prescriptionGeojson, aggregateSwathMap, appliedRateColumn,
-    trimmedMap, swathTrimmedMap, yieldColumn, yieldTrimmedMap,
+    trimmedMap, swathTrimmedMap, yieldColumn, yieldTrimmedMap, intersectedYieldMap,
   ]);
 
   const valueKey = useMemo(() => {
     if (mapLayer === 'prescription') return 'ReqN';
     if (mapLayer === 'aggrSwaths') return 'weighted_rate';
-    if (mapLayer === 'yield') return yieldColumn ?? '';
+    if (mapLayer === 'yield' || mapLayer === 'intersectedYield') return yieldColumn ?? '';
     return 'applied_N_rate';
   }, [mapLayer, yieldColumn]);
 
   const unit = useMemo(() => {
     if (mapLayer === 'prescription') return 'lb of N/ac';
     if (mapLayer === 'aggrSwaths') return 'Weighted Rate';
-    if (mapLayer === 'yield') return 'Yield';
+    if (mapLayer === 'yield' || mapLayer === 'intersectedYield') {
+      return YIELD_COLUMN_UNITS[yieldColumn] ?? 'Yield';
+    }
     return rateMultiplier !== 1 ? 'lb N/ac' : 'Applied Rate';
-  }, [mapLayer, rateMultiplier]);
+  }, [mapLayer, rateMultiplier, yieldColumn]);
 
   const secondaryUnit = useMemo(() => {
     if (mapLayer === 'prescription' || mapLayer === 'swath' || mapLayer === 'applied') {
@@ -560,7 +569,7 @@ const AppliedMaps = () => {
         cells_geojson: aggregateSwathMap,
       });
       setIntersectedYieldMap(response?.data?.geojson_data ?? null);
-      setYieldTrimPercent(0); // no need to trim data for intersected yield map
+      setMapLayer('intersectedYield'); // switch to the Intersected Yield Map tab to show the result
     } catch (error) {
       const message = error?.response?.data?.message || 'Could not intersect the yield map with the cells.';
       setIntersectedYieldMap(null);
@@ -617,6 +626,16 @@ const AppliedMaps = () => {
     const layers = [
       ...(appliedRateColumn && trimmedMap?.features?.length
         ? [{ value: 'applied', label: 'Applied Fertilizer', geojson: trimmedMap }]
+        : []),
+      // Swath and yield layers are only available to users with swath permissions.
+      ...(canViewSwaths && aggregateSwathMap?.features?.length
+        ? [{ value: 'aggrSwaths', label: 'Aggregated Swaths', geojson: aggregateSwathMap }]
+        : []),
+      ...(canViewSwaths && yieldColumn && yieldTrimmedMap?.features?.length
+        ? [{ value: 'yield', label: 'Yield Map', geojson: yieldTrimmedMap }]
+        : []),
+      ...(canViewSwaths && yieldColumn && intersectedYieldMap?.features?.length
+        ? [{ value: 'intersectedYield', label: 'Intersected Yield Map', geojson: intersectedYieldMap }]
         : []),
       ...(prescriptionGeojson?.features?.length
         ? [{ value: 'prescription', label: 'Prescription', geojson: prescriptionGeojson }]
@@ -748,7 +767,7 @@ const AppliedMaps = () => {
         ? [{ name: 'aggregated_swaths.geojson', geojson: aggregateSwathMap }]
         : []),
       ...(trimmedYieldMap?.features?.length
-        ? [{ name: 'yield_map.geojson', geojson: trimmedYieldMap }]
+        ? [{ name: 'trimmed_yield_map.geojson', geojson: trimmedYieldMap }]
         : []),
       ...(intersectedYieldMap?.features?.length
         ? [{ name: 'intersected_yield_map.geojson', geojson: intersectedYieldMap }]
@@ -1106,11 +1125,11 @@ const AppliedMaps = () => {
                       <Typography variant="body2" color="textSecondary">
                         Note:
                         <br />
-                        1. &quot;Intersect with Cells&quot; runs on the original yield map using
-                        the trim you have selected.
+                        1. The slider trims the uploaded yield map. &quot;Intersect with
+                        Cells&quot; runs on the trimmed yield map, so
+                        set the trim first, then intersect.
                         <br />
-                        2. Changing the trim after intersecting is not saved or downloaded, so
-                        always set the trim first, then intersect.
+                        2. The result shows up in the &quot;Intersected Yield Map&quot; tab.
                       </Typography>
                       <PSAButton
                         title={loadingIntersectedYield ? 'Intersecting...' : 'Intersect with Cells'}
@@ -1155,6 +1174,7 @@ const AppliedMaps = () => {
                   { label: 'Swaths', value: 'swath' },
                   { label: 'Aggregated swaths', value: 'aggrSwaths' },
                   { label: 'Yield Map', value: 'yield' },
+                  { label: 'Intersected Yield Map', value: 'intersectedYield' },
                 ] : []),
                 { label: 'Prescription', value: 'prescription' },
               ]}
@@ -1187,6 +1207,25 @@ const AppliedMaps = () => {
               </Typography>
             )}
 
+            {mapLayer === 'intersectedYield' && !yieldMap && (
+              <Typography color="textSecondary">
+                Upload a yield map.
+              </Typography>
+            )}
+
+            {mapLayer === 'intersectedYield' && yieldMap && !yieldColumn && (
+              <Typography color="textSecondary">
+                Select the yield column, then intersect the yield map with the cells.
+              </Typography>
+            )}
+
+            {mapLayer === 'intersectedYield' && yieldColumn && !intersectedYieldMap
+              && !loadingIntersectedYield && (
+              <Typography color="textSecondary">
+                Intersect the yield map with the cells to view this map.
+              </Typography>
+            )}
+
             {mapLayer === 'prescription' && !loadingPrescription && !prescriptionGeojson && (
               <Typography color="textSecondary">
                 {!selectedField ? 'Select a field to view the latest prescription.' : 'No saved prescription found for this field.'}
@@ -1213,7 +1252,7 @@ const AppliedMaps = () => {
             {mapLayer === 'prescription' && loadingPrescription && <CircularProgress size={24} />}
             {mapLayer === 'swath' && loadingSwath && <CircularProgress size={24} />}
             {mapLayer === 'aggrSwaths' && loadingAggregateSwath && <CircularProgress size={24} />}
-            {mapLayer === 'yield' && loadingIntersectedYield && <CircularProgress size={24} />}
+            {mapLayer === 'intersectedYield' && loadingIntersectedYield && <CircularProgress size={24} />}
 
             {mapLayer === 'swath' && !loadingSwath && swathError && (
               <Typography color="textSecondary">{swathError}</Typography>
